@@ -2,12 +2,26 @@
     box-sizing: border-box;
 }
 
+:root {
+    color-scheme: light dark;
+    --color-bg: #fff;
+    --color-fg: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #121212;
+        --color-fg: #e6e6e6;
+    }
+}
+
 #wrapper {
     margin: 1.5rem 1rem;
 }
 
 body {
-    color: #000;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
     font-weight: 300;
 }
 
