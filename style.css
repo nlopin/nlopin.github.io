@@ -6,12 +6,14 @@
     color-scheme: light dark;
     --color-bg: #fff;
     --color-fg: #000;
+    --color-link-underline: color-mix(in srgb, currentColor 25%, transparent);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         --color-bg: #121212;
         --color-fg: #e6e6e6;
+        --color-link-underline: currentColor;
     }
 }
 
@@ -39,7 +41,7 @@ h2 {
 }
 
 a {
-    text-decoration-color: color-mix(in srgb, currentColor 25%, transparent);
+    text-decoration-color: var(--color-link-underline);
     text-decoration-thickness: 1px;
     text-underline-offset: 2px;
 }
