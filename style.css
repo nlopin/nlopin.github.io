@@ -24,6 +24,12 @@ h2 {
     margin: 0;
 }
 
+a {
+    text-decoration-color: color-mix(in srgb, currentColor 25%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
 main > div {
     margin-bottom: 1rem;
 }
