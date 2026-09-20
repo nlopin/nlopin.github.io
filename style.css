@@ -13,7 +13,7 @@
     :root {
         --color-bg: #121212;
         --color-fg: #e6e6e6;
-        --color-link-underline: currentColor;
+        --color-link-underline: color-mix(in srgb, currentColor 50%, transparent);;
     }
 }
 
