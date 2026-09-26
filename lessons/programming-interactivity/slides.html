@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 1 — How the Web Actually Works</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/slides.css">
+</head>
+<body>
+
+<div class="deck-progress"></div>
+<div class="deck-counter"></div>
+
+<main class="deck">
+
+  <section class="slide title">
+    <div class="kicker">Programming Interactivity · Lecture 1</div>
+    <h1>How the web actually works</h1>
+    <p class="muted">No build step, no install. View source is the whole lesson.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">00</div>
+    <h2>Agenda</h2>
+    <ul>
+      <li>Inspiration tour</li>
+      <li>HTML's history</li>
+      <li>The web platform</li>
+      <li>Client &amp; server</li>
+      <li>One document, many destinations</li>
+      <li>The DOM tree</li>
+      <li>Your first HTML file</li>
+      <li>DevTools x-ray</li>
+    </ul>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">01 · Opener</div>
+    <h2>Strange, beautiful, broken</h2>
+    <p class="muted">Same web. Wildly different builds. "Pretty" and "well-built" are different axes.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">02</div>
+    <h2>Where HTML came from</h2>
+    <ul>
+      <li>1991 — a rough proposal at CERN</li>
+      <li>1995–99 — browser wars, W3C referees</li>
+      <li>2000–03 — the XHTML detour</li>
+      <li>2004 — WHATWG breaks away</li>
+      <li>2014 — HTML5 ships</li>
+      <li>2019–now — one Living Standard</li>
+    </ul>
+  </section>
+
+  <section class="slide center">
+    <h2>No version number. No vote.</h2>
+    <p class="muted">Edited in public, by the browser makers, constantly.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">03</div>
+    <h2>The web platform</h2>
+    <p class="muted">A modern browser is an operating system. All of this is plain JavaScript, no plugin required.</p>
+    <div class="cols">
+      <ul>
+        <li>Fetch, DOM, Storage</li>
+        <li>Canvas / WebGL / WebGPU</li>
+        <li>Web Audio, Web Speech</li>
+      </ul>
+      <ul>
+        <li>Geolocation &amp; sensors</li>
+        <li>WebSockets, WebRTC</li>
+        <li>Service &amp; Web Workers</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">04</div>
+    <h2>Client, server, browser</h2>
+    <p>Client asks → network carries it → server answers with plain text → <strong>only then</strong> does the browser render anything.</p>
+    <p class="muted">A server doesn't know what a "webpage" looks like. It just sends bytes.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">05</div>
+    <h2>One document, many destinations</h2>
+    <ul>
+      <li>Phone, tablet, desktop — same markup, different layout</li>
+      <li>A screen reader is a browser too</li>
+      <li>It reads the DOM, not the pixels</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">06</div>
+    <h2>The DOM is a living tree</h2>
+    <p>The browser never sees your source text. It builds a tree of nodes — and keeps that tree valid, even when your HTML wasn't.</p>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">07</div>
+    <h2>Your first HTML file</h2>
+    <p class="muted">A text editor, a browser, <code>File → Open</code>. Nothing else.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">08</div>
+    <h2>DevTools as an x-ray</h2>
+    <ul>
+      <li>Fix low-contrast text live in Styles</li>
+      <li>Reveal a hidden element</li>
+      <li>Read a failed request's status code</li>
+      <li>Read a console error</li>
+      <li>Find data hiding in an attribute</li>
+    </ul>
+    <p class="muted">Edits a local copy of the tree. Reload and it's gone — free to break things.</p>
+  </section>
+
+  <section class="slide center">
+    <h2>Recap</h2>
+    <p>Bytes over a network → a tree the browser keeps valid → rendered for whichever destination is asking.</p>
+    <p class="muted">Next: from a static tree to an interactive one.</p>
+  </section>
+
+</main>
+
+<script src="../assets/slides.js"></script>
+</body>
+</html>

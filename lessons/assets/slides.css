@@ -1,0 +1,140 @@
+/* Shared slide-deck theme. Used by every lecture's slides.html — keep changes here so all decks stay consistent. */
+
+:root {
+  --bg: #0a0a0c;
+  --fg: #f0f0f2;
+  --muted: #8d8d95;
+  --line: rgba(255, 255, 255, .12);
+  --accent: hsl(162 60% 55% / 1);
+  --code-bg: #17171b;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font: 400 1rem/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+h1, h2, h3 { color: var(--accent); font-weight: 600; line-height: 1.15; margin: 0 0 .6em; }
+strong { color: var(--fg); }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code { background: var(--code-bg); padding: .1em .4em; border-radius: 4px; font-size: .85em; }
+pre { background: var(--code-bg); padding: 1em 1.2em; border-radius: 10px; overflow-x: auto; font-size: .6em; text-align: left; }
+
+.deck {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100vh;
+  width: 100vw;
+  padding: 6vh 8vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.slide[hidden] { display: none; }
+
+.slide .kicker {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: clamp(.75rem, 1.3vw, .95rem);
+  margin: 0 0 .3em;
+}
+
+.slide h1 { font-size: clamp(2.6rem, 6vw, 5rem); }
+.slide h2 { font-size: clamp(2rem, 4.6vw, 3.4rem); }
+.slide h3 { font-size: clamp(1.3rem, 2.6vw, 1.8rem); color: var(--fg); }
+
+.slide p, .slide li { font-size: clamp(1.1rem, 2.1vw, 1.6rem); color: var(--fg); max-width: 46em; }
+.slide p.muted, .slide li.muted { color: var(--muted); }
+
+.slide ul, .slide ol { padding-left: 1.1em; margin: 0; display: flex; flex-direction: column; gap: .5em; }
+
+.slide.title { justify-content: center; align-items: flex-start; }
+.slide.center { align-items: center; text-align: center; }
+
+.slide .cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* --- chrome: progress bar, slide counter --- */
+
+.deck-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--accent);
+  transition: width .25s ease;
+  z-index: 10;
+}
+
+.deck-counter {
+  position: fixed;
+  bottom: 1.1rem; right: 1.4rem;
+  font: 400 .8rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--muted);
+  z-index: 10;
+}
+
+@media (max-width: 640px) {
+  .slide .cols { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+
+/* --- overview mode: grid of all slides, toggled with "o" --- */
+
+.overview-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-content: start;
+  gap: 1.5rem;
+  padding: 3rem;
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.slide-thumb {
+  position: relative;
+  aspect-ratio: var(--aspect-ratio, 16 / 9);
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.slide-thumb:hover { border-color: var(--accent); }
+.slide-thumb.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.slide-thumb .slide { transform-origin: top left; pointer-events: none; }
+
+.overview-hint {
+  position: fixed;
+  bottom: 1.1rem; left: 1.4rem;
+  font: 400 .8rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--muted);
+  z-index: 51;
+}

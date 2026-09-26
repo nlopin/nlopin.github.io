@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 1 — How the Web Actually Works</title>
+<meta property="og:title" content="Programming Interactivity — Lecture 1"/>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --muted: #666;
+    --line: #ddd;
+    --accent: #b3401f;
+    --accent-bg: #fdf1ec;
+    --code-bg: #f5f4f1;
+    --card-bg: #fafafa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --fg: #eee;
+      --muted: #9a9a9a;
+      --line: #34343a;
+      --accent: #ff8a5c;
+      --accent-bg: #2a201a;
+      --code-bg: #1f1f24;
+      --card-bg: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 300 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  a:not(.card):not(.pill) { text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 2px; }
+  code, pre, textarea, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+  pre { background: var(--code-bg); padding: .9rem 1rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; }
+
+  header.top {
+    padding: 3rem 1.5rem 2rem;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  header.top .kicker { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; margin-bottom: .5rem; }
+  header.top h1 { font-size: 2.1rem; font-weight: 500; margin: 0 0 .5rem; line-height: 1.25; }
+  header.top p.lede { color: var(--muted); font-size: 1.05rem; max-width: 60ch; margin: 0; }
+
+  nav.agenda-nav {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.agenda-nav .inner {
+    max-width: 880px; margin: 0 auto; padding: .6rem 1.5rem;
+    display: flex; gap: 1rem; overflow-x: auto; font-size: .82rem;
+  }
+  nav.agenda-nav a { white-space: nowrap; color: var(--muted); text-decoration: none; }
+  nav.agenda-nav a:hover { color: var(--fg); }
+
+  main { max-width: 880px; margin: 0 auto; padding: 0 1.5rem 6rem; }
+
+  section { padding-top: 3.5rem; scroll-margin-top: 3.5rem; }
+  section + section { border-top: 1px solid var(--line); }
+  section .num { color: var(--muted); font-size: .85rem; font-family: ui-monospace, monospace; }
+  section h2 { font-size: 1.5rem; font-weight: 500; margin: .25rem 0 1rem; }
+  section h3 { font-size: 1.05rem; font-weight: 600; margin: 1.75rem 0 .5rem; }
+  section > p { max-width: 68ch; }
+
+  details.notes {
+    margin: 1rem 0; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--card-bg);
+  }
+  details.notes summary {
+    cursor: pointer; padding: .6rem .9rem; font-size: .85rem; font-weight: 600;
+    color: var(--muted); list-style: revert;
+  }
+  details.notes[open] summary { color: var(--fg); }
+  details.notes .body { padding: 0 .9rem .9rem; font-size: .92rem; }
+  details.notes .body p:first-child { margin-top: 0; }
+
+  table.agenda { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 1rem 0 0; }
+  table.agenda th, table.agenda td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); }
+  table.agenda th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  table.agenda td.min { font-family: ui-monospace, monospace; color: var(--muted); white-space: nowrap; }
+  table.agenda tr.total td { border-bottom: none; border-top: 2px solid var(--fg); font-weight: 600; }
+
+  .demo {
+    border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem;
+    margin: 1.25rem 0; background: var(--card-bg);
+  }
+  .demo > .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .75rem; }
+
+  .site-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 640px) { .site-grid { grid-template-columns: 1fr; } }
+  .site-col h4 { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 .6rem; }
+  .site-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .5rem; }
+  .site-col a.card {
+    display: block; padding: .6rem .75rem; border: 1px solid var(--line); border-radius: 8px;
+    text-decoration: none; color: var(--fg); font-size: .92rem;
+  }
+  .site-col a.card:hover { border-color: var(--accent); }
+  .site-col a.card small { display: block; color: var(--muted); font-weight: 300; margin-top: .15rem; }
+
+  button {
+    font: inherit; background: var(--fg); color: var(--bg); border: none; border-radius: 6px;
+    padding: .5rem 1rem; cursor: pointer; font-size: .88rem;
+  }
+  button:hover { opacity: .85; }
+  button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+
+  .req-diagram { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: 1rem 0; }
+  .req-diagram .node {
+    flex: 1; text-align: center; padding: .9rem .5rem; border: 1px solid var(--line); border-radius: 8px;
+    font-size: .85rem; transition: border-color .2s, background .2s;
+  }
+  .req-diagram .node.active { border-color: var(--accent); background: var(--accent-bg); }
+  .req-diagram .arrow { color: var(--muted); font-size: 1.1rem; }
+  .req-log { font-size: .82rem; }
+  .req-log .line { padding: .15rem 0; color: var(--muted); }
+  .req-log .line.hit { color: var(--fg); }
+  .req-log .key { color: var(--accent); }
+
+  .timeline-nav { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .timeline-nav button {
+    background: transparent; color: var(--fg); border: 1px solid var(--line);
+    border-radius: 99px; padding: .35rem .8rem; font-size: .8rem;
+  }
+  .timeline-nav button.active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .timeline-body { font-size: .92rem; }
+  .timeline-body h4 { margin: 0 0 .35rem; font-size: .95rem; }
+  .timeline-body p { margin: 0; max-width: 62ch; }
+
+  .api-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1rem; }
+  @media (max-width: 720px) { .api-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .api-grid { grid-template-columns: 1fr; } }
+  .api-card { border: 1px solid var(--line); border-radius: 8px; padding: .75rem .85rem; background: var(--card-bg); }
+  .api-card h4 { margin: 0 0 .3rem; font-size: .88rem; display: flex; align-items: baseline; gap: .4rem; flex-wrap: wrap; }
+  .api-card p { margin: 0; font-size: .82rem; color: var(--muted); }
+  .used-badge { font-size: .68rem; font-weight: 400; color: var(--accent); }
+
+  .viewport-row { display: flex; gap: 1rem; align-items: flex-end; overflow-x: auto; padding-bottom: .5rem; margin-top: 1rem; }
+  .viewport {
+    flex: none; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--bg);
+  }
+  .viewport .vp-label { font-size: .72rem; text-align: center; padding: .35rem 0; color: var(--muted); border-bottom: 1px solid var(--line); font-family: ui-monospace, monospace; }
+  .viewport .vp-frame { overflow: auto; padding: .6rem; height: 260px; }
+  .mini-page { display: flex; flex-wrap: wrap; gap: .4rem; font-size: .72rem; }
+  .mini-page .mp-header { flex: 1 1 100%; background: var(--fg); color: var(--bg); padding: .4rem; border-radius: 4px; }
+  .mini-page .mp-nav { flex: 1 1 100%; display: flex; gap: .3rem; flex-wrap: wrap; }
+  .mini-page .mp-nav span { background: var(--code-bg); padding: .2rem .4rem; border-radius: 4px; }
+  .mini-page .mp-side { flex: 1 1 70px; background: var(--code-bg); border-radius: 4px; padding: .4rem; min-height: 60px; }
+  .mini-page .mp-main { flex: 3 1 140px; background: var(--code-bg); border-radius: 4px; padding: .4rem; min-height: 60px; }
+
+  .speak-box { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+  .speak-box p.sample { flex: 1 1 260px; margin: 0; padding: .75rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; font-size: .92rem; }
+  #speak-status { font-size: .82rem; color: var(--muted); }
+
+  .dom-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 720px) { .dom-wrap { grid-template-columns: 1fr; } }
+  .dom-wrap textarea {
+    width: 100%; min-height: 220px; resize: vertical; padding: .75rem; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: .85rem;
+  }
+  #dom-tree { min-height: 220px; border: 1px solid var(--line); border-radius: 8px; padding: .75rem; overflow: auto; background: var(--bg); font-size: .85rem; }
+  #dom-tree ul { list-style: none; margin: 0; padding-left: 1.1rem; border-left: 1px dashed var(--line); }
+  #dom-tree > ul { padding-left: 0; border-left: none; }
+  #dom-tree li { padding: .1rem 0; }
+  #dom-tree .tag { color: var(--accent); }
+  #dom-tree .txt { color: var(--muted); font-style: italic; }
+  .pane-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .35rem; }
+
+  .editor-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 720px) { .editor-wrap { grid-template-columns: 1fr; } }
+  #html-editor {
+    width: 100%; min-height: 300px; resize: vertical; padding: .9rem; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--code-bg); color: var(--fg); font-size: .85rem; line-height: 1.5;
+  }
+  #html-preview { width: 100%; min-height: 300px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .editor-actions { display: flex; gap: .5rem; margin-top: .6rem; flex-wrap: wrap; }
+
+  .sandbox { border: 1px dashed var(--line); border-radius: 8px; padding: 1rem; margin-top: 1rem; background: var(--bg); }
+  .sandbox h5 { margin: 1.1rem 0 .3rem; font-size: .9rem; }
+  .sandbox h5:first-child { margin-top: 0; }
+  .contrast-bad { color: #ddd; background: #fff; padding: .3rem .5rem; border-radius: 4px; }
+  @media (prefers-color-scheme: dark) { .contrast-bad { color: #3a3a3a; background: #26262b; } }
+  .hidden-note { display: none; }
+  .checklist { list-style: none; padding: 0; margin: 1rem 0 0; display: flex; flex-direction: column; gap: .5rem; font-size: .92rem; }
+  .checklist li { display: flex; gap: .5rem; align-items: flex-start; }
+  .checklist input { margin-top: .3rem; }
+
+  footer.end {
+    max-width: 880px; margin: 3rem auto 0; padding: 2rem 1.5rem 3rem; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: .88rem;
+  }
+  footer.end a { color: var(--muted); }
+
+  .pill { display: inline-block; font-size: .7rem; padding: .1rem .5rem; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); text-decoration: none; margin-left: .4rem; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="kicker">Programming Interactivity · Lecture 1</div>
+  <h1>How the web actually works</h1>
+  <p class="lede">Everything on this page runs in the browser, no build step, no install — because that's the point of today. View source any time; it's the whole lesson.</p>
+</header>
+
+<nav class="agenda-nav">
+  <div class="inner">
+    <a href="#agenda">Agenda</a>
+    <a href="#opener">1. Inspiration tour</a>
+    <a href="#html-history">2. HTML's history</a>
+    <a href="#web-platform">3. The web platform</a>
+    <a href="#client-server">4. Client &amp; server</a>
+    <a href="#destinations">5. Many destinations</a>
+    <a href="#dom-tree-section">6. The DOM tree</a>
+    <a href="#first-file">7. First HTML file</a>
+    <a href="#devtools">8. DevTools x-ray</a>
+    <a href="#recap">Recap</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="agenda">
+  <div class="num">00</div>
+  <h2>Lecture agenda</h2>
+  <p>A rough runtime for a longer studio session. Adjust freely — the demos below don't depend on the timing. Sections 2 and 3 are the most cuttable if you're short on time.</p>
+  <table class="agenda">
+    <thead><tr><th>Segment</th><th>Minutes</th><th>Mode</th></tr></thead>
+    <tbody>
+      <tr><td>1. Inspiration opener</td><td class="min">10</td><td>Browse together</td></tr>
+      <tr><td>2. Where HTML came from</td><td class="min">10</td><td>Talk + live demo</td></tr>
+      <tr><td>3. The web platform: what's in the box</td><td class="min">10</td><td>Talk + tour</td></tr>
+      <tr><td>4. Client, server, browser</td><td class="min">20</td><td>Talk + live demo</td></tr>
+      <tr><td>5. One document, many destinations</td><td class="min">15</td><td>Demo</td></tr>
+      <tr><td>Break</td><td class="min">10</td><td>—</td></tr>
+      <tr><td>6. The DOM as a living tree</td><td class="min">20</td><td>Interactive demo</td></tr>
+      <tr><td>7. Your first HTML file, by hand</td><td class="min">35</td><td>Hands-on, everyone codes</td></tr>
+      <tr><td>8. DevTools as an x-ray</td><td class="min">25</td><td>Live break + fix challenge</td></tr>
+      <tr><td>Recap &amp; Q&amp;A</td><td class="min">15</td><td>Talk</td></tr>
+      <tr class="total"><td>Total</td><td class="min">170</td><td></td></tr>
+    </tbody>
+  </table>
+  <details class="notes">
+    <summary>Prep checklist (instructor only)</summary>
+    <div class="body">
+      <ul>
+        <li>Test classroom wifi before class — sections 2, 4, and 8 need a live connection. If it's unreliable, narrate the diagrams instead of firing the real requests.</li>
+        <li>Open this page in the browser you'll project, then open DevTools once beforehand so panel sizing is already sane on the projector.</li>
+        <li>Swap the "inspiration tour" links for your own current favorites — the three columns below are just a reasonable default.</li>
+        <li>For section 7, have students actually open a plain text editor and a browser side by side on their own machines — the in-page playground is a warm-up, not a replacement.</li>
+        <li>170 minutes is long for one sitting — sections 2 and 3 are pure talk-and-look, easiest to compress or assign as reading if the room's attention is fading.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section id="opener">
+  <div class="num">01</div>
+  <h2>Inspiration opener: strange, beautiful, broken</h2>
+  <p>Before any theory: the web is a huge, weird place. These are three real, currently-live sites in each mood. Click through a few together and ask "how do you think this is built?" — no answers yet, just noticing.</p>
+  <div class="site-grid">
+    <div class="site-col">
+      <h4>Strange</h4>
+      <ul>
+        <li><a class="card" href="https://www.zombo.com/" target="_blank" rel="noopener">Zombo.com<small>Infinite Flash-era absurdity, rebuilt without Flash.</small></a></li>
+        <li><a class="card" href="https://theuselessweb.com/" target="_blank" rel="noopener">The Useless Web<small>One button, one random pointless site. Great as a live redirect demo.</small></a></li>
+        <li><a class="card" href="https://windows93.net/" target="_blank" rel="noopener">Windows93<small>A fake broken OS, entirely running in the DOM.</small></a></li>
+      </ul>
+    </div>
+    <div class="site-col">
+      <h4>Beautiful</h4>
+      <ul>
+        <li><a class="card" href="https://pudding.cool/" target="_blank" rel="noopener">The Pudding<small>Visual essays — same HTML/CSS/JS you'll learn, at full stretch.</small></a></li>
+        <li><a class="card" href="https://bruno-simon.com/" target="_blank" rel="noopener">Bruno Simon<small>A portfolio that's also a driving game. Ask: still "a webpage"?</small></a></li>
+        <li><a class="card" href="https://www.are.na/" target="_blank" rel="noopener">Are.na<small>Quiet, confident typographic design — restraint as a choice.</small></a></li>
+      </ul>
+    </div>
+    <div class="site-col">
+      <h4>Broken (but it works)</h4>
+      <ul>
+        <li><a class="card" href="https://www.spacejam.com/1996/" target="_blank" rel="noopener">Space Jam (1996)<small>The original site, still live at its original address.</small></a></li>
+        <li><a class="card" href="https://craigslist.org/" target="_blank" rel="noopener">Craigslist<small>Unstyled by choice for 25+ years, and still doing its job.</small></a></li>
+        <li><a class="card" href="https://news.ycombinator.com/" target="_blank" rel="noopener">Hacker News<small>Barely any CSS. Fast, legible, huge audience anyway.</small></a></li>
+      </ul>
+    </div>
+  </div>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Land on: "pretty" and "well-built" are different axes. Craigslist and Hacker News are almost aggressively plain and still handle real traffic and real money. Bruno Simon's site is a great bridge into "a webpage is just a document — until it isn't."</p>
+    </div>
+  </details>
+</section>
+
+<section id="html-history">
+  <div class="num">02</div>
+  <h2>Where HTML came from</h2>
+  <p>HTML isn't a fixed thing you memorize once. It has changed shape completely at least twice, and today it doesn't even have a version number. That history explains a lot of the web's weirdness — including some of what you just saw in the opening tour.</p>
+  <div class="demo">
+    <div class="label">Timeline — click an era</div>
+    <div class="timeline-nav" id="timeline-nav"></div>
+    <div class="timeline-body" id="timeline-body"></div>
+  </div>
+  <p>Today the spec lives at <a href="https://html.spec.whatwg.org/" target="_blank" rel="noopener">html.spec.whatwg.org</a>, maintained by the WHATWG — a group steered by Google, Mozilla, Apple, and Microsoft, with anyone free to file an issue or open a pull request against it on GitHub. A change generally needs two independent browser engines willing to actually implement it before it's considered settled. There's no vote, no fixed release date, and no "HTML6" planned — it just changes, in public, constantly. That's why it's called a <strong>Living Standard</strong> rather than a numbered spec.</p>
+  <div class="demo">
+    <div class="label">Live demo — the spec's actual commit history</div>
+    <p style="margin-top:0;">Don't take "living" on faith — this fetches the real, current commit log of the WHATWG HTML spec's source repository.</p>
+    <button id="spec-pulse-btn" type="button">Check the spec's pulse</button>
+    <div class="req-log" id="spec-pulse-log" style="margin-top:1rem;"></div>
+  </div>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>The throughline: <em>who gets to decide what a browser must do?</em> First nobody (browser wars), then a slow committee that bet wrong (W3C/XHTML2), then the vendors who actually ship browsers took it back over (WHATWG). Worth naming that this is a genuine case study in open-source governance, not just trivia.</p>
+    </div>
+  </details>
+</section>
+
+<section id="web-platform">
+  <div class="num">03</div>
+  <h2>The web platform: what's in the box</h2>
+  <p>HTML is the document format. But a modern browser is really more like an operating system: it hands JavaScript access to dozens of capabilities that have nothing to do with markup. These are all just functions you call — no plugin, no install, no special syntax. You've already used three of them on this page without noticing.</p>
+  <div class="api-grid">
+    <div class="api-card"><h4>Fetch <span class="used-badge">used above ↑</span></h4><p>Make an HTTP request from JavaScript, read the response as text or JSON.</p></div>
+    <div class="api-card"><h4>DOM <span class="used-badge">used above ↑</span></h4><p>Read and change the tree of the page itself, live, while it's running.</p></div>
+    <div class="api-card"><h4>Web Speech <span class="used-badge">used below ↓</span></h4><p>Text-to-speech and speech-to-text, built into the browser.</p></div>
+    <div class="api-card"><h4>Canvas / WebGL / WebGPU</h4><p>Draw pixels and 3D graphics directly, frame by frame.</p></div>
+    <div class="api-card"><h4>Web Audio</h4><p>Generate, analyze, and mix sound in real time.</p></div>
+    <div class="api-card"><h4>Geolocation &amp; sensors</h4><p>Ask (with permission) for location, device orientation, motion.</p></div>
+    <div class="api-card"><h4>Storage</h4><p><code>localStorage</code> and IndexedDB: save data on the visitor's machine, no server needed.</p></div>
+    <div class="api-card"><h4>WebSockets</h4><p>Keep a connection open so server and client can push messages either way, anytime.</p></div>
+    <div class="api-card"><h4>WebRTC</h4><p>Peer-to-peer audio, video, and data — straight between two browsers.</p></div>
+    <div class="api-card"><h4>Service Workers</h4><p>Intercept network requests, cache assets, work offline, send push notifications.</p></div>
+    <div class="api-card"><h4>Web Workers &amp; WebAssembly</h4><p>Run real computation off the main thread, or run compiled non-JS code at near-native speed.</p></div>
+    <div class="api-card"><h4>Media capture &amp; files</h4><p>Read the camera, microphone, dropped files, or the clipboard, with the user's OK.</p></div>
+  </div>
+  <p>Not all of these come from the same standards body — WebGL comes from the Khronos Group, WebRTC is jointly W3C and IETF, most of the rest are W3C or WHATWG working groups. In practice you won't read any of those specs day to day; you'll live in <a href="https://developer.mozilla.org/en-US/docs/Web/API" target="_blank" rel="noopener">MDN's Web API index</a> and check <a href="https://caniuse.com/" target="_blank" rel="noopener">caniuse.com</a> before relying on something new.</p>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>This is the "wow" moment to spend a beat on: the useless-web-button, the 3D portfolio game, and the text-to-speech demo they just heard are all built from this same list, called from plain JavaScript. Nothing here needs a framework. Good moment to preview that the rest of the course is essentially "learning to call these."</p>
+    </div>
+  </details>
+</section>
+
+<section id="client-server">
+  <div class="num">04</div>
+  <h2>Client, server, and what a browser does with what it receives</h2>
+  <p>Press the button. This page (the <strong>client</strong>) sends a real request to a <strong>server</strong> and shows you exactly what comes back, before the browser turns it into anything visual.</p>
+  <div class="demo">
+    <div class="label">Live demo — real network request</div>
+    <div class="req-diagram">
+      <div class="node" id="node-client">Client<br><small>(this browser)</small></div>
+      <div class="arrow">→</div>
+      <div class="node" id="node-network">Network</div>
+      <div class="arrow">→</div>
+      <div class="node" id="node-server">Server<br><small>api.github.com</small></div>
+      <div class="arrow">→</div>
+      <div class="node" id="node-parse">Browser parses &amp; renders</div>
+    </div>
+    <button id="fetch-btn" type="button">Send a request</button>
+    <button id="fetch-reset" type="button" class="ghost">Reset</button>
+    <div class="req-log" id="req-log" style="margin-top:1rem;"></div>
+  </div>
+  <p>What just happened, in order: your browser opened a connection, sent a plain-text HTTP request with a method and headers, the server ran some code and sent back a plain-text HTTP response (status code, headers, body), and only <em>then</em> did the browser do anything with it. A server doesn't know or care what a "webpage" looks like — it just sends bytes.</p>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Emphasize the response is <em>just text</em> — status line, headers, body. Nothing about fonts, layout, or color exists yet. Rendering is a separate step the browser does afterward. If wifi fails, open the Network tab live instead (bridges into section 8).</p>
+    </div>
+  </details>
+</section>
+
+<section id="destinations">
+  <div class="num">05</div>
+  <h2>One document, many destinations</h2>
+  <p>The exact same HTML below is shown at three different widths — a rough stand-in for phone, tablet, and a TV/desktop. Nothing about the source changes. Scroll each frame if it overflows.</p>
+  <div class="viewport-row">
+    <div class="viewport" style="width: 200px;">
+      <div class="vp-label">phone · 375px</div>
+      <div class="vp-frame" style="width: 187px;">
+        <div class="mini-page">
+          <div class="mp-header">Site name</div>
+          <div class="mp-nav"><span>Home</span><span>Work</span><span>About</span></div>
+          <div class="mp-side">Filters</div>
+          <div class="mp-main">Main content flows here. Same markup, same CSS rules — the layout just has less room, so things stack.</div>
+        </div>
+      </div>
+    </div>
+    <div class="viewport" style="width: 340px;">
+      <div class="vp-label">tablet · 768px</div>
+      <div class="vp-frame" style="width: 327px;">
+        <div class="mini-page">
+          <div class="mp-header">Site name</div>
+          <div class="mp-nav"><span>Home</span><span>Work</span><span>About</span></div>
+          <div class="mp-side">Filters</div>
+          <div class="mp-main">Main content flows here. Same markup, same CSS rules — more room, so filters and content sit side by side.</div>
+        </div>
+      </div>
+    </div>
+    <div class="viewport" style="width: 460px;">
+      <div class="vp-label">TV / desktop · 1280px+</div>
+      <div class="vp-frame" style="width: 447px;">
+        <div class="mini-page">
+          <div class="mp-header">Site name</div>
+          <div class="mp-nav"><span>Home</span><span>Work</span><span>About</span></div>
+          <div class="mp-side">Filters</div>
+          <div class="mp-main">Main content flows here. Plenty of room now — but it's still the same DOM, laid out differently.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3>A destination with no screen at all</h3>
+  <p>A screen reader is a browser too — it just turns the DOM into speech instead of pixels. Click below to hear this page's own text read aloud, using your browser's built-in speech engine (no server involved this time — it's entirely local).</p>
+  <div class="demo">
+    <div class="label">Live demo — text to speech</div>
+    <div class="speak-box">
+      <p class="sample" id="speak-sample">A screen reader doesn't see color, spacing, or a hero image. It reads the DOM, in document order, using whatever semantic information the HTML provides — headings, lists, button labels, alt text.</p>
+      <div>
+        <button id="speak-btn" type="button">▶ Read this aloud</button>
+        <button id="speak-stop" type="button" class="ghost">Stop</button>
+        <div id="speak-status"></div>
+      </div>
+    </div>
+  </div>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Ask: "what did the speech engine skip?" (Nothing here — it's plain text.) Now imagine the sentence were an image with no <code>alt</code> — the screen reader destination gets <em>nothing</em>. Same document, different destinations, wildly different experiences if you don't plan for it.</p>
+    </div>
+  </details>
+</section>
+
+<section id="dom-tree-section">
+  <div class="num">06</div>
+  <h2>The DOM as a living tree</h2>
+  <p>Type or edit HTML on the left. The browser doesn't see your text — it sees a tree of nested nodes, shown on the right, rebuilt on every keystroke. That tree, not your source text, is what CSS styles and what JavaScript touches.</p>
+  <div class="dom-wrap">
+    <div>
+      <div class="pane-label">Source (edit me)</div>
+      <textarea id="dom-source" spellcheck="false">&lt;article&gt;
+  &lt;h2&gt;Hello&lt;/h2&gt;
+  &lt;p&gt;This is a &lt;strong&gt;tree&lt;/strong&gt;, not text.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Leaf one&lt;/li&gt;
+    &lt;li&gt;Leaf two&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;</textarea>
+    </div>
+    <div>
+      <div class="pane-label">Live DOM tree</div>
+      <div id="dom-tree"></div>
+    </div>
+  </div>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Break something on purpose: delete a closing <code>&lt;/li&gt;</code> and watch the browser silently repair the tree anyway. That's the "living" part — the DOM is always a valid tree, even when your HTML wasn't.</p>
+    </div>
+  </details>
+</section>
+
+<section id="first-file">
+  <div class="num">07</div>
+  <h2>Your first HTML file, by hand, no tools</h2>
+  <p>This playground is a warm-up. For the real exercise, everyone opens a plain text editor (TextEdit in plain-text mode, Notepad, or VS Code with no extensions) and a browser, saves a file called <code>index.html</code>, and opens it with <strong>File → Open</strong>. No server, no framework, no npm — just a file and a browser.</p>
+  <div class="editor-wrap">
+    <div>
+      <div class="pane-label">index.html</div>
+      <textarea id="html-editor" spellcheck="false"></textarea>
+      <div class="editor-actions">
+        <button id="editor-starter" type="button" class="ghost">Insert skeleton</button>
+        <button id="editor-clear" type="button" class="ghost">Clear</button>
+      </div>
+    </div>
+    <div>
+      <div class="pane-label">What the browser shows</div>
+      <iframe id="html-preview" title="live preview" sandbox=""></iframe>
+    </div>
+  </div>
+  <details class="notes">
+    <summary>Suggested build order (say it out loud as they type)</summary>
+    <div class="body">
+      <ol>
+        <li><code>&lt;!DOCTYPE html&gt;</code> — tells the browser "this is HTML, use modern rules."</li>
+        <li><code>&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</code> — the skeleton every page has.</li>
+        <li>A <code>&lt;title&gt;</code> inside <code>&lt;head&gt;</code> — ask them to check the browser tab.</li>
+        <li>One <code>&lt;h1&gt;</code> and one <code>&lt;p&gt;</code> in <code>&lt;body&gt;</code> — save, reload, see it appear.</li>
+        <li>An <code>&lt;img&gt;</code> with a deliberately wrong <code>src</code> — reload, see it break, talk about why (bridges into section 8).</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<section id="devtools">
+  <div class="num">08</div>
+  <h2>DevTools as an x-ray</h2>
+  <p>Everything below is real, live HTML on this page — not a screenshot. Open DevTools (<code>F12</code>, or right-click → Inspect) and work through the checklist by actually poking at the sandbox.</p>
+  <div class="sandbox" id="devtools-sandbox">
+    <h5>1. Low-contrast text</h5>
+    <p class="contrast-bad" id="contrast-target">This sentence is technically visible. Find it in the Elements panel and fix its color in the Styles pane until you can actually read it.</p>
+
+    <h5>2. A hidden element</h5>
+    <p class="hidden-note" id="hidden-target">You found me. I have <code>display: none</code> — toggle it off in the Styles pane.</p>
+    <p><em>(There's a paragraph above with no visible text yet — go find it in the Elements tree.)</em></p>
+
+    <h5>3. A request that fails</h5>
+    <img src="./this-image-does-not-exist.jpg" alt="deliberately broken image, on purpose" width="120" height="80" style="border:1px solid var(--line); border-radius:4px;">
+    <p><small>Open the Network tab, reload, and find the request for this image. What status code comes back?</small></p>
+
+    <h5>4. An error in the console</h5>
+    <button id="buggy-btn" type="button">Click me</button>
+    <p><small>Open the Console tab first, <em>then</em> click. Read the error — which line, which file, which variable?</small></p>
+
+    <h5>5. Data hiding in an attribute</h5>
+    <p id="data-target" data-secret="the-dom-is-a-tree" data-hint="check my attributes in Elements">This element is carrying information you can't see on the page at all.</p>
+  </div>
+  <ul class="checklist">
+    <li><input type="checkbox" id="c1"><label for="c1">Fixed the low-contrast text so it's actually legible</label></li>
+    <li><input type="checkbox" id="c2"><label for="c2">Revealed the hidden paragraph</label></li>
+    <li><input type="checkbox" id="c3"><label for="c3">Found the failed image request and its status code in the Network tab</label></li>
+    <li><input type="checkbox" id="c4"><label for="c4">Read the console error and identified the file/line</label></li>
+    <li><input type="checkbox" id="c5"><label for="c5">Found both <code>data-*</code> attributes on item 5 in Elements</label></li>
+  </ul>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Land the big idea: everything students just did — editing styles, toggling attributes, reading network traffic — changes nothing on the actual server. DevTools edits a local copy of the tree. Reload and it's gone. That's freedom to experiment without fear, and it's the whole reason "view source" is such a good teacher.</p>
+    </div>
+  </details>
+</section>
+
+<section id="recap">
+  <div class="num">·</div>
+  <h2>Recap</h2>
+  <ul>
+    <li>A webpage is bytes over a network, sent by a server, interpreted by a client.</li>
+    <li>The same document reaches very different destinations — screens of every size, and no screen at all.</li>
+    <li>The browser doesn't work with your HTML text; it works with the DOM, a tree it builds and keeps valid.</li>
+    <li>You can build a real webpage with a text editor and nothing else.</li>
+    <li>DevTools lets you see and safely break that tree, live, with zero risk to the real file.</li>
+  </ul>
+  <p><strong>Next lecture:</strong> from a static tree to an interactive one — events, and the first line of JavaScript that responds to a click.</p>
+</section>
+
+</main>
+
+<footer class="end">
+  <p>Programming Interactivity — Lecture 1 material.<a class="pill" href="../../">lopin.me</a></p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // --- Section 2: HTML history timeline ---
+  var ERAS = [
+    { year: "1991", title: "A rough proposal", body: "Tim Berners-Lee circulates a memo for sharing physics papers at CERN, borrowing tags from an older print-formatting language called SGML. Fewer than 20 elements." },
+    { year: "1995–99", title: "Browser wars", body: "Netscape and Microsoft race to ship features, not standards — tags like <blink> and <marquee> land in one browser and not the other. The newly formed W3C tries to referee: HTML 2.0, then 3.2, then 4.01 in 1999." },
+    { year: "2000–03", title: "The XHTML detour", body: "The W3C bets HTML's future on XHTML — HTML rewritten as strict XML — and plans a clean-break XHTML2 with no backward compatibility. Browser makers, stuck supporting the old web, mostly ignore it." },
+    { year: "2004", title: "WHATWG breaks away", body: "Engineers from Mozilla, Opera, and Apple, frustrated the W3C is designing for a web that doesn't exist yet, start their own group outside it: the WHATWG. Their draft, “Web Applications 1.0,” becomes HTML5." },
+    { year: "2007–14", title: "W3C rejoins, HTML5 ships", body: "The W3C quietly drops XHTML2 and adopts the WHATWG's draft instead. In 2014 it publishes “HTML5” as an official, versioned Recommendation." },
+    { year: "2019–now", title: "The Living Standard", body: "The W3C and WHATWG agree to stop maintaining two competing specs. The WHATWG's continuously updated version becomes the one authoritative source. No “HTML6” is planned — just “HTML,” edited in the open, every day." }
+  ];
+  var timelineNav = document.getElementById("timeline-nav");
+  var timelineBody = document.getElementById("timeline-body");
+  if (timelineNav && timelineBody) {
+    ERAS.forEach(function (era, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = era.year;
+      btn.addEventListener("click", function () { showEra(i); });
+      timelineNav.appendChild(btn);
+    });
+    function showEra(i) {
+      Array.prototype.forEach.call(timelineNav.children, function (btn, idx) {
+        btn.classList.toggle("active", idx === i);
+      });
+      var era = ERAS[i];
+      timelineBody.innerHTML = "<h4>" + era.year + " — " + era.title + "</h4><p>" + era.body + "</p>";
+    }
+    showEra(ERAS.length - 1);
+  }
+
+  // --- Section 2: spec commit-history demo ---
+  var pulseBtn = document.getElementById("spec-pulse-btn");
+  var pulseLog = document.getElementById("spec-pulse-log");
+  if (pulseBtn) {
+    pulseBtn.addEventListener("click", function () {
+      pulseBtn.disabled = true;
+      pulseLog.innerHTML = '<div class="line">Fetching recent commits to whatwg/html…</div>';
+      fetch("https://api.github.com/repos/whatwg/html/commits?per_page=5")
+        .then(function (res) {
+          if (!res.ok) throw new Error("GitHub API returned " + res.status);
+          return res.json();
+        })
+        .then(function (commits) {
+          pulseLog.innerHTML = "";
+          commits.forEach(function (c) {
+            var date = new Date(c.commit.author.date).toLocaleDateString();
+            var msg = c.commit.message.split("\n")[0];
+            var div = document.createElement("div");
+            div.className = "line hit";
+            div.innerHTML = '<span class="key">' + date + "</span> " + msg + " — " + c.commit.author.name;
+            pulseLog.appendChild(div);
+          });
+          var note = document.createElement("div");
+          note.className = "line";
+          note.textContent = "That's the actual spec, edited by actual people, this week.";
+          pulseLog.appendChild(note);
+        })
+        .catch(function (err) {
+          pulseLog.innerHTML = '<div class="line">Couldn’t reach GitHub (' + err.message + '). Point at <a href="https://github.com/whatwg/html/commits/main" target="_blank" rel="noopener">github.com/whatwg/html/commits</a> instead — it updates most days.</div>';
+        })
+        .finally(function () { pulseBtn.disabled = false; });
+    });
+  }
+
+  // --- Section 4: client/server fetch demo ---
+  var fetchBtn = document.getElementById("fetch-btn");
+  var fetchReset = document.getElementById("fetch-reset");
+  var log = document.getElementById("req-log");
+  var nodes = ["node-client", "node-network", "node-server", "node-parse"].map(function (id) {
+    return document.getElementById(id);
+  });
+
+  function clearActive() {
+    nodes.forEach(function (n) { n.classList.remove("active"); });
+  }
+  function logLine(html, hit) {
+    var div = document.createElement("div");
+    div.className = "line" + (hit ? " hit" : "");
+    div.innerHTML = html;
+    log.appendChild(div);
+  }
+  function step(i, delay) {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        clearActive();
+        nodes[i].classList.add("active");
+        resolve();
+      }, delay);
+    });
+  }
+
+  fetchBtn.addEventListener("click", function () {
+    fetchBtn.disabled = true;
+    log.innerHTML = "";
+    clearActive();
+    logLine('<span class="key">→</span> GET https://api.github.com/zen', true);
+    step(0, 50)
+      .then(function () { return step(1, 400); })
+      .then(function () { return step(2, 500); })
+      .then(function () {
+        return fetch("https://api.github.com/zen").then(function (res) {
+          logLine('<span class="key">status</span> ' + res.status + " " + res.statusText, true);
+          logLine('<span class="key">content-type</span> ' + (res.headers.get("content-type") || "unknown"), true);
+          return res.text();
+        });
+      })
+      .then(function (text) {
+        return step(3, 300).then(function () { return text; });
+      })
+      .then(function (text) {
+        logLine('<span class="key">body</span> "' + text + '"', true);
+        logLine("This text is all the server sent. Headings, colors, layout — none of that exists yet. That's the browser's job, next.", false);
+      })
+      .catch(function (err) {
+        logLine('<span class="key">failed</span> ' + err.message + " — probably no network here. Narrate the diagram instead: client asks, server answers with plain text, browser renders it.", false);
+      })
+      .finally(function () {
+        fetchBtn.disabled = false;
+      });
+  });
+
+  fetchReset.addEventListener("click", function () {
+    log.innerHTML = "";
+    clearActive();
+  });
+
+  // --- Section 5: speech synthesis demo ---
+  var speakBtn = document.getElementById("speak-btn");
+  var speakStop = document.getElementById("speak-stop");
+  var speakStatus = document.getElementById("speak-status");
+  var speakSample = document.getElementById("speak-sample");
+
+  if (!("speechSynthesis" in window)) {
+    speakBtn.disabled = true;
+    speakStatus.textContent = "Speech synthesis isn't available in this browser.";
+  } else {
+    speakBtn.addEventListener("click", function () {
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance(speakSample.textContent);
+      utter.onstart = function () { speakStatus.textContent = "Reading…"; };
+      utter.onend = function () { speakStatus.textContent = "Done."; };
+      utter.onerror = function () { speakStatus.textContent = "Couldn't play audio here."; };
+      window.speechSynthesis.speak(utter);
+    });
+    speakStop.addEventListener("click", function () {
+      window.speechSynthesis.cancel();
+      speakStatus.textContent = "Stopped.";
+    });
+  }
+
+  // --- Section 6: DOM tree visualizer ---
+  var domSource = document.getElementById("dom-source");
+  var domTree = document.getElementById("dom-tree");
+
+  function describeElement(el) {
+    var s = "<span class=\"tag\">&lt;" + el.tagName.toLowerCase() + "&gt;</span>";
+    if (el.id) s += " #" + el.id;
+    if (el.className && typeof el.className === "string") s += " ." + el.className.split(/\s+/).join(".");
+    return s;
+  }
+
+  function buildTree(node) {
+    var ul = document.createElement("ul");
+    node.childNodes.forEach(function (child) {
+      if (child.nodeType === 1) {
+        var li = document.createElement("li");
+        li.innerHTML = describeElement(child);
+        if (child.childNodes.length) li.appendChild(buildTree(child));
+        ul.appendChild(li);
+      } else if (child.nodeType === 3 && child.textContent.trim()) {
+        var textLi = document.createElement("li");
+        var t = child.textContent.trim();
+        textLi.innerHTML = '<span class="txt">"' + (t.length > 40 ? t.slice(0, 40) + "…" : t) + '"</span>';
+        ul.appendChild(textLi);
+      }
+    });
+    return ul;
+  }
+
+  function renderDomTree() {
+    var html = domSource.value;
+    var doc = new DOMParser().parseFromString(html, "text/html");
+    domTree.innerHTML = "";
+    domTree.appendChild(buildTree(doc.body));
+  }
+  domSource.addEventListener("input", renderDomTree);
+  renderDomTree();
+
+  // --- Section 7: HTML playground ---
+  var htmlEditor = document.getElementById("html-editor");
+  var htmlPreview = document.getElementById("html-preview");
+  var starterBtn = document.getElementById("editor-starter");
+  var clearBtn = document.getElementById("editor-clear");
+  var SKELETON = "<!DOCTYPE html>\n<html>\n<head>\n  <title>My first page</title>\n</head>\n<body>\n  <h1>Hello, web</h1>\n  <p>I wrote this by hand.</p>\n</body>\n</html>\n";
+
+  function updatePreview() {
+    htmlPreview.srcdoc = htmlEditor.value;
+  }
+  htmlEditor.addEventListener("input", updatePreview);
+  starterBtn.addEventListener("click", function () {
+    htmlEditor.value = SKELETON;
+    updatePreview();
+  });
+  clearBtn.addEventListener("click", function () {
+    htmlEditor.value = "";
+    updatePreview();
+  });
+  htmlEditor.value = SKELETON;
+  updatePreview();
+
+  // --- Section 8: DevTools sandbox bug ---
+  var buggyBtn = document.getElementById("buggy-btn");
+  buggyBtn.addEventListener("click", function () {
+    // Intentional: triggers a real ReferenceError for students to read in the console.
+    // eslint-disable-next-line no-undef
+    totallyUndefinedVariable.doSomething();
+  });
+})();
+</script>
+</body>
+</html>
