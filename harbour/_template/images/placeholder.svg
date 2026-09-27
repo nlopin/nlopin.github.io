@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Image placeholder">
+  <rect x="1" y="1" width="638" height="358" rx="14" fill="none" stroke="#8d8d95" stroke-width="2" stroke-dasharray="10 8" opacity=".55"/>
+  <g fill="none" stroke="#8d8d95" stroke-width="3" opacity=".7">
+    <circle cx="242" cy="150" r="20"/>
+    <path d="M196 232l58-58 42 42 36-36 72 72z" stroke-linejoin="round"/>
+  </g>
+  <text x="320" y="292" text-anchor="middle" fill="#8d8d95" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" opacity=".8">images/your-image.png</text>
+</svg>

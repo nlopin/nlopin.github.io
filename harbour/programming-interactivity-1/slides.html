@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programming Interactivity — Slides</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/slides.css">
+<style>
+  /* Click-to-reveal process stepper (03 slide). CSS-only: hidden radios +
+     labels, no JS, per lessons/CLAUDE.md. */
+  .process { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; width: 100%; user-select: none; }
+
+  .step-radio { position: absolute; opacity: 0; pointer-events: none; }
+
+  .step-chip {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: .7rem 1.3rem;
+    font-size: clamp(1.05rem, 2vw, 1.4rem);
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    background: var(--muted);
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 1em;
+    flex: 0 0 auto;
+  }
+
+  .cols:has(#ps1:checked) label[for="ps1"],
+  .cols:has(#ps2:checked) label[for="ps2"],
+  .cols:has(#ps3:checked) label[for="ps3"],
+  .cols:has(#ps4:checked) label[for="ps4"],
+  .cols:has(#ps5:checked) label[for="ps5"],
+  .cols:has(#ps6:checked) label[for="ps6"] { border-color: var(--accent); }
+
+  .cols:has(#ps1:checked) label[for="ps1"] .step-num,
+  .cols:has(#ps2:checked) label[for="ps2"] .step-num,
+  .cols:has(#ps3:checked) label[for="ps3"] .step-num,
+  .cols:has(#ps4:checked) label[for="ps4"] .step-num,
+  .cols:has(#ps5:checked) label[for="ps5"] .step-num,
+  .cols:has(#ps6:checked) label[for="ps6"] .step-num { background: var(--accent); }
+
+  .step-arrow { color: var(--muted); margin-left: 1.7em; }
+
+  .step-detail { min-height: 14em; }
+  .step-detail p { display: none; margin: 0; }
+  .step-detail p + p { margin-top: .5rem; }
+
+  #ps1:checked ~ .step-detail p[data-step="1"],
+  #ps2:checked ~ .step-detail p[data-step="2"],
+  #ps3:checked ~ .step-detail p[data-step="3"],
+  #ps4:checked ~ .step-detail p[data-step="4"],
+  #ps5:checked ~ .step-detail p[data-step="5"],
+  #ps6:checked ~ .step-detail p[data-step="6"] { display: block; }
+</style>
+</head>
+<body>
+
+<div class="deck-progress"></div>
+<div class="deck-counter"></div>
+
+<main class="deck">
+
+  <section class="slide title">
+    <div class="kicker">Course Overview</div>
+    <h1>Programming Interactivity</h1>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Outline</div>
+    <h2>How the course runs</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">15</div><p>Classes</p></div>
+      <div class="stat-card"><div class="num">3</div><p>Weeks</p></div>
+      <div class="stat-card"><div class="num">Mon–Fri</div><p>17:00</p></div>
+      <div class="stat-card"><div class="num">In person</div></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Class Overview</div>
+    <h2>What each week covers</h2>
+    <div class="week-list">
+      <div class="week-row">
+        <div class="week-num">Week 1</div>
+        <div>
+          <h3>Web basics</h3>
+          <p class="muted">Core elements and layout mental model</p>
+        </div>
+      </div>
+      <div class="week-row">
+        <div class="week-num">Week 2</div>
+        <div>
+          <h3>JS and Web API</h3>
+          <p class="muted">Bringing pages to life with JavaScript</p>
+        </div>
+      </div>
+      <div class="week-row">
+        <div class="week-num">Week 3</div>
+        <div>
+          <h3>Data fetching, final project</h3>
+          <p class="muted">Connecting to real data and shipping your project</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>Guest Speakers</h2>
+    <div class="cols cards">
+      <div>
+        <div class="kicker">Accessibility · October 5</div>
+        <h3>Glafira Zhur</h3>
+        <p class="muted">Google Developer Expert (GDE) for Web, a11y ambassador</p>
+      </div>
+      <div>
+        <div class="kicker">Animation · October 6</div>
+        <h3>Carmen Ansio</h3>
+        <p class="muted">Design Engineer at Stripe, animation expert</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Icebreaker</div>
+    <h2>Let's get to know each other</h2>
+    <ul>
+      <li>Your name</li>
+      <li>What are your expectations from the course?</li>
+      <li>If you were an animal, what would you be — and why?</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Your Instructor</div>
+    <h2>Nik Lopin</h2>
+    <p class="byline">Software Engineer @ Stripe · 15+ years in the industry</p>
+    <div class="logo-row">
+      <div class="logo-chip"><img src="images/beeline.png" alt="Beeline"></div>
+      <div class="logo-chip"><img src="images/freenow.svg" alt="FREENOW"></div>
+      <div class="logo-chip"><img src="images/factorial.png" alt="Factorial"></div>
+      <div class="logo-chip"><img src="images/stripe.svg" alt="Stripe"></div>
+    </div>
+  </section>
+
+  <section class="slide title">
+    <div class="kicker">Programming Interactivity</div>
+    <h1>AI usage disclaimer</h1>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">The shift</div>
+    <h2>We read more code than we write</h2>
+    <ul>
+      <li><strong>We generate code</strong> more than we write it by hand.</li>
+      <li><strong>So we review generated code</strong> and judge whether it's good enough.</li>
+      <li><strong>Judging well takes knowledge:</strong> the mental models behind the technology and the idiomatic patterns of this language, in this environment — plus knowing what other options exist and what clarifying questions to ask.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">The shift</div>
+    <h2>Learning code is learning to read</h2>
+    <div class="cols cards">
+      <div>
+        <h3>Language</h3>
+        <ul>
+          <li>Letters</li>
+          <li>Words</li>
+          <li>Sentences</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Code</h3>
+        <ul>
+          <li>Symbols — decipher each one</li>
+          <li>Statements — "this means that"</li>
+          <li>Patterns — whole shapes at a glance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">The shift</div>
+    <h2>Reading in patterns</h2>
+    <pre class="big">for (let i = 0; i &lt; items.length; i++) {
+  render(items[i]);
+}</pre>
+    <p class="muted">You don't read it symbol by symbol. You see a loop — and know where to look, which condition to check, how to read the body.</p>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">The shift</div>
+    <h2>Get your hands dirty</h2>
+    <p class="muted">Watching code or generating it won't show you the idea behind it. Understanding comes from writing it yourself.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">How we learn</div>
+    <h2>What works for learning to code</h2>
+    <ul>
+      <li><strong>Write code yourself.</strong> Without copying, even if it's small.</li>
+      <li><strong>Debug real code.</strong> Diagnose systematically before searching for the answer.</li>
+      <li><strong>Retrieve from memory.</strong> Try the syntax before looking it up.</li>
+      <li><strong>Small, varied exercises.</strong> Same concept, different contexts.</li>
+      <li><strong>Trace code.</strong> Predict values and output before running.</li>
+      <li><strong>Modify worked examples.</strong> Change one requirement, see what breaks.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">How we learn</div>
+    <h2>Useful, but not enough alone</h2>
+    <ul>
+      <li><strong>Explain code.</strong> Say why each part exists.</li>
+      <li><strong>Pair programming, code review.</strong> Swap roles, justify decisions aloud.</li>
+      <li><strong>Watch tutorials.</strong> Pause and reproduce from memory.</li>
+      <li><strong>Read documentation.</strong> Answer a concrete question, then apply it.</li>
+      <li><strong>Copy code.</strong> Only as a start — then modify and rebuild it.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">How we learn</div>
+    <h2>Learning is progressive loading</h2>
+    <figure class="bare">
+      <img src="images/progressive-loading.jpg" alt="Progressive loading: the same photo shown three times, blurred at first and sharper as more data arrives">
+    </figure>
+    <p class="muted">The deeper you learn, the sharper the picture — and the more you notice what's off.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Allowed</div>
+    <h2>Use AI to explore and understand</h2>
+    <ul>
+      <li><strong>Self-test.</strong> Ask AI for open questions on the topic, answer them as completely as you can, then have it point out what was wrong and what to polish.</li>
+      <li><strong>Build demos and playgrounds</strong> that explain one specific topic.</li>
+      <li><strong>Debug on purpose.</strong> Ask AI to write buggy code, then find and fix the bugs by hand.</li>
+    </ul>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">Homework</div>
+    <h2>By hand.</h2>
+    <p class="muted">Unless told otherwise.</p>
+  </section>
+
+
+  <section class="slide title">
+    <div class="kicker">Programming Interactivity · Lecture 1</div>
+    <h1>The Web</h1>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">Today's goal</div>
+    <h2>HTML structure</h2>
+    <p class="muted">The browser builds a tree either way. The tags you pick decide whether that tree means anything to a screen reader, a search engine, or the next developer.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Opener</div>
+    <h2>Strange, beautiful, broken</h2>
+    <p class="muted">Same web. Wildly different builds. "Pretty" and "well-built" are different axes.</p>
+    <ul>
+      <li>Apps in a tab: <a href="https://excalidraw.com/" target="_blank" rel="noopener">Excalidraw</a> · <a href="https://www.photopea.com/" target="_blank" rel="noopener">Photopea</a> · <a href="https://earth.google.com/web/" target="_blank" rel="noopener">Google Earth</a></li>
+      <li>Old, still online: <a href="https://info.cern.ch/hypertext/WWW/TheProject.html" target="_blank" rel="noopener">The first website</a> · <a href="https://www.spacejam.com/1996/" target="_blank" rel="noopener">Space Jam (1996)</a> · <a href="https://www.berkshirehathaway.com/" target="_blank" rel="noopener">Berkshire Hathaway</a></li>
+      <li>Exploration: <a href="https://wwwwwwwww.jodi.org/" target="_blank" rel="noopener">JODI</a> · <a href="https://www.cameronsworld.net/" target="_blank" rel="noopener">Cameron's World</a> · <a href="https://windows93.net/" target="_blank" rel="noopener">Windows93</a> · <a href="https://thisisnotawebsitedotcom.com/" target="_blank" rel="noopener">This Is Not a Website</a> · <a href="https://bruno-simon.com/" target="_blank" rel="noopener">Bruno Simon</a></li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>Where HTML came from</h2>
+    <div class="timeline">
+      <div class="timeline-rows">
+        <input type="radio" name="html-era" id="era1" checked>
+        <label for="era1"><span class="year">1991</span>A rough proposal at CERN</label>
+        <input type="radio" name="html-era" id="era2">
+        <label for="era2"><span class="year">1995–99</span>Browser wars, W3C referees</label>
+        <input type="radio" name="html-era" id="era3">
+        <label for="era3"><span class="year">2000–03</span>The XHTML detour</label>
+        <input type="radio" name="html-era" id="era4">
+        <label for="era4"><span class="year">2004</span>WHATWG breaks away</label>
+        <input type="radio" name="html-era" id="era5">
+        <label for="era5"><span class="year">2014</span>HTML5 ships</label>
+        <input type="radio" name="html-era" id="era6">
+        <label for="era6"><span class="year">2019–now</span>One Living Standard</label>
+      </div>
+      <div class="timeline-detail">
+        <div>
+          <h3>1991 — A rough proposal</h3>
+          <p>Tim Berners-Lee circulates a memo for sharing physics papers at CERN, borrowing tags from an older print-formatting language called SGML. Fewer than 20 elements. First website in the internet is the <a href="http://info.cern.ch">CERN webpage</a>.</p>
+        </div>
+        <div>
+          <h3>1995–99 — Browser wars</h3>
+          <p>Netscape and Microsoft race to ship features, not standards — <code>&lt;blink&gt;</code> and <code>&lt;marquee&gt;</code> land in one browser and not the other. The new W3C referees: HTML 2.0, 3.2, then 4.01. More on <a href="https://en.wikipedia.org/wiki/Browser_wars">Wikipedia</a>.</p>
+        </div>
+        <div>
+          <h3>2000–03 — The XHTML detour</h3>
+          <p>The W3C bets on XHTML — HTML rewritten as strict XML — and plans a clean-break XHTML2 with no backward compatibility. Browser makers, stuck supporting the old web, mostly ignore it.</p>
+        </div>
+        <div>
+          <h3>2004 — WHATWG breaks away</h3>
+          <p>Mozilla, Opera, and Apple engineers start their own group outside the W3C. Their draft, “Web Applications 1.0,” becomes HTML5.</p>
+        </div>
+        <div>
+          <h3>2014 — HTML5 ships</h3>
+          <p>The W3C drops XHTML2, adopts the WHATWG draft, and in 2014 publishes “HTML5” as an official, versioned Recommendation.</p>
+        </div>
+        <div>
+          <h3>2019–now — The Living Standard</h3>
+          <p>W3C and WHATWG stop maintaining two competing specs. The WHATWG's continuously updated version is the single source. No “HTML6” — just “HTML,” edited in the open.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide center">
+    <h2>No version number.</h2>
+    <p class="muted">Edited in public, by the browser makers, constantly.</p>
+    <p class="big-link"><a href="https://html.spec.whatwg.org/">html.spec.whatwg.org</a></p>
+  </section>
+
+  <section class="slide">
+    <h2>How a feature gets into HTML</h2>
+    <p class="muted">Example: the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Popover_API" target="_blank" rel="noopener">Popover API</a> — click a step to see it at that stage.</p>
+    <div class="cols">
+      <input type="radio" name="proc-step" id="ps1" class="step-radio" checked>
+      <input type="radio" name="proc-step" id="ps2" class="step-radio">
+      <input type="radio" name="proc-step" id="ps3" class="step-radio">
+      <input type="radio" name="proc-step" id="ps4" class="step-radio">
+      <input type="radio" name="proc-step" id="ps5" class="step-radio">
+      <input type="radio" name="proc-step" id="ps6" class="step-radio">
+
+      <div class="process">
+        <label for="ps1" class="step-chip"><span class="step-num">1</span>Idea + explainer doc</label>
+        <span class="step-arrow" aria-hidden="true">&darr;</span>
+        <label for="ps2" class="step-chip"><span class="step-num">2</span>Incubated in the WICG</label>
+        <span class="step-arrow" aria-hidden="true">&darr;</span>
+        <label for="ps3" class="step-chip"><span class="step-num">3</span>PR against the spec</label>
+        <span class="step-arrow" aria-hidden="true">&darr;</span>
+        <label for="ps4" class="step-chip"><span class="step-num">4</span>Browsers signal support</label>
+        <span class="step-arrow" aria-hidden="true">&darr;</span>
+        <label for="ps5" class="step-chip"><span class="step-num">5</span>Origin trial / behind a flag</label>
+        <span class="step-arrow" aria-hidden="true">&darr;</span>
+        <label for="ps6" class="step-chip"><span class="step-num">6</span>Interop &rarr; merged in</label>
+      </div>
+
+      <div class="step-detail">
+        <p data-step="1">Anyone — a browser engineer, a web developer, a standards body — writes an explainer: the problem it solves, real use cases, and a rough sketch of an API. No spec syntax yet, just the pitch for why the platform needs this.</p>
+        <p data-step="1" class="muted"><a href="https://open-ui.org/components/popover.research.explainer/" target="_blank" rel="noopener">Popover's explainer, on Open UI &rarr;</a></p>
+
+        <p data-step="2">The explainer moves into the W3C's Web Incubator Community Group (WICG), an open venue where anyone can join, prototype the idea, and stress-test it in real code before it's spec material. Most proposals quietly die here — that's the point of incubating first.</p>
+        <p data-step="2" class="muted"><a href="https://github.com/w3ctag/design-reviews/issues/743" target="_blank" rel="noopener">TAG design review of the incubated proposal &rarr;</a></p>
+
+        <p data-step="3">Once the design settles, someone writes it up as normative spec text: a pull request against the WHATWG HTML Living Standard's repo on GitHub, spelling out the exact algorithm steps a browser has to implement.</p>
+        <p data-step="3" class="muted"><a href="https://github.com/whatwg/html/pull/8221" target="_blank" rel="noopener">whatwg/html PR #8221, "Add popover attribute" &rarr;</a></p>
+
+        <p data-step="4">Each engine — Chromium, Gecko (Firefox), WebKit (Safari) — publicly records its position: supportive, neutral, or opposed, usually as tracked GitHub issues. A feature one engine is dead-set against rarely ends up shipping everywhere.</p>
+        <p data-step="4" class="muted"><a href="https://github.com/mozilla/standards-positions/issues/698" target="_blank" rel="noopener">Mozilla's position &rarr;</a> · <a href="https://github.com/WebKit/standards-positions/issues/74" target="_blank" rel="noopener">WebKit's position &rarr;</a></p>
+
+        <p data-step="5">An engine ships a real, working implementation, gated behind a flag or an origin trial — a time-boxed token real sites can opt into. Developers get to use the actual feature in production and report back before anything becomes permanent.</p>
+        <p data-step="5" class="muted"><a href="https://chromestatus.com/feature/5463833265045504" target="_blank" rel="noopener">Popover on Chrome Status, incl. its origin trial &rarr;</a></p>
+
+        <p data-step="6">When multiple engines converge on identical behavior — verified by shared suites like Web Platform Tests — the spec pull request merges. The feature is now simply part of HTML, with no version number attached to it.</p>
+        <p data-step="6" class="muted"><a href="https://html.spec.whatwg.org/multipage/popover.html" target="_blank" rel="noopener">The popover attribute, in the HTML spec &rarr;</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>The web platform</h2>
+    <p class="muted">A modern browser is an operating system. All of this is plain JavaScript, no plugin required.</p>
+    <div class="cols">
+      <ul>
+        <li>Fetch, DOM, Storage</li>
+        <li>Canvas / WebGL / WebGPU</li>
+        <li>Web Audio, Web Speech</li>
+      </ul>
+      <ul>
+        <li>Geolocation &amp; sensors</li>
+        <li>WebSockets, WebRTC</li>
+        <li>Service &amp; Web Workers</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>Client, server, browser</h2>
+    <p>Client asks → network carries it → server answers with plain text → <strong>only then</strong> does the browser render anything.</p>
+    <p class="muted">A server doesn't know what a "webpage" looks like. It just sends bytes.</p>
+  </section>
+
+  <section class="slide">
+    <h2>One document, many destinations</h2>
+    <ul>
+      <li>Phone, tablet, desktop — same markup, different layout</li>
+      <li>A screen reader is a browser too</li>
+      <li>It reads the DOM, not the pixels</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>Name what content is, not how it looks</h2>
+    <div class="cols cards">
+      <div>
+        <h3>Only divs</h3>
+        <ul>
+          <li><code>&lt;div class="header"&gt;</code></li>
+          <li><code>&lt;div class="nav"&gt;</code></li>
+          <li><code>&lt;div class="main"&gt;</code></li>
+          <li><code>&lt;div class="footer"&gt;</code></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Semantic tags</h3>
+        <ul>
+          <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-header-element" target="_blank" rel="noopener"><code>&lt;header&gt;</code></a></li>
+          <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-nav-element" target="_blank" rel="noopener"><code>&lt;nav&gt;</code></a></li>
+          <li><a href="https://html.spec.whatwg.org/multipage/grouping-content.html#the-main-element" target="_blank" rel="noopener"><code>&lt;main&gt;</code></a></li>
+          <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-footer-element" target="_blank" rel="noopener"><code>&lt;footer&gt;</code></a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted">Same box on screen either way. Only one version tells a screen reader, a search engine, or the next dev what's actually there.</p>
+  </section>
+
+  <section class="slide center">
+    <h2>Name a semantic tag</h2>
+    <p class="muted">Out loud, anything but <code>&lt;div&gt;</code> — go.</p>
+  </section>
+
+  <section class="slide">
+    <h2>Semantic tags, grouped</h2>
+    <table class="table">
+      <tr>
+        <th>Landmarks</th>
+        <td>
+          <ul>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-header-element" target="_blank" rel="noopener"><code>&lt;header&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-nav-element" target="_blank" rel="noopener"><code>&lt;nav&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/grouping-content.html#the-main-element" target="_blank" rel="noopener"><code>&lt;main&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-aside-element" target="_blank" rel="noopener"><code>&lt;aside&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-footer-element" target="_blank" rel="noopener"><code>&lt;footer&gt;</code></a></li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>Structure</th>
+        <td>
+          <ul>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-article-element" target="_blank" rel="noopener"><code>&lt;article&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-section-element" target="_blank" rel="noopener"><code>&lt;section&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements" target="_blank" rel="noopener"><code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/grouping-content.html#the-figure-element" target="_blank" rel="noopener"><code>&lt;figure&gt;</code></a></li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>Interactive</th>
+        <td>
+          <ul>
+            <li><a href="https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element" target="_blank" rel="noopener"><code>&lt;button&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element" target="_blank" rel="noopener"><code>&lt;a&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element" target="_blank" rel="noopener"><code>&lt;details&gt;</code></a></li>
+            <li><a href="https://html.spec.whatwg.org/multipage/interactive-elements.html#the-dialog-element" target="_blank" rel="noopener"><code>&lt;dialog&gt;</code></a></li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <section class="slide">
+    <h2>Landmarks are the map</h2>
+    <ul>
+      <li>One <a href="https://html.spec.whatwg.org/multipage/grouping-content.html#the-main-element" target="_blank" rel="noopener"><code>&lt;main&gt;</code></a> per page — the actual content, the skip-link target</li>
+      <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-header-element" target="_blank" rel="noopener"><code>&lt;header&gt;</code></a> / <a href="https://html.spec.whatwg.org/multipage/sections.html#the-footer-element" target="_blank" rel="noopener"><code>&lt;footer&gt;</code></a> can repeat: once for the page, once per <a href="https://html.spec.whatwg.org/multipage/sections.html#the-article-element" target="_blank" rel="noopener"><code>&lt;article&gt;</code></a></li>
+      <li>Wrap any set of navigation links in <a href="https://html.spec.whatwg.org/multipage/sections.html#the-nav-element" target="_blank" rel="noopener"><code>&lt;nav&gt;</code></a>, even a short one</li>
+      <li>Screen-reader users jump landmark to landmark, same as headings</li>
+      <li>DevTools' Accessibility panel lists landmarks as their own tree</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>Headings are the outline</h2>
+    <ul>
+      <li>One <a href="https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements" target="_blank" rel="noopener"><code>&lt;h1&gt;</code></a> per page — the topic</li>
+      <li><a href="https://html.spec.whatwg.org/multipage/sections.html#the-h1,-h2,-h3,-h4,-h5,-and-h6-elements" target="_blank" rel="noopener"><code>&lt;h2&gt;</code></a> / <code>&lt;h3&gt;</code> nest under it — don't skip levels for size</li>
+      <li>Screen-reader users jump the page heading to heading, not by scrolling</li>
+      <li>DevTools' Accessibility panel shows this outline directly</li>
+      <li>Font size is CSS's job, never the reason to pick a heading level</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>The DOM is a living tree</h2>
+    <p>The browser never sees your source text. It builds a tree of nodes — and keeps that tree valid, even when your HTML wasn't.</p>
+    <ul>
+      <li>Closes tags you forgot to close</li>
+      <li>Un-nests tags that overlap, like <code>&lt;b&gt;&lt;i&gt;&lt;/b&gt;&lt;/i&gt;</code></li>
+      <li>Moves stray text out of elements that can't hold it directly, like <code>&lt;table&gt;</code></li>
+      <li>Inserts the structural elements you skipped — <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code>, even <code>&lt;tbody&gt;</code></li>
+    </ul>
+    <p class="muted">The browser never tells you it happened — a validator does.</p>
+    <p class="big-link"><a href="https://validator.w3.org/" target="_blank" rel="noopener">validator.w3.org</a></p>
+  </section>
+
+  <section class="slide">
+    <h2>Anatomy of an HTML file</h2>
+    <pre class="big">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;title&gt;My page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    <div class="cols">
+      <div>
+        <h3>In <code>&lt;head&gt;</code></h3>
+        <ul>
+          <li><code>&lt;meta charset&gt;</code>, <code>&lt;meta viewport&gt;</code></li>
+          <li><code>&lt;meta name="description"&gt;</code>, Open Graph tags</li>
+          <li>Favicon and stylesheet <code>&lt;link&gt;</code>s</li>
+        </ul>
+      </div>
+      <div>
+        <h3>In <code>&lt;body&gt;</code></h3>
+        <ul>
+          <li>Headings, paragraphs, lists</li>
+          <li>Images, links, buttons, forms</li>
+          <li>Everything the visitor actually sees</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>What each piece does</h2>
+    <ul>
+      <li><code>&lt;!DOCTYPE html&gt;</code> — use modern rules, not 1990s quirks mode</li>
+      <li><code>&lt;html lang="en"&gt;</code> — the root node; <code>lang</code> is what a screen reader uses to pick a pronunciation</li>
+      <li><code>&lt;head&gt;</code> — metadata for the browser and search engines, nothing the visitor sees</li>
+      <li><code>&lt;title&gt;</code> — the one required piece of content inside <code>&lt;head&gt;</code></li>
+      <li><code>&lt;body&gt;</code> — everything the visitor actually sees; structure it with tags that name the content, not divs</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>DevTools as an x-ray</h2>
+    <ul>
+      <li>Fix low-contrast text live in Styles</li>
+      <li>Reveal a hidden element</li>
+      <li>Read a failed request's status code</li>
+      <li>Read a console error</li>
+      <li>Find data hiding in an attribute</li>
+      <li>Read the heading outline in the Accessibility panel</li>
+    </ul>
+    <p class="muted">Edits a local copy of the tree. Reload and it's gone — free to break things.</p>
+  </section>
+
+  <section class="slide center">
+    <div class="kicker">Exercise</div>
+    <h2>Fix the div soup</h2>
+    <p class="muted">Refactor into semantic HTML — pick landmarks, build one heading outline, use real buttons and links.</p>
+    <p><a href="https://codepen.io/editor/Lopinopulos/pen/01a0e4cd-2a30-7572-84da-50e3fc56b317" target="_blank" rel="noopener">Open the starter pen &rarr;</a></p>
+  </section>
+
+  <section class="slide">
+    <h2>Recap</h2>
+    <ul>
+      <li>A webpage is bytes over a network — the browser turns them into a tree, valid or not</li>
+      <li>The tags you pick are what make that tree mean something to a screen reader, a search engine, or the next developer</li>
+      <li><code>&lt;head&gt;</code> describes the document; <code>&lt;body&gt;</code> is what the visitor sees</li>
+      <li>DevTools and a validator both show you the tree you actually built</li>
+    </ul>
+    <p class="muted">Next: giving that tree a look.</p>
+  </section>
+
+</main>
+
+<script src="../assets/slides.js"></script>
+</body>
+</html>

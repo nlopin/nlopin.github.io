@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slide templates</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/slides.css">
+</head>
+<body>
+
+<!--
+  A gallery of every slide pattern in ../assets/slides.css.
+
+  To start a deck: copy this directory to lessons/<lesson-name>/, delete the
+  slides you don't need, and replace the placeholder text. Each slide below is
+  labelled with the pattern it shows, so you can also copy a single section
+  into a deck you already have.
+
+  Rules: no inline style attributes, no per-deck <style> block, no JavaScript.
+  A pattern you need that isn't here goes into ../assets/slides.css so every
+  deck gets it. See ../CLAUDE.md.
+-->
+
+<div class="deck-progress"></div>
+<div class="deck-counter"></div>
+
+<main class="deck">
+
+  <!-- TITLE — opening slide. Big heading, left-aligned, one line of framing. -->
+  <section class="slide title">
+    <div class="kicker">Course name · Lecture N</div>
+    <h1>Slide deck title</h1>
+    <p class="muted">Subtitle or one-line framing.</p>
+  </section>
+
+  <!-- AGENDA — kicker, heading, up to ~6 short items. Split the slide if more. -->
+  <section class="slide">
+    <div class="kicker">00</div>
+    <h2>Agenda</h2>
+    <ul>
+      <li>First topic</li>
+      <li>Second topic</li>
+      <li>Third topic</li>
+      <li>Fourth topic</li>
+    </ul>
+  </section>
+
+  <!-- STATEMENT — one idea, centered, nothing competing with it. -->
+  <section class="slide center">
+    <div class="kicker">01 · Section</div>
+    <h2>A single statement, centered</h2>
+    <p class="muted">Use .center when the slide carries one idea.</p>
+  </section>
+
+  <!-- PROSE — heading and a short paragraph or two. The default text slide. -->
+  <section class="slide">
+    <div class="kicker">02</div>
+    <h2>Heading with a paragraph</h2>
+    <p>One or two sentences of plain prose. Put the claim in the sentence, and
+      use <strong>strong</strong> for the words you'll land on out loud.</p>
+    <p class="muted">A second, quieter line for the caveat or the aside.</p>
+  </section>
+
+  <!-- TEXT + IMAGE — two columns, prose beside a picture.
+       Swap the order of the two children to put the image on the left. -->
+  <section class="slide">
+    <div class="kicker">03</div>
+    <h2>Text beside an image</h2>
+    <div class="cols media">
+      <div>
+        <p>The text column. Keep it to a short paragraph or a few bullets — the
+          picture is doing half the work.</p>
+      </div>
+      <figure>
+        <img src="images/placeholder.svg" alt="Describe what the image shows">
+        <figcaption>Optional caption.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FULL-WIDTH IMAGE — the picture is the slide. Add class="bare" to the
+       figure for a transparent diagram or logo that needs no frame. -->
+  <section class="slide center">
+    <div class="kicker">04</div>
+    <h2>One picture, full width</h2>
+    <figure>
+      <img src="images/placeholder.svg" alt="Describe what the image shows">
+      <figcaption>What the audience should notice in it.</figcaption>
+    </figure>
+  </section>
+
+  <!-- LINK — a URL to read out and type. Monospace, wraps, clickable. -->
+  <section class="slide center">
+    <div class="kicker">Resource</div>
+    <h2>Try it yourself</h2>
+    <p class="big-link"><a href="https://developer.mozilla.org/en-US/docs/Web/HTML">developer.mozilla.org/en-US/docs/Web/HTML</a></p>
+    <p class="muted">One line on what's behind the link.</p>
+  </section>
+
+  <!-- TWO COLUMNS — parallel content only, where the comparison is the point. -->
+  <section class="slide">
+    <div class="kicker">05</div>
+    <h2>Two parallel lists</h2>
+    <div class="cols">
+      <ul>
+        <li>First item</li>
+        <li>Second item</li>
+        <li>Third item</li>
+      </ul>
+      <ul>
+        <li>Fourth item</li>
+        <li>Fifth item</li>
+        <li>Sixth item</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CARDS — two columns as bordered boxes. Good for two named things. -->
+  <section class="slide">
+    <h2>Two cards</h2>
+    <div class="cols cards">
+      <div>
+        <div class="kicker">Label · Date</div>
+        <h3>First card</h3>
+        <p class="muted">A line of detail.</p>
+      </div>
+      <div>
+        <div class="kicker">Label · Date</div>
+        <h3>Second card</h3>
+        <p class="muted">A line of detail.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIGURES — a row of numbers. Four cards across, two on a phone. -->
+  <section class="slide">
+    <div class="kicker">Outline</div>
+    <h2>The course in numbers</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">15</div><p>Classes</p></div>
+      <div class="stat-card"><div class="num">3</div><p>Weeks</p></div>
+      <div class="stat-card"><div class="num">Mon–Fri</div><p>5:00 PM</p></div>
+      <div class="stat-card"><div class="num">On Campus</div><p>In person</p></div>
+    </div>
+  </section>
+
+  <!-- LABELLED ROWS — a stack of rows, each with a label on the left. -->
+  <section class="slide">
+    <div class="kicker">Class overview</div>
+    <h2>What each week covers</h2>
+    <div class="week-list">
+      <div class="week-row">
+        <div class="week-num">Week 1</div>
+        <div>
+          <h3>First week's topic</h3>
+          <p class="muted">One line on what it builds toward.</p>
+        </div>
+      </div>
+      <div class="week-row">
+        <div class="week-num">Week 2</div>
+        <div>
+          <h3>Second week's topic</h3>
+          <p class="muted">One line on what it builds toward.</p>
+        </div>
+      </div>
+      <div class="week-row">
+        <div class="week-num">Week 3</div>
+        <div>
+          <h3>Third week's topic</h3>
+          <p class="muted">One line on what it builds toward.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERSON — heading with a byline hugging it, plus a row of logos.
+       Add class="current" to a chip to mark the present one, and
+       <div class="logo-arrow">→</div> between chips to show a sequence. -->
+  <section class="slide">
+    <div class="kicker">Your instructor</div>
+    <h2>Name Surname</h2>
+    <p class="byline">Role @ Company · what you bring to the room</p>
+    <div class="logo-row">
+      <div class="logo-chip"><img src="images/placeholder.svg" alt="Company one"></div>
+      <div class="logo-chip"><img src="images/placeholder.svg" alt="Company two"></div>
+      <div class="logo-chip current"><img src="images/placeholder.svg" alt="Company three"></div>
+    </div>
+  </section>
+
+  <!-- CODE — a short snippet. Keep it to what fits without scrolling. -->
+  <section class="slide">
+    <div class="kicker">06</div>
+    <h2>Your first HTML file</h2>
+    <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Hello&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello, web&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+    <p class="muted">A text editor, a browser, <code>File → Open</code>. Nothing else.</p>
+  </section>
+
+  <!-- TIMELINE — vertical list of dated rows; clicking a row shows its detail on
+       the right. One radio + label per row, one <div> per detail, same order. Max 8. -->
+  <section class="slide">
+    <div class="kicker">Timeline</div>
+    <h2>How we got here</h2>
+    <div class="timeline">
+      <div class="timeline-rows">
+        <input type="radio" name="tl-demo" id="tl-demo1" checked>
+        <label for="tl-demo1"><span class="year">1990</span>First event</label>
+        <input type="radio" name="tl-demo" id="tl-demo2">
+        <label for="tl-demo2"><span class="year">2000</span>Second event</label>
+        <input type="radio" name="tl-demo" id="tl-demo3">
+        <label for="tl-demo3"><span class="year">2010</span>Third event</label>
+      </div>
+      <div class="timeline-detail">
+        <div>
+          <h3>1990 — First event</h3>
+          <p>One or two sentences on what happened and why it matters.</p>
+        </div>
+        <div>
+          <h3>2000 — Second event</h3>
+          <p>One or two sentences on what happened and why it matters.</p>
+        </div>
+        <div>
+          <h3>2010 — Third event</h3>
+          <p>One or two sentences on what happened and why it matters.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING — the one sentence you want them to leave with. -->
+  <section class="slide center">
+    <h2>Recap</h2>
+    <p>The single sentence you want them to leave with.</p>
+    <p class="muted">Next lecture: …</p>
+  </section>
+
+</main>
+
+<script src="../assets/slides.js"></script>
+</body>
+</html>

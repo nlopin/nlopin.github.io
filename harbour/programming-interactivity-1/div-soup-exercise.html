@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova Studio</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 400 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1c1c1e;
+    background: #fafafa;
+  }
+  .page { max-width: 960px; margin: 0 auto; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .brand { font-weight: 700; font-size: 1.2rem; }
+  .navlinks { display: flex; gap: 1.5rem; }
+  .navlink { color: #444; cursor: pointer; }
+  .navlink:hover { color: #b3401f; }
+
+  .hero { text-align: center; padding: 4rem 1.5rem 3rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; color: #b3401f; font-size: .8rem; font-weight: 600; margin-bottom: .75rem; }
+  .bigtitle { font-size: 2.4rem; font-weight: 700; line-height: 1.2; max-width: 30ch; margin: 0 auto .75rem; }
+  .lede { color: #555; max-width: 45ch; margin: 0 auto 1.5rem; }
+  .cta {
+    display: inline-block;
+    background: #1c1c1e;
+    color: #fff;
+    padding: .75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2.5rem;
+    padding: 0 1.5rem 3rem;
+  }
+  @media (max-width: 640px) { .content { grid-template-columns: 1fr; } }
+
+  .posttitle { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem; }
+  .post { display: flex; gap: 1.25rem; margin-bottom: 2rem; }
+  @media (max-width: 640px) { .post { flex-direction: column; } }
+  .postimg {
+    flex: 0 0 160px;
+    height: 110px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ffd8c2, #ffb199);
+  }
+  .caption { font-size: .78rem; color: #888; margin-top: .4rem; }
+  .posttitle2 { font-weight: 700; font-size: 1.05rem; margin-bottom: .3rem; }
+  .postbody { color: #555; font-size: .95rem; margin-bottom: .4rem; }
+  .readmore { color: #b3401f; font-weight: 600; cursor: pointer; font-size: .9rem; }
+
+  .sidebar {
+    background: #f0efec;
+    border-radius: 12px;
+    padding: 1.5rem;
+    align-self: start;
+  }
+  .sidetitle { font-weight: 700; margin-bottom: .6rem; }
+  .sidebody { color: #555; font-size: .92rem; margin-bottom: 1.25rem; }
+  .stats { display: flex; gap: 1.5rem; }
+  .stat { flex: 1; }
+  .statnum { font-size: 1.3rem; font-weight: 700; }
+  .statlabel { font-size: .8rem; color: #777; }
+
+  .footer {
+    border-top: 1px solid #e5e5e5;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #777;
+    font-size: .85rem;
+  }
+  .footlinks { display: flex; gap: 1rem; }
+  .footlink { cursor: pointer; }
+  .footlink:hover { color: #333; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="topbar">
+    <div class="brand">Nova Studio</div>
+    <div class="navlinks">
+      <span class="navlink">Home</span>
+      <span class="navlink">Work</span>
+      <span class="navlink">About</span>
+      <span class="navlink">Contact</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">Design &amp; development studio</div>
+    <div class="bigtitle">We build interfaces people enjoy using</div>
+    <div class="lede">A small studio helping startups turn rough ideas into products people actually want to open twice.</div>
+    <span class="cta">Get in touch</span>
+  </div>
+
+  <div class="content">
+
+    <div class="main">
+      <div class="posttitle">Recent work</div>
+
+      <div class="post">
+        <div class="postimg"></div>
+        <div>
+          <div class="posttitle2">Redesigning checkout for Ferry &amp; Co</div>
+          <div class="postbody">Cut checkout time by a third by removing every field that wasn't strictly required, and testing the rest with real customers.</div>
+          <span class="readmore">Read more &rarr;</span>
+        </div>
+      </div>
+
+      <div class="post">
+        <div class="postimg"></div>
+        <div>
+          <div class="posttitle2">A dashboard nobody had to be trained on</div>
+          <div class="postbody">Replaced a 40-page onboarding PDF with a dashboard whose layout explains itself. Support tickets dropped 60%.</div>
+          <span class="readmore">Read more &rarr;</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sidetitle">About the studio</div>
+      <div class="sidebody">Four designers and engineers, based remotely, working with one client at a time.</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="statnum">37</div>
+          <div class="statlabel">Projects shipped</div>
+        </div>
+        <div class="stat">
+          <div class="statnum">6yr</div>
+          <div class="statlabel">In business</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footertext">&copy; 2026 Nova Studio</div>
+    <div class="footlinks">
+      <span class="footlink">Privacy</span>
+      <span class="footlink">Terms</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

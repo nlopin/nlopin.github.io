@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Imtorance of semantics</title>
+    <link rel="stylesheet" href="../assets/slides.css">
+</head>
+<body>
+    <article>
+        <h1>Lesson 1. The web</h1>
+        <section>
+        <h2>AI disclaimer</h2>
+        <p>We talk about AI here</p>
+        </section>
+        <section>
+        <h2>The web</h2>
+        <p>some generic words about web</p>
+        <h3>Semantics</h3>
+        <p>semantics is imortant</p>
+        <h3>HTML Spec</h3>
+        <p>this is about </p>
+        </section>
+    </article>
+    <label>
+    <input type="checkbox" name="use div" id="div-activator">
+        Replace everything with `div`
+    </label>
+    <script>
+      const checkboxEl = document.getElementById("div-activator");
+      const articleEl = document.getElementsByTagName("article")[0]
+      const semanticChildrenCloned = articleEl.cloneNode(true);
+      checkboxEl.addEventListener("click", function(event) {
+        if (event.target.checked) {
+          for (const el of articleEl.children) {
+            replaceWithDivRec(el)
+          }
+        } else {
+          articleEl.replaceWith(semanticChildrenCloned.cloneNode(true));
+        }
+      });
+
+      function replaceWithDivRec(el) {
+        const divEl = document.createElement("div");
+        if (el.firstElementChild !== null) {
+          for (const childEl of el.children) {
+            divEl.appendChild(replaceWithDivRec(childEl))
+          }
+        } else {
+          divEl.textContent = el.textContent
+        }
+
+        el.replaceWith(divEl)
+        return divEl
+      }
+    </script>
+</body>

@@ -8,6 +8,7 @@
   var counter = document.querySelector(".deck-counter");
   if (!slides.length) return;
 
+  var EDGE = 100; // px from the left/right edge that counts as a nav click
   var current = 0;
   var overviewGrid = null;
 
@@ -133,12 +134,24 @@
   });
 
   document.addEventListener("click", function (e) {
-    if (overviewGrid) return;
-    // Ignore clicks on interactive content inside a slide.
-    if (e.target.closest("a, button, input, textarea, select, label, iframe, [data-no-nav]")) return;
-    var x = e.clientX / window.innerWidth;
-    if (x < 0.3) prev();
-    else next();
+    // Only the outer 100px on each side navigates; clicks elsewhere do nothing.
+    var dir = edgeDirection(e);
+    if (dir) goTo(current + dir);
+    // The edge may no longer navigate (first/last slide), so refresh the cursor.
+    document.documentElement.classList.toggle("nav-edge", edgeDirection(e) !== 0);
+  });
+
+  // Show a pointer only over an edge that will actually navigate.
+  function edgeDirection(e) {
+    if (overviewGrid) return 0;
+    if (e.target.closest("a, button, input, textarea, select, label, iframe, [data-no-nav]")) return 0;
+    if (e.clientX < EDGE && current > 0) return -1;
+    if (e.clientX > window.innerWidth - EDGE && current < slides.length - 1) return 1;
+    return 0;
+  }
+
+  document.addEventListener("mousemove", function (e) {
+    document.documentElement.classList.toggle("nav-edge", edgeDirection(e) !== 0);
   });
 
   window.addEventListener("resize", function () {
