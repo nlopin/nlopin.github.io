@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS — dressing the web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+
+/* title */
+.title-grid { display: grid; grid-template-columns: 1fr 720px; gap: 40px; height: 100%; align-items: center; }
+.title .kicker { color: var(--yellow); }
+.title .kicker::before { background: var(--yellow); border-color: var(--yellow); }
+.slide .title-h1 { font-size: 140px; line-height: 0.86; letter-spacing: -0.04em; margin: 10px 0 60px; }
+.slide .title-h1 em { color: var(--yellow); font-size: 1.05em; letter-spacing: -0.02em; }
+.title-sub { font: 500 24px/1.5 var(--font-mono); color: #b9b0a0; max-width: 640px; }
+.collage { position: relative; height: 760px; }
+.collage img { position: absolute; width: 470px; border: 4px solid var(--paper); border-radius: 12px; box-shadow: 0 30px 60px rgb(0 0 0 / 0.5); }
+.collage img:nth-child(1) { left: 0; top: 30px; transform: rotate(-7deg); }
+.collage img:nth-child(2) { right: 0; top: 0; transform: rotate(5deg); }
+.collage img:nth-child(3) { left: 30px; bottom: 30px; transform: rotate(4deg); }
+.collage img:nth-child(4) { right: 20px; bottom: 60px; transform: rotate(-4deg); }
+.collage .naked { position: absolute; left: 50%; top: 50%; width: 330px; transform: translate(-50%, -50%) rotate(-1deg); z-index: 3; border-color: var(--yellow); }
+.collage .naked-tag { position: absolute; left: 50%; top: calc(50% + 120px); transform: translateX(-50%) rotate(-3deg); z-index: 4; }
+
+/* showcase */
+.showcase { flex: 1; min-height: 0; }
+.outfit-btns { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; font: 600 22px var(--font-mono); }
+.outfit-btns button { font: 700 22px var(--font-mono); padding: 10px 18px; border-radius: 10px; border: 3px solid var(--ink); background: var(--white); cursor: pointer; }
+.outfit-btns button:hover { background: var(--yellow); }
+
+/* map */
+.map { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; margin-top: 10px; }
+.map div { border: 3px solid var(--ink); border-radius: 14px; padding: 18px 16px; min-height: 300px; display: flex; flex-direction: column; gap: 10px; font-size: 22px; line-height: 1.3; box-shadow: 6px 6px 0 var(--ink); }
+.map b { font: italic 400 40px/1 var(--font-serif); }
+.map strong { font-size: 26px; line-height: 1.05; }
+.map time { font: 700 20px var(--font-mono); margin-top: auto; }
+.map .m1 { background: var(--blue); color: #fff; } .map .m2 { background: var(--yellow); } .map .m3 { background: var(--tomato); }
+.map .mb { background: var(--paper-2); border-style: dashed; box-shadow: none; } .map .m4 { background: var(--violet); color: #fff; }
+.map .m5 { background: var(--green); } .map .m6 { background: var(--pink); }
+
+/* bets */
+.bets { display: flex; gap: 16px; flex-wrap: wrap; }
+.bets .chip { font-size: 22px; padding: 12px 18px; }
+
+/* 1996 */
+.oldweb { background: #c0c0c0; border: 3px solid var(--ink); border-radius: 6px; padding: 18px; font-family: "Times New Roman", serif; box-shadow: 8px 8px 0 var(--ink); }
+.oldweb .bar { background: navy; color: #fff; font: 700 18px Arial, sans-serif; padding: 4px 10px; margin: -18px -18px 16px; }
+.oldweb .body { background: #fff; padding: 18px; font-size: 22px; }
+.oldweb .mq { display: block; color: #f00; font: 700 26px "Comic Sans MS", cursive; }
+
+/* email brief */
+.email { background: var(--white); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 8px 8px 0 var(--ink); font-size: 28px; overflow: hidden; }
+.email header { padding: 16px 24px; border-bottom: 2px solid var(--line); font: 500 20px/1.6 var(--font-mono); color: var(--muted); }
+.email header b { color: var(--ink); }
+.email p { padding: 0 24px; margin: 18px 0; }
+
+/* paths tree */
+.tree { font: 500 30px/1.6 var(--font-mono); background: var(--white); border: 3px solid var(--ink); border-radius: 16px; padding: 22px 30px; white-space: pre; box-shadow: 8px 8px 0 var(--ink); }
+.tree .f { color: var(--blue); font-weight: 700; }
+.qa { display: grid; gap: 16px; }
+.qa > div { display: block; font-size: 28px; line-height: 1.6; }
+.qa > div .step { display: block; margin-top: 4px; }
+.qa code.ans { font-size: 30px; background: var(--yellow); padding: 4px 10px; border: 2px solid var(--ink); }
+
+/* misc fixes */
+.counts.strip { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.counts.strip .card { min-height: 0; padding: 14px 16px; font-size: 20px; box-shadow: 4px 4px 0 var(--ink); }
+.counts.strip .card h3 { font-size: 20px; margin-bottom: 8px; }
+.counts.strip .card code { font-size: 21px; margin-bottom: 6px; }
+.slide .email ol > li { font-size: 30px; margin-bottom: 10px; }
+.slide code, .slide pre, .slide kbd, .slide textarea { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide ol.numgrid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+.slide ol.numgrid li { font-size: 26px; }
+.slide del { text-decoration-thickness: 3px; text-decoration-color: var(--tomato); opacity: 0.8; }
+.slide .card.act code { background: rgb(255 255 255 / 0.2); color: #fff; }
+.slide .hl { background: linear-gradient(transparent 66%, rgb(255 210 63 / 0.85) 66% 94%, transparent 94%); padding: 0 0.08em; }
+.slide.exercise .hl { background: linear-gradient(transparent 66%, rgb(255 210 63 / 0.45) 66% 94%, transparent 94%); }
+.dt-pin.inl { position: static; transform: none; vertical-align: middle; width: 30px; height: 30px; font-size: 16px; margin-left: 8px; }
+.dt-decl .dt-pin.inl { text-decoration: none; }
+.slide.exercise .checklist li::before { color: var(--yellow) !important; font-size: 36px !important; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > .fill + p, .slide > div + p { margin-top: 26px; }
+.slide pre.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+.slide .card.dark code { background: #2c2924; color: var(--yellow); }
+.slide .sel-table.compact td:first-child { width: 200px; }
+.slide .sel-table.compact td:nth-child(2) { width: 110px; }
+.slide .sel-table.compact { font-size: 25px; }
+.slide .grid-3 .card pre.code.small { font-size: 23px; padding: 14px 16px; }
+.slide kbd { color: var(--ink); }
+
+/* round-1 additions */
+.crimes2 { display: grid; gap: 4px; }
+.crimes2 > div { display: grid; grid-template-columns: 50px 690px 1fr; gap: 24px; align-items: center; padding: 8px 0; border-bottom: 2px solid var(--line); font-size: 26px; line-height: 1.3; }
+.crimes2 b { font: 800 44px/1 var(--font-sans); color: var(--act-ink); }
+.crimes2 pre.code { font-size: 24px !important; padding: 12px 18px !important; }
+.formats { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+.formats code { font-size: 28px !important; background: var(--white) !important; border: 2px solid var(--ink); padding: 6px 14px !important; border-radius: 10px !important; }
+.slide .checklist.one { grid-template-columns: 1fr; }
+.slide .muted-list li { color: #bdb4a4; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+
+/* anatomy */
+.anatomy { display: grid; grid-template-columns: 1fr 520px; gap: 40px; align-items: center; flex: 1; }
+.anat-code { font: 500 58px/1.45 var(--font-mono); background: var(--code-bg); color: var(--code-ink); border: 3px solid var(--ink); border-radius: 20px; padding: 40px 48px; margin: 0; white-space: pre; }
+.anat-code span { border-radius: 8px; transition: background 0.2s, box-shadow 0.2s, opacity 0.2s; }
+.anat-code .a-sel { color: var(--hl-sel); } .anat-code .a-prop { color: var(--hl-prop); } .anat-code .a-val { color: var(--hl-val); } .anat-code .a-p { color: var(--hl-punct); }
+.anat-on { background: rgb(255 210 63 / 0.25); box-shadow: 0 0 0 6px rgb(255 210 63 / 0.6); }
+.slide.s1:not(.s2) .a-sel,
+.slide.s2:not(.s3) .a-block,
+.slide.s3:not(.s4) .a-decl,
+.slide.s4:not(.s5) .a-prop,
+.slide.s5:not(.s6) .a-val,
+.slide.s6 .a-rule { background: rgb(255 210 63 / 0.22); box-shadow: 0 0 0 6px rgb(255 210 63 / 0.55); }
+.anat-list { display: grid; gap: 8px; margin: 0; }
+.anat-list li { font-size: 22px; line-height: 1.2; padding: 9px 16px 9px 60px; background: var(--white); border: 3px solid var(--ink); border-radius: 12px; margin: 0; }
+.anat-list li::before { top: 14px; left: 14px; }
+.anat-list li b { display: block; font-size: 26px; }
+
+/* devtools mock */
+.dt { background: #fff; color: #202124; border: 3px solid var(--ink); border-radius: 14px; overflow: hidden; font: 400 25px/1.5 "Menlo", "SF Mono", var(--font-mono); box-shadow: 8px 8px 0 var(--ink); }
+.dt-tabs { display: flex; gap: 26px; padding: 10px 18px 0; background: #f1f3f4; border-bottom: 1px solid #cbcdd1; font: 500 21px system-ui, sans-serif; }
+.dt-tabs span { padding-bottom: 8px; color: #5f6368; }
+.dt-tabs .on { color: #1a73e8; border-bottom: 3px solid #1a73e8; }
+.dt-rule { padding: 8px 18px; border-bottom: 1px solid #e8eaed; position: relative; }
+.dt-head { display: flex; justify-content: space-between; }
+.dt-sel { color: #881280; }
+.dt-src { color: #5f6368; text-decoration: underline; font-size: 20px; }
+.dt-src.ua { text-decoration: none; font-style: italic; }
+.dt-decl { padding-left: 26px; position: relative; }
+.dt-decl .p { color: #c80000; } .dt-decl .v { color: #1a1aa6; }
+.dt-decl.over { text-decoration: line-through; color: #80868b; }
+.dt-decl.over .p, .dt-decl.over .v { color: #80868b; }
+.dt-decl.bad .p { text-decoration: line-through; }
+.dt-decl.bad::after { content: "⚠"; position: absolute; left: 0; color: #e37400; }
+.dt-inh { position: relative; padding: 6px 18px; background: #f8f9fa; color: #5f6368; font: 500 21px system-ui, sans-serif; border-bottom: 1px solid #e8eaed; }
+.dt-pin { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--tomato); color: #fff; font: 800 18px var(--font-sans); border: 3px solid var(--ink); position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2; }
+.dt-notes { display: grid; gap: 16px; margin: 0; }
+.dt-notes li { font-size: 26px; padding-left: 56px; margin: 0; }
+.dt-notes li::before { background: var(--tomato) !important; border: 3px solid var(--ink); width: 36px !important; height: 36px !important; line-height: 30px !important; color: #fff !important; font-family: var(--font-sans) !important; font-weight: 800 !important; }
+
+/* basic selectors table */
+.sel-table { width: 100%; border-collapse: collapse; font-size: 28px; }
+.sel-table td { padding: 14px 16px; border-bottom: 2px solid var(--line); vertical-align: middle; }
+.sel-table td:first-child { width: 330px; }
+.sel-table td:first-child code { font-size: 32px; background: var(--code-bg); color: var(--hl-sel); padding: 6px 14px; border-radius: 8px; }
+.sel-table td:nth-child(2) { font: 700 20px var(--font-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; width: 200px; }
+
+/* mini trees */
+.mt-card { background: var(--white); border: 3px solid var(--ink); border-radius: 18px; padding: 26px 28px; box-shadow: 8px 8px 0 var(--ink); }
+.mt-card pre.code { font-size: 44px; text-align: center; margin-bottom: 20px; }
+.mt-card p { font-size: 28px; }
+.mtree { font: 600 22px var(--font-mono); display: grid; gap: 10px; }
+.mnode { border: 2px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--paper); }
+.mnode .kids { display: flex; gap: 10px; margin-top: 8px; }
+.mnode .kids > .mnode { flex: 1; }
+.mnode.hit { background: var(--tomato); color: #fff; border-color: var(--ink); }
+.mnode.hit > .kids .mnode { color: var(--ink); }
+
+/* combinators */
+.combos { display: grid; gap: 14px; }
+.combos > div { display: grid; grid-template-columns: 170px 420px 1fr; align-items: center; gap: 24px; padding: 14px 20px; background: var(--white); border: 3px solid var(--ink); border-radius: 14px; font-size: 28px; }
+.combos b { font: 800 40px var(--font-mono); color: var(--tomato); text-align: center; }
+.combos code { font-size: 26px; }
+
+/* tournament */
+.rounds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items: stretch; margin-top: 10px; }
+.round { position: relative; background: var(--white); border: 3px solid var(--ink); border-radius: 16px; padding: 22px 20px; box-shadow: 6px 6px 0 var(--ink); font-size: 26px; line-height: 1.3; }
+.round:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 50%; transform: translate(50%, -50%); font: 800 26px/1 var(--font-sans); color: var(--ink); background: var(--yellow); border: 3px solid var(--ink); border-radius: 50%; width: 40px; height: 40px; display: grid; place-items: center; z-index: 2; }
+.round b { font: italic 400 58px/1 var(--font-serif); display: block; color: var(--violet); }
+.round strong { display: block; font-size: 29px; line-height: 1.05; margin: 8px 0 10px; }
+.round.hot { background: var(--violet); color: #fff; }
+.round.hot b { color: var(--yellow); }
+
+/* scoreboard */
+.scoreboard { display: flex; gap: 20px; justify-content: center; margin: 12px 0 26px; }
+.scoreboard div { width: 250px; border: 4px solid var(--ink); border-radius: 18px; text-align: center; padding: 14px 10px 18px; color: #fff; box-shadow: 8px 8px 0 var(--ink); }
+.scoreboard div span { display: block; font: 800 150px/1 var(--font-mono); }
+.scoreboard div small { font: 800 22px var(--font-mono); letter-spacing: 0.15em; }
+.scoreboard .a { background: var(--spec-a); } .scoreboard .b { background: var(--spec-b); } .scoreboard .c { background: var(--spec-c); }
+.bigsel { text-align: center; font: 700 64px var(--font-mono); margin: 0 0 8px; }
+.bigsel .ia { color: var(--spec-a); } .bigsel .ib { color: #d18a00; } .bigsel .ic { color: var(--spec-c); }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.counts .card { padding: 24px 20px; font-size: 26px; min-height: 300px; }
+.counts .card h3 { font-size: 26px; margin-bottom: 14px; }
+.counts .card code { display: inline-block; margin: 0 6px 12px 0; font-size: 28px; }
+.counts .ca { border-top: 14px solid var(--spec-a); } .counts .cb { border-top: 14px solid var(--spec-b); } .counts .cc { border-top: 14px solid var(--spec-c); }
+.counts .cz { border-top: 14px solid var(--line); } .counts .cx { border-top: 14px solid var(--violet); }
+
+/* staircase */
+.stairs { position: relative; flex: none; height: 380px; margin: 0 0 20px; }
+.stairs div { position: absolute; font: 700 30px var(--font-mono); background: var(--white); border: 3px solid var(--ink); border-radius: 12px; padding: 12px 18px; box-shadow: 6px 6px 0 var(--ink); white-space: nowrap; }
+.stairs div small { font-size: 20px; color: var(--muted); margin-left: 10px; }
+.stairs div:nth-child(1) { left: 0; bottom: 0; }
+.stairs div:nth-child(2) { left: 150px; bottom: 72px; }
+.stairs div:nth-child(3) { left: 300px; bottom: 144px; }
+.stairs div:nth-child(4) { left: 450px; bottom: 216px; background: #ffe0d8; }
+.stairs div:nth-child(5) { left: 600px; bottom: 288px; background: var(--tomato); color: #fff; }
+.stairs div:nth-child(5) small { color: #ffe0d8; }
+.stairs .boom { left: auto !important; right: 60px; bottom: 250px !important; font-size: 90px !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; }
+.slide.breakslide::before { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 32px; color: #dfe4ff; max-width: none; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+/* colours */
+.contrast-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.contrast-row div { border: 3px solid var(--ink); border-radius: 14px; padding: 26px 22px; font-size: 24px; font-weight: 400; line-height: 1.4; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; }
+.contrast-row small { font: 700 20px var(--font-mono); background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 6px; align-self: flex-start; }
+.contrast-row small.ok { background: var(--green); }
+.contrast-row small.no { background: var(--tomato); }
+
+/* property groups */
+.pgroups { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.pgroups .card { font-size: 24px; padding: 24px; min-height: 420px; }
+.pgroups .card h3 { font-size: 28px; margin-bottom: 14px; }
+.pgroups code { display: inline-block; margin: 0 6px 12px 0; font-size: 25px; }
+.pgroups .next { opacity: 0.55; border-style: dashed; box-shadow: none; }
+
+/* units table */
+.utable { width: 100%; border-collapse: collapse; font-size: 28px; }
+.utable td { padding: 13px 16px; border-bottom: 2px solid var(--line); }
+.utable td:first-child { width: 160px; }
+.utable td:first-child code { font: 800 34px var(--font-mono); background: var(--green); padding: 4px 14px; border: 2px solid var(--ink); border-radius: 8px; }
+.utable td:last-child { color: var(--muted); font-size: 24px; }
+
+/* checklist */
+.checklist { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+.checklist li { font-size: 27px; }
+.slide.exercise .checklist li::before { color: var(--yellow); }
+.checklist li::before { content: "☐" !important; background: none !important; border: 0 !important; top: -4px !important; left: 0 !important; width: auto !important; height: auto !important; font-size: 34px; color: var(--act-ink); }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="title no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-title="CSS — dressing the web">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 2</p>
+      <h1 class="title-h1">CSS,<br><em class="s">or how to</em><br>dress a page</h1>
+      <p class="title-sub">connecting styles · anatomy of a rule · selectors · the cascade · specificity · properties &amp; units</p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <img src="images/outfit-swiss.png" alt="">
+      <img src="images/outfit-neon.png" alt="">
+      <img src="images/outfit-zine.png" alt="">
+      <img src="images/outfit-brutal.png" alt="">
+      <img class="naked" src="images/outfit-none.png" alt="">
+      <span class="sticker naked-tag">same HTML ×5</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Keep the prologue to 8 minutes: click three themes, not five, if the room is slow.</p>
+    <p> Welcome back. Last week: HTML = meaning. Today: how it looks. Three hours, one 15-minute break at 1:15.</p>
+    <p>Don't explain the collage yet — the next slide does it live.</p>
+    <p>Keys: <code>p</code> opens presenter view, <code>m</code> the slide menu, <code>n</code> notes, <code>Esc</code> leaves an editor so arrows work again.</p>
+  </aside>
+</section>
+
+<section data-title="One page. Five outfits.">
+  <p class="kicker">Warm-up</p>
+  <h2>One page. <em class="s">Five</em> outfits.</h2>
+  <div class="frame showcase">
+    <iframe data-src="project/showcase/index.html?theme=" title="The Night Market page, switchable stylesheets"></iframe>
+  </div>
+  <aside class="notes">
+    <p>The page starts with <b>no CSS at all</b>. Click the switcher at the bottom of the page (or click into it and press 0–4). Go: nothing → swiss → brutal → neon → zine.</p>
+    <p>Scroll inside a couple of them — show vendor cards, the sold-out stamp in zine, the striped rows in brutal.</p>
+    <p>Ask: <b>"How many HTML files is this?"</b> Take guesses. Answer on the next slide: one.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Not a single tag changed">
+  <p class="kicker">What just happened</p>
+  <h2>Not a single tag changed.</h2>
+  <script type="text/x-code" data-lang="html" class="big"><link rel="stylesheet" href="⟦themes/neon.css⟧"></script>
+  <p class="mt">One line swapped a stylesheet. The HTML says <strong>what things are</strong>. The CSS says <strong>how they look</strong>. Keep them apart and you can re-dress a site without touching its content.</p>
+  <p class="small muted">Cascading Style Sheets: <strong>style</strong> = how it looks · <strong>sheets</strong> = a set of style rules · <strong>cascading</strong> = who wins when rules disagree (Act 4).</p>
+  <aside class="notes">
+    <p>History in 30 seconds: before CSS, style lived inside HTML — <code>&lt;font color&gt;</code>, <code>&lt;center&gt;</code>, <code>bgcolor</code>, layout tables and spacer GIFs on every page. Change the red = edit 400 files; layout tables confused screen readers. 1994: Håkon Wium Lie at CERN proposes "Cascading HTML Style Sheets"; CSS 1 ships 1996. Today: about a hundred modules, still growing.</p>
+    <p>This is the whole idea of CSS. Mention CSS Zen Garden (2003, Dave Shea): one HTML file, hundreds of designs submitted by designers worldwide. It convinced the industry that separating content and style works.</p>
+    <p>Everything today is about the right-hand side of that separation.</p>
+  </aside>
+</section>
+
+<section data-title="The brief">
+  <p class="kicker">Our client for today</p>
+  <h2>The Harbour Night Market needs a website</h2>
+  <div class="split center">
+    <figure class="shot" style="height:560px"><img src="images/outfit-none.png" alt="The Night Market page with no CSS: black Times New Roman text, blue underlined links, bullet lists."></figure>
+    <div class="email">
+      <header><b>From:</b> Marta, Harbour Night Market<br><b>Subject:</b> site goes live Friday 😬</header>
+      <p>Our developer finished the HTML. It's all there — vendors, schedule, tickets.</p>
+      <p>But it looks like 1995. Can you make it feel like a <strong>night market</strong>?</p>
+      <p class="muted">— M.</p>
+      <p class="small" style="border-top:2px solid var(--line);padding-top:14px"><strong>Get the files:</strong> <a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener"><code>github.com/nlopin/programming-interactivity-exercises</code></a> → folder <code>02-css-fundamentals</code></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Everyone gets this exact HTML (<code>project/starter/</code>). It's well-structured, semantic, lots of classes to hook into — the kind of HTML we wrote last week.</p>
+    <p>By the end of today each of you has your own outfit for it. Be honest about layout: the showcase grids use one line of next week's CSS — it's in their starter file as "magic for now".</p>
+  </aside>
+</section>
+
+<section data-title="Today's map">
+  <p class="kicker">The plan · 3 hours</p>
+  <h2>Five acts and a finale</h2>
+  <div class="map">
+    <div class="m1"><b>Act 1</b><strong>Plug it in</strong>connecting CSS to HTML<time>0:06</time></div>
+    <div class="m2"><b>Act 2</b><strong>Speak CSS</strong>anatomy of a rule<time>0:28</time></div>
+    <div class="m3"><b>Act 3</b><strong>Point at things</strong>selectors<time>0:42</time></div>
+    <div class="mb"><b>☕</b><strong>Break</strong>15 minutes<time>1:15</time></div>
+    <div class="m4"><b>Act 4</b><strong>Settle the fight</strong>cascade &amp; specificity<time>1:30</time></div>
+    <div class="m5"><b>Act 5</b><strong>The toolbox</strong>colour, type, boxes, units<time>2:00</time></div>
+    <div class="m6"><b>Finale</b><strong>Dress the market</strong>your makeover<time>2:30</time></div>
+  </div>
+  <p class="mt">Rule of the day: <span class="hl">you type something every 15 minutes.</span></p>
+  <aside class="notes">
+    <p>Point at the times — the footer of each slide shows which act we're in. Presenter view (<code>p</code>) tells me if I'm running late.</p>
+  </aside>
+</section>
+
+<section class="act" data-act="1" data-act-name="Plug it in" data-at="0:06" data-title="Act 1 — Plug it in">
+  <div class="act-deco">&lt;link&gt;</div>
+  <div class="act-num">Act 1</div>
+  <h1>Plug it in</h1>
+  <div class="act-meta"><span class="chip">0:06 – 0:28</span><span>how CSS reaches the HTML</span></div>
+  <div class="act-list"><span>browser defaults</span><span>style=""</span><span>&lt;style&gt;</span><span>&lt;link&gt;</span><span>paths</span></div>
+</section>
+
+<section data-title="You never start from zero">
+  <p class="kicker">Before you write a line</p>
+  <h2>You never start from zero</h2>
+  <div class="split fill">
+    <div class="stack">
+      <p>That "naked" page wasn't unstyled. Every browser ships a <strong>user-agent stylesheet</strong>: the reason <code>h1</code> is big, links are blue, and <code>body</code> has an 8px margin.</p>
+      <script type="text/x-code" data-lang="css" class="small">/* excerpt from Chrome's own stylesheet */
+body { display: block; margin: 8px; }
+h1 {
+  display: block;
+  font-size: 2em;
+  margin-block: 0.67em;
+  font-weight: bold;
+}
+a:-webkit-any-link {
+  color: -webkit-link;
+  text-decoration: underline;
+}</script>
+    </div>
+    <div class="frame"><iframe data-src="project/starter/index.html" title="The starter page with browser defaults only"></iframe></div>
+  </div>
+  <aside class="notes">
+    <p>Every CSS you write is layered on top of this. It's also why pages look slightly different in Chrome, Safari and Firefox — their default sheets differ a bit. That's why people use a small "reset".</p>
+    <p>DevTools shows these rules labelled <i>user agent stylesheet</i>.</p>
+  </aside>
+</section>
+
+<section data-title="Three ways to attach CSS">
+  <p class="kicker">From smallest reach to largest</p>
+  <h2>Three ways to attach CSS</h2>
+  <div class="stack">
+    <div class="row top step"><span class="chip act" style="min-width:210px;text-align:center">1 · one element</span><div class="fill"><script type="text/x-code" data-lang="html"><a class="button" ⟦style="background: tomato"⟧>Get a ticket</a></script></div></div>
+    <div class="row top step"><span class="chip act" style="min-width:210px;text-align:center">2 · one page</span><div class="fill"><script type="text/x-code" data-lang="html"><!-- in the <head> -->
+⟦<style> .button { background: tomato; } </style>⟧</script></div></div>
+    <div class="row top step"><span class="chip act" style="min-width:210px;text-align:center">3 · every page</span><div class="fill"><script type="text/x-code" data-lang="html"><!-- in the <head> -->
+⟦<link rel="stylesheet" href="css/style.css">⟧</script></div></div>
+  </div>
+  <p class="step mt"><span class="hl">Your default is <code>&lt;link&gt;</code>:</span> one file styles the whole site, and the browser caches it.</p>
+  <aside class="notes">
+    <p>1. <code>style</code> attribute: one element. You'll see it a lot when JavaScript sets styles.</p>
+    <p>2. <code>&lt;style&gt;</code> element: one page. Fine for demos and single-page experiments.</p>
+    <p>Inline can't do <code>:hover</code> or media queries and beats every selector (Act 4). <code>@import</code> inside CSS also exists — it makes the browser wait, so prefer <code>&lt;link&gt;</code> (the demo themes use it for Google Fonts; fine in a demo).</p>
+    <p>3. <code>&lt;link&gt;</code>: one file, any number of pages. This is your default. <code>rel</code> says what kind of resource it is; <code>href</code> says where.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Paths are relative to the HTML">
+  <p class="kicker">Predict</p>
+  <h2>Paths start where the HTML file is</h2>
+  <div class="split center">
+    <div class="tree">market/
+├── index.html
+├── <span class="f">css/</span>
+│   └── style.css
+└── <span class="f">about/</span>
+    └── team.html</div>
+    <div class="qa">
+      <div>From <code>index.html</code>:<span class="step"><code class="ans">href="css/style.css"</code></span></div>
+      <div>From <code>about/team.html</code>:<span class="step"><code class="ans">href="../css/style.css"</code> <span class="small muted">— <code>..</code> = up one folder</span></span></div>
+      <div>What about <code>href="/css/style.css"</code>?<span class="step">Starts at the <strong>site root</strong>. Breaks when you open the file straight from your disk, and on sites that live in a sub-folder. Use relative paths.</span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Ask each question, wait for an answer, then reveal. Most "my CSS doesn't work" bugs in the first weeks are this slide.</p>
+  </aside>
+</section>
+
+<section data-title="DevTools, your CSS x-ray">
+  <p class="kicker">The tool you'll use every day</p>
+  <h2>DevTools: the browser tells on itself</h2>
+  <div class="split l2 center">
+    <div class="dt">
+      <div class="dt-tabs"><span class="on">Styles</span><span>Computed</span><span>Layout</span><span>Event Listeners</span></div>
+      <div class="dt-rule"><span class="dt-sel">element.style</span> { }</div>
+      <div class="dt-rule">
+        <div class="dt-head"><span><span class="dt-sel">.card h3</span> {</span><span><span class="dt-pin inl">2</span> <span class="dt-src">style.css:12</span></span></div>
+        <div class="dt-decl bad"><span class="p">colr</span>: <span class="v">tomato</span>; <span class="dt-pin inl">1</span></div>
+        <div class="dt-decl"><span class="p">font-size</span>: <span class="v">32px</span>;</div>
+        <div class="dt-decl"><span class="p">margin</span>: ▸ <span class="v">8px 0</span>;</div>
+        }
+      </div>
+      <div class="dt-rule">
+        <div class="dt-head"><span><span class="dt-sel">h3</span> {</span><span class="dt-src ua">user agent stylesheet</span></div>
+        <div class="dt-decl"><span class="p">display</span>: <span class="v">block</span>;</div>
+        <div class="dt-decl over"><span class="p">font-size</span>: <span class="v">1.17em</span>; <span class="dt-pin inl">3</span></div>
+        }
+      </div>
+    </div>
+    <ol class="dt-notes">
+      <li><strong>⚠ + strike-through</strong> = the browser couldn't read it. Your typo detector.</li>
+      <li><strong>File and line</strong> — click it to jump to the source.</li>
+      <li><strong>Crossed out, no ⚠</strong> = valid, but it lost a fight. Act 4.</li>
+    </ol>
+  </div>
+  <p class="small muted mt">Click any value to edit it live. Tick boxes switch declarations on and off. Nothing is saved — experiment freely.</p>
+  <aside class="notes">
+    <p>2 minutes, projected, BEFORE Ex 1, so everyone can do its step 4. The ⚠ / crossed-out legend comes back in the bug hunt and Act 4. Open real DevTools on the starter page and show the same things: right-click → Inspect, the Styles panel, the checkbox toggles, editing a value, the Computed tab (the final answer after the cascade).</p>
+    <p>Shortcut: ⌘⌥I (Mac), F12 or Ctrl+Shift+I (Windows). ⌘⌥C jumps straight into "pick an element".</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Plug in the market">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 1 · solo · 10 min</p>
+  <div class="ex-head"><h2>Plug in the market</h2><button class="timer" data-min="10"></button></div>
+  <ol>
+    <li>Get the repo <a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener"><code>github.com/nlopin/programming-interactivity-exercises</code></a> (<code>git clone</code>, or Code → Download ZIP and <strong>extract it first</strong>). Open <code>02-css-fundamentals/project/starter/</code> in your editor.</li>
+    <li>Add a <code>&lt;link&gt;</code> to <code>css/style.css</code> in the <code>&lt;head&gt;</code> — it lives in the <code>css/</code> folder, like on the paths slide.</li>
+    <li>In <code>style.css</code>, delete the <code>/*</code> and <code>*/</code> around <code>body { background: hotpink; }</code>. Save, reload. Pink = connected.</li>
+    <li>DevTools (<kbd>⌘</kbd> <kbd>⌥</kbd> <kbd>I</kbd> · Windows <kbd>F12</kbd>) → Elements → click <code>&lt;body&gt;</code>. Find your rule in the Styles panel.</li>
+  </ol>
+  <p class="where mt">All exercise paths from here on are inside <b>02-css-fundamentals/</b>. Done early? <b>exercises/01-broken-links/</b> — five pages, five ways to break a link. We'll solve them together next.</p>
+  <aside class="notes">
+    <p>The DevTools tour happened on the projector just before (previous slide). Walk around and check a few screens. Typical problems: file saved as style.css.txt, link placed after &lt;/head&gt; (works, but wrong place), editor not saved, wrong folder.</p>
+    <p>Broken-links pack: A no rel, B wrong path, C &lt;style src&gt;, D &lt;style&gt; tags pasted into the .css file (first rule dies), E capital letter in file name (works on Mac, breaks on the server).</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Spot the crime">
+  <p class="kicker">Together · spot the crime</p>
+  <h2>Five links. Same symptom: <em class="s">nothing happens</em></h2>
+  <div class="crimes2">
+    <div><b>A</b><script type="text/x-code" data-lang="html"><link href="css/style.css"></script><span class="step">No <code>rel</code> — the browser doesn't know it's a stylesheet.</span></div>
+    <div><b>B</b><script type="text/x-code" data-lang="html"><link rel="stylesheet" href="style.css"></script><span class="step">Wrong folder. Network tab: <strong>404</strong>.</span></div>
+    <div><b>C</b><script type="text/x-code" data-lang="html"><style src="css/style.css"></style></script><span class="step"><code>&lt;style&gt;</code> has no <code>src</code>. Silently ignored.</span></div>
+    <div><b>D</b><script type="text/x-code" data-lang="css"><style> body { background: #ffd23f; }</script><span class="step">HTML pasted into a .css file: the first rule dies, the rest work.</span></div>
+    <div><b>E</b><script type="text/x-code" data-lang="html"><link rel="stylesheet" href="css/Style.css"></script><span class="step">Capital S: fine on a Mac, broken on the server.</span></div>
+  </div>
+  <p class="step"><strong>Debug order:</strong> ① Network tab: did the file load? ② Styles panel: is my rule there? ③ Is it crossed out? — Act 4.</p>
+  <aside class="notes">
+    <p>3 minutes max. Reveal all five quickly; discuss B (paths — their own link just used css/) and D (silent partial failure) only. Teacher-led, whether or not they did 1b. The files are in <code>exercises/01-broken-links/</code> — open page D live: the stamp says "connected" but the page isn't yellow. CSS fails one rule at a time — bridge into Act 2.</p>
+  </aside>
+</section>
+
+<section class="act" data-act="2" data-act-name="Speak CSS" data-at="0:28" data-title="Act 2 — Speak CSS">
+  <div class="act-deco">{ : ; }</div>
+  <div class="act-num">Act 2</div>
+  <h1>Speak CSS</h1>
+  <div class="act-meta"><span class="chip">0:28 – 0:42</span><span>the grammar of one rule</span></div>
+  <div class="act-list"><span>rule</span><span>selector</span><span>declaration</span><span>property</span><span>value</span><span>silent failure</span></div>
+</section>
+
+<section data-steps="6" data-title="Anatomy of a rule">
+  <p class="kicker">Anatomy of a rule</p>
+  <h2>One rule, six names</h2>
+  <div class="anatomy">
+    <pre class="anat-code"><span class="a-rule"><span class="a-sel">.vendor-card h3</span> <span class="a-block"><span class="a-p">{</span>
+  <span class="a-decl"><span class="a-prop">color</span><span class="a-p">:</span> <span class="a-val">tomato</span><span class="a-p">;</span></span>
+  <span class="a-decl2"><span class="a-prop">font-size</span><span class="a-p">:</span> <span class="a-val">1.5rem</span><span class="a-p">;</span></span>
+<span class="a-p">}</span></span></span></pre>
+    <ol class="anat-list">
+      <li class="step"><b>Selector</b>which elements</li>
+      <li class="step"><b>Declaration block</b>everything in <code>{ }</code></li>
+      <li class="step"><b>Declaration</b>one instruction, ends with <code>;</code></li>
+      <li class="step"><b>Property</b>what to change</li>
+      <li class="step"><b>Value</b>what to change it to</li>
+      <li class="step"><b>Rule</b> (or ruleset) — the whole thing</li>
+    </ol>
+  </div>
+  <p class="small"><strong>Grammar:</strong> <code>:</code> between property and value · <code>;</code> ends a declaration · <code>{ }</code> wraps the block · <code>/* */</code> comments · whitespace is free.</p>
+  <aside class="notes">
+    <p>Then read it as a sentence: "Find every h3 inside a .vendor-card. Make its colour tomato and its size 1.5rem." Selector = who, declarations = what. Step through; each step lights up one part. Have the class say the names out loud with you. We'll use these words all day — "your declaration is invalid", "your selector doesn't match".</p>
+  </aside>
+</section>
+
+<section data-title="CSS fails silently">
+  <p class="kicker">Live · try breaking it</p>
+  <h2>CSS fails silently</h2>
+  <div class="fill live" data-zoom="1.7">
+    <script type="text/plain" data-role="html"><article class="card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></article></script>
+    <textarea>
+.card {
+  background: papayawhip;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.card h3 {
+  colr: tomato;       /* typo */
+  font-size: 32px;    /* still works */
+  margin: 8px 0;
+}
+</textarea>
+  </div>
+  <div class="reveal-box step mt">One typo → <strong>that line</strong> is skipped. One broken selector → the <strong>whole rule</strong> is skipped: <code>h2, h3:hovr { color: tomato }</code> styles nothing, not even the h2.</div>
+  <aside class="notes">
+    <p>Fix <code>colr</code> live. Then break different things from the bug hunt: write <code>margin: 8 px</code>, delete the <code>}</code> after the first rule, add <code>h3:hovr</code> to the selector. A missing <code>}</code> is the odd one out: it eats the <em>next</em> rule (with native CSS nesting the next rule becomes a nested one that matches nothing). A broken selector loses its whole rule. Everything else: just that line.</p>
+    <p>JavaScript: one typo and the program stops. CSS: one typo and one line is skipped — great for users, terrible for debugging.</p>
+    <p>Why? The web must keep working when a browser meets CSS written for a newer browser. Unknown = ignore and move on.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Bug hunt">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 2 · solo · 7 min</p>
+  <div class="ex-head"><h2>Bug hunt: seven bugs, zero error messages</h2><button class="timer" data-min="7"></button></div>
+  <p>A vendor card that should look finished. Seven tiny mistakes are hiding in its CSS. Fix them until every pill turns green.</p>
+  <ul>
+    <li>Use DevTools on the preview: right-click → Inspect. Look for ⚠.</li>
+    <li>Read each line slowly, as the browser would: property, colon, value, semicolon.</li>
+  </ul>
+  <p class="where mt">Open <b>exercises/02-bug-hunt.html</b></p>
+  <aside class="notes">
+    <p>Bugs: missing ; after papayawhip (also kills border), border-radius: 16 (no unit), colour, -0.02 em (space), padding: 4px, 10px (comma), upper-case, :hovr (kills the paragraph rule).</p>
+    <p>Debrief verbally, 2 minutes: ask the room to call out bugs; open the exercise page on the projector and fix them live. Emphasise the two big-blast-radius bugs: the missing semicolon (two declarations lost) and the broken selector (whole rule lost).</p>
+  </aside>
+</section>
+
+<section class="act" data-act="3" data-act-name="Point at things" data-at="0:42" data-title="Act 3 — Point at things">
+  <div class="act-deco">. # &gt;</div>
+  <div class="act-num">Act 3</div>
+  <h1>Point at things</h1>
+  <div class="act-meta"><span class="chip">0:42 – 1:15</span><span>selectors</span></div>
+  <div class="act-list"><span>type</span><span>.class</span><span>#id</span><span>[attr]</span><span>combinators</span><span>:pseudo-classes</span><span>::pseudo-elements</span><span>:has()</span></div>
+</section>
+
+<section data-title="A selector is a question">
+  <p class="kicker">Live · type anything</p>
+  <h2>A selector is a question to the DOM</h2>
+  <div class="fill sel-tester" data-presets="h3|.tag|#tickets|.vendor-card|li.featured|.vendor-list > li|h2 + ul|[type=&quot;email&quot;]|.vendor-card:has(.badge)|*">
+    <script type="text/plain">
+      <header class="site-header">
+        <a class="logo" href="#">Night Market</a>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="#vendors">Vendors</a></li>
+            <li><a href="#tickets">Tickets</a></li>
+          </ul>
+        </nav>
+      </header>
+      <section id="vendors">
+        <h2>Vendors</h2>
+        <ul class="vendor-list">
+          <li class="vendor-card featured">
+            <span class="tag">Food</span>
+            <h3>Dumpling Dynasty</h3>
+          </li>
+          <li class="vendor-card">
+            <span class="tag">Music</span>
+            <h3>Side B Records</h3>
+          </li>
+          <li class="vendor-card sold-out">
+            <span class="tag">Food</span>
+            <h3>Churros Till Late</h3>
+            <strong class="badge">Sold out</strong>
+          </li>
+          <li class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>The Plant Swap</h3>
+          </li>
+        </ul>
+      </section>
+      <section id="tickets">
+        <h2>Get a ticket</h2>
+        <form class="ticket-form">
+          <label for="email">Email</label>
+          <input id="email" type="email" required>
+          <button type="submit">Reserve</button>
+        </form>
+      </section>
+    </script>
+  </div>
+  <aside class="notes">
+    <p>"Which elements?" — the browser answers by pointing. Click the presets left to right; then take requests from the room ("select all the tags", "only the sold-out card").</p>
+    <p>Show an invalid selector (<code>.tag:hovr</code>) — the counter turns red: that's the whole rule being dropped.</p>
+    <p>Playground for students: <code>playgrounds/selectors.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="The basic five">
+  <p class="kicker">Simple selectors</p>
+  <h2>The basic five</h2>
+  <table class="sel-table">
+    <tr><td><code>h3</code></td><td>type</td><td>every <code>&lt;h3&gt;</code> on the page</td></tr>
+    <tr><td><code>.tag</code></td><td>class</td><td>every element with <code>class="tag"</code> — any tag, any number</td></tr>
+    <tr><td><code>#tickets</code></td><td>id</td><td>the one element with <code>id="tickets"</code></td></tr>
+    <tr><td><code>[type="email"]</code></td><td>attribute</td><td>elements whose attribute matches — <code>[required]</code>, <code>[href^="https"]</code></td></tr>
+    <tr><td><code>*</code></td><td>universal</td><td>everything. Mostly used for resets.</td></tr>
+  </table>
+  <p class="mt"><span class="hl">Style with classes.</span> Ids are for anchors (<code>#tickets</code> in a link) and JavaScript — you'll see why in Act 4.</p>
+  <aside class="notes">
+    <p>An element can have many classes: <code>class="vendor-card featured"</code> — two separate classes, not one called "vendor-card featured".</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="The most expensive space in CSS">
+  <p class="kicker">Spot the difference</p>
+  <h2>The most expensive space in CSS</h2>
+  <div class="split">
+    <div class="mt-card">
+      <script type="text/x-code" data-lang="css">li.featured</script>
+      <p><strong>No space:</strong> an <code>li</code> that <em>is</em> <code>.featured</code>.</p>
+      <div class="mtree step"><div class="mnode">ul<div class="kids"><div class="mnode hit">li.featured<div class="kids"><div class="mnode">h3</div></div></div><div class="mnode">li<div class="kids"><div class="mnode">span.featured</div></div></div></div></div></div>
+    </div>
+    <div class="mt-card">
+      <script type="text/x-code" data-lang="css">li .featured</script>
+      <p><strong>Space:</strong> a <code>.featured</code> <em>inside</em> an <code>li</code>.</p>
+      <div class="mtree step"><div class="mnode">ul<div class="kids"><div class="mnode">li.featured<div class="kids"><div class="mnode">h3</div></div></div><div class="mnode">li<div class="kids"><div class="mnode hit">span.featured</div></div></div></div></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Ask: which element does each one select? Reveal the trees. Then go back one slide and try both in the tester.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3a — Selector Arena">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 3a · pairs · 6 min</p>
+  <div class="split l2 fill">
+    <div class="stack">
+      <div class="ex-head"><h2>Selector Arena</h2><button class="timer" data-min="6"></button></div>
+      <p>15 levels at the market stall. Select exactly the wobbling items. Your selector runs for real.</p>
+      <ul>
+        <li>Hover an item to see its HTML.</li>
+        <li>Levels 1–6 in class. 7–15 are homework.</li>
+        <li>Stuck 2 minutes? Press 💡.</li>
+      </ul>
+      <p class="where">Open <b>playgrounds/selector-arena.html</b></p>
+    </div>
+    <div class="frame" style="box-shadow:8px 8px 0 var(--yellow)"><iframe data-src="playgrounds/selector-arena.html" title="Selector Arena"></iframe></div>
+  </div>
+  <aside class="notes">
+    <p>Open the Arena full-screen in its own tab for the level-1 demo — the slide iframe is only a teaser. Homework: levels 7–15. Debrief 1 minute: which level hurt most? (Usually 5 vs 6 — tag+class vs descendant.) Demo level 1 together on the projector (type <code>lemon</code>, Enter). Then everyone on their own laptops. Progress is saved in their browser.</p>
+    <p>Walk around. Common trap: level 5 vs 6 (no space vs space). Levels 7–15 (child, grouping, attributes, position, siblings, :not, :has) are homework — they revise this act.</p>
+  </aside>
+</section>
+
+<section data-title="Combinators">
+  <p class="kicker">Relationships</p>
+  <h2>Combinators describe family relations</h2>
+  <div class="combos">
+    <div><b>A B</b><code>.vendor-card h3</code><span>descendant — B anywhere inside A</span></div>
+    <div><b>A &gt; B</b><code>.main-nav &gt; ul</code><span>child — B directly inside A, one level</span></div>
+    <div><b>A + B</b><code>h2 + ul</code><span>next sibling — the B right after A</span></div>
+    <div><b>A ~ B</b><code>h2 ~ p</code><span>later siblings — every B after A, same parent</span></div>
+    <div style="border-style:dashed"><b>A, B</b><code>h1, h2, h3</code><span>not a relation: a list. Same styles, several selectors.</span></div>
+  </div>
+  <aside class="notes">
+    <p>Tree words from last week: parent, child, sibling, descendant. The DOM tree is what selectors walk.</p>
+  </aside>
+</section>
+
+<section data-title="Pseudo-classes: state">
+  <p class="kicker">Live · hover, click, tab into it</p>
+  <h2>Pseudo-classes: <em class="s">state</em> and <em class="s">position</em></h2>
+  <div class="fill live" data-zoom="1.6">
+    <script type="text/plain" data-role="html"><p><a class="button" href="#">Get a ticket</a></p><ul><li>Dumplings</li><li>Vinyl</li><li>Posters</li><li>Plants</li></ul></script>
+    <script type="text/plain" data-role="base">body{font-family:system-ui} .button{display:inline-block;padding:12px 20px;border-radius:99px;background:#17140f;color:#fff;text-decoration:none;font-weight:700} input{font:inherit;padding:8px;border:2px solid #999;border-radius:8px} button{font:inherit;padding:8px 14px}</script>
+    <textarea>
+.button:hover {
+  background: tomato;
+}
+
+/* links & buttons: keyboard only.
+   text fields: always */
+.button:focus-visible {
+  outline: 4px solid gold;
+  outline-offset: 3px;
+}
+
+li:nth-child(odd) { background: #f4efe6; }
+</textarea>
+  </div>
+  <p class="mt small"><strong>Position:</strong> <code>:first-child</code> <code>:last-child</code> <code>:nth-child(odd)</code> <code>:nth-child(3n+1)</code> — try formulas later in <code>playgrounds/nth-child.html</code>.</p>
+  <aside class="notes">
+    <p>Hover the button, press it, then click into the preview and press Tab: the gold ring appears only for keyboard focus. That's <code>:focus-visible</code> — use it instead of <code>:focus</code> and never delete focus outlines without a replacement (accessibility, last week's keyboard exercise).</p>
+    <p>More states for the cheat sheet, not for today: <code>:active</code>, <code>:disabled</code>, <code>:checked</code>, and <code>:user-invalid</code> (a form field the user has touched and got wrong — nicer than <code>:invalid</code>, which is red before anyone types).</p>
+  </aside>
+</section>
+
+<section data-title=":has() — the parent selector">
+  <p class="kicker">Live · :has() works everywhere since late 2023</p>
+  <h2>Logic: <code>:not()</code> and <code>:has()</code></h2>
+  <div class="fill live" data-zoom="1.3" data-layout="wide-preview">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card sold-out"><span class="tag">Food</span><h3>Churros Till Late</h3><strong class="badge">Sold out</strong></li><li class="vendor-card"><span class="tag">Crafts</span><h3>The Plant Swap</h3></li></ul></script>
+    <script type="text/plain" data-role="base">body{font-family:system-ui} .vendor-list{list-style:none;padding:0;display:flex;gap:10px} .vendor-card{border:2px solid #17140f;border-radius:10px;padding:10px 14px;flex:1} h3{margin:6px 0} .tag{font-size:12px;background:#eee;padding:2px 8px;border-radius:99px} .badge{color:#b3290b} form{margin-top:16px} input,button{font:inherit;padding:6px 10px}</script>
+    <textarea>
+/* every card except... */
+.vendor-card:not(.sold-out) h3 {
+  color: tomato;
+}
+
+/* the CARD reacts to its content */
+.vendor-card:has(.badge) {
+  opacity: 0.45;
+  border-style: dashed;
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p><code>:not()</code> excludes. <code>:has()</code> is the parent selector we waited 20 years for: before :has(), CSS could only look <i>down</i> the tree. Now a parent can react to its children. (Bonus for later: <code>form:has(input:invalid) button</code> dims a submit button until the form is valid.)</p>
+  </aside>
+</section>
+
+<section data-title="Pseudo-elements">
+  <p class="kicker">Live · parts that aren't in the HTML</p>
+  <h2>Pseudo-elements: <code>::</code> invents a part</h2>
+  <div class="fill live" data-zoom="1.45">
+    <script type="text/plain" data-role="html"><article class="featured"><h3>Dumpling Dynasty</h3><p class="lead">Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience.</p></article><ul><li>Food</li><li>Music</li></ul></script>
+    <script type="text/plain" data-role="base">body{font-family:system-ui;line-height:1.4}</script>
+    <textarea>
+.featured h3::before {
+  content: "★ ";   /* required */
+  color: gold;
+}
+
+.featured::after {
+  content: "Staff pick";
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 10px;
+  background: gold;
+  border-radius: 99px;
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Others for the cheat sheet: <code>::first-letter</code> (drop caps), <code>::marker</code> (list bullets), <code>::selection</code>, <code>::placeholder</code>. The zine theme uses ::before for the tape strips and ::after for the heart and the scissors line — open themes/zine.css later.</p>
+    <p>One colon = state or position (pseudo-class). Two colons = a generated part (pseudo-element).</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3b — Point at the market">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 3b · solo · 8 min · live checks</p>
+  <div class="ex-head"><h2>Point at the market</h2><button class="timer" data-min="8"></button></div>
+  <p>Open <b style="color:var(--yellow)">exercises/03-market-selectors.html</b>. Pills turn green when you're right. Copy your CSS into <code>css/style.css</code> afterwards.</p>
+  <ol class="numgrid">
+    <li>No bullets in the nav list <span class="muted">· list-style</span></li>
+    <li>Nav links: no underline <span class="muted">· text-decoration</span></li>
+    <li><code>→ </code> before each nav link <span class="muted">· ::before + content</span></li>
+    <li>Featured card's heading: tomato</li>
+    <li>Sold-out cards at half opacity <span class="muted">· opacity</span></li>
+    <li>Cards that <em>have</em> a <code>.badge</code>: dashed border</li>
+  </ol>
+  <p class="where">Stretch: striped even rows · UPPERCASE table headings · email glows on <code>:focus-visible</code>.</p>
+  <aside class="notes">
+    <p>Tasks 1–6 are core; 7–9 are stretch. The property names are given next to each task — they weren't taught yet and that's fine: the exercise is about selectors. Debrief 2 minutes: <code>.sold-out</code> vs <code>.vendor-card:has(.badge)</code> — two ways to find the same cards. No ids, no long chains. The hot pink can stay until Ex 5a.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:15" data-title="Break">
+  <div class="lanterns" aria-hidden="true"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break <em>time</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>When we're back: <strong>Marta found a bug</strong> — and it takes the whole cascade to explain it.</p>
+  <aside class="notes">
+    <p>Click the timer to start. It beeps at zero. Leave the Selector Arena open for people who want to keep playing.</p>
+  </aside>
+</section>
+
+<section class="act" data-act="4" data-act-name="Settle the fight" data-at="1:30" data-title="Act 4 — Settle the fight">
+  <div class="act-deco">!important</div>
+  <div class="act-num">Act 4</div>
+  <h1>Settle the fight</h1>
+  <div class="act-meta"><span class="chip">1:30 – 2:00</span><span>the case of the stubborn button</span></div>
+  <div class="act-list"><span>clue 1 · order</span><span>clue 2 · the tournament</span><span>clue 3 · specificity</span><span>verdict</span><span>inheritance</span></div>
+  <aside class="notes"><p>Everything in this act is the investigation. Next slide opens the case.</p></aside>
+</section>
+
+<section data-title="The case of the stubborn button">
+  <p class="kicker">Marta found a bug</p>
+  <h2>The case of the stubborn button</h2>
+  <div class="fill live" data-layout="wide-code" data-zoom="1.6" data-label="stays blue. why?">
+    <script type="text/plain" data-role="html"><section id="tickets"><h2>Get a ticket</h2><a class="ticket-button" href="#">Reserve my spot</a></section></script>
+    <script type="text/plain" data-role="base">
+      body { font-family: system-ui, sans-serif; }
+      h2 { margin: 0 0 16px; }
+      .ticket-button { padding: 14px 22px; border-radius: 999px; text-decoration: none; font-weight: 700; display: inline-block; }
+    </script>
+    <textarea>
+/* style.css — this is the whole story */
+
+/* line 12, the previous developer */
+#tickets a { background: royalblue; color: white; }
+
+/* line 318, Marta's fix at the bottom */
+.ticket-button { background: tomato; }
+</textarea>
+  </div>
+  <p class="mt">Both rules are right here. Both match the button. Marta's comes later. <strong>So why is it still blue?</strong></p>
+  <div class="bets"><span class="chip line">a typo</span><span class="chip line">browser cache</span><span class="chip line">the first rule "sticks"</span><span class="chip line">one rule is stronger</span></div>
+  <aside class="notes">
+    <p>Nothing is hidden: the editor shows every rule that touches the button (the base CSS is only padding and radius). After Act 3 everyone can read both selectors — what they're missing is the rule for who wins. That's this act.</p>
+    <p>Ask for bets, hands up per chip. Let people argue for "later rule wins" — it's the natural guess and it's wrong here. Try changing tomato to other colours live: still blue. Don't solve it yet: "In about ten minutes you'll explain this in one sentence, and you'll know three ways to fix it — two of them bad."</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Two rules, one heading">
+  <p class="kicker">Clue 1 · predict</p>
+  <h2>Two rules, one heading. What colour?</h2>
+  <div class="split">
+    <div class="stack">
+      <span class="chip line" style="align-self:flex-start">round 1</span>
+      <script type="text/x-code" data-lang="css" class="big">h1 { color: tomato; }
+h1 { color: royalblue; }</script>
+      <div class="reveal-box solid step"><strong style="color:royalblue">royalblue.</strong> Same selector, same strength → the <strong>last</strong> one wins.</div>
+    </div>
+    <div class="stack step">
+      <span class="chip line" style="align-self:flex-start">round 2 · <code>&lt;h1 class="title"&gt;</code></span>
+      <script type="text/x-code" data-lang="css" class="big">.title { color: tomato; }
+h1 { color: royalblue; }</script>
+      <div class="reveal-box solid step"><strong style="color:tomato">tomato.</strong> <code>h1</code> comes later — and still loses. A class is <strong>more specific</strong>. Order only breaks ties.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Round 1: hands up tomato / royalblue. Everyone gets it. Round 2: most will say royalblue — that's the point. "Last one wins" is only the final tie-breaker. So what are the earlier rounds?</p>
+    <p>Order also applies between files: a later <code>&lt;link&gt;</code> wins ties against an earlier one.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="The cascade is a tournament">
+  <p class="kicker">Clue 2 · the algorithm</p>
+  <h2>The cascade is a tournament</h2>
+  <p>For every property of every element, all matching declarations compete. You only go to the next round (→) on a tie.</p>
+  <div class="rounds">
+    <div class="round step"><b>1</b><strong>Importance &amp; origin</strong>any <code>!important</code> beats all normal CSS</div>
+    <div class="round step"><b>2</b><strong>Inline style</strong><code>style=""</code> beats any selector</div>
+    <div class="round step"><b>3</b><strong>Layers</strong><code>@layer</code> — homework round 6</div>
+    <div class="round step hot"><b>4</b><strong>Specificity</strong>how precise the selector is</div>
+    <div class="round step"><b>5</b><strong>Order</strong>the later one wins</div>
+  </div>
+  <p class="mt step">For your own CSS, almost every fight is decided in <strong>round 4 or 5</strong>.</p>
+  <aside class="notes">
+    <p>Round 1 in full (only if asked): normal CSS stacks browser &lt; user stylesheet &lt; you; with <code>!important</code> it flips to you &lt; user &lt; browser, so a reader who needs it can always win. Round 3: <code>@layer</code> — later layer wins, unlayered beats layered (bonus round 6 of Ex 4). Round 2: a <code>style=""</code> attribute beats every selector.</p>
+    <p>This is the "Cascading" in the name. Reveal round by round. Most day-to-day fights are between your own rules, same origin, no layers — so specificity and order.</p>
+    <p>(Pedantic footnote if asked: the spec also has "context"/scoping for Shadow DOM. Not needed.)</p>
+  </aside>
+</section>
+
+<section data-title="Round 4 — specificity">
+  <p class="kicker">Clue 3 · round 4, the one you'll fight daily</p>
+  <h2>Specificity is a score in three columns</h2>
+  <p class="bigsel"><span class="ia">#tickets</span> <span class="ib">.button</span><span class="ib">:hover</span></p>
+  <div class="scoreboard">
+    <div class="a"><span>1</span><small>IDs</small></div>
+    <div class="b"><span>2</span><small>CLASSES</small></div>
+    <div class="c"><span>0</span><small>TYPES</small></div>
+  </div>
+  <p class="step" style="text-align:center;max-width:none;margin-bottom:18px">Compare left to right. The first column that differs decides. <strong>(1,0,0) beats (0,99,0).</strong></p>
+  <div class="counts strip step">
+    <div class="card ca"><h3>ID</h3><code>#tickets</code></div>
+    <div class="card cb"><h3>CLASS</h3><code>.tag</code><code>[type]</code><code>:hover</code></div>
+    <div class="card cc"><h3>TYPE</h3><code>h3</code><code>li</code><code>::before</code></div>
+    <div class="card cz"><h3>ZERO</h3><code>*</code><code>&gt;</code><code>+</code><code>~</code><code>:where()</code></div>
+    <div class="card cx"><h3>BORROWED</h3><code>:not()</code><code>:has()</code><small>= strongest argument</small></div>
+  </div>
+  <aside class="notes">
+    <p>Pseudo-classes count as classes, pseudo-elements as types, combinators are free. <code>:where()</code> is always zero (Ex 4b round 4). <code>:is()</code>, <code>:not()</code>, <code>:has()</code> borrow their strongest argument: <code>:not(#x)</code> counts as an id. Calculator and a 7-round duel for homework: <code>playgrounds/specificity.html</code>. Quick oral check instead of the duel: "<code>#tickets .button</code> or <code>.page .form .row .button</code>?" Like comparing version numbers, or football league tables: points first, goal difference only if points tie. Eleven classes never add up to an id — the columns don't carry over.</p>
+  </aside>
+</section>
+
+<section data-title="Mystery solved">
+  <p class="kicker">The verdict</p>
+  <h2>Mystery solved: the id outweighs the class</h2>
+  <div class="split fill">
+    <div class="live" data-layout="stack" data-zoom="1.5" style="font-size:20px">
+      <script type="text/plain" data-role="html"><section id="tickets"><h2>Get a ticket</h2><a class="ticket-button" href="#">Reserve my spot</a></section></script>
+      <script type="text/plain" data-role="base">#tickets { font-family: system-ui, sans-serif; } #tickets h2 { margin: 0 0 16px; } .ticket-button { padding: 14px 22px; border-radius: 999px; text-decoration: none; display: inline-block; font-weight: 700; }</script>
+      <textarea>
+/* line 12 — the previous developer */
+#tickets a { background: royalblue; color: white; }
+
+/* line 318 — Marta's fix */
+.ticket-button { background: tomato; }
+</textarea>
+    </div>
+    <div class="stack">
+      <div class="spec-calc" data-compare data-value="#tickets a||.ticket-button" style="font-size:28px"></div>
+      <p class="step">Being later doesn't help: the fight was settled in round 4.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Show it in real DevTools first (right-click the preview → Inspect): <code>.ticket-button</code> background struck through, <code>#tickets a</code> above it. Then the calculator on the right says why. Pay off the bet: who picked "one rule is stronger"? The id rule was on screen all along — it just carries more weight. (1,0,1) vs (0,1,0). Being later only matters in round 5, and we never get there.</p>
+    <p>DevTools lists rules winner-first; hover a selector to see its specificity; the font shows as "Inherited from section#tickets".</p>
+    <p>Try the fixes live on the next slide's list.</p>
+  </aside>
+</section>
+
+<section data-title="Three ways out">
+  <p class="kicker">Fixing it</p>
+  <h2>Three ways out — two of them bad</h2>
+  <div class="grid-3">
+    <div class="card step"><span class="label">💣 the nuke</span><script type="text/x-code" data-lang="css" class="small">.ticket-button {
+  background: tomato !important;
+}</script><p class="mt">Works. Now the next person needs <code>!important</code> too.</p></div>
+    <div class="card step"><span class="label">🔫 the arms race</span><script type="text/x-code" data-lang="css" class="small">#tickets .ticket-button {
+  background: tomato;
+}</script><p class="mt">Works. (1,1,0). The stakes just went up again.</p></div>
+    <div class="card act step"><span class="label" style="color:inherit">✅ fix the cause</span><p style="margin:0 0 8px">Change only the <strong>selector</strong> on line 12:</p><p style="font:700 24px var(--font-mono);margin:0 0 8px"><del>#tickets a</del> → .ticket-button</p><p class="mt">Now it matches only the button, at (0,1,0) — same as Marta's rule, so the later one wins.</p><p class="small" style="margin:10px 0 0">Habit: short, flat selectors. Nobody wins a specificity war.</p></div>
+  </div>
+  <aside class="notes">
+    <p>Contrast for the next exercise: in round 2 you <em>can't</em> fix the cause, because the locked rule isn't yours — that's the pain of inherited ids. Go back one slide and type each fix into the editor to prove they work. Then argue for C: fix the rule that was too strong, not the one that lost. <code>:where()</code> keeps the id selector but zeroes its weight; renaming it to a class would work too if you can edit the HTML.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 4a — Win the fight, rounds 1–2">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 4a · pairs · 4 min</p>
+  <div class="ex-head"><h2>Now you: rounds 1 and 2</h2><button class="timer" data-min="4"></button></div>
+  <p>You just watched the verdict. Now win two fights yourself — no <code>!important</code>.</p>
+  <ol>
+    <li><strong>The tie-break</strong> — make the heading tomato, no ids.</li>
+    <li><strong>Beat the id</strong> — try ten classes first. Feel it fail. The locked rule can't be edited, so you're stuck with bad fix #2 — this is what inheriting someone else's ids feels like.</li>
+  </ol>
+  <p class="where mt">Open <b>exercises/04-win-the-fight.html</b> · stop after round 2.</p>
+  <aside class="notes"><p>Students type within 13 minutes of the break. Rounds 3–6 come after inheritance.</p></aside>
+</section>
+
+<section data-title="Inheritance">
+  <p class="kicker">Not a fight — family resemblance</p>
+  <h2>Some properties are passed down</h2>
+  <div class="split r2 fill">
+    <div class="stack">
+      <div class="card flat"><span class="label">Inherited</span><code>color</code> <code>font-*</code> <code>line-height</code> <code>text-align</code> <code>letter-spacing</code> <code>list-style</code> <code>cursor</code> <code>visibility</code></div>
+      <div class="card flat"><span class="label">Not inherited</span><code>margin</code> <code>padding</code> <code>border</code> <code>background</code> <code>width</code> <code>height</code> <code>display</code></div>
+      <p class="small muted">Rule of thumb: text-ish properties inherit, box-ish properties don't.</p>
+
+    </div>
+    <div class="live" data-layout="stack" data-zoom="1.4">
+      <script type="text/plain" data-role="html"><article><h3>Salt &amp; Ink</h3><p>Risograph posters of the port, printed in <strong>two colours</strong>.</p></article></script>
+      <textarea>
+article {
+  color: #7b4dff;
+  font-family: Georgia, serif;
+  border: 3px solid tomato;
+  padding: 12px;
+}
+/* h3 and p inherit colour + font,
+   not the border */
+</textarea>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Imagine if border inherited: every nested element would get its own border. Chaos. So the spec picks sensible defaults: set <code>font-family</code> once on <code>body</code> and the whole page gets it.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Inherited vs direct">
+  <p class="kicker">Predict · last clue before you practise</p>
+  <h2>An id against a lonely <code>p</code></h2>
+  <div class="split center">
+    <div class="stack">
+      <script type="text/x-code" data-lang="html"><div id="main">
+  <p>Which colour am I?</p>
+</div></script>
+      <script type="text/x-code" data-lang="css" class="big">#main { color: red; }
+p { color: blue; }</script>
+    </div>
+    <div class="reveal-box solid step"><strong style="color:blue">blue.</strong> <code>#main</code> targets the <em>div</em>. The <code>p</code> only inherits red — and an inherited value has <strong>no specificity at all</strong>. Any rule that targets the element itself wins.</div>
+  </div>
+  <aside class="notes">
+    <p>The specificity crowd will shout red. This is the #1 source of "but my id should win!" confusion. Specificity only compares rules that match the <i>same element</i>.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 4 — Win the fight">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 4b · pairs · 4 min</p>
+  <div class="ex-head"><h2>Win the fight: round 3</h2><button class="timer" data-min="4"></button></div>
+  <p>Back to the same page. Round 3 in class; rounds 4–6 are homework.</p>
+  <ol class="checklist one">
+    <li>Round 3 · The inheritance trap</li>
+    <li class="muted">Homework · round 4 zero power · round 5 inline style · round 6 layers</li>
+  </ol>
+  <p class="where mt">Open <b>exercises/04-win-the-fight.html</b> · each round has a "why it works" reveal — open it <em>after</em> you win.</p>
+  <aside class="notes">
+    <p>Close Act 4 with one line: "short, flat selectors; no ids; !important only for code you can't edit; surprised? find the crossed-out line." Debrief 2 minutes: cold-call round 2 (why ten classes lose to one id) and round 3 (the inheritance trap) — the exit ticket checks both. Rounds 1–3 are the core concepts: order, specificity columns, inheritance vs direct. 4–6: :where(), inline, layers.</p>
+  </aside>
+</section>
+
+<section class="act" data-act="5" data-act-name="The toolbox" data-at="2:00" data-title="Act 5 — The toolbox">
+  <div class="act-deco">rem</div>
+  <div class="act-num">Act 5</div>
+  <h1>The toolbox</h1>
+  <div class="act-meta"><span class="chip">2:00 – 2:30</span><span>properties &amp; units</span></div>
+  <div class="act-list"><span>Marta writes back</span><span>contrast</span><span>type &amp; units</span><span>box model</span><span>custom properties</span></div>
+</section>
+
+<section data-title="Marta writes back">
+  <p class="kicker">A new email</p>
+  <h2>The button works. Now four new complaints.</h2>
+  <div class="email" style="max-width:1150px">
+    <header><b>From:</b> Marta, Harbour Night Market<br><b>Subject:</b> Re: site goes live Friday</header>
+    <ol style="padding:0 24px;margin:18px 0">
+      <li>The ticket button is hard to read on my phone in the sun.</li>
+      <li>On my big monitor the text runs across the whole screen.</li>
+      <li>The vendor cards feel cramped. Everything touches everything.</li>
+      <li>If we rebrand, can I change the colour in <em>one</em> place?</li>
+    </ol>
+  </div>
+  <p class="mt">Act 5 answers them in order: <strong>contrast · type &amp; units · boxes · custom properties</strong>. Your makeover is the reply.</p>
+  <aside class="notes"><p>Each following slide's kicker names the complaint it answers. Keeps Act 5 a story, not a list.</p></aside>
+</section>
+
+<section class="vc" data-title="Contrast is not optional">
+  <p class="kicker">Complaint 1 · "hard to read"</p>
+  <h2>Contrast is not optional</h2>
+  <p class="formats"><code>tomato</code><code>#ff6347</code><code>rgb(255 99 71)</code><code>rgb(255 99 71 / 50%)</code><span class="small muted" style="align-self:center">— same colour; hsl() knobs in <code>playgrounds/color.html</code></span></p>
+  <div class="contrast-row">
+    <div style="background:#fff;color:#c4c4c4">Vendors open at 19:00. Bring cash for the stalls.<small class="no">1.7&nbsp;:&nbsp;1 ✗</small></div>
+    <div style="background:#fff;color:#767676">Vendors open at 19:00. Bring cash for the stalls.<small class="ok">4.5&nbsp;:&nbsp;1 ✓ AA</small></div>
+    <div style="background:tomato;color:#fff">Reserve my spot — Marta's button.<small class="no">2.95&nbsp;:&nbsp;1 ✗ fails even large</small></div>
+    <div style="background:tomato;color:#17140f">Reserve my spot — fixed with dark text.<small class="ok">6.2&nbsp;:&nbsp;1 ✓ AA</small></div>
+  </div>
+  <p class="mt">Our fix left white text on tomato — and it fails. <strong>4.5&nbsp;:&nbsp;1</strong> for normal text, <strong>3&nbsp;:&nbsp;1</strong> for large headings. DevTools' colour picker shows the ratio.</p>
+  <aside class="notes">
+    <p>Colour notations in one breath: 148 names, hex and rgb are red/green/blue, any of them takes transparency. hsl() = hue, saturation, lightness — keep hue, move lightness for shades (the colour playground shows it; rebeccapurple story if time). oklch only if asked.</p>
+    <p>Light grey text on white is the most common accessibility failure on the web. One in twelve men has some colour vision deficiency; everybody reads phones in sunlight.</p>
+  </aside>
+</section>
+
+<section data-title="Typography">
+  <p class="kicker">Complaint 2 · "text runs across the screen" · live</p>
+  <h2>Typography is 90% of the look</h2>
+  <div class="fill live" data-zoom="1.1" style="font-size:24px">
+    <script type="text/plain" data-role="html"><section class="hero"><p class="eyebrow">Friday 16 October · 19:00 – 01:00</p><h1>Harbour Night Market</h1><p class="lead">Forty stalls, three stages and one very long table on the waterfront. Street food, vinyl, handmade things and people you haven't met yet.</p></section></script>
+    <textarea>
+/* web font loaded by a <link> in <head> */
+.hero {
+  font-family: "Bricolage Grotesque",
+    system-ui, sans-serif;
+  text-align: center;
+}
+.lead {
+  font-size: 1.25rem;
+  line-height: 1.5;   /* no unit! */
+  /* max-width: 60ch; */
+  /* margin-inline: auto; */
+}
+h1 {
+  font-family: "Instrument Serif", serif;
+  font-size: 4.5rem;
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>First the complaint: the lead runs across the full width. Uncomment <code>max-width: 60ch</code> and <code>margin-inline: auto</code> — that's Marta's answer. Then try: swap h1 font to "Space Mono", change letter-spacing, set line-height 3 then 0.8. Explain the font stack: the browser walks the list until it finds a font it has; always end with a generic family (serif, sans-serif, monospace, system-ui).</p>
+    <p>Web fonts: fonts.google.com → pick a family → copy the <code>&lt;link&gt;</code> into your <code>&lt;head&gt;</code> before your stylesheet, then use the name in <code>font-family</code> with fallbacks. At most two families. (Also on the cheat sheet.)</p>
+    <p>Unitless line-height = multiply by the element's own font size, and children recalculate. With a unit, children inherit a fixed length — a classic bug.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="Units — relative to what?">
+  <p class="kicker">Complaint 2 · the units we just used</p>
+  <h2>Every unit answers: <em class="s">relative to what?</em></h2>
+  <table class="utable">
+    <tr><td><code>px</code></td><td>a CSS pixel — fixed</td><td>borders, shadows, hairlines</td></tr>
+    <tr><td><code>%</code></td><td>the containing block — depends on the property</td><td>widths yes; heights only if the parent has one</td></tr>
+    <tr><td><code>em</code></td><td>this element's font-size<br><small class="muted">in <code>font-size</code> itself: the parent's</small></td><td>padding that grows with its text</td></tr>
+    <tr><td><code>rem</code></td><td>the root (<code>html</code>) font-size — <strong>1rem = 16px</strong> by default</td><td>font sizes — follows the reader's browser setting</td></tr>
+    <tr><td><code>vw</code> <code>vh</code></td><td>1% of the viewport</td><td>full-screen sections, fluid headlines</td></tr>
+    <tr><td><code>ch</code></td><td>width of the “0” glyph</td><td>readable line length: <strong>60–70ch</strong></td></tr>
+  </table>
+  <aside class="notes">
+    <p>Homework: <code>playgrounds/units.html</code> — predict which bars move before each slider. em compounds: nested <code>li { font-size: 1.3em }</code> grows 1.3 × 1.3 × 1.3… each level; rem doesn't. That's why font sizes are rem, and em is for padding that should scale with its own text. (Demo: <code>playgrounds/units.html</code>.)</p>
+    <p>Why rem for text: many people raise their browser's default font size (Chrome → Settings → Appearance → Font size). <code>18px</code> ignores that; <code>1.125rem</code> is 18px by default and grows with it. Page zoom scales everything, px too — the setting only moves rem/em. Never set <code>html { font-size: 10px }</code>.</p>
+    <p>A CSS pixel isn't a hardware pixel — on a retina screen one CSS px is 2×2 or 3×3 device pixels. Next slide: see them move.</p>
+  </aside>
+</section>
+
+<section data-title="Block and inline boxes">
+  <p class="kicker">Complaint 3 · "cramped" · first: why won't my margin work?</p>
+  <h2>Block boxes stack. Inline boxes flow.</h2>
+  <div class="fill live" data-zoom="1.45">
+    <script type="text/plain" data-role="html"><p>A <span class="tag">Food</span> tag inside a paragraph, and a <a class="button" href="#">ticket link</a> in the same line of text.</p><p>The next paragraph.</p></script>
+    <script type="text/plain" data-role="base">body{font-family:system-ui;line-height:1.5} p{background:#ebe3d3;margin:0 0 8px} .tag{background:#ffd23f} .button{background:#17140f;color:#fff;text-decoration:none}</script>
+    <textarea>
+/* span and a are INLINE boxes.
+   Uncomment one line at a time. */
+.tag, .button {
+  /* width: 200px; */     /* ignored */
+  /* margin: 20px; */     /* only sideways */
+  /* padding: 10px; */    /* spills over */
+  /* display: inline-block; */ /* fix */
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Block (p, h1–h6, li, section, div): full width, stacks top to bottom. Inline (a, span, strong, em): flows like words — width and height are ignored, vertical margins do nothing, padding paints over neighbouring lines.</p>
+    <p>Uncomment inline-block: now width and all margins work, and it still sits in the line. The stubborn button used exactly this. The rest of <code>display</code> (flex, grid) is next week.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="How wide is it on screen?">
+  <p class="kicker">Complaint 3 · predict first</p>
+  <h2>How wide is it on screen?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="css" class="big">.card {
+  width: 300px;
+  padding: 20px;
+  border: 5px solid;
+}</script>
+    <div class="stack">
+      <div class="reveal-box solid step"><strong>350px.</strong> By default <code>width</code> is the <em>content</em> only: 300 + 2×20 + 2×5.</div>
+      <div class="reveal-box step">Add <code>box-sizing: border-box</code> → <strong>300px</strong>. Width now means the visible box; the content shrinks to fit.</div>
+      <script type="text/x-code" data-lang="css" class="step">/* the most copied line in CSS */
+*, *::before, *::after { box-sizing: border-box; }</script>
+    </div>
+  </div>
+  <p class="small step"><strong>Shorthands:</strong> <code>margin: 10px 20px</code> = top/bottom, left/right · four values go clockwise T R B L · <code>margin: 0 auto</code> centres · <code>border: 2px solid tomato</code> = width style colour. More on the cheat sheet.</p>
+  <aside class="notes">
+    <p>Everyone puts the last snippet at the top of their stylesheet. All four themes start with it. Do it in your project now.</p>
+  </aside>
+</section>
+
+<section data-title="Every element is a box">
+  <p class="kicker">Now check your prediction · drag the sliders</p>
+  <h2>Every element is a box</h2>
+  <div class="fill box-lab" style="font-size:28px"></div>
+  <p class="small mt">Stacked blocks? Vertical margins <strong>don't add up</strong> — the bigger one wins (20px + 30px → a 30px gap).</p>
+  <aside class="notes">
+    <p>Content → padding (inside, gets the background) → border → margin (outside, transparent, pushes neighbours). Show DevTools' box model diagram in the Computed tab — same picture.</p>
+    <p>Set width 300, padding 20, border 5 — the quiz numbers — and read 350px. Flip to border-box: 300px. Margin collapse (vertical margins merge, 20 + 30 → 30) is on the cheat sheet.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Mini-exercise — Box your cards">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Mini-exercise · solo · 3 min · in your project</p>
+  <div class="ex-head"><h2>Box your vendor cards</h2><button class="timer" data-min="3"></button></div>
+  <ol>
+    <li>Put the <code>box-sizing: border-box</code> reset at the top of <code>css/style.css</code>.</li>
+    <li>Give <code>.vendor-card</code> a <code>padding</code>, a <code>border</code> (with a style!) and a <code>border-radius</code>.</li>
+    <li>Use a shorthand with two values: <code>padding: 1rem 1.5rem</code>.</li>
+  </ol>
+  <p class="where mt">Check in DevTools → Computed: the box diagram shows your numbers.</p>
+  <aside class="notes"><p>Keeps the "type every 15 minutes" promise in the post-break slump. The reset is already in the 5a skeleton — they can uncomment just that line now.</p></aside>
+</section>
+
+<section data-title="Custom properties">
+  <p class="kicker">Complaint 4 · "one place" · live</p>
+  <h2>Custom properties: name a value once</h2>
+  <div class="fill live" data-zoom="1.5" style="font-size:24px">
+    <script type="text/plain" data-role="html"><article class="card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p><a class="button" href="#">Reserve</a></article></script>
+    <script type="text/plain" data-role="base">body{font-family:system-ui} .card{max-width:320px;padding:16px} .button{color:#fff;text-decoration:none;padding:6px 14px;display:inline-block} .tag{padding:2px 8px}</script>
+    <textarea>
+/* 1. declare on :root — the html element */
+:root {
+  --accent: tomato;
+  --radius: 14px;
+}
+
+/* 2. use with var() */
+.card { border: 3px solid var(--accent);
+        border-radius: var(--radius); }
+h3 { color: var(--accent); }
+.tag, .button { background: var(--accent);
+                border-radius: var(--radius); }
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Change <code>--accent</code> to rebeccapurple and <code>--radius</code> to 0: everything follows. <code>:root</code> is the html element — declaring there makes the variable available everywhere, because custom properties inherit. A section can override locally: <code>.dark { --accent: gold; }</code>.</p>
+    <p>All four outfits from the start open with a :root full of variables — show themes/neon.css.</p>
+  </aside>
+</section>
+
+<section data-title="Draw your brief">
+  <p class="kicker">Live · everyone draws their own</p>
+  <h2>A night market, in the style of…</h2>
+  <div class="brief" style="font-size:36px"></div>
+  <p class="mt small muted">Draw yours at <code>exercises/05-dress-the-market.html</code> — now, before Ex 5a, so your palette and fonts serve the brief. One redraw allowed.</p>
+  <aside class="notes">
+    <p>Draw one on the projector to show how it works. Constraints make it easier to start, not harder.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 5a — Prep the market">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 5a · solo · 8 min · in your project</p>
+  <div class="ex-head"><h2>Three decisions for your brief</h2><button class="timer" data-min="8"></button></div>
+  <p>Your brief's mood and colour rule drive these. The skeleton is at the top of <code>css/style.css</code> — uncomment it and fill every <code>…</code></p>
+  <div class="grid-3 mt">
+    <div class="card"><span class="label">1 · palette</span><code>--bg</code> <code>--ink</code> <code>--accent</code><p class="mt">Every text pair ≥ <strong>4.5&nbsp;:&nbsp;1</strong> — pair checker in <code>playgrounds/color.html</code>.</p></div>
+    <div class="card"><span class="label">2 · type</span><code>font-family</code><p class="mt">One stack. h1 ≈ <code>3rem</code>, h2 ≈ <code>2rem</code> (1rem = 16px).</p></div>
+    <div class="card"><span class="label">3 · measure</span><code>max-width</code><p class="mt">Text at <strong>60–70ch</strong>.</p></div>
+  </div>
+  <p class="where mt">Web font &lt;link&gt;: copy it from <b>exercises/05-dress-the-market.html</b>.</p>
+  <aside class="notes">
+    <p>Delete the hot pink first. Walk around and ask "what's your contrast ratio?" — make them open the picker. Web fonts: fonts.google.com → copy the &lt;link&gt; into the head before css/style.css.</p>
+  </aside>
+</section>
+
+<section class="act" data-act="6" data-act-name="Dress the market" data-at="2:30" data-title="Finale — Dress the market">
+  <div class="act-deco">:root</div>
+  <div class="act-num">Finale</div>
+  <h1>Dress the market</h1>
+  <div class="act-meta"><span class="chip">2:30 – 3:00</span><span>everything, at once</span></div>
+  <div class="act-list"><span>15 minutes</span><span>exit ticket</span><span>homework</span></div>
+</section>
+
+<section class="exercise" data-title="Exercise 5b — The makeover">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 5b · solo · 15 min</p>
+  <div class="ex-head"><h2>The makeover</h2><button class="timer" data-min="15"></button></div>
+  <div class="split">
+    <div>
+      <h3 style="color:var(--yellow)">In class — your reply to Marta</h3>
+      <ul class="checklist one">
+        <li>Your brief's mood is visible</li>
+        <li>Vendor cards look like cards</li>
+        <li><code>:hover</code> + <code>:focus-visible</code> on links &amp; buttons</li>
+        <li>One visible <code>::before</code> or <code>::after</code></li>
+        <li><code>.sold-out</code> looks sold out</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:#bdb4a4">Homework</h3>
+      <ul class="checklist one muted-list">
+        <li>All text ≥ 4.5&nbsp;:&nbsp;1 contrast</li>
+        <li>No ids, no <code>!important</code></li>
+        <li>Each variable used twice</li>
+        <li>Submitted on Google Classroom (zip or repo link) by end of week</li>
+      </ul>
+    </div>
+  </div>
+  <p class="where">Want a card grid? Uncomment the <b>layout magic</b> line at the bottom of <b>style.css</b> — next week you'll know why. Your brief is already drawn. Stuck? Steal from <b>project/showcase/themes/*.css</b>.</p>
+  <aside class="notes">
+    <p>Walk around. Ask each person which round of the cascade their last bug was decided in. At 2:45 give a 2-minute warning.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Exit ticket">
+  <p class="kicker">Recap &amp; exit ticket · answer on paper, then reveal</p>
+  <h2>Three questions before you go</h2>
+  <ol>
+    <li>Specificity of <code>.nav li:first-child &gt; a::before</code>? <span class="step chip act">(0, 2, 3)</span></li>
+    <li><code>.page .card { color: red }</code> and <code>h3 { color: blue }</code>. An <code>h3</code> inside the card is…? <span class="step chip act">blue — the h3 only inherits red</span></li>
+    <li><code>width: 200px; padding: 20px; border: 2px solid</code>, default box-sizing. Width on screen? <span class="step chip act">244px</span></li>
+  </ol>
+  <p class="mt small muted">Today: plug it in · speak CSS · point at things · settle the fight · the toolbox · dress it. Same HTML, your outfit.</p>
+  <aside class="notes">
+    <p>Quick hands-up count for each. Q3 bonus trap if someone asks: without <code>solid</code> the border style is <code>none</code>, its width computes to 0, and the answer is 240px. If fewer than half got #2, start next lecture with a 2-minute inheritance refresher.</p>
+  </aside>
+</section>
+
+<section data-title="Homework and next week">
+  <p class="kicker">Until next week</p>
+  <h2>Homework &amp; what's next</h2>
+  <div class="split">
+    <div>
+      <h3>Homework</h3>
+      <ul>
+        <li>Finish your market. Tick every box on the makeover checklist.</li>
+        <li>Submit on <strong>Google Classroom</strong> by <strong>end of the week</strong>: a zip of your <code>starter/</code> folder, or a link to your repo.</li>
+        <li>Selector Arena levels 7–15, and the units playground.</li>
+      </ul>
+      <h3 class="mt">Read</h3>
+      <ul class="small">
+        <li>MDN — <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics" target="_blank" rel="noopener">CSS styling basics</a> · <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Handling_conflicts" target="_blank" rel="noopener">Handling conflicts</a></li>
+        <li>web.dev Learn CSS — <a href="https://web.dev/learn/css/box-model" target="_blank" rel="noopener">Box model</a> · <a href="https://web.dev/learn/css/selectors" target="_blank" rel="noopener">Selectors</a> · <a href="https://web.dev/learn/css/the-cascade" target="_blank" rel="noopener">The cascade</a> · <a href="https://web.dev/learn/css/specificity" target="_blank" rel="noopener">Specificity</a></li>
+      </ul>
+    </div>
+    <div class="card dark">
+      <span class="label">Next lecture · Layout</span>
+      <p>The vendor grid in every theme is one line:</p>
+      <script type="text/x-code" data-lang="css" class="small">grid-template-columns:
+  repeat(auto-fill, minmax(16rem, 1fr));</script>
+      <p class="mt">Next week you'll know why. Flexbox, Grid, and <code>@media</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Point them to github.com/nlopin/programming-interactivity-exercises → 02-css-fundamentals — every playground, every exercise and the printable cheat sheet.</p>
+  </aside>
+</section>
+
+<section class="title no-chrome" data-title="Same HTML. Your outfit.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="title-h1">Same HTML.<br><em class="s">Your</em><br>outfit.</h1>
+      <p class="title-sub">exercises · playgrounds · cheat sheet →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <img src="images/outfit-zine.png" alt="">
+      <img src="images/outfit-brutal.png" alt="">
+      <img src="images/outfit-neon.png" alt="">
+      <img src="images/outfit-swiss.png" alt="">
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>
