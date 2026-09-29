@@ -75,6 +75,7 @@ From `assets/slides.css`:
 | `.byline` | muted line that hugs the heading above it |
 | `.cols` | two equal columns |
 | `.cols.cards` | two columns as bordered cards |
+| `<pre>` inside a `.cols.cards` card | one-line code sample in a card — smaller type, never wraps |
 | `.cols.media` | two columns, vertically centred — text beside an image |
 | `<figure>` + `<figcaption>` (+ `.bare`) | framed image with a caption; `.bare` drops the frame |
 | `pre.big` | enlarged code block — a short snippet that is the focus of the slide |
@@ -84,6 +85,9 @@ From `assets/slides.css`:
 | `table.table` (`<th>` label + `<td>` value, one row per group) | grouped reference table — label column auto-aligns across rows |
 | `.logo-row` + `.logo-chip` (+ `.current`) + `.logo-arrow` | logo sequence |
 | `.timeline` > `.timeline-rows` (radio + `label` with `.year`) + `.timeline-detail` (one `div` per row) | clickable vertical timeline, detail on the right; max 8 rows |
+| `<kbd>` | a keyboard key drawn as a keycap — `<kbd>Enter</kbd>` |
+| `<mark>` inside a `<pre>` | highlight part of a code block — "what is this part called?" |
+| `<details data-no-nav>` + `<summary>` | click-to-reveal answer under a question or prediction |
 
 `_template/slides.html` is a gallery with one slide per pattern above — copy the
 directory, delete the slides you don't need, and replace the text.

@@ -1,0 +1,224 @@
+/* Finished stylesheet for live-canvas.html, one chunk per lecture block.
+   Only uses what the lecture has covered by that point: no flexbox, no grid,
+   no custom properties. */
+
+
+/* ---------- Block 3: CSS intro — prove the link works ---------- */
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+
+/* ---------- Block 4: anatomy + inheritance ---------- */
+
+/* color and line-height are inherited: every element picks them up. */
+body {
+  color: hsl(240 6% 12%);
+  line-height: 1.6;
+}
+
+/* Try this, then delete it: border is NOT inherited, only body gets one. */
+/* body { border: 4px dashed hotpink; } */
+
+
+/* ---------- Block 5: selectors ---------- */
+
+/* type + descendant */
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* pseudo-class: state */
+nav a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 3px solid hsl(14 70% 41%);
+  outline-offset: 3px;
+}
+
+/* class */
+.brand {
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 600;
+}
+
+/* next-sibling combinator: a divider between articles, not above the first */
+article + article {
+  border-top: 1px solid hsl(0 0% 85%);
+}
+
+/* attribute selector + pseudo-element: mark external links */
+a[href^="https"]::after {
+  content: " ↗";
+}
+
+/* Keeps the "about the dashboard" text for screen readers, hides it on screen.
+   Copy as is: position and clip come in a later lecture. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+
+/* ---------- Block 6: cascade and specificity ---------- */
+
+/* This rule comes after `nav a { color: inherit }` and `.brand`, yet the nav
+   links and the brand stay dark: `nav a` (0-0-2) and `.brand` (0-1-0) both
+   beat `a` (0-0-1). Order only decides between equal specificity.
+   Inspect a nav link: Styles shows this rule crossed out. */
+a {
+  color: hsl(14 70% 41%);
+}
+
+/* Try, then delete: an id beats every class rule above. */
+/* #work h2 { color: hotpink; } */
+
+
+/* ---------- Block 7: units and colors ---------- */
+
+body {
+  background: hsl(40 20% 98%);
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+.eyebrow {
+  font-size: .8rem;
+  color: hsl(14 70% 41%);   /* 5.5:1 on the background */
+}
+
+.lede,
+article p,
+aside p {
+  color: hsl(240 4% 36%);   /* 6.8:1 on the background */
+}
+
+/* readable line length */
+header,
+main,
+footer {
+  max-width: 65ch;
+}
+
+
+/* ---------- Block 8: flow layout ---------- */
+
+/* li is block: make the nav items sit in one line */
+nav li {
+  display: inline;
+}
+
+/* horizontal margin works on inline boxes */
+nav li + li {
+  margin-inline-start: 1rem;
+}
+
+/* Try: an inline <a> with vertical padding overlaps the lines around it.
+   inline-block makes the padding take space. */
+.cta {
+  display: inline-block;
+  padding: .75rem 1.5rem;
+  background: hsl(240 6% 12%);
+  color: hsl(0 0% 100%);
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.cta:hover {
+  background: hsl(240 6% 25%);
+}
+
+/* Try, then delete: */
+/* html { writing-mode: vertical-rl; } */
+/* <html dir="rtl"> — margin-inline-start above flips on its own */
+
+
+/* ---------- Block 9: box model ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/* center the page column, with a gutter on small screens */
+header,
+main,
+footer {
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+header {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid hsl(0 0% 85%);
+}
+
+.hero {
+  padding-block: 3rem;
+}
+
+/* margin collapse: the gap between two articles is 1.5rem, not 3rem */
+article {
+  margin-block: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+aside {
+  margin-block: 3rem;
+  padding: 1.5rem;
+  background: hsl(40 12% 93%);
+  border-radius: 12px;
+}
+
+dd {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+dt {
+  font-size: .85rem;
+  color: hsl(240 4% 36%);
+}
+
+dl > div + div {
+  margin-top: 1rem;
+}
+
+footer {
+  padding-block: 1.5rem;
+  border-top: 1px solid hsl(0 0% 85%);
+}

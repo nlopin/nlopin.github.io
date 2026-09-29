@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova Studio</title>
+<link rel="stylesheet" href="live-canvas.css">
+</head>
+<body>
+
+<!--
+  Live-coding canvas for lecture 2: the lecture-1 div-soup page, refactored
+  into semantic HTML, with no styles at all. Style it live in
+  live-canvas.css, a few rules per theory block.
+
+  live-canvas-final.css is the finished stylesheet, split into one chunk per
+  block. If live coding goes wrong, point the <link> at it, or paste in the
+  chunks up to where you are.
+-->
+
+<header>
+  <a class="brand" href="#">Nova Studio</a>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="mailto:hello@example.com">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <p class="eyebrow">Design &amp; development studio</p>
+    <h1>We build interfaces people enjoy using</h1>
+    <p class="lede">A small studio helping startups turn rough ideas into products people actually want to open twice.</p>
+    <a class="cta" href="mailto:hello@example.com">Get in touch</a>
+  </section>
+
+  <section id="work">
+    <h2>Recent work</h2>
+
+    <article>
+      <h3>Redesigning checkout for Ferry &amp; Co</h3>
+      <p>Cut checkout time by a third by removing every field that wasn't strictly required, and testing the rest with real customers.</p>
+      <a href="#">Read more <span class="visually-hidden">about the Ferry &amp; Co checkout</span></a>
+    </article>
+
+    <article>
+      <h3>A dashboard nobody had to be trained on</h3>
+      <p>Replaced a 40-page onboarding PDF with a dashboard whose layout explains itself. Support tickets dropped <strong>60%</strong>.</p>
+      <a href="#">Read more <span class="visually-hidden">about the dashboard</span></a>
+    </article>
+  </section>
+
+  <aside id="about">
+    <h2>About the studio</h2>
+    <p>Four designers and engineers, based remotely, working with one client at a time.</p>
+    <dl>
+      <div>
+        <dt>Projects shipped</dt>
+        <dd>37</dd>
+      </div>
+      <div>
+        <dt>In business</dt>
+        <dd>6 years</dd>
+      </div>
+    </dl>
+  </aside>
+
+</main>
+
+<footer>
+  <p><small>&copy; 2026 Nova Studio</small></p>
+  <nav aria-label="Legal">
+    <ul>
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="https://dribbble.com/">Dribbble</a></li>
+    </ul>
+  </nav>
+</footer>
+
+</body>
+</html>

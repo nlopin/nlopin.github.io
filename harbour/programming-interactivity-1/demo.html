@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+    <main>He>
+        <p>Not interesting text</p>
+        <h2>
+            Section 1
+        </h2>
+        <p>Section 1 text</p>
+        <p>Section 1 text</p>
+        <h2>Section 2</h2>
+            <p>Section 2 text</p>
+            <h3>Section 2.3</h3>
+            <p>2.3 details</p>
+    </main>
+    <footer>
+        <div>
+        <label>
+        <input type="checkbox" id="divConv">
+            Convert all element to divs
+        </label>
+        </div>
+    </footer>
+</body>
+<script>
+  const checkboxEl = document.getElementById("divConv");
+  const articleEl = document.getElementsByTagName("main")[0]
+  const semanticChildrenCloned = articleEl.cloneNode(true);
+  checkboxEl.addEventListener("click", function(event) {
+    if (event.target.checked) {
+      for (const el of articleEl.children) {
+        replaceWithDivRec(el)
+      }
+    } else {
+      articleEl.replaceWith(semanticChildrenCloned.cloneNode(true));
+    }
+  });
+
+  function replaceWithDivRec(el) {
+    const divEl = document.createElement("div");
+    if (el.firstElementChild !== null) {
+      for (const childEl of el.children) {
+        divEl.appendChild(replaceWithDivRec(childEl))
+      }
+    } else {
+      divEl.textContent = el.textContent
+    }
+
+    el.replaceWith(divEl)
+    return divEl
+  }
+</script>
+</html>

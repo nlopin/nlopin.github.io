@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>px vs rem</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem 1.5rem 4rem;
+    font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color: hsl(240 6% 12%);
+    background: hsl(0 0% 100%);
+  }
+  main { max-width: 65ch; margin-inline: auto; }
+  section { margin-block: 2.5rem; padding-top: 1.5rem; border-top: 1px solid hsl(0 0% 85%); }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; }
+  .size { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; color: hsl(240 4% 36%); }
+
+  /* ---- the experiment ---- */
+  .px  { font-size: 24px; }
+  .rem { font-size: 1.5rem; }
+
+  .em-list li  { font-size: 0.8em; }
+  .rem-list li { font-size: 0.8rem; }
+
+  /* ---- fix me: this fails the contrast check ---- */
+  .low-contrast { color: hsl(0 0% 72%); }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>px vs rem</h1>
+  <p>Your root font size right now: <strong class="size" id="root-size">…</strong></p>
+
+  <section>
+    <h2>1. Change the default font size</h2>
+    <ol>
+      <li>Chrome: Settings → Appearance → Font size → <strong>Very large</strong>.<br>
+        Firefox: Settings → General → Fonts → Size → <strong>24</strong>.</li>
+      <li>Reload this page. Which line grew?</li>
+      <li>Now set it back and use zoom (Cmd +) instead. What's different?</li>
+    </ol>
+    <p class="px">I'm <code>font-size: 24px</code> <span class="size" data-measure></span></p>
+    <p class="rem">I'm <code>font-size: 1.5rem</code> <span class="size" data-measure></span></p>
+  </section>
+
+  <section>
+    <h2>2. em compounds, rem doesn't</h2>
+    <p>Both lists set <code>li</code> to 0.8 of something.</p>
+    <p><code>li { font-size: 0.8em; }</code></p>
+    <ul class="em-list">
+      <li>Level 1 <span class="size" data-measure></span>
+        <ul>
+          <li>Level 2 <span class="size" data-measure></span>
+            <ul>
+              <li>Level 3 <span class="size" data-measure></span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <p><code>li { font-size: 0.8rem; }</code></p>
+    <ul class="rem-list">
+      <li>Level 1 <span class="size" data-measure></span>
+        <ul>
+          <li>Level 2 <span class="size" data-measure></span>
+            <ul>
+              <li>Level 3 <span class="size" data-measure></span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Fix the contrast</h2>
+    <p class="low-contrast">This paragraph is hard to read. Inspect it, click the color swatch in the Styles panel, and drag the color until the contrast ratio shows a ✓.</p>
+  </section>
+
+</main>
+
+<script>
+  // Prints each element's computed font size next to it, in px.
+  function measure() {
+    var root = getComputedStyle(document.documentElement).fontSize;
+    document.getElementById("root-size").textContent = root;
+    document.querySelectorAll("[data-measure]").forEach(function (el) {
+      el.textContent = "→ " + getComputedStyle(el.parentElement).fontSize;
+    });
+  }
+  measure();
+  window.addEventListener("resize", measure);
+</script>
+</body>
+</html>

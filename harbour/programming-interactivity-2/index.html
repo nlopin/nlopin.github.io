@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 2 — CSS fundamentals</title>
+<meta property="og:title" content="Programming Interactivity — Lecture 2"/>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --muted: #666;
+    --line: #ddd;
+    --accent: #b3401f;
+    --code-bg: #f5f4f1;
+    --card-bg: #fafafa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --fg: #eee;
+      --muted: #9a9a9a;
+      --line: #34343a;
+      --accent: #ff8a5c;
+      --code-bg: #1f1f24;
+      --card-bg: #1c1c21;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 300 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+  pre { background: var(--code-bg); padding: .9rem 1rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; }
+  pre code { background: none; padding: 0; }
+
+  header.top { padding: 3rem 1.5rem 2rem; max-width: 880px; margin: 0 auto; }
+  header.top .kicker { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; margin-bottom: .5rem; }
+  header.top h1 { font-size: 2.1rem; font-weight: 500; margin: 0 0 .5rem; line-height: 1.25; }
+  header.top p.lede { color: var(--muted); font-size: 1.05rem; max-width: 60ch; margin: 0; }
+
+  nav.agenda-nav {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.agenda-nav .inner {
+    max-width: 880px; margin: 0 auto; padding: .6rem 1.5rem;
+    display: flex; gap: 1rem; overflow-x: auto; font-size: .82rem;
+  }
+  nav.agenda-nav a { white-space: nowrap; color: var(--muted); text-decoration: none; }
+  nav.agenda-nav a:hover { color: var(--fg); }
+
+  main { max-width: 880px; margin: 0 auto; padding: 0 1.5rem 6rem; }
+  section { padding-top: 3.5rem; scroll-margin-top: 3.5rem; }
+  section + section { border-top: 1px solid var(--line); }
+  section .num { color: var(--muted); font-size: .85rem; font-family: ui-monospace, monospace; }
+  section h2 { font-size: 1.5rem; font-weight: 500; margin: .25rem 0 1rem; }
+  section h3 { font-size: 1.05rem; font-weight: 600; margin: 1.75rem 0 .5rem; }
+  section > p, section > ul, section > ol { max-width: 68ch; }
+  li + li { margin-top: .25rem; }
+
+  .meta { color: var(--muted); font-size: .88rem; margin-top: -.5rem; }
+  .cut { font-size: .72rem; padding: .05rem .45rem; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+
+  details.notes { margin: 1rem 0; border: 1px solid var(--line); border-radius: 8px; background: var(--card-bg); }
+  details.notes summary { cursor: pointer; padding: .6rem .9rem; font-size: .85rem; font-weight: 600; color: var(--muted); }
+  details.notes[open] summary { color: var(--fg); }
+  details.notes .body { padding: 0 .9rem .9rem; font-size: .92rem; }
+  details.notes .body > :first-child { margin-top: 0; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 1rem 0 0; }
+  th, td { text-align: left; vertical-align: top; padding: .5rem .6rem; border-bottom: 1px solid var(--line); }
+  thead th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.min { font-family: ui-monospace, monospace; color: var(--muted); white-space: nowrap; }
+  tr.total td { border-bottom: none; border-top: 2px solid var(--fg); font-weight: 600; }
+  tr.break td { color: var(--muted); }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { display: flex; gap: .5rem; align-items: flex-start; }
+  .checklist input { margin-top: .35rem; }
+
+  footer.end { max-width: 880px; margin: 3rem auto 0; padding: 2rem 1.5rem 3rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+  footer.end a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="kicker">Programming Interactivity · Lecture 2</div>
+  <h1>CSS fundamentals</h1>
+  <p class="lede">Interactive HTML, then CSS: rules, selectors, the cascade and specificity, units, flow and the box model. 180 minutes: about 86 of theory, 84 of practice, 10 of break.</p>
+</header>
+
+<nav class="agenda-nav" aria-label="Sections">
+  <div class="inner">
+    <a href="#agenda">Agenda</a>
+    <a href="#arc">Arc</a>
+    <a href="#keyboard">1. Keyboard</a>
+    <a href="#interactive">2. Interactive HTML</a>
+    <a href="#css-intro">3. CSS intro</a>
+    <a href="#anatomy">4. Anatomy</a>
+    <a href="#selectors">5. Selectors</a>
+    <a href="#cascade">6. Cascade</a>
+    <a href="#units">7. Units &amp; colors</a>
+    <a href="#flow">8. Flow</a>
+    <a href="#box">9. Box model</a>
+    <a href="#exercise">10. Exercise</a>
+    <a href="#wrap-up">11. Wrap-up</a>
+    <a href="#prep">Prep</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="agenda">
+  <div class="num">00</div>
+  <h2>Agenda</h2>
+  <p>Deck: <a href="slides.html">slides.html</a>. Items marked <span class="cut">✂ cut</span> below can go if you run late; together they free about 12 minutes.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time</th><th>Block</th><th>Min</th><th>Mode</th></tr></thead>
+      <tbody>
+        <tr><td class="min">0:00</td><td>1. Cold open: keyboard only</td><td class="min">15</td><td>Practice, solo</td></tr>
+        <tr><td class="min">0:15</td><td>2. Interactive HTML, driven by the debrief</td><td class="min">12</td><td>Theory</td></tr>
+        <tr><td class="min">0:27</td><td>3. What CSS is, why it exists</td><td class="min">10</td><td>Theory + live code</td></tr>
+        <tr><td class="min">0:37</td><td>4. Anatomy of a rule + inheritance</td><td class="min">7</td><td>Theory</td></tr>
+        <tr><td class="min">0:44</td><td>4. Anatomy quiz</td><td class="min">8</td><td>Practice, whole room</td></tr>
+        <tr><td class="min">0:52</td><td>5. Selectors</td><td class="min">15</td><td>Theory + live code</td></tr>
+        <tr><td class="min">1:07</td><td>6. The cascade and specificity</td><td class="min">6</td><td>Theory + live code</td></tr>
+        <tr><td class="min">1:13</td><td>6. Which rule wins?</td><td class="min">4</td><td>Practice, whole room</td></tr>
+        <tr><td class="min">1:17</td><td>5–6. CSS Diner</td><td class="min">12</td><td>Practice, solo</td></tr>
+        <tr class="break"><td class="min">1:29</td><td>Break</td><td class="min">10</td><td>—</td></tr>
+        <tr><td class="min">1:39</td><td>7. Units and colors</td><td class="min">10</td><td>Theory + live code</td></tr>
+        <tr><td class="min">1:49</td><td>7. px vs rem, contrast fix</td><td class="min">8</td><td>Practice, solo</td></tr>
+        <tr><td class="min">1:57</td><td>8. Flow layout</td><td class="min">8</td><td>Theory + demos</td></tr>
+        <tr><td class="min">2:05</td><td>9. Box model</td><td class="min">13</td><td>Theory + demos</td></tr>
+        <tr><td class="min">2:18</td><td>9. Predict-the-box quiz</td><td class="min">5</td><td>Practice, whole room</td></tr>
+        <tr><td class="min">2:23</td><td>10. Style the signup form</td><td class="min">27</td><td>Practice, pairs</td></tr>
+        <tr><td class="min">2:50</td><td>10. Show and tell</td><td class="min">5</td><td>Practice, whole room</td></tr>
+        <tr><td class="min">2:55</td><td>11. Exit ticket + homework</td><td class="min">5</td><td>Wrap-up</td></tr>
+        <tr class="total"><td></td><td>Total</td><td class="min">180</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">The cascade block's 10 minutes come from interactive HTML (−3), CSS Diner (−3), units (−2) and flow (−2).</p>
+</section>
+
+<section id="arc">
+  <h2>The arc: break it, understand it, fix it</h2>
+  <ul>
+    <li><strong>Break:</strong> the lecture opens with students using real sites keyboard-only. They lose the focus ring and get stuck before hearing any theory.</li>
+    <li><strong>Understand:</strong> the HTML recap explains each failure they hit. The box-model block explains why <code>outline</code> exists and why removing it hurts.</li>
+    <li><strong>Fix:</strong> the final form has a planted <code>outline: none</code>. It ends with someone else completing the form keyboard-only.</li>
+  </ul>
+  <h3>Running threads</h3>
+  <ul>
+    <li><strong>One live canvas.</strong> <a href="live-canvas.html">live-canvas.html</a> is the lecture-1 div-soup page, refactored into semantic HTML, with no styles. Add a few rules to <code>live-canvas.css</code> in every theory block. <a href="live-canvas-final.css">live-canvas-final.css</a> has the finished version, one chunk per block, for recovery.</li>
+    <li><strong>One DevTools move per block:</strong>
+      <ul>
+        <li>Blocks 1–2: Accessibility tree</li>
+        <li>Block 3: Styles panel and the user agent stylesheet</li>
+        <li>Block 4: crossed-out declarations</li>
+        <li>Block 6: Styles panel order, where losing rules are crossed out</li>
+        <li>Block 7: color picker and contrast ratio</li>
+        <li>Block 9: Computed box diagram</li>
+        <li>Block 10: Rendering → emulate focused page</li>
+      </ul>
+    </li>
+    <li><strong>Predict before revealing.</strong> Every demo starts with "what will happen?". The deck's answers stay behind a click (<code>&lt;details&gt;</code>).</li>
+  </ul>
+</section>
+
+<section id="keyboard">
+  <div class="num">01 · 15 min · practice</div>
+  <h2>Cold open: keyboard only</h2>
+  <p class="meta">Goal: students feel why semantics and focus styles matter before any theory.</p>
+  <ul>
+    <li>Show the setup slide first. On a Mac, Safari and Firefox skip links on Tab until it's switched on. Without it, the first 10 minutes are lost.</li>
+    <li>Four tasks:
+      <ul>
+        <li>gov.uk: when does someone born 15/10/1966 get a free bus pass? The good baseline. It starts at the homepage, so finding the tool is part of the task (the slide hints "pension calculator"): it's the <a href="https://www.gov.uk/state-pension-age">State Pension age calculator</a>, option "bus pass". Answer: 15 October 2033, in England.</li>
+        <li>renfe.com: a train search</li>
+        <li>ikea.com: a desk under €100 into the cart, then open the cart</li>
+        <li>idealista.com (idealista.es redirects there): the list of apartments for rent in Barcelona, then open the 3rd result</li>
+      </ul>
+    </li>
+    <li>Walk around the room. Point out the cookie banners: they're usually the first thing that fails.</li>
+  </ul>
+  <details class="notes">
+    <summary>Talking point</summary>
+    <div class="body">
+      <p>Don't explain anything yet. When someone says "I'm stuck", answer "write down where". Collect the worst failures on the board under the four debrief questions (couldn't reach, Tab jumped around, stuck, focus vanished); the next block is built from them, one pitfall per question.</p>
+    </div>
+  </details>
+</section>
+
+<section id="interactive">
+  <div class="num">02 · 12 min · theory</div>
+  <h2>Interactive HTML, driven by the debrief</h2>
+  <p class="meta">Goal: every failure from the cold open gets a name and an HTML cause. The "Common pitfalls" slide is the map for the whole block: each following slide's kicker says which pitfall it answers.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pitfall</th><th>Slides</th></tr></thead>
+      <tbody>
+        <tr><td>1. Couldn't reach it</td><td>A div is not a button → Link or button? → Both, side by side (gov.uk cookie banner) → Looks like a button, is a link ("Start now")</td></tr>
+        <tr><td>2. Tab jumped around</td><td>Focus order is source order. <code>tabindex</code> above 0 is almost always wrong.</td></tr>
+        <tr><td>3. Stuck in a banner</td><td>A real modal keeps focus: <code>&lt;dialog&gt;</code> with <code>showModal()</code> moves focus inside, keeps Tab inside, closes on Esc and returns focus (teaser only).</td></tr>
+        <tr><td>Forms</td><td>Not a pitfall they hit: sighted keyboard users see labels. Opens with the unstyled signup form, "the form you style at the end, and what makes its HTML right", framed as what the gov.uk calculator does right. Includes <code>&lt;select&gt;</code> and <code>&lt;details&gt;</code> (Controls that come ready-made).</td></tr>
+        <tr><td>4. Focus vanished</td><td>The bridge slide: back to the signup form. "The HTML is right, it looks like 1995, and one line of CSS hides the focus ring." Straight into CSS. Paid off later on two slides with the same kicker: <code>:focus</code> vs <code>:focus-visible</code> (selectors) and Outline is not part of the box (box model).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Talking points</h3>
+  <ul>
+    <li>Link vs button: go somewhere vs do something. An <code>&lt;a&gt;</code> without <code>href</code> can't be focused.</li>
+    <li>The gov.uk screenshots are from the cold open. If someone inspects "Start now": it's <code>&lt;a href role="button"&gt;</code>. gov.uk adds the role so screen readers call it a button, which is a debated design-system choice. Plain <code>&lt;a href&gt;</code> is the right default.</li>
+    <li>Label ↔ input via <code>for</code>/<code>id</code>: a bigger click target, and the name a screen reader says. <code>name</code> is the key the form sends.</li>
+    <li>Input types bring the right mobile keyboard and validation. <code>required</code>, <code>autocomplete</code>, <code>placeholder</code> only for an example value.</li>
+    <li><code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code> for radio buttons: same <code>name</code> means one group.</li>
+    <li><strong>Demo:</strong> open <a href="form-exercise.html">form-exercise.html</a> unstyled, fill it, submit. Read the query string in the address bar: forms work without JS. The gov.uk calculator does the same: the answers end up in its URL (<code>/state-pension-age/y/bus_pass/1966-10-15</code>).</li>
+    <li>The gotcha: <code>&lt;button&gt;</code> inside a form defaults to <code>type="submit"</code>.</li>
+    <li><span class="cut">✂ cut</span> The "Controls that come ready-made" slide (<code>&lt;select&gt;</code>, <code>&lt;details&gt;</code>). Keep the <code>&lt;dialog&gt;</code> slide: it answers pitfall 3.</li>
+  </ul>
+  <details class="notes">
+    <summary>Common misconception</summary>
+    <div class="body"><p>"Accessibility is an extra feature we add at the end." No: picking the right element gives it for free, and picking the wrong one makes it expensive. Glafira Zhur's guest lecture on October 5 goes deeper.</p></div>
+  </details>
+</section>
+
+<section id="css-intro">
+  <div class="num">03 · 10 min · theory</div>
+  <h2>What CSS is, why it exists</h2>
+  <ul>
+    <li>HTML is meaning, CSS is presentation. Show tweakcn.com, and switch between 2–3 theme presets: same components, only the CSS changes.</li>
+    <li><strong>Demo:</strong> turn CSS off on a news site (Firefox → View → Page Style → No Style). It's still readable because of its semantics.</li>
+    <li>The user agent stylesheet: why <code>h1</code> is big with no CSS. Show it in the Styles panel.</li>
+    <li>Three places CSS can live. We use <code>&lt;link rel="stylesheet"&gt;</code>: one file for many pages, cached.</li>
+    <li><strong>Live canvas:</strong> open <code>live-canvas.html</code> (no styles), then add the block 3 chunk: a <code>font-family</code> on <code>body</code>. The whole page changes, which proves the link works.</li>
+  </ul>
+</section>
+
+<section id="anatomy">
+  <div class="num">04 · 7 + 8 min</div>
+  <h2>Anatomy of a rule, inheritance, quiz</h2>
+  <ul>
+    <li>Parts: selector, declaration block, declaration, property, value, and the rule as a whole.</li>
+    <li>CSS forgives silently: an unknown property is skipped. A missing <code>;</code> merges two declarations into one invalid one, and both are lost. Show the crossed-out ⚠ in DevTools.</li>
+    <li><strong>Inheritance:</strong> <code>color</code>, <code>font-*</code>, <code>line-height</code> pass down; <code>margin</code>, <code>padding</code>, <code>border</code> don't.</li>
+    <li><strong>Live canvas:</strong> block 4 chunk. Uncomment the <code>body { border }</code> line to show only the body gets one, then delete it.</li>
+    <li><strong>Quiz:</strong> 6 slides with the same snippet and a different part highlighted in each. The room shouts the answer, then you click "Answer".</li>
+  </ul>
+</section>
+
+<section id="selectors">
+  <div class="num">05 · 15 min · theory</div>
+  <h2>Selectors</h2>
+  <ul>
+    <li>Simple selectors: type, class, id (explain why to avoid it for styling), <code>*</code>, attribute.</li>
+    <li>Combinators: descendant, <code>&gt;</code>, <code>+</code>, <code>~</code>. The comma is a list, not a combinator.</li>
+    <li>Pseudo-classes for state. Here the recap pays off: <code>:focus-visible</code>, <code>:checked</code>, <code>:required</code>, and <code>:invalid</code> vs <code>:user-invalid</code>.</li>
+    <li>Pseudo-classes for structure. <span class="cut">✂ cut</span> <code>:has()</code> is optional.</li>
+    <li><code>:focus</code> vs <code>:focus-visible</code>: why designers remove the ring (mouse clicks) and why they don't have to.</li>
+    <li>Pseudo-elements: two colons, a part of an element.</li>
+    <li><strong>Live canvas:</strong> block 5 chunk. Live-code each selector type as you introduce it.</li>
+  </ul>
+  <p>CSS Diner comes after block 6: its later levels need a feel for which selector matches what, and the break follows it.</p>
+</section>
+
+<section id="cascade">
+  <div class="num">06 · 6 + 4 min</div>
+  <h2>The cascade and specificity</h2>
+  <p class="meta">Goal: when two rules disagree, students can predict the winner and read it in DevTools.</p>
+  <ul>
+    <li><strong>Open with a prediction:</strong> <code>p { color: red }</code> and <code>.intro { color: blue }</code> on <code>&lt;p class="intro"&gt;</code>. Hands up for red, then for blue. It's blue.</li>
+    <li><strong>How the browser picks a winner, in order:</strong>
+      <ol>
+        <li>Origin and importance: your stylesheet beats the browser's; <code>!important</code> beats both. (Strictly, the browser's own <code>!important</code> rules win over yours, but students won't meet those.)</li>
+        <li>Specificity: the more specific selector wins.</li>
+        <li>Source order: if they tie, the later one wins.</li>
+      </ol>
+      A <code>style=""</code> attribute beats any selector. An inherited value loses to any rule that targets the element directly, even <code>*</code>.
+    </li>
+    <li><strong>Specificity is three numbers,</strong> compared left to right: ids, then classes/attributes/pseudo-classes, then types/pseudo-elements. <code>*</code> and combinators count zero. There's no carrying: 11 classes never beat 1 id.</li>
+    <li><strong>Which rule wins?</strong> 3 predict slides:
+      <ul>
+        <li><code>a:hover</code> (0-1-1) beats <code>nav a</code> (0-0-2).</li>
+        <li>The same selector twice: the later one wins.</li>
+        <li><code>#nav a</code> (1-0-1) beats <code>.menu .link.active</code> (0-3-0).</li>
+      </ul>
+    </li>
+    <li><strong>Keep specificity low:</strong> style with classes, avoid ids, avoid <code>!important</code>. DevTools → Styles lists the matching rules with the winner on top and the losers crossed out.</li>
+    <li><strong>Live canvas:</strong> block 6 chunk. Add <code>a { color: … }</code> after the <code>nav a { color: inherit }</code> from block 5. The nav links stay dark even though the new rule comes later. Inspect a nav link to see the <code>a</code> rule crossed out.</li>
+    <li><strong>CSS Diner</strong> (12 min): levels 1–16 for everyone. Levels 13–15 (the sibling combinators) are where students usually get stuck.</li>
+  </ul>
+  <details class="notes">
+    <summary>Common misconceptions</summary>
+    <div class="body">
+      <ul>
+        <li>"The last rule always wins." Only between rules of equal specificity.</li>
+        <li>"<code>!important</code> fixes it." It wins this fight and starts the next one: the only way to beat it is another <code>!important</code>.</li>
+        <li>"More selectors in a rule means more specific." It's what kind they are: one id outweighs any number of classes.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section id="units">
+  <div class="num">07 · 10 + 8 min</div>
+  <h2>Units and colors</h2>
+  <ul>
+    <li><code>px</code> vs <code>rem</code> / <code>em</code> / <code>%</code> / <code>vw</code> / <code>vh</code> / <code>ch</code>. <span class="cut">✂ cut</span> <code>dvh</code>.</li>
+    <li><strong>Why rem:</strong> the user's default font size setting. Zoom scales everything, so zoom doesn't show the difference; the font size setting does.</li>
+    <li><code>em</code> compounds in nested lists; <code>rem</code> doesn't.</li>
+    <li><code>max-width: 65ch</code> on the canvas is an instant, visible improvement.</li>
+    <li>Colors: named, hex, <code>rgb()</code>, <code>hsl()</code>, alpha, <code>currentColor</code>. <span class="cut">✂ cut</span> <code>oklch()</code>.</li>
+    <li>Why HSL: change only the lightness to get the hover and active shades.</li>
+    <li>Contrast: 4.5:1 for body text, 3:1 for large text and UI parts. Show the ratio in the DevTools color picker.</li>
+    <li><strong>Live canvas:</strong> block 7 chunk.</li>
+    <li><strong>Practice:</strong> <a href="px-vs-rem.html">px-vs-rem.html</a>: change the Chrome font size and see which line grows. The em/rem lists print their computed sizes. Then fix the low-contrast paragraph.</li>
+  </ul>
+  <details class="notes">
+    <summary>Common misconception</summary>
+    <div class="body"><p>"rem vs px is taste." No: the <code>px</code> version ignores a setting that people with low vision rely on.</p></div>
+  </details>
+</section>
+
+<section id="flow">
+  <div class="num">08 · 8 min · theory</div>
+  <h2>Flow layout</h2>
+  <p class="meta">Taught before the box model on purpose: margin collapse and inline padding only make sense once block vs inline is clear.</p>
+  <ul>
+    <li>Normal flow: block boxes stack in the block direction; inline boxes wrap along the inline direction.</li>
+    <li>Block vs inline, and which elements are which.</li>
+    <li><strong>Predict:</strong> <code>width</code> on a <code>span</code>. Then show <a href="flow-and-box-demo.html">flow-and-box-demo.html</a> §1.</li>
+    <li>Directions depend on the language: demo §5 switches <code>writing-mode</code> and <code>dir</code>. <span class="cut">✂ cut</span> Logical properties are a teaser only.</li>
+    <li><code>display: none</code> also removes the element from the accessibility tree, which ties back to block 2.</li>
+    <li><strong>Live canvas:</strong> block 8 chunk: <code>nav li { display: inline }</code>, then the <code>.cta</code> first as inline (padding overlaps the lines), then as <code>inline-block</code>.</li>
+  </ul>
+</section>
+
+<section id="box">
+  <div class="num">09 · 13 + 5 min</div>
+  <h2>Box model</h2>
+  <ul>
+    <li>Content, padding, border, margin. Hover each layer in the Computed box diagram.</li>
+    <li>Shorthands go clockwise from the top. <code>margin-inline: auto</code> centers a block.</li>
+    <li><strong>Predict quiz</strong> (3 slides):
+      <ul>
+        <li>The gap between two <code>p</code> with <code>margin: 20px 0</code> is 20px (collapse).</li>
+        <li>An inline <code>a</code> with <code>padding: 20px</code> doesn't make the line taller.</li>
+        <li><code>width: 200px; padding: 20px; border: 5px</code> renders 250px wide.</li>
+      </ul>
+      Demos §2–§4 measure each of these live.
+    </li>
+    <li><code>box-sizing: border-box</code> and the universal reset.</li>
+    <li><strong>Outline is not part of the box</strong>, which closes the loop with the cold open. Demo §6: focus with a border shifts the text, focus with an outline doesn't.</li>
+    <li><strong>Live canvas:</strong> block 9 chunk. The <code>65ch</code> from block 7 plus <code>margin-inline: auto</code> centers the column.</li>
+  </ul>
+</section>
+
+<section id="exercise">
+  <div class="num">10 · 27 + 5 min · pairs</div>
+  <h2>Style the signup form</h2>
+  <p>Starter: <a href="form-exercise.html">form-exercise.html</a> + <code>form-exercise.css</code>. The HTML has correct semantics (labels, a fieldset, email/tel/date inputs, a select, a textarea, a required checkbox, a <code>&lt;details&gt;</code>). The starter CSS includes <code>*:focus { outline: none; }</code>.</p>
+  <ul>
+    <li>Pairs: driver types, navigator reads the checklist, swap every 10 minutes.</li>
+    <li>The checklist is on two slides: structure (items 1–4) and states (items 5–7). Item 7 bans ids and <code>!important</code>, so the cascade block gets practiced.</li>
+    <li>Stretch: <code>label:has(:checked)</code> for the chosen ticket, and make it work with <code>dir="rtl"</code> by using logical properties.</li>
+    <li><strong>Show and tell:</strong> two pairs share their screen. Someone else in the room completes the form keyboard-only. DevTools → Rendering → "Emulate a focused page" keeps focus visible while you talk.</li>
+  </ul>
+  <details class="notes">
+    <summary>What to look for while walking around</summary>
+    <div class="body">
+      <ul>
+        <li>Using <code>:invalid</code> turns every required field red on load. Point them to <code>:user-invalid</code>.</li>
+        <li>A <code>:focus-visible</code> rule that "doesn't work": it's losing to a more specific rule. Have them find the crossed-out declaration in Styles.</li>
+        <li>Radio labels are inline, so they wrap onto one line. Fine, or <code>display: block</code> on them.</li>
+        <li><code>width: 100%</code> on inputs plus padding overflows without the <code>border-box</code> reset. It's a useful mistake: let them hit it.</li>
+        <li>Contrast checks on the placeholder color too (<code>::placeholder</code>).</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section id="wrap-up">
+  <div class="num">11 · 5 min</div>
+  <h2>Exit ticket and homework</h2>
+  <ol>
+    <li>Name the parts of <code>p { margin: 1rem; }</code>.</li>
+    <li>Why <code>&lt;button&gt;</code> and not <code>&lt;div&gt;</code>?</li>
+    <li>A hovered nav link: <code>nav a</code> or <code>a:hover</code>, which wins? (<code>a:hover</code>, 0-1-1 vs 0-0-2)</li>
+    <li><code>width: 100px; padding: 10px</code> with <code>border-box</code>: how wide? (100px)</li>
+  </ol>
+  <p>Collect the answers on paper or in a poll. Whatever most people got wrong opens lecture 3.</p>
+  <p><strong>Homework:</strong> style the lecture-1 div-soup refactor. It must pass the keyboard test and a contrast check, with no ids and no <code>!important</code>. Due at the start of lecture 3.</p>
+</section>
+
+<section id="prep">
+  <h2>Prep checklist</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="p1"><label for="p1">The day before: try all four keyboard tasks yourself. Sites change, and cookie banners differ by region. Have a backup site ready.</label></li>
+    <li><input type="checkbox" id="p2"><label for="p2">Check that CSS Diner, gov.uk, renfe.com, ikea.com and idealista.com load on the classroom network.</label></li>
+    <li><input type="checkbox" id="p3"><label for="p3">Empty <code>live-canvas.css</code> (it should hold only its comment) and open <code>live-canvas-final.css</code> in a second editor tab.</label></li>
+    <li><input type="checkbox" id="p4"><label for="p4">Enable keyboard navigation on the projector machine, and open DevTools once so the panels are already sized.</label></li>
+    <li><input type="checkbox" id="p5"><label for="p5">Prepare exit ticket slips or a poll.</label></li>
+  </ul>
+  <h3>Files</h3>
+  <ul>
+    <li><a href="slides.html">slides.html</a>: the deck</li>
+    <li><a href="live-canvas.html">live-canvas.html</a>, <code>live-canvas.css</code>, <a href="live-canvas-final.css">live-canvas-final.css</a>: the live-coding thread</li>
+    <li><a href="px-vs-rem.html">px-vs-rem.html</a>: block 7 practice</li>
+    <li><a href="flow-and-box-demo.html">flow-and-box-demo.html</a>: blocks 8–9 demos</li>
+    <li><a href="form-exercise.html">form-exercise.html</a> + <code>form-exercise.css</code>: blocks 2 and 10</li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="end">
+  <p>Programming Interactivity · Lecture 2 · Previous: <a href="../programming-interactivity-1/index.html">Lecture 1</a></p>
+</footer>
+
+</body>
+</html>

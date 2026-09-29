@@ -1,0 +1,21 @@
+/* Starter styles for the signup form.
+   Most of these lines are harmless. One of them hurts keyboard users —
+   find it and fix it. Then write the rest of the styles below. */
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+*:focus {
+  outline: none;
+}
+
+/* Your styles go here. */

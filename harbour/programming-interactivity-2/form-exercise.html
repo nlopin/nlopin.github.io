@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontend Night — sign up</title>
+<link rel="stylesheet" href="form-exercise.css">
+</head>
+<body>
+
+<!--
+  Lecture 2 exercise: style this form.
+
+  Don't change the HTML (except to add a class if you really need one).
+  All your CSS goes into form-exercise.css. The checklist is on the slides.
+
+  On CodePen: paste this <body> into the HTML pane and form-exercise.css
+  into the CSS pane.
+
+  Submit the form and look at the address bar: method="get" puts every
+  field into the URL, with no JavaScript involved.
+-->
+
+<header>
+  <h1>Frontend Night</h1>
+  <p>An evening of short talks about the web platform. Free, with pizza.</p>
+</header>
+
+<main>
+  <form action="" method="get">
+
+    <p class="hint">Fields marked * are required.</p>
+
+    <div class="field">
+      <label for="name">Full name *</label>
+      <input id="name" name="name" type="text" autocomplete="name" required>
+    </div>
+
+    <div class="field">
+      <label for="email">Email *</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.com" required>
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone</label>
+      <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+34 600 000 000">
+      <details>
+        <summary>Why do we ask?</summary>
+        <p>Only to text you if the venue changes. We delete it after the event.</p>
+      </details>
+    </div>
+
+    <div class="field">
+      <label for="date">Which night? *</label>
+      <input id="date" name="date" type="date" min="2026-10-01" max="2026-12-31" required>
+    </div>
+
+    <fieldset>
+      <legend>Ticket *</legend>
+      <label><input type="radio" name="ticket" value="student" required> Student — free</label>
+      <label><input type="radio" name="ticket" value="regular"> Regular — €5</label>
+      <label><input type="radio" name="ticket" value="supporter"> Supporter — €20</label>
+    </fieldset>
+
+    <div class="field">
+      <label for="shirt">T-shirt size</label>
+      <select id="shirt" name="shirt">
+        <option value="">No T-shirt, thanks</option>
+        <option>S</option>
+        <option>M</option>
+        <option>L</option>
+        <option>XL</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="question">A question for the speakers</label>
+      <textarea id="question" name="question" rows="4"></textarea>
+    </div>
+
+    <label class="consent">
+      <input type="checkbox" name="coc" required>
+      I agree to the <a href="https://berlincodeofconduct.org/" target="_blank" rel="noopener">code of conduct</a> *
+    </label>
+
+    <button>Sign up</button>
+
+  </form>
+</main>
+
+<footer>
+  <p>Questions? <a href="mailto:hello@example.com">hello@example.com</a></p>
+</footer>
+
+</body>
+</html>

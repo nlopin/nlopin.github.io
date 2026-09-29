@@ -133,6 +133,24 @@
     </div>
   </section>
 
+  <!-- CARDS WITH CODE — a <pre> inside a card is a one-line code sample:
+       smaller type, no wrapping, no second box. -->
+  <section class="slide">
+    <h2>Two cards with code</h2>
+    <div class="cols cards">
+      <div>
+        <h3>A link</h3>
+        <pre>&lt;a href="/cart"&gt;Cart&lt;/a&gt;</pre>
+        <p class="muted">A line of detail.</p>
+      </div>
+      <div>
+        <h3>A button</h3>
+        <pre>&lt;button&gt;Add to cart&lt;/button&gt;</pre>
+        <p class="muted">A line of detail.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- FIGURES — a row of numbers. Four cards across, two on a phone. -->
   <section class="slide">
     <div class="kicker">Outline</div>
@@ -234,6 +252,20 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- QUIZ — a question about a snippet. <mark> points at part of the code;
+       the answer stays hidden in a <details data-no-nav> until clicked. -->
+  <section class="slide">
+    <div class="kicker">Quiz · 1 / 3</div>
+    <h2>What is the highlighted part?</h2>
+    <pre class="big">h1 {
+  <mark>color</mark>: red;
+}</pre>
+    <details data-no-nav>
+      <summary>Answer</summary>
+      <p>A property. <code>red</code> is its value.</p>
+    </details>
   </section>
 
   <!-- CLOSING — the one sentence you want them to leave with. -->

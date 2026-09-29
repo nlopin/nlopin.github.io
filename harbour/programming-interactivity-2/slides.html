@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 2 — Interactive HTML</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/slides.css">
+</head>
+<body>
+
+<div class="deck-progress"></div>
+<div class="deck-counter"></div>
+
+<main class="deck">
+
+  <section class="slide title">
+    <div class="kicker">Programming Interactivity · Lecture 2</div>
+    <h1>Interactive HTML</h1>
+    <p class="byline">The keyboard test, links and buttons, forms, focus.</p>
+  </section>
+
+  <!-- ============ Cold open: keyboard only ============ -->
+
+  <section class="slide center">
+    <div class="kicker">Warm-up</div>
+    <h2>Put your mouse away</h2>
+    <p class="muted">For the next 15 minutes you use the web with the keyboard only. First, make sure your browser lets you.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Before we start · Mac only</div>
+    <h2>Turn on keyboard navigation</h2>
+    <table class="table">
+      <tr><th>Safari</th><td>Settings → Advanced → <strong>Press Tab to highlight each item on a webpage</strong></td></tr>
+      <tr><th>Firefox</th><td>Settings → Accessibility → <strong>Use the tab key to move focus between form controls and links</strong></td></tr>
+    </table>
+    <p class="muted">Without this, Tab on a Mac skips every link.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Before we start</div>
+    <h2>The keys</h2>
+    <table class="table">
+      <tr><th>Tab / Shift+Tab</th><td>Next / previous interactive element</td></tr>
+      <tr><th>Enter</th><td>Follow a link, press a button, submit a form</td></tr>
+      <tr><th>Space</th><td>Press a button, toggle a checkbox</td></tr>
+      <tr><th>Arrows</th><td>Move inside a radio group or a select</td></tr>
+      <tr><th>Esc</th><td>Close a menu or a dialog</td></tr>
+    </table>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Exercise · 15 min</div>
+    <h2>Unplug the mouse</h2>
+    <ul>
+      <li><a href="https://www.gov.uk/" target="_blank" rel="noopener">gov.uk</a>: when does someone born 15/10/1966 get a free bus pass? (hint: it's in the pension calculator)</li>
+      <li><a href="https://www.renfe.com/es/en" target="_blank" rel="noopener">renfe.com</a>: find a train Barcelona → Madrid next Friday</li>
+      <li><a href="https://www.ikea.com/es/en/" target="_blank" rel="noopener">ikea.com</a>: put a desk under €100 in the cart, then open the cart</li>
+      <li><a href="https://www.idealista.com/en/" target="_blank" rel="noopener">idealista.com</a>: list apartments for rent in Barcelona and open the 3rd one</li>
+    </ul>
+    <p>Note as you go: what Tab couldn't reach, where Tab jumped around, where you got stuck, where the focus ring vanished.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Debrief</div>
+    <h2>What did Tab do?</h2>
+    <ol>
+      <li>What did Tab stop on?</li>
+      <li>What did it skip?</li>
+      <li>Where did it jump around?</li>
+      <li>Where were you stuck?</li>
+      <li>Where did the focus ring vanish?</li>
+    </ol>
+  </section>
+
+  <!-- ============ Bridge: interactive elements ============ -->
+
+  <section class="slide center">
+    <div class="kicker">Interactive elements</div>
+    <h2>Everything Tab stopped on is an interactive element</h2>
+    <p class="muted">The browser knows it's interactive because the HTML says so.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Interactive elements</div>
+    <h2>Tab stops on these</h2>
+    <table class="table">
+      <tr><th>&lt;a href&gt;</th><td>A link to another page</td></tr>
+      <tr><th>&lt;button&gt;</th><td>An action on this page</td></tr>
+      <tr><th>&lt;input&gt; &lt;select&gt; &lt;textarea&gt;</th><td>Form controls</td></tr>
+      <tr><th>&lt;summary&gt;</th><td>Opens and closes a <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details" target="_blank" rel="noopener"><code>&lt;details&gt;</code></a></td></tr>
+    </table>
+    <details data-no-nav>
+      <summary>Try it: this is a &lt;details&gt;</summary>
+      <p>Enter opens and closes it. No JavaScript involved.</p>
+    </details>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Interactive elements · What Tab skipped</div>
+    <h2>A div is not a button</h2>
+    <pre class="big">&lt;div class="btn" onclick="buy()"&gt;Buy&lt;/div&gt;
+
+&lt;button type="button" onclick="buy()"&gt;Buy&lt;/button&gt;</pre>
+    <ul>
+      <li>The <code>div</code> has no Tab stop, ignores Enter and Space, and a screen reader reads only "Buy"</li>
+      <li>The <code>button</code> gets all three for free</li>
+    </ul>
+  </section>
+
+  <!-- ============ Links and buttons ============ -->
+
+  <section class="slide">
+    <div class="kicker">Links and buttons</div>
+    <h2>Link or button?</h2>
+    <div class="cols cards">
+      <div>
+        <h3><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a" target="_blank" rel="noopener"><code>&lt;a href&gt;</code></a> goes somewhere</h3>
+        <pre>&lt;a href="/cart"&gt;Cart&lt;/a&gt;</pre>
+        <ul>
+          <li>Represents a hyperlink</li>
+          <li>Moves to the page set in <code>href</code></li>
+          <li>Adds the page to the browser history</li>
+          <li><kbd>Enter</kbd> to follow the link</li>
+        </ul>
+      </div>
+      <div>
+        <h3><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button" target="_blank" rel="noopener"><code>&lt;button&gt;</code></a> does something</h3>
+        <pre>&lt;button&gt;Add to cart&lt;/button&gt;</pre>
+        <ul>
+          <li>Performs an action on the same page</li>
+          <li>The <code>type</code> attribute defines its behavior</li>
+          <li>Default <code>type</code> is <code>submit</code></li>
+          <li><kbd>Enter</kbd> or <kbd>Space</kbd> to press</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Links and buttons</div>
+    <h2>Both, side by side</h2>
+    <figure>
+      <img src="images/govuk-cookie-banner.png" alt="The gov.uk cookie banner: two green buttons, Accept additional cookies and Reject additional cookies, and a blue underlined link, View cookies">
+      <figcaption>gov.uk's cookie banner.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>Accept</strong> and <strong>Reject</strong> are <code>&lt;button&gt;</code>s: they change a setting, you stay on the page</li>
+      <li><strong>View cookies</strong> is an <code>&lt;a href&gt;</code>: it opens another page</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Links and buttons</div>
+    <h2>Looks like a button, is a link</h2>
+    <div class="cols media">
+      <div>
+        <p><strong>Start now</strong> opens a new page, so gov.uk made it a link. The button look is only CSS.</p>
+        <p class="muted">Pick the element by what it does, not by how it looks.</p>
+      </div>
+      <figure class="bare">
+        <img src="images/govuk-start-now.png" alt="The gov.uk Start now button: white bold text and an arrow on a green background">
+      </figure>
+    </div>
+    <p><strong>Test:</strong> the URL changes → <code>&lt;a href&gt;</code>. Something happens on this page → <code>&lt;button&gt;</code>.</p>
+  </section>
+
+  <!-- ============ Forms ============ -->
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>Most interactive elements live in forms</h2>
+    <div class="cols media">
+      <div>
+        <p>You style this signup form at the end of today. First, what makes its HTML right.</p>
+        <p class="muted">The gov.uk calculator you used is built the same way.</p>
+        <p><a href="form-exercise.html" target="_blank" rel="noopener">Open form-exercise.html →</a></p>
+      </div>
+      <figure>
+        <img src="images/unstyled-form.png" alt="An unstyled signup form in default browser styles: plain black text, labels next to plain boxes, a grey fieldset around three radio buttons, and a small grey Sign up button">
+      </figure>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>Every input needs a name</h2>
+    <pre class="big">&lt;label for="email"&gt;Email&lt;/label&gt;
+&lt;input id="email" name="email"
+       type="email" autocomplete="email"
+       required&gt;</pre>
+    <ul>
+      <li><code>for</code> ↔ <code>id</code> connects them: clicking the label focuses the input</li>
+      <li>A screen reader says the label when the input gets focus</li>
+      <li><code>name</code> is the key the form sends</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>A placeholder is not a label</h2>
+    <ul>
+      <li>It disappears as soon as you type</li>
+      <li>Light grey by default: low contrast</li>
+      <li>Screen readers don't reliably read it</li>
+      <li>Use it for an example value, never for the name</li>
+    </ul>
+    <pre class="big">&lt;label for="phone"&gt;Phone&lt;/label&gt;
+&lt;input id="phone" type="tel"
+       placeholder="+34 600 000 000"&gt;</pre>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>The type does the work</h2>
+    <table class="table">
+      <tr><th>email</th><td>@ on the phone keyboard, format check</td></tr>
+      <tr><th>tel</th><td>Number pad</td></tr>
+      <tr><th>number</th><td>Spinner, <code>min</code> / <code>max</code> / <code>step</code></td></tr>
+      <tr><th>date</th><td>Native date picker</td></tr>
+      <tr><th>required</th><td>Can't submit it empty</td></tr>
+      <tr><th>autocomplete</th><td>Autofill: <code>name</code>, <code>email</code>, <code>tel</code>, <code>street-address</code>…</td></tr>
+    </table>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>A dropdown comes ready-made</h2>
+    <pre class="big">&lt;label for="city"&gt;City&lt;/label&gt;
+&lt;select id="city" name="city"&gt;
+  &lt;option&gt;Barcelona&lt;/option&gt;
+  &lt;option&gt;Madrid&lt;/option&gt;
+&lt;/select&gt;</pre>
+    <p>Arrows move through the options, typing jumps to a match. <span class="muted">No script. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select" target="_blank" rel="noopener">MDN: &lt;select&gt;</a></span></p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>Group related choices</h2>
+    <pre class="big">&lt;fieldset&gt;&lt;legend&gt;Ticket&lt;/legend&gt;
+  &lt;label&gt;
+    &lt;input type="radio" name="ticket"&gt; Student
+  &lt;/label&gt;
+  &lt;label&gt;…&lt;/label&gt;
+&lt;/fieldset&gt;</pre>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>What the group gives you</h2>
+    <ul>
+      <li>Same <code>name</code> means one group: arrows move inside it, Tab jumps past it</li>
+      <li>A screen reader says: "Ticket, group. Student, radio button, 1 of 2"</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Forms</div>
+    <h2>Forms work without JavaScript</h2>
+    <pre class="big">&lt;form action="" method="get"&gt;
+  …
+  &lt;button&gt;Sign up&lt;/button&gt;
+&lt;/form&gt;</pre>
+    <ul>
+      <li>Submit it and look at the URL: <code>?email=ada%40example.com&amp;ticket=student</code></li>
+      <li>The gov.uk calculator works this way: your answers end up in the URL</li>
+      <li>Gotcha: a <code>&lt;button&gt;</code> inside a form is <code>type="submit"</code> by default</li>
+    </ul>
+  </section>
+
+  <!-- ============ Focus: order, trapped, vanished → bridge to CSS ============ -->
+
+  <section class="slide">
+    <div class="kicker">Focus</div>
+    <h2>Focus is where the keyboard is</h2>
+    <table class="table">
+      <tr><th>Tab jumped around</th><td>Order: where Tab goes next</td></tr>
+      <tr><th>Stuck in a banner</th><td>Trapped: where Tab is allowed to go</td></tr>
+      <tr><th>Ring vanished</th><td>Visible: whether you can see it</td></tr>
+    </table>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Focus · Tab jumped around</div>
+    <h2>Focus order is source order</h2>
+    <ul>
+      <li>Tab follows the HTML, not the visual layout</li>
+      <li><code>tabindex="0"</code>: add to the order, in source position</li>
+      <li><code>tabindex="-1"</code>: focusable by script only</li>
+      <li><code>tabindex="1"</code> and up: don't. It breaks everyone's order</li>
+    </ul>
+    <p class="muted">More on October 5 with Glafira Zhur.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Focus · Stuck in a banner</div>
+    <h2>A real modal keeps focus</h2>
+    <p>A <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog" target="_blank" rel="noopener"><code>&lt;dialog&gt;</code></a> opened with <code>showModal()</code>:</p>
+    <ul>
+      <li>Moves focus inside, and Tab stays inside</li>
+      <li>Closes on Esc, and focus goes back where it was</li>
+    </ul>
+    <p class="muted">A <code>&lt;div&gt;</code> banner does none of this unless someone writes it in JavaScript.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">Focus · Ring vanished</div>
+    <h2>This one is CSS</h2>
+    <div class="cols media">
+      <div>
+        <p>Back to the signup form. Labels, a fieldset, real buttons: the HTML is right. It still looks like 1995, and one line of its CSS hides the focus ring.</p>
+        <p class="muted">The rest of today is CSS. At the end, you style this form.</p>
+      </div>
+      <figure>
+        <img src="images/unstyled-form.png" alt="An unstyled signup form in default browser styles: plain black text, labels next to plain boxes, a grey fieldset around three radio buttons, and a small grey Sign up button">
+      </figure>
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>Recap</h2>
+    <ul>
+      <li>Tab stops only on interactive elements: links, buttons, form controls, <code>&lt;summary&gt;</code></li>
+      <li>A link goes somewhere, a button does something. Pick by what it does, not how it looks</li>
+      <li>Every input needs a label; a placeholder is not one</li>
+      <li>The input's <code>type</code> gives the right keyboard, validation and autofill for free</li>
+      <li>Focus follows source order; a <code>&lt;dialog&gt;</code> keeps it inside</li>
+      <li>The focus ring is CSS. That's next</li>
+    </ul>
+  </section>
+
+</main>
+
+<script src="../assets/slides.js"></script>
+</body>
+</html>

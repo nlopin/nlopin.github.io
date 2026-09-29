@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow and box demos</title>
+<style>
+  body {
+    margin: 0;
+    padding: 2rem 1.5rem 4rem;
+    font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    color: hsl(240 6% 12%);
+    background: hsl(0 0% 100%);
+  }
+  main { max-width: 70ch; margin-inline: auto; }
+  section { margin-block: 3rem; padding-top: 1.5rem; border-top: 1px solid hsl(0 0% 85%); }
+  code, pre { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; }
+  pre { background: hsl(40 12% 95%); padding: .75rem 1rem; border-radius: 8px; overflow-x: auto; }
+  .stage { border: 1px dashed hsl(0 0% 70%); padding: 1rem; margin-top: 1rem; }
+  .readout { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; color: hsl(240 4% 36%); }
+  .gold { background: hsl(45 100% 60%); }
+
+  /* 1. width on an inline box */
+  .demo-width span { width: 200px; }
+  .demo-width .ib { display: inline-block; }
+
+  /* 2. vertical padding on an inline box */
+  .demo-inline-pad a { padding: 20px; }
+
+  /* 3. margin collapse */
+  .demo-collapse p { margin: 20px 0; background: hsl(200 80% 88%); }
+
+  /* 4. content-box vs border-box */
+  .demo-sizing .box { width: 200px; padding: 20px; border: 5px solid hsl(240 6% 12%); background: hsl(200 80% 88%); }
+  .demo-sizing .content { box-sizing: content-box; }
+  .demo-sizing .border  { box-sizing: border-box; margin-top: 1rem; }
+  .ruler { width: 200px; height: 6px; margin-top: 1rem; background: hsl(14 70% 41%); }
+
+  /* 5. writing modes */
+  .demo-modes .stage { height: 14rem; }
+
+  /* 6. border vs outline on focus */
+  .demo-focus button { font: inherit; padding: .5rem 1rem; margin-right: .5rem; border: 1px solid hsl(0 0% 60%); background: hsl(0 0% 96%); border-radius: 6px; }
+  .demo-focus .shift:focus { outline: none; border: 5px solid hsl(14 70% 41%); }
+  .demo-focus .steady:focus-visible { outline: 5px solid hsl(14 70% 41%); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Flow and box demos</h1>
+  <p>Ask the room to predict each one before you scroll to it. Inspect everything: DevTools → Computed shows the box diagram.</p>
+
+  <section class="demo-width">
+    <h2>1. Width on an inline box</h2>
+    <pre>span { width: 200px; }</pre>
+    <div class="stage">
+      <p>Inline: <span class="gold">short</span> text continues.</p>
+      <p>inline-block: <span class="gold ib">short</span> text continues.</p>
+    </div>
+  </section>
+
+  <section class="demo-inline-pad">
+    <h2>2. Vertical padding on an inline box</h2>
+    <pre>a { padding: 20px; }</pre>
+    <div class="stage">
+      <p>A paragraph with a few lines of text so the padding has neighbours above and below it. Here is <a class="gold" href="#">a padded link</a> in the middle of the paragraph, and then the text keeps going for another line or two so you can see the overlap.</p>
+    </div>
+  </section>
+
+  <section class="demo-collapse">
+    <h2>3. Margin collapse</h2>
+    <pre>p { margin: 20px 0; }</pre>
+    <div class="stage">
+      <p>One</p>
+      <p>Two</p>
+    </div>
+    <p class="readout" id="gap-readout"></p>
+  </section>
+
+  <section class="demo-sizing">
+    <h2>4. content-box vs border-box</h2>
+    <pre>.box { width: 200px; padding: 20px; border: 5px solid; }</pre>
+    <div class="stage">
+      <div class="box content">content-box</div>
+      <p class="readout" data-width-of=".demo-sizing .content"></p>
+      <div class="box border">border-box</div>
+      <p class="readout" data-width-of=".demo-sizing .border"></p>
+      <div class="ruler" title="200px ruler"></div>
+      <p class="readout">↑ a 200px ruler</p>
+    </div>
+  </section>
+
+  <section class="demo-modes">
+    <h2>5. Block and inline direction</h2>
+    <label for="mode">Writing mode</label>
+    <select id="mode">
+      <option value="horizontal-tb|ltr">horizontal-tb, ltr (English)</option>
+      <option value="horizontal-tb|rtl">horizontal-tb, rtl (Arabic, Hebrew)</option>
+      <option value="vertical-rl|ltr">vertical-rl (vertical Japanese)</option>
+    </select>
+    <div class="stage" id="mode-stage">
+      <p>First paragraph. Inline boxes flow along the line.</p>
+      <p>Second paragraph. Blocks stack in the block direction.</p>
+    </div>
+  </section>
+
+  <section class="demo-focus">
+    <h2>6. Border vs outline for focus</h2>
+    <p>Tab to each button. Watch the text after them.</p>
+    <div class="stage">
+      <button class="shift">border on focus</button>
+      <button class="steady">outline on focus</button>
+      <span>← does this text move?</span>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function px(n) { return Math.round(n) + "px"; }
+
+  // 3. distance between the two paragraphs
+  var ps = document.querySelectorAll(".demo-collapse .stage p");
+  var gap = ps[1].getBoundingClientRect().top - ps[0].getBoundingClientRect().bottom;
+  document.getElementById("gap-readout").textContent = "Measured gap: " + px(gap);
+
+  // 4. rendered widths
+  document.querySelectorAll("[data-width-of]").forEach(function (out) {
+    var box = document.querySelector(out.dataset.widthOf);
+    out.textContent = "Rendered width: " + px(box.getBoundingClientRect().width);
+  });
+
+  // 5. writing mode switcher
+  document.getElementById("mode").addEventListener("change", function (e) {
+    var parts = e.target.value.split("|");
+    var stage = document.getElementById("mode-stage");
+    stage.style.writingMode = parts[0];
+    stage.dir = parts[1];
+  });
+</script>
+</body>
+</html>
