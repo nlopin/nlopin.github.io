@@ -1,0 +1,14 @@
+/* Act 3 · Flex — line things up along one axis */
+
+/* logo left, nav right, vertically centred */
+.site-header { display: flex; justify-content: space-between; align-items: center; }
+.main-nav ul { display: flex; gap: 1.5rem; margin: 0; }
+
+/* hero: a column, centred vertically in its min-height */
+.hero { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+
+/* card: a column; the link takes all the leftover space above it */
+.vendor-card { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 0; }
+.card-link { margin-top: auto; }
+
+.site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }

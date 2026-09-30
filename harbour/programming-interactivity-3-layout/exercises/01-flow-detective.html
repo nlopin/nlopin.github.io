@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 1 · Flow detective</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Exercise 1 · 10 min · cases 1–4 in class</span></div>
+    <span class="eyebrow-tag">Act 1 · Flow</span>
+    <h1>Flow <em>detective</em></h1>
+    <p class="intro">Before we leave normal flow, we fix it. Each case is a real bug from the market page. <strong>Predict what's wrong before you touch the code</strong>, then fix it in the editor. The chips turn green when the case is closed. The <strong>index.html</strong> tab above each editor shows the HTML, with every class name. Cases 1–4 in class; 5–7 if you finish early (6 is the warm-up's cascade fight).</p>
+    <div class="tip"><p style="margin:0"><strong>Two rules you need today.</strong> In flow, a block's <strong>width comes from its parent</strong> (it fills the line), and its <strong>height comes from its children</strong> (it grows with its content). Every case below is one of those two rules, the box model, intrinsic sizing, or the cascade.</p></div>
+    <section class="case">
+      <header><b>1</b><h2>The inputs that stick out</h2></header>
+      <p class="complaint">The name and email boxes stick out of the ticket form on the right.</p>
+      <p>Both inputs have <code>width: 100%</code>. So why are they wider than the form?</p>
+    <div class="live panel" data-solved="✓ Case closed: width now means the whole visible box." data-show-html data-measure="form, input" data-zoom="1.2">
+      <script type="text/plain" data-role="html"><form class="ticket-form"><label for="n">Name</label><input id="n"><label for="e">Email</label><input id="e"></form></script>
+      <script type="text/plain" data-role="base">
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.ticket-form { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.25rem; margin: 1.25rem; } .ticket-form label { display: block; margin: 0.6rem 0 0.3rem; } .ticket-form input { width: 100%; padding: 0.6rem 0.9rem; }</script>
+      <textarea>/* fix it here */
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The inputs fit inside the form", "expr": "r('#n').right <= r('form').right - parseFloat(cs('form','padding-right')) + 0.5 && r('#e').right <= r('form').right - parseFloat(cs('form','padding-right')) + 0.5"}, {"label": "They still fill the form's width", "expr": "near(r('#n').width, q('form').clientWidth - 2 * parseFloat(cs('form','padding-left')), 1)"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>By default <code>width</code> sets only the <em>content</em>. Padding and border are added on top: 100% + 2 × 0.9rem + 2 × 2px. <code>box-sizing: border-box</code> makes width mean the whole visible box. Put it on everything, once, at the top of every stylesheet:</p><pre class="code" data-lang="css">*, *::before, *::after { box-sizing: border-box; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>Wall to wall</h2></header>
+      <p class="complaint">On a big monitor the text runs from one edge of the screen to the other. Nobody reads lines that long.</p>
+      <p>Make <code>main</code> at most <strong>36rem</strong> wide and put it in the <strong>middle</strong> of the window. Drag the window-width slider to test a big and a small screen.</p>
+    <div class="live panel" data-solved="✓ Case closed: max-width + auto margins." data-show-html data-measure="main" data-resizable="360-1400-1200" data-zoom="1">
+      <script type="text/plain" data-role="html"><main><h1>Harbour Night Market</h1><p>Forty stalls, three stages and one very long table on the waterfront at Moll de la Fusta. Street food, vinyl, handmade things and people you haven't met yet.</p><p>Entry is free. Bring cash or a card for the stalls. The market has never closed early.</p></main></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+main { background: #1b202b; padding: 1.25rem; } body { padding: 1rem; }</script>
+      <textarea>main {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "main is at most 36rem wide", "expr": "r('main').width <= 576.5"}, {"label": "main is centred", "expr": "near(r('main').left, w.innerWidth - r('main').right, 2)"}, {"label": "It still shrinks on a small screen", "require": "max-width"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>A block is as wide as its parent allows. <code>max-width</code> caps it, and the space that's left over has to go somewhere: an <code>auto</code> margin eats it. Auto on both sides = equal halves = centred. Use <code>max-width</code>, not <code>width</code>: on a phone narrower than 36rem, it still shrinks.</p><pre class="code" data-lang="css">main {
+  max-width: 36rem;
+  margin-inline: auto;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>The hero that won't grow</h2></header>
+      <p class="complaint">The hero should fill the whole first screen.</p>
+      <p>Someone already wrote <code>height: 100%</code>. It does nothing. Why? Make the hero <strong>at least as tall as the window</strong>, without a fixed number of pixels.</p>
+    <div class="live panel" data-solved="✓ Case closed: the hero now has a height the browser can know." data-show-html data-measure=".hero" data-zoom="1">
+      <script type="text/plain" data-role="html"><section class="hero"><p class="eyebrow">Friday 16 October</p><h1>Harbour Night Market</h1><p>Forty stalls, three stages, one very long table.</p></section><section><h2>Vendors</h2><p>…</p></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { margin: 0; } .hero { background: radial-gradient(circle at 80% 20%, rgb(255 181 71 / 0.35), transparent 45%), #171b25; } .hero h1 { font: 400 3.5rem/0.9 'Instrument Serif', serif; }</script>
+      <script type="text/plain" data-role="locked">.hero { height: 100%; }</script>
+      <textarea>/* height: 100% is ignored. Why? */
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The hero is at least as tall as the window", "expr": "r('.hero').height >= w.innerHeight - 0.5"}, {"label": "No fixed pixel height", "forbid": "height\\s*:\\s*[\\d.]+px"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Width flows down from the parent, but height grows up from the children. <code>height: 100%</code> means "100% of my parent's height", and the parent's height is <code>auto</code>: it waits for its children. Nobody knows the number, so the browser ignores the percentage. <code>vh</code> is measured from the window, which always has a height. Use <code>min-height</code>, so the hero can still grow when the text is longer than the screen.</p><pre class="code" data-lang="css">.hero { min-height: 100vh; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b>4</b><h2>The missing 20 pixels</h2></header>
+      <p class="complaint">30px of margin under the first card, 20px above the second. The gap is 30px, not 50px.</p>
+      <p>Measure the gap (the blue labels show every box). Then make it <strong>exactly 50px</strong>. You may not change <code>.a</code>.</p>
+    <div class="live panel" data-solved="✓ Case closed: vertical margins collapse — the bigger one wins." data-show-html data-measure=".a, .b" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><div class="vendor-card a"><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></div><div class="vendor-card b"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1rem; } .vendor-card { margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.a { margin-bottom: 30px; }</script>
+      <textarea>.b {
+  margin-top: 20px;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The gap is exactly 50px", "expr": "near(r('.b').top - r('.a').bottom, 50, 0.5)"}, {"label": ".a is untouched", "forbid": "\\.a\\b"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Vertical margins between blocks <strong>collapse</strong>: they don't add up, the bigger one wins. 30 and 20 → 30. So <code>.b</code> needs <code>margin-top: 50px</code> (50 beats 30). Horizontal margins never collapse, and neither do margins inside a flex or grid container. That's one reason people like <code>gap</code>.</p><pre class="code" data-lang="css">.b { margin-top: 50px; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>The button that ignores its width</h2></header>
+      <p class="complaint">The ticket button should be 12rem wide. It isn't, and its padding covers the line above.</p>
+      <p>Don't touch the width. Find the one declaration that lets <code>width</code> and vertical padding work, while the button stays <strong>inside the sentence</strong>.</p>
+    <div class="live panel" data-solved="✓ Case closed: inline-block = sits in the line, sized like a block." data-show-html data-measure=".button" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><p>Doors open at 19:00. <a class="button" href="#">Get a free ticket</a> and skip the queue at the gate, which gets very long after nine.</p><p>The next paragraph.</p></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1.25rem; } p { max-width: 30rem; } .button { display: inline; padding: 0.7rem 1.3rem; }</script>
+      <textarea>.button {
+  width: 12rem;
+  text-align: center;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The button is 12rem wide", "expr": "near(r('.button').width, 192, 1)"}, {"label": "It's still inside the line of text", "expr": "cs('.button','display').startsWith('inline')"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>a</code> is an <strong>inline</strong> box: it flows like a word, and words have no width. Its vertical padding is painted, but doesn't push the lines apart. <code>inline-block</code> sits in the line like a word, but is sized like a block.</p><pre class="code" data-lang="css">.button {
+  width: 12rem;
+  text-align: center;
+  display: inline-block;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">6 · bonus</b><h2>The rule that loses</h2></header>
+      <p class="complaint"><code>.card { max-width: none }</code> is in the stylesheet, yet the card is still narrow. Is the browser broken?</p>
+      <p>Make the card as wide as its section. No ids, no <code>!important</code>. Check DevTools in your head first: which rule is crossed out, and why?</p>
+    <div class="live panel" data-solved="✓ Case closed: layout properties obey the cascade like every other property." data-show-html data-measure=".card" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><main><section><article class="card vendor-card"><h3>Dumpling Dynasty</h3><p>The queue is part of the experience.</p></article></section></main></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+</script>
+      <script type="text/plain" data-role="locked">main section .card { max-width: 16rem; }</script>
+      <textarea>.card {
+  max-width: none;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The card fills its section", "expr": "near(r('.card').width, q('section').clientWidth - 2 * parseFloat(cs('section','padding-left')), 1)"}, {"label": "No !important", "forbid": "important"}, {"label": "No ids", "forbid": "id"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>main section .card</code> scores (0,1,2). <code>.card</code> scores (0,1,0) and loses, even though it comes later. Match it (a tie, and yours comes later) or beat it, for example with <code>main section .card</code> or <code>section .vendor-card.card</code>. Layout properties are ordinary properties: <code>display</code>, <code>width</code>, <code>position</code> all go through the same cascade.</p><pre class="code" data-lang="css">main section .card { max-width: none; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">7 · bonus</b><h2>The tag that stretches</h2></header>
+      <p>The tag must sit on its <strong>own line</strong> (so it stays <code>display: block</code>), but only be as wide as its text. No <code>inline-block</code>, no flex, no fixed width.</p>
+    <div class="live panel" data-solved="✓ fit-content: the shrink-to-fit width, on demand." data-show-html data-measure=".tag" data-zoom="1.3">
+      <script type="text/plain" data-role="html"><article class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></article></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1.25rem; } .vendor-card { margin: 0; }</script>
+      <textarea>.tag {
+  display: block;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Still on its own line, in the flow", "expr": "cs('.tag','display') === 'block' && cs('.tag','float') === 'none' && cs('.tag','position') === 'static' && r('h3').top >= r('.tag').bottom"}, {"label": "As wide as its text", "expr": "r('.tag').width < 80"}, {"label": "No fixed width", "forbid": "width\\s*:\\s*[\\d.]+(px|rem|em)"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>width: fit-content</code> asks for the intrinsic size: max-content, capped by the available space. <code>max-content</code> also passes here (but never wraps). This is the width absolute boxes and floats get automatically.</p><pre class="code" data-lang="css">.tag {
+  display: block;
+  width: fit-content;
+}</pre></details>
+    </section>
+  </div>
+</body>
+</html>

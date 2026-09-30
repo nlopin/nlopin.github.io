@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 2 · Pin it</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Exercise 2 · 12 min · cases 1–3 + 5 in class</span></div>
+    <span class="eyebrow-tag">Act 2 · Position</span>
+    <h1>Pin <em>it</em></h1>
+    <p class="intro">Six things that need pinning. Press <strong>◌ target</strong> in an editor to show a red chalk outline where the thing should end up. Cases 1–3 and 5 in class; 4 and 6 if you finish early. Then the same code goes into your project in the finale.</p>
+    <div class="tip"><p style="margin:0"><strong>The rule of the act.</strong> <code>absolute</code> is measured from the nearest <strong>positioned</strong> ancestor (anything but <code>static</code>). No positioned ancestor → the first screen of the page. So: <code>position: relative</code> on the parent, <code>position: absolute</code> on the child.</p></div>
+    <section class="case">
+      <header><b>1</b><h2>The stamp</h2></header>
+      <p class="complaint">The Sold out stamps look like text. They should sit on the corner of the card, like a real stamp.</p>
+      <p>Pin the badge (<code>.badge</code>, inside a <code>.vendor-card</code>) so its top edge is <strong>12px above</strong> the card and its right edge <strong>16px in</strong> from the card's right edge. Rotate it if you like (<code>transform: rotate(8deg)</code>) — rotation doesn't count against you. Place it with <code>top</code> and <code>right</code>: <code>translate</code> only moves the paint, not the box.</p>
+    <div class="live panel" data-solved="✓ Stamped: relative parent, absolute child." data-show-html >
+      <script type="text/plain" data-role="html"><section><ul class="vendor-list"><li class="vendor-card sold-out"><span class="tag">Food</span><h3>Churros Till Late</h3><p>Crisp, sugared and dunked in thick chocolate.</p><strong class="badge">Sold out</strong> <a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p><a class="card-link" href="#">Find the stall →</a></li></ul></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+section { padding: 2rem 1.25rem; }</script>
+      <script type="text/plain" data-role="solution">.vendor-card { position: relative; } .badge { position: absolute; top: -12px; right: 16px; }</script>
+      <textarea>.badge {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The stamp sits on the card's corner", "match": ".badge"}, {"label": "The other card didn't move", "expr": "near(r('.vendor-card + .vendor-card').top - r('.vendor-card').bottom, parseFloat(cs('.vendor-card','margin-bottom')), 1)"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>position: absolute</code> takes the badge out of the flow (the card closes the gap it leaves) and measures <code>top</code>/<code>right</code> from the nearest positioned ancestor. Without <code>position: relative</code> on the card, that ancestor is the page — try removing it and watch the stamp fly.</p><pre class="code" data-lang="css">.vendor-card { position: relative; }
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  transform: rotate(8deg);
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>The menu that runs away</h2></header>
+      <p class="complaint">Scroll down and the menu is gone. It should stay at the top.</p>
+      <p>Make the header (<code>.site-header</code>) <strong>stick to the top</strong> of the window while you scroll. Then scroll the preview past the Sold out card and look closely: who is painted on top? Fix that too.</p>
+      <p><small><strong>Sticky doesn't stick?</strong> ① no <code>top</code> value ② its parent is only as tall as it is (sticky can't leave its parent) ③ an ancestor has <code>overflow: hidden</code>.</small></p>
+    <div class="live panel tall" data-solved="✓ It sticks, and it wins the fight for the top layer." data-show-html >
+      <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav class="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Tickets</a></li></ul></nav></header><section><ul class="vendor-list"><li class="vendor-card sold-out"><span class="tag">Food</span><h3>Churros Till Late</h3><p>Crisp, sugared and dunked in thick chocolate.</p><strong class="badge">Sold out</strong> <a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p><a class="card-link" href="#">Find the stall →</a></li></ul><p>Scroll down. Where did the menu go?</p><p>Forty stalls, three stages and one very long table on the waterfront.</p><p>Street food, vinyl, handmade things and people you haven't met yet.</p><p>The market has never closed early.</p><p>Bring cash or a card for the stalls.</p><p>Dogs on a leash are welcome.</p><p>The silent disco starts at midnight.</p><p>Last orders at half past midnight.</p><p>Moll de la Fusta, Barcelona.</p></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.vendor-card { position: relative; } .badge { position: absolute; top: -12px; right: 16px; } .site-header { background: #171b25; }</script>
+      <textarea>.site-header {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The header is sticky", "sel": ".site-header", "prop": "position", "is": "sticky"}, {"label": "…and sticks at top: 0", "sel": ".site-header", "prop": "top", "is": "0px"}, {"label": "It paints above the positioned stamp", "expr": "cs('.site-header','z-index') !== 'auto' && +cs('.site-header','z-index') > 0"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>sticky</code> behaves like normal flow until the element would scroll past <code>top: 0</code>; then it sticks. Without <code>top</code> it never sticks. The stamp is positioned and comes later in the HTML, so it's painted on top of the header. <code>z-index: 1</code> (on a positioned element) lifts the header above it.</p><pre class="code" data-lang="css">.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>You are here</h2></header>
+      <p class="complaint">The 📍 sits under the map instead of on it, at the entrance.</p>
+      <p>Put the pin (<code>.you-are-here</code>) <strong>16px from the left</strong> and <strong>16px from the bottom</strong> of the map (<code>.market-map</code>).</p>
+    <div class="live panel" data-solved="✓ Pinned. bottom works just like top, from the other edge." data-show-html >
+      <script type="text/plain" data-role="html"><section><div class="market-map"><div class="zone stage">Main stage</div><div class="zone food">Food street</div><div class="zone pier">The pier</div><div class="zone gate">Entrance</div><span class="you-are-here">📍 You are here</span></div></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+section { padding: 1.25rem; } .gate { margin: 0; padding: 1rem; }</script>
+      <script type="text/plain" data-role="solution">.market-map { position: relative; } .you-are-here { position: absolute; left: 16px; bottom: 16px; }</script>
+      <textarea>.you-are-here {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The pin is on the entrance", "match": ".you-are-here"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Same pattern as the stamp: the map is the anchor. <code>bottom</code> and <code>left</code> measure from the bottom and left edges of the anchor's padding box.</p><pre class="code" data-lang="css">.market-map { position: relative; }
+.you-are-here {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>Back to top</h2></header>
+      <p class="complaint">The round “back to top” button should always sit in the bottom-right corner of the screen, even while scrolling.</p>
+      <p>Pin it (<code>.to-top</code>) <strong>24px from the right and bottom edges of the window</strong>. Scroll the preview to test.</p>
+    <div class="live panel tall" data-solved="✓ fixed: measured from the window, not the page." data-show-html >
+      <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav class="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Tickets</a></li></ul></nav></header><section><ul class="vendor-list"><li class="vendor-card sold-out"><span class="tag">Food</span><h3>Churros Till Late</h3><p>Crisp, sugared and dunked in thick chocolate.</p><strong class="badge">Sold out</strong> <a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p><a class="card-link" href="#">Find the stall →</a></li></ul><p>Scroll down. Where did the menu go?</p><p>Forty stalls, three stages and one very long table on the waterfront.</p><p>Street food, vinyl, handmade things and people you haven't met yet.</p><p>The market has never closed early.</p><p>Bring cash or a card for the stalls.</p><p>Dogs on a leash are welcome.</p><p>The silent disco starts at midnight.</p><p>Last orders at half past midnight.</p><p>Moll de la Fusta, Barcelona.</p></section><a class="to-top" href="#">↑</a></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.site-header { background: #171b25; }</script>
+      <script type="text/plain" data-role="solution">.to-top { position: fixed; right: 24px; bottom: 24px; }</script>
+      <textarea>.to-top {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "It stays put while you scroll", "sel": ".to-top", "prop": "position", "is": "fixed"}, {"label": "24px from the window's corner", "match": ".to-top"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>fixed</code> is measured from the window (the viewport), so it doesn't move when the page scrolls. Its parent's <code>position</code> doesn't matter.</p><pre class="code" data-lang="css">.to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>5</b><h2>z-index: 9999 still loses</h2></header>
+      <p class="complaint">The churros menu opens UNDER the header — even though it already has <code>z-index: 9999</code>.</p>
+      <p>The menu (<code>.dropdown</code>) must paint <strong>above</strong> the header (<code>.top</code>). Rules: don't touch the header, keep the card's <code>transform</code> (it animates on hover), don't move the menu. Why does 9999 lose to 10?</p>
+    <div class="live panel" data-solved="✓ The card's own stacking context now outranks the header." data-show-html data-zoom="1.1">
+      <script type="text/plain" data-role="html"><header class="top">🏮 Night Market · z-index: 10</header><section><article class="vendor-card"><h3>Churros Till Late</h3><p>Open the menu…</p><div class="dropdown">🍩 Menu · z-index: 9999</div></article></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.top { position: relative; z-index: 10; background: #ffb547; color: #12151d; font-weight: 800; padding: 1rem 1.25rem; } section { padding: 0 1.25rem; } .vendor-card { margin-top: -1.2rem; } .dropdown { position: absolute; left: 3rem; top: -1.5rem; width: 15rem; height: 6rem; background: #ff6b4a; color: #12151d; font-weight: 800; padding: 0.8rem; border-radius: 10px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.5); }</script>
+      <script type="text/plain" data-role="locked">.vendor-card { transform: translateY(0); }</script>
+      <textarea>.dropdown {
+  z-index: 9999;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The menu paints above the header", "expr": "(() => { const h = r('.top'); const el = d.elementFromPoint(h.left + 70, h.bottom - 4); return !!(el && el.closest('.dropdown')); })()"}, {"label": "Card keeps its transform", "expr": "cs('.vendor-card','transform') !== 'none'"}, {"label": "Header untouched", "forbid": "\\.top"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>transform</code> turns the card into a <strong>stacking context</strong> (and the dropdown's containing block). Inside it, 9999 only ranks the dropdown among the card's children; the whole card paints as one layer at level 0, below the header's 10. Lift the <em>context</em>: give the card <code>position: relative; z-index: 11</code>. (Removing the transform would work too — but the rules forbade it.)</p><pre class="code" data-lang="css">.vendor-card {
+  position: relative;
+  z-index: 11;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">6 · bonus</b><h2>The fixed button that scrolls away</h2></header>
+      <p>The ↑ button is <code>position: fixed</code> (read-only), but it scrolls away with the page. Find the culprit in the HTML tab and make the button stick to the <strong>window's</strong> bottom-right corner again. You may not change <code>.to-top</code>.</p>
+    <div class="live panel tall" data-solved="✓ No transformed ancestor, so fixed means the window again." data-show-html >
+      <script type="text/plain" data-role="html"><div class="shell"><p>The page wrapper has a gentle entrance animation, so it keeps a transform.</p><p>Scroll line 1. Harbour Night Market.</p><p>Scroll line 2. Harbour Night Market.</p><p>Scroll line 3. Harbour Night Market.</p><p>Scroll line 4. Harbour Night Market.</p><p>Scroll line 5. Harbour Night Market.</p><p>Scroll line 6. Harbour Night Market.</p><p>Scroll line 7. Harbour Night Market.</p><p>Scroll line 8. Harbour Night Market.</p><p>Scroll line 9. Harbour Night Market.</p><p>Scroll line 10. Harbour Night Market.</p><p>Scroll line 11. Harbour Night Market.</p><p>Scroll line 12. Harbour Night Market.</p><p>Scroll line 13. Harbour Night Market.</p><p>Scroll line 14. Harbour Night Market.</p><p>Scroll line 15. Harbour Night Market.</p><a class="to-top" href="#">↑</a></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.shell { margin-top: 120px; padding: 1.25rem; animation: none; } .to-top { margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.shell { transform: translateY(0); }
+.to-top { position: fixed; right: 24px; bottom: 24px; }</script>
+      <script type="text/plain" data-role="solution">.shell { transform: none; }</script>
+      <textarea>/* the button's CSS is fine. Who traps it? */
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Pinned to the window corner", "match": ".to-top"}, {"label": ".to-top untouched", "forbid": "\\.to-top"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>An ancestor with <code>transform</code> (also <code>filter</code>, <code>perspective</code>, <code>contain: paint</code>, <code>will-change: transform</code>) becomes the containing block for its <code>fixed</code> descendants. In real projects: render modals and toasts at the end of <code>body</code>, outside animated wrappers — or use a <code>&lt;dialog&gt;</code> opened with <code>showModal()</code>, which goes to the browser's top layer, above every stacking context.</p><pre class="code" data-lang="css">.shell { transform: none; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">more</b><h2>Want more?</h2></header>
+      <p>The <a href="../playgrounds/stall-setter.html?set=position">Stall Setter · Position</a> set has six more pins: stretching with <code>left</code> + <code>right</code>, dead-centring, and who ends up in front (<code>z-index</code>).</p>
+    </section>
+  </div>
+</body>
+</html>

@@ -14,7 +14,7 @@
   const MODE = params.has("presenter") ? "presenter" : params.has("embed") ? "embed" : "main";
   const deck = document.querySelector(".deck");
   const slides = [...deck.children].filter((s) => s.tagName === "SECTION");
-  const bc = "BroadcastChannel" in window ? new BroadcastChannel("css-lecture-deck") : null;
+  const bc = "BroadcastChannel" in window ? new BroadcastChannel("layout-lecture-deck") : null;
 
   // --- act propagation: every slide inherits the last act marker -------------
   let act = "0", actName = "Prologue", actAt = "0:00";
@@ -105,7 +105,7 @@
     if (MODE === "main") {
       const hash = "#" + (idx + 1);
       if (location.hash !== hash) history.replaceState(null, "", hash);
-      document.title = `${idx + 1}. ${s.dataset.title} — CSS`;
+      document.title = `${idx + 1}. ${s.dataset.title} — Layout`;
     }
   }
 
@@ -144,7 +144,7 @@
         break;
       case "m": case "M": case "o": case "O": toggleMenu(); break;
       case "n": case "N": notesDrawer.hidden = !notesDrawer.hidden; break;
-      case "p": case "P": window.open(location.pathname + "?presenter#" + (idx + 1), "css-presenter", "width=1280,height=800"); break;
+      case "p": case "P": window.open(location.pathname + "?presenter#" + (idx + 1), "layout-presenter", "width=1280,height=800"); break;
       case "t": case "T": toggleClock(); break;
       case "Escape": if (menu && !menu.hidden) toggleMenu(false); break;
       default: return false;

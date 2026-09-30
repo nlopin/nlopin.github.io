@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stall Setter · a layout game</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    html, body { height: 100%; }
+    body.page { display: flex; flex-direction: column; min-height: 100vh; }
+    .game { flex: 1; display: grid; grid-template-columns: minmax(20rem, 27rem) minmax(0, 1fr); gap: 1.25rem; padding: 1.25rem; min-height: 0; }
+    .side { display: flex; flex-direction: column; gap: 0.8rem; min-height: 0; }
+    .brand { display: flex; justify-content: space-between; align-items: center; font: 700 0.8rem var(--font-mono); }
+    .brand a { color: var(--ink); }
+    .brand h1 { font: 800 1.5rem/1 var(--font-sans); letter-spacing: -0.02em; margin: 0; }
+    .brand h1 em { font-family: var(--font-serif); font-weight: 400; }
+    .sets { display: flex; gap: 0.3rem; }
+    .sets button { flex: 1; font: 800 0.85rem var(--font-sans); padding: 0.5rem; border: 2px solid var(--ink); border-radius: 0.5rem; background: var(--white); color: var(--ink); cursor: pointer; }
+    .sets button[aria-pressed="true"] { background: var(--ink); color: var(--yellow); }
+    .sets small { display: block; font: 600 0.65rem var(--font-mono); opacity: 0.75; }
+    .levels { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+    .levels button { width: 2.1rem; height: 2.1rem; border-radius: 0.4rem; border: 2px solid var(--ink); background: var(--white); font: 700 0.8rem var(--font-mono); cursor: pointer; color: var(--ink); }
+    .levels button.done { background: var(--green); color: #fff; }
+    .levels button[aria-current="true"] { background: var(--ink); color: var(--yellow); }
+    .level-card { background: var(--white); border: 2px solid var(--ink); border-radius: 0.9rem; padding: 1rem 1.1rem; box-shadow: 5px 5px 0 var(--ink); }
+    .level-card small { font: 700 0.72rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .level-card h2 { font: 800 1.4rem/1.1 var(--font-sans); margin: 0.3rem 0 0.4rem; letter-spacing: -0.02em; }
+    .level-card p { margin: 0; font-size: 1rem; }
+    .level-card code, .hint code { font: 700 0.9em var(--font-mono); background: var(--paper-2); padding: 0.1em 0.3em; border-radius: 0.25em; }
+    .editor { display: flex; flex-direction: column; min-height: 13rem; flex: 1; background: var(--code-bg); border: 2px solid var(--ink); border-radius: 0.6rem; overflow: hidden; }
+    .editor .live-locked { max-height: 40%; }
+    .editor .live-code { min-height: 8rem; font-size: 1rem; }
+    .feedback { min-height: 1.5rem; font-size: 1rem; font-weight: 700; }
+    .feedback.good { color: #0b5c3f; }
+    .helpers { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .ghost-btn { font: 600 0.85rem var(--font-sans); border: 2px solid var(--ink); border-radius: 0.6rem; background: transparent; padding: 0.45rem 0.8rem; cursor: pointer; color: var(--ink); }
+    .ghost-btn.next { background: var(--yellow); font-weight: 800; }
+    .hint { background: var(--white); border: 2px dashed var(--ink); border-radius: 0.6rem; padding: 0.6rem 0.8rem; font-size: 0.95rem; }
+    .stage { position: relative; min-height: 24rem; border: 3px solid var(--ink); border-radius: 1rem; overflow: hidden; background: #0c1f2b; }
+    .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+    .legend { position: absolute; left: 0.8rem; bottom: 0.8rem; z-index: 3; font: 700 0.75rem var(--font-mono); color: #fff; background: rgb(0 0 0 / 0.55); padding: 0.4rem 0.6rem; border-radius: 0.4rem; }
+    .win { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; text-align: center; background: rgb(23 20 15 / 0.7); color: var(--paper); }
+    .win[hidden] { display: none; }
+    .win h2 { font: 800 3rem/1 var(--font-sans); margin: 0 0 0.6rem; }
+    .win h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+    .win p { margin: 0 0 1rem; }
+    @media (max-width: 860px) { .game { grid-template-columns: 1fr; } .stage { min-height: 22rem; } }
+  </style>
+</head>
+<body class="page">
+  <div class="game">
+    <div class="side">
+      <div class="brand"><h1>Stall <em>Setter</em></h1><a href="../index.html">all materials</a></div>
+      <div class="sets" id="sets"></div>
+      <ul class="levels" id="levels" aria-label="Levels"></ul>
+      <div class="level-card">
+        <small id="lvl-num"></small>
+        <h2 id="lvl-title"></h2>
+        <p id="lvl-task"></p>
+      </div>
+      <div class="editor">
+        <div class="live-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="live-tab" aria-selected="true">market.css</span><span class="spacer"></span><button class="live-btn" type="button" id="reset">↺ reset</button></div>
+        <div class="live-locked" id="locked-wrap"><span class="live-locked-label">🔒 already in the stylesheet — read only</span><pre class="code" id="locked"></pre></div>
+        <div class="live-code"><pre id="hl" aria-hidden="true"></pre><textarea id="css" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Your CSS"></textarea></div>
+      </div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="helpers">
+        <button class="ghost-btn" type="button" id="hint-btn">💡 Hint</button>
+        <button class="ghost-btn" type="button" id="answer-btn">🏳 Show an answer</button>
+        <button class="ghost-btn" type="button" id="wipe">↺ Reset progress</button>
+      </div>
+      <div class="hint" id="hint" hidden></div>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="under" title="Target: the chalk marks" tabindex="-1"></iframe>
+      <iframe id="over" title="Your market"></iframe>
+      <span class="legend">dashed = chalk mark · solid = your stall</span>
+      <div class="win" id="win" hidden><div><h2>Stall <em>set!</em></h2><p id="win-text"></p><button class="ghost-btn next" type="button" id="next">Next level →</button></div></div>
+    </div>
+  </div>
+
+  <script>
+  addEventListener("DOMContentLoaded", function () {
+    "use strict";
+    const $ = (s) => document.querySelector(s);
+    const E = { dumplings: "🥟", vinyl: "🎸", plant: "🌵", churros: "🍩", drinks: "🍹", lemon: "🍋", fish: "🐟", bread: "🥖", cheese: "🧀", stage: "🎤", table: "🍽️", banner: "🏮 Night Market 🏮", awning: "〰〰〰〰〰〰〰〰" };
+    const S = (...names) => names.map((n) => `<div class="stall ${n}"><span>${E[n] || n}</span><small>.${n}</small></div>`).join("");
+    const PIER = (inner, cls = "") => `<div class="pier ${cls}">${inner}</div>`;
+    const SIX = S("dumplings", "vinyl", "plant", "churros", "drinks", "lemon");
+    const THREE = S("dumplings", "vinyl", "plant");
+    const GRIDSTALL = ".stall { width: auto; height: auto; min-height: 70px; }";
+
+    const LEVELS = {
+      position: [
+        { title: "Scoot over", html: PIER(S("dumplings", "lemon", "vinyl")), base: ".pier { display: flex; gap: 40px; padding: 40px; align-items: flex-start; }",
+          task: "The lemonade stand 🍋 must move <b>2 tiles right and 1 tile down</b> — and its neighbours must not move at all. One tile = 40px.",
+          start: ".lemon {\n  \n}", solution: ".lemon { position: relative; top: 40px; left: 80px; }",
+          hint: "<code>position: relative</code> moves an element from its own seat. <code>top: 40px</code> pushes it <em>down</em> from the top, <code>left: 80px</code> pushes it right. The seat stays reserved, so nothing else moves." },
+        { title: "Corner pitch", html: PIER(S("dumplings", "churros")), base: ".pier { padding: 40px; }", locked: ".pier { position: relative; }",
+          task: "Pin the churros stall 🍩 to the <b>top-right corner</b> of the pier.",
+          start: ".churros {\n  \n}", solution: ".churros { position: absolute; top: 0; right: 0; }",
+          hint: "<code>position: absolute</code> takes it out of the flow. <code>top: 0; right: 0</code> are measured from the nearest positioned ancestor — here the pier, because it has <code>position: relative</code>." },
+        { title: "Lost at sea", html: PIER(S("dumplings", "churros")), base: ".pier { padding: 40px; }", locked: ".churros { position: absolute; bottom: 0; left: 0; }",
+          task: "The churros stall floated off into the sea! It should sit in the <b>bottom-left corner of the pier</b>. You may not touch <code>.churros</code>.",
+          start: "/* Bring it back. */\n", solution: ".pier { position: relative; }", forbid: /\.churros/,
+          hint: "An absolute element looks up the tree for the nearest ancestor that is <em>positioned</em> (anything but <code>static</code>). Nobody is, so it pinned itself to the first screen of the page. Make the pier its anchor." },
+        { title: "The awning", html: PIER(S("awning", "dumplings", "vinyl")), base: ".pier { padding: 80px 40px; display: flex; gap: 40px; } .awning { height: 40px; width: auto; font-size: 18px; letter-spacing: 4px; overflow: hidden; }", locked: ".pier { position: relative; }",
+          task: "Stretch the striped awning across the <b>whole top edge</b> of the pier. Don't set a width.",
+          start: ".awning {\n  position: absolute;\n  \n}", solution: ".awning { position: absolute; top: 0; left: 0; right: 0; }",
+          hint: "An absolute box is only as wide as its content. Give it <em>both</em> <code>left: 0</code> and <code>right: 0</code> and it stretches between them." },
+        { title: "Centre stage", html: PIER(S("stage")), base: ".pier { padding: 40px; }", locked: ".pier { position: relative; }",
+          task: "Put the stage 🎤 in the <b>exact centre</b> of the pier. New trick: <code>top: 50%; left: 50%</code> puts its <em>corner</em> in the centre; <code>transform: translate(-50%, -50%)</code> pulls it back by half its own size.",
+          start: ".stage {\n  \n}", solution: ".stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }",
+          hint: "<code>top: 50%; left: 50%</code> puts its <em>top-left corner</em> in the centre. <code>transform: translate(-50%, -50%)</code> pulls it back by half its own size. (Also works: <code>inset: 0; margin: auto;</code>)" },
+        { title: "Who's in front?", html: PIER(S("plant", "dumplings")), base: ".pier { padding: 40px; }", locked: ".pier { position: relative; }\n.plant { position: absolute; top: 60px; left: 60px; }\n.dumplings { position: absolute; top: 100px; left: 100px; }",
+          task: "The stalls overlap. The plant swap 🌵 must be <b>in front</b> of the dumplings. Nothing moves.",
+          start: ".plant {\n  \n}", solution: ".plant { z-index: 1; }",
+          check: (d) => { const r = d.querySelector(".dumplings").getBoundingClientRect(); const el = d.elementFromPoint(r.left + 10, r.top + 10); return !!(el && el.closest(".plant")); },
+          hint: "Later in the HTML paints on top. <code>z-index</code> changes the order for positioned elements: higher number = closer to you." },
+      ],
+      flex: [
+        { title: "Open the market", html: PIER(S("dumplings", "vinyl", "plant")), task: "The stalls are stacked in a queue. Line them up <b>in a row</b>.",
+          start: ".pier {\n  \n}", solution: ".pier { display: flex; }", hint: "One line on the <em>parent</em>: <code>display: flex</code>. Its children become flex items and line up along the main axis." },
+        { title: "End of the pier", html: PIER(THREE), locked: ".pier { display: flex; }", task: "Move all three stalls to the <b>far end</b> (right) of the pier.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: flex-end; }", hint: "<code>justify-content</code> moves items along the main axis: <code>flex-start</code>, <code>center</code>, <code>flex-end</code>…" },
+        { title: "Room to breathe", html: PIER(S("dumplings", "vinyl", "plant", "churros")), locked: ".pier { display: flex; }", task: "First stall at the start, last at the end, the rest <b>spread evenly between</b>.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: space-between; }", hint: "<code>space-between</code> puts all the free space <em>between</em> items, none at the edges." },
+        { title: "Middle of the pier", html: PIER(THREE), locked: ".pier { display: flex; }", task: "Keep the stalls on the left, but move them to the <b>vertical middle</b> of the pier.",
+          start: ".pier {\n  \n}", solution: ".pier { align-items: center; }", hint: "Up and down is the <em>cross</em> axis in a row. The cross-axis property is <code>align-items</code>." },
+        { title: "Dead centre", html: PIER(THREE), locked: ".pier { display: flex; }", task: "Centre the row <b>both ways</b>: horizontally and vertically.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: center; align-items: center; }", hint: "Two axes, two properties: <code>justify-content</code> for the main axis, <code>align-items</code> for the cross axis." },
+        { title: "A queue again", html: PIER(THREE), locked: ".pier { display: flex; }", task: "Turn the row into a <b>column</b>, top to bottom.",
+          start: ".pier {\n  \n}", solution: ".pier { flex-direction: column; }", hint: "<code>flex-direction</code> sets the main axis: <code>row</code> or <code>column</code>. Stalls stay 80px wide here because they have a fixed width." },
+        { title: "The axis trap", html: PIER(THREE), locked: ".pier {\n  display: flex;\n  flex-direction: column;\n}", task: "Keep the column, on the left edge, but move it to the <b>vertical middle</b> of the pier.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: center; }", hint: "In a column the main axis points <em>down</em>. So which property moves things vertically now? (Not <code>align-items</code>!)" },
+        { title: "Drinks at the far end", html: PIER(S("dumplings", "vinyl", "plant", "drinks")), locked: ".pier { display: flex; }", task: "Three stalls stay at the start. Push only the drinks stall 🍹 to the <b>far right</b>.",
+          start: ".drinks {\n  \n}", solution: ".drinks { margin-left: auto; }", hint: "Try <code>margin-left: auto</code> on the stall you want to push. (Why an auto margin can do that is the mystery after the break.)" },
+        { title: "Middle of the row", html: PIER(THREE), locked: ".pier { display: flex; }", task: "Group the stalls in the <b>horizontal middle</b>.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: center; }", hint: "<code>justify-content</code> again: it moves the whole group along the main axis." },
+        { title: "Equal aisles", html: PIER(THREE), locked: ".pier { display: flex; }", task: "The same gap everywhere: before, between and after every stall.",
+          start: ".pier {\n  \n}", solution: ".pier { justify-content: space-evenly; }", hint: "<code>space-around</code> is close, but its edge gaps are half-size. You want <code>space-evenly</code>." },
+        { title: "Aisles, not margins", html: PIER(S("dumplings", "vinyl", "plant", "churros")), locked: ".pier { display: flex; }", task: "Leave exactly <b>one tile (40px)</b> between neighbours, and none at the edges.",
+          start: ".pier {\n  \n}", solution: ".pier { gap: 40px; }", hint: "<code>gap</code> puts space only <em>between</em> items. No margin maths." },
+        { title: "Too many stalls", html: PIER(S("dumplings", "vinyl", "plant", "churros", "drinks", "lemon", "fish", "bread", "cheese")), base: ".stall { flex-shrink: 0; }", locked: ".pier {\n  display: flex;\n  gap: 20px;\n}", task: "Nine stalls don't fit in one row. Let them <b>continue on a new row</b>.",
+          start: ".pier {\n  \n}", solution: ".pier { flex-wrap: wrap; }", hint: "By default flex squeezes everything into one line. <code>flex-wrap: wrap</code> lets it break into more lines." },
+        { title: "The long table", html: PIER(S("dumplings", "table", "drinks")), locked: ".pier {\n  display: flex;\n  gap: 20px;\n}", task: "The long table 🍽️ should <b>grow to fill</b> all the space left between the two stalls.",
+          start: ".table {\n  \n}", solution: ".table { flex-grow: 1; }", hint: "<code>flex-grow: 1</code> says: give me the leftover space. (<code>flex: 1</code> works too.)" },
+      ],
+      grid: [
+        { title: "Three columns", html: PIER(SIX), base: GRIDSTALL, task: "Arrange the six stalls in <b>three equal columns</b>.",
+          start: ".pier {\n  display: grid;\n  \n}", solution: ".pier { display: grid; grid-template-columns: 1fr 1fr 1fr; }", hint: "<code>grid-template-columns</code> lists the columns. <code>1fr</code> = one share of the free space. <code>repeat(3, 1fr)</code> is the same thing." },
+        { title: "Fair shares", html: PIER(SIX), base: GRIDSTALL, locked: ".pier { display: grid; }", task: "Three columns again, but the middle one is <b>twice as wide</b> as each side column.",
+          start: ".pier {\n  \n}", solution: ".pier { grid-template-columns: 1fr 2fr 1fr; }", hint: "fr units are shares. 1 + 2 + 1 = 4 shares: the middle gets 2 of them." },
+        { title: "Aisles", html: PIER(SIX), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}", task: "Leave a <b>20px aisle</b> between all rows and columns.",
+          start: ".pier {\n  \n}", solution: ".pier { gap: 20px; }", hint: "Same <code>gap</code> as in flex. It works on rows and columns." },
+        { title: "The star stall", html: PIER(SIX), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 20px;\n}", task: "Dumpling Dynasty 🥟 is the star: make it <b>two columns wide</b>.",
+          start: ".dumplings {\n  \n}", solution: ".dumplings { grid-column: span 2; }", hint: "<code>grid-column: span 2</code> = take two columns, starting wherever you land." },
+        { title: "The banner", html: PIER(S("banner", "dumplings", "vinyl", "plant")), base: GRIDSTALL + " .banner { font-size: 22px; }", locked: ".pier {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 20px;\n}", task: "The banner must stretch across <b>every column</b>, from the first line to the last.",
+          start: ".banner {\n  \n}", solution: ".banner { grid-column: 1 / -1; }", hint: "Grid lines are numbered from 1. <code>-1</code> is the last line, however many columns there are: <code>grid-column: 1 / -1</code>." },
+        { title: "Tall stall", html: PIER(SIX), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 20px;\n}", task: "The plant swap 🌵 is <b>two rows tall</b>.",
+          start: ".plant {\n  \n}", solution: ".plant { grid-row: span 2; }", hint: "Same idea as columns: <code>grid-row: span 2</code>." },
+        { title: "By the numbers", html: PIER(S("stage", "dumplings", "vinyl", "plant", "churros")), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  grid-template-columns: repeat(4, 1fr);\n  grid-template-rows: repeat(3, 1fr);\n  gap: 20px;\n}", task: "The stage 🎤 goes from <b>column line 2 to line 4</b>, and from <b>row line 1 to line 3</b>.",
+          start: ".stage {\n  \n}", solution: ".stage { grid-column: 2 / 4; grid-row: 1 / 3; }", hint: "<code>grid-column: start / end</code> uses line numbers, not column numbers. A 4-column grid has lines 1 to 5. Name both lines, for columns and rows: with <code>span</code> the stage may land elsewhere and push the other stalls around." },
+        { title: "Draw the map", html: PIER(S("stage", "dumplings", "table", "plant", "drinks")), base: GRIDSTALL + " .stage{grid-area:stage} .dumplings{grid-area:food} .table{grid-area:table} .plant{grid-area:plant} .drinks{grid-area:drinks}",
+          locked: ".pier {\n  display: grid;\n  grid-template-columns: 1fr 2fr 1fr;\n  grid-template-rows: 1fr 1fr 1fr;\n  gap: 20px;\n}\n/* the stalls already have names:\n   stage  food  table  plant  drinks */",
+          task: "Draw the market with words. Stage across the top two columns, drinks down the whole right side, food on the left under the stage, table and plants in the middle. Match the chalk marks.",
+          start: ".pier {\n  grid-template-areas:\n    \". . .\"\n    \". . .\"\n    \". . .\";\n}", solution: '.pier { grid-template-areas: "stage stage drinks" "food table drinks" "food plant drinks"; }',
+          hint: "Each string is one row; each word is one cell. Repeat a name to make an area span cells. Areas must be rectangles." },
+        { title: "The magic line", html: PIER(SIX + S("fish", "bread")), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  gap: 20px;\n}", task: "Write last time's magic line: as many columns as fit, each <b>at least 160px</b>, stretched to fill. Resize the window afterwards and watch.",
+          start: ".pier {\n  grid-template-columns: \n}", solution: ".pier { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }", hint: "<code>minmax(160px, 1fr)</code> = never narrower than 160px, share the rest. <code>repeat(auto-fill, …)</code> = as many columns as fit." },
+        { title: "Centre, the grid way", html: PIER(S("stage")), locked: ".pier { display: grid; }", task: "Centre the stage in the pier, both ways, with <b>one declaration</b>.",
+          start: ".pier {\n  \n}", solution: ".pier { place-items: center; }", hint: "<code>place-items</code> = <code>align-items</code> + <code>justify-items</code> in one." },
+      ],
+      deep: [
+        { title: "Shrink by weight", html: PIER(S("dumplings", "table", "drinks")), base: ".stall { width: auto; }", locked: ".pier {\n  display: flex;\n  width: 420px;\n  height: auto;\n}\n.stall { flex: 0 1 200px; }",
+          task: "Three 200px stalls on a 420px pier: 180px too many. Right now each gives up 60px. Make the long table 🍽️ give up <b>twice as much</b> as each of the others.",
+          start: ".table {\n  \n}", solution: ".table { flex-shrink: 2; }",
+          hint: "Shrinking is weighted by <code>flex-shrink × flex-basis</code>. Same basis, so doubling <code>flex-shrink</code> doubles the share: −45, −90, −45." },
+        { title: "Blowout", html: '<div class="pier"><div class="stall dumplings">🥟</div><div class="stall vinyl">Supercalifragilisticexpialidocious</div><div class="stall plant">🌵</div></div>', base: GRIDSTALL + " .pier { width: 680px; overflow: hidden; } .vinyl { font-size: 22px; }", locked: ".pier {\n  display: grid;\n  gap: 20px;\n  grid-template-columns: repeat(3, 1fr);\n}",
+          task: "Three “equal” columns, but one long word pushes its column wide. Make the three columns <b>truly equal</b>. The word may overflow its stall.",
+          start: ".pier {\n  grid-template-columns: \n}", solution: ".pier { grid-template-columns: repeat(3, minmax(0, 1fr)); }",
+          hint: "<code>1fr</code> is <code>minmax(auto, 1fr)</code>: never below the content's min-content. <code>minmax(0, 1fr)</code> removes that floor." },
+        { title: "Fit, not fill", html: PIER(THREE), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  gap: 20px;\n  grid-template-columns:\n    repeat(auto-fill, minmax(120px, 1fr));\n}",
+          task: "Only three stalls, but the grid keeps empty columns for stalls that don't exist. Stretch the three across the <b>whole pier</b>, keeping the 120px minimum.",
+          start: ".pier {\n  \n}", solution: ".pier { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }",
+          hint: "<code>auto-fill</code> keeps empty tracks; <code>auto-fit</code> collapses them to 0, so the <code>1fr</code> columns share their space." },
+        { title: "Fill the hole", html: PIER(S("vinyl", "dumplings", "table", "plant", "drinks", "lemon")), base: GRIDSTALL, locked: ".pier {\n  display: grid;\n  gap: 20px;\n  grid-template-columns: repeat(3, 1fr);\n}\n.table { grid-column: span 2; }",
+          task: "The long table doesn't fit in the first row, so it wraps and leaves a <b>hole</b> top-right. Let a later stall move up into it — one declaration, no placing by hand.",
+          start: ".pier {\n  \n}", solution: ".pier { grid-auto-flow: dense; }",
+          hint: "<code>grid-auto-flow: dense</code> back-fills holes with later items. It changes visual order, not tab order: use it for decoration, not for things read in sequence." },
+        { title: "Lines have names", html: PIER(S("banner", "dumplings", "vinyl", "plant")), base: GRIDSTALL + " .banner { font-size: 22px; }", locked: ".pier {\n  display: grid;\n  gap: 20px;\n  grid-template-columns:\n    [shore] 1fr [path] 2fr [water] 1fr [edge];\n}",
+          task: "Hang the banner from line <code>path</code> to line <code>edge</code>, in the first row. Use the names, not numbers.",
+          start: ".banner {\n  \n}", solution: ".banner { grid-column: path / edge; grid-row: 1; }", require: /path[\s\S]*edge|edge[\s\S]*path/,
+          hint: "Named lines go in brackets inside the track list. <code>grid-column: path / edge</code>. (<code>grid-template-areas</code> creates names too: an area <code>stage</code> gives lines <code>stage-start</code> and <code>stage-end</code>.)" },
+        { title: "Trapped", html: PIER(S("dumplings", "drinks")), base: ".pier { padding: 40px; }", locked: ".pier { transform: translate(0); }\n.drinks {\n  position: fixed;\n  right: 0;\n  bottom: 0;\n}",
+          task: "The drinks stall is <code>fixed</code> to the bottom-right corner… of the pier, not of the sea. Free it: it belongs in the bottom-right corner of the whole scene. You may not touch <code>.drinks</code>.",
+          start: "/* who traps it? */\n", solution: ".pier { transform: none; }", forbid: /\.drinks/,
+          hint: "A <code>transform</code> on an ancestor makes it the containing block for <code>fixed</code> descendants. Remove it (<code>transform: none</code>)." },
+      ],
+    };
+    const SET_NAMES = { position: "Position", flex: "Flexbox", grid: "Grid", deep: "Deep cuts" };
+
+    const SCENE = `
+      html, body { height: 100%; }
+      body { margin: 0; padding: 28px; box-sizing: border-box; font: 700 14px/1.2 system-ui, sans-serif;
+        background: repeating-radial-gradient(circle at 0 100%, #0c1f2b 0 18px, #0f2635 18px 36px); }
+      .pier { height: 100%; box-sizing: border-box; border-radius: 12px; border: 4px solid #5a3514;
+        background:
+          linear-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1px) -1px -1px / 40px 40px,
+          linear-gradient(90deg, rgb(255 255 255 / 0.13) 1px, transparent 1px) -1px -1px / 40px 40px,
+          repeating-linear-gradient(90deg, #b07a47 0 38px, #9c6a3c 38px 40px); }
+      .stall { width: 80px; height: 80px; box-sizing: border-box; display: grid; place-items: center; font-size: 34px; line-height: 1;
+        color: #17140f; border: 3px solid #17140f; border-radius: 10px; background: var(--c, #fffdf8);
+        box-shadow: 0 5px 0 rgb(0 0 0 / 0.3); align-content: center; gap: 3px; }
+      .stall small { font: 700 10px/1 ui-monospace, Menlo, monospace; opacity: 0.75; }
+      .awning small { display: none; }
+      .dumplings { --c: #ffd23f; } .vinyl { --c: #82ccff; } .plant { --c: #bff08f; } .churros { --c: #ffa383; } .drinks { --c: #ff9fd6; }
+      .lemon { --c: #fff27a; } .fish { --c: #9fe6c8; } .bread { --c: #f3c98b; } .cheese { --c: #ffe08a; } .stage { --c: #ff8a6b; } .table { --c: #e8d9b8; }
+      .banner { --c: #17140f; color: #ffd23f; }
+      .awning { --c: repeating-linear-gradient(90deg, #ff5a36 0 20px, #fffdf8 20px 40px); background: var(--c); color: transparent; }
+      html.ghost .stall { background: rgb(255 255 255 / 0.1); border: 3px dashed rgb(255 255 255 / 0.9); box-shadow: none; filter: grayscale(1); opacity: 0.55; }
+      html.top body { background: transparent !important; }
+      html.top .pier { background: transparent !important; border-color: transparent !important; }
+      html.top.won .stall { animation: hop 0.5s ease-out 2; }
+      @keyframes hop { 50% { translate: 0 -12px; } }
+    `;
+    const KEYS = "<script>addEventListener('keydown',function(e){if(/INPUT|TEXTAREA/.test(e.target.tagName))return;if(['ArrowRight','ArrowLeft','PageUp','PageDown'].indexOf(e.key)>-1)parent.postMessage({deckKey:e.key},'*')})<\/script>";
+    const doc = (lvl, cls, css) => `<!doctype html><html class="${cls}"><head><meta charset="utf-8"><style>${SCENE}</style><style>${lvl.base || ""}</style><style>${lvl.locked || ""}</style><style id="u">${css}</style>${KEYS}</head><body>${lvl.html}<\/body><\/html>`;
+
+    const STORE = "stall-setter-v1";
+    let done = {};
+    try { done = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) {}
+    const save = () => { try { localStorage.setItem(STORE, JSON.stringify(done)); } catch (e) {} };
+    const params = new URLSearchParams(location.search);
+    let set = LEVELS[params.get("set")] ? params.get("set") : "flex";
+    let n = Math.max(0, Math.min(LEVELS[set].length - 1, (+params.get("level") || 1) - 1));
+    const drafts = {};
+
+    const ta = $("#css"), hl = $("#hl"), under = $("#under"), over = $("#over");
+    const paint = () => { hl.innerHTML = Kit.hl("css", ta.value) + "\n "; hl.scrollTop = ta.scrollTop; };
+    ta.addEventListener("scroll", () => { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; });
+
+    function renderNav() {
+      $("#sets").innerHTML = "";
+      for (const k of Object.keys(LEVELS)) {
+        const count = LEVELS[k].filter((_, i) => done[k + i]).length;
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(k === set));
+        b.innerHTML = `${SET_NAMES[k]}<small>${count}/${LEVELS[k].length}</small>`;
+        b.onclick = () => { saveDraft(); loadedKey = null; set = k; load(0); };
+        $("#sets").append(b);
+      }
+      $("#levels").innerHTML = "";
+      LEVELS[set].forEach((l, i) => {
+        const li = document.createElement("li"), b = document.createElement("button");
+        b.type = "button"; b.textContent = i + 1; b.title = l.title;
+        if (done[set + i]) b.classList.add("done");
+        b.setAttribute("aria-current", String(i === n));
+        b.onclick = () => load(i);
+        li.append(b); $("#levels").append(li);
+      });
+    }
+    let loadedKey = null;
+    const saveDraft = () => { if (loadedKey) drafts[loadedKey] = ta.value; };
+    function load(i) {
+      saveDraft();
+      n = i;
+      loadedKey = set + n;
+      const l = LEVELS[set][n];
+      history.replaceState(null, "", `?set=${set}&level=${n + 1}`);
+      $("#lvl-num").textContent = `${SET_NAMES[set]} · level ${n + 1} of ${LEVELS[set].length}`;
+      $("#lvl-title").textContent = l.title;
+      $("#lvl-task").innerHTML = l.task;
+      $("#locked-wrap").hidden = !l.locked;
+      $("#locked").innerHTML = Kit.hl("css", l.locked || "");
+      $("#hint").hidden = true;
+      $("#hint").innerHTML = l.hint;
+      $("#win").hidden = true;
+      $("#feedback").textContent = "";
+      ta.value = drafts[set + n] != null ? drafts[set + n] : l.start;
+      paint();
+      under.srcdoc = doc(l, "ghost", l.solution);
+      over.srcdoc = doc(l, "top", ta.value);
+      renderNav();
+    }
+    function check() {
+      const l = LEVELS[set][n];
+      let du, dt;
+      try { du = under.contentDocument; dt = over.contentDocument; } catch (e) { return; }
+      if (!du || !dt || !du.body || !dt.body || !dt.getElementById("u")) return;
+      const a = [...du.querySelectorAll(".stall")], b = [...dt.querySelectorAll(".stall")];
+      let placed = 0;
+      a.forEach((el, i) => {
+        const p = el.getBoundingClientRect(), q = b[i] && b[i].getBoundingClientRect();
+        if (q && ["left", "top", "width", "height"].every((k) => Math.abs(p[k] - q[k]) <= 2)) placed++;
+      });
+      let ok = placed === a.length && a.length > 0;
+      if (ok && l.check) ok = l.check(dt);
+      if (ok && l.require && !l.require.test(ta.value.replace(/\/\*[\s\S]*?\*\//g, ""))) { $("#feedback").textContent = "Everything's in place — now do it the way the task asks."; $("#feedback").className = "feedback"; dt.documentElement.classList.remove("won"); return; }
+      if (ok && l.forbid && l.forbid.test(ta.value.replace(/\/\*[\s\S]*?\*\//g, ""))) { $("#feedback").textContent = "Everything's in place — but this level says: don't touch that selector."; $("#feedback").className = "feedback"; return; }
+      dt.documentElement.classList.toggle("won", ok);
+      if (ok) {
+        const first = !done[set + n];
+        done[set + n] = true; save(); renderNav();
+        $("#feedback").textContent = "✓ Every stall is on its mark.";
+        $("#feedback").className = "feedback good";
+        if (first || $("#win").hidden) {
+          const last = n === LEVELS[set].length - 1;
+          $("#win-text").textContent = last ? `That's the whole ${SET_NAMES[set]} set.` : "Next level unlocked.";
+          $("#next").textContent = last ? "Back to level 1" : "Next level →";
+          setTimeout(() => { $("#win").hidden = false; }, 700);
+        }
+      } else {
+        $("#feedback").textContent = `${placed} of ${a.length} stalls on their marks` + (l.check && placed === a.length ? " — but who's in front?" : "");
+        $("#feedback").className = "feedback";
+      }
+    }
+    let raf;
+    ta.addEventListener("input", () => {
+      paint();
+      $("#win").hidden = true;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        try { over.contentDocument.getElementById("u").textContent = ta.value; } catch (e) {}
+        requestAnimationFrame(check);
+      });
+    });
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { ta.blur(); return; }
+      if (e.key === "Tab") { e.preventDefault(); document.execCommand("insertText", false, "  "); }
+      else if (e.key === "Enter") {
+        const before = ta.value.slice(0, ta.selectionStart);
+        const line = before.slice(before.lastIndexOf("\n") + 1);
+        let ind = line.match(/^\s*/)[0];
+        if (/\{\s*$/.test(line)) ind += "  ";
+        e.preventDefault(); document.execCommand("insertText", false, "\n" + ind);
+      }
+    });
+    over.addEventListener("load", () => setTimeout(check, 50));
+    under.addEventListener("load", () => setTimeout(check, 50));
+    new ResizeObserver(() => requestAnimationFrame(check)).observe($("#stage"));
+    $("#reset").onclick = () => { ta.value = LEVELS[set][n].start; ta.dispatchEvent(new Event("input")); };
+    $("#hint-btn").onclick = () => { $("#hint").hidden = !$("#hint").hidden; };
+    $("#answer-btn").onclick = () => { ta.value = LEVELS[set][n].solution.replace(/\{ /g, "{\n  ").replace(/; (?=[\w-])/g, ";\n  ").replace(/; \}/g, ";\n}").replace(/" "/g, '"\n    "'); ta.dispatchEvent(new Event("input")); };
+    $("#wipe").onclick = () => { done = {}; save(); renderNav(); };
+    $("#next").onclick = () => { $("#win").hidden = true; load(n === LEVELS[set].length - 1 ? 0 : n + 1); };
+    document.addEventListener("keydown", (e) => {
+      if (e.target === ta) return;
+      if (["ArrowRight", "ArrowLeft", "PageUp", "PageDown"].includes(e.key) && parent !== window) parent.postMessage({ deckKey: e.key }, "*");
+    });
+    addEventListener("message", (e) => { if (e.data && e.data.deckKey && e.source !== parent && parent !== window) parent.postMessage(e.data, "*"); });
+    load(n);
+  });
+  </script>
+</body>
+</html>

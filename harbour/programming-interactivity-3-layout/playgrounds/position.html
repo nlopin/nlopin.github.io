@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Position lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.pos-lab{height:36rem;font-size:1.35rem}</style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Position</span>
+    <h1>Pin the <em>stamp</em></h1>
+    <p class="intro">One badge, five values of <code>position</code>. The yellow dashed box is the <strong>containing block</strong>: the box that <code>top</code> and <code>right</code> are measured from. The blue dashed box is the seat the badge keeps in the flow. Scroll the little page for <code>fixed</code> and <code>sticky</code>.</p>
+    <div class="pos-lab"></div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li><code>relative</code> + <code>top: 20px</code>. Did the text around it move?</li>
+      <li><code>absolute</code> + <code>top: 0</code> + <code>right: 0</code>. Where did it go? Why?</li>
+      <li>Now set the card to <code>relative</code>. What changed, and why is this the most used pattern in CSS?</li>
+      <li><code>fixed</code>, then scroll. Then <code>sticky</code> + <code>top: 0</code>, then scroll. What's the difference?</li>
+      <li>Badge <code>fixed</code>, card <code>transform</code>. Scroll. Why is "fixed" suddenly scrolling? Try <code>absolute</code> with the card static but transformed, too.</li>
+    </ol>
+  </div>
+</body>
+</html>

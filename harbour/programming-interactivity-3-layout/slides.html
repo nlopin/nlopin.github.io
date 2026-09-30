@@ -1,0 +1,1442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout — or where things go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide kbd { color: var(--ink); }
+.slide pre.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+.slide .hl { background: linear-gradient(transparent 66%, rgb(255 210 63 / 0.85) 66% 94%, transparent 94%); padding: 0 0.08em; }
+.slide.exercise .hl { background: linear-gradient(transparent 66%, rgb(255 210 63 / 0.45) 66% 94%, transparent 94%); }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > .fill + p, .slide > div + p { margin-top: 24px; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+.slide .card.dark code { background: #2c2924; color: var(--yellow); }
+.slide .card.act code { background: rgb(255 255 255 / 0.25); }
+
+.slide.statement p.kicker { font-size: 20px; color: var(--act-ink); }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: 1fr 760px; gap: 40px; height: 100%; align-items: center; }
+.title .kicker { color: var(--yellow); }
+.title .kicker::before { background: var(--yellow); border-color: var(--yellow); }
+.slide .title-h1 { font-size: 150px; line-height: 0.86; letter-spacing: -0.04em; margin: 10px 0 56px; }
+.slide .title-h1.sm { font-size: 112px; }
+.slide .title-h1 em { color: var(--yellow); font-size: 1.02em; letter-spacing: -0.02em; }
+.title-sub { font: 500 24px/1.5 var(--font-mono); color: #b9b0a0; max-width: 640px; }
+.collage { position: relative; height: 760px; }
+.collage .frame { position: absolute; width: 470px; height: 560px; border: 4px solid var(--paper); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5); --z: 0.36; }
+.collage .frame:nth-child(1) { left: 0; top: 40px; transform: rotate(-5deg); }
+.collage .frame:nth-child(2) { right: 0; bottom: 30px; transform: rotate(4deg); border-color: var(--yellow); }
+.collage .sticker { position: absolute; z-index: 3; }
+.collage .s1 { left: 90px; top: 10px; background: var(--paper); }
+.collage .s2 { right: 60px; bottom: 0; transform: rotate(3deg); }
+
+/* problems list */
+.slide ol.problems > li { font-size: 32px; margin-bottom: 14px; }
+
+/* map of acts */
+.map { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 10px; }
+.map div { border: 3px solid var(--ink); border-radius: 14px; padding: 18px 16px; min-height: 330px; display: flex; flex-direction: column; gap: 10px; font-size: 22px; line-height: 1.3; box-shadow: 6px 6px 0 var(--ink); }
+.map b { font: italic 400 40px/1 var(--font-serif); }
+.map strong { font-size: 27px; line-height: 1.05; }
+.map .glyph { font: 800 64px/1 var(--font-mono); letter-spacing: -0.05em; }
+.map time { font: 700 20px var(--font-mono); margin-top: auto; }
+.map .m1 { background: var(--blue); color: #fff; } .map .m2 { background: var(--yellow); } .map .m3 { background: var(--tomato); }
+.map .mb { background: var(--paper-2); border-style: dashed; box-shadow: none; } .map .m4 { background: var(--violet); color: #fff; } .map .m6 { background: var(--pink); }
+
+/* duel strip */
+.slide .spec-duel { font-size: 34px; gap: 14px; }
+.rounds { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font: 700 22px var(--font-mono); }
+.rounds span { background: var(--white); border: 3px solid var(--ink); border-radius: 12px; padding: 10px 14px; }
+.rounds i { font-style: normal; font-weight: 800; }
+
+/* flow diagram */
+.flowdiag { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.flowdiag .pane { background: var(--white); border: 3px solid var(--ink); border-radius: 16px; padding: 22px; box-shadow: 8px 8px 0 var(--ink); }
+.flowdiag h3 { font-size: 30px; }
+.fb { font: 700 22px var(--font-mono); border: 3px solid var(--ink); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; background: #cfe0ff; }
+.fb.short { width: 60%; }
+.fi-line { font-size: 26px; line-height: 2.1; }
+.fi { font: 700 22px var(--font-mono); border: 3px solid var(--ink); border-radius: 8px; padding: 4px 10px; background: #ffe7a3; }
+
+/* width flows down / height grows up */
+.dirs { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: stretch; }
+.dir { position: relative; border: 3px solid var(--ink); border-radius: 18px; padding: 28px; background: var(--white); box-shadow: 8px 8px 0 var(--ink); }
+.dir h3 { font-size: 44px; margin-bottom: 18px; }
+.dir .nest { border: 3px dashed var(--ink); border-radius: 12px; padding: 18px; font: 700 20px var(--font-mono); }
+.dir .nest .nest { margin-top: 10px; background: color-mix(in srgb, var(--act) 18%, transparent); }
+.dir .arrow { position: absolute; right: 26px; top: 110px; bottom: 26px; width: 18px; }
+.dir .arrow::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 18px; width: 6px; background: var(--tomato); }
+.dir .arrow::after { content: ""; position: absolute; left: -6px; bottom: 0; border: 15px solid transparent; border-top: 20px solid var(--tomato); border-bottom: 0; }
+.dir.up .arrow::before { top: 18px; bottom: 0; }
+.dir.up .arrow::after { top: 0; bottom: auto; border-top: 0; border-bottom: 20px solid var(--tomato); }
+.dir p { font-size: 28px; margin: 18px 70px 0 0; }
+
+/* two traps */
+.traps .card pre.code { font-size: 22px; margin: 10px 0; }
+.traps .card p { font-size: 26px; }
+
+/* position table */
+.ptable { width: 100%; border-collapse: collapse; font-size: 27px; }
+.ptable td, .ptable th { padding: 12px 14px; border-bottom: 2px solid var(--line); text-align: left; vertical-align: middle; }
+.ptable th { font: 700 18px var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.ptable td:first-child { width: 220px; }
+.ptable td:first-child code { font: 800 30px var(--font-mono); background: var(--yellow); padding: 4px 14px; border: 2px solid var(--ink); border-radius: 8px; }
+.ptable td:nth-child(2) { width: 170px; font: 700 22px var(--font-mono); }
+.ptable .no { color: #d23a17; } .ptable .yes { color: #0b7a52; }
+.ptable td:last-child { color: var(--muted); font-size: 23px; }
+
+/* bets */
+.bets { display: flex; gap: 16px; flex-wrap: wrap; }
+.bets .chip { font-size: 24px; padding: 14px 20px; }
+
+/* ancestor tree */
+.climb { display: grid; gap: 8px; font: 700 25px var(--font-mono); align-content: start; }
+.climb div { display: flex; align-items: center; gap: 18px; padding: 7px 16px; background: var(--white); border: 3px solid var(--ink); border-radius: 12px; }
+.climb div small { font: 500 21px var(--font-sans); color: var(--muted); margin-left: auto; }
+.climb .me { background: var(--tomato); color: #fff; }
+.climb .me small { color: #ffe0d8; }
+.climb .anchor { background: var(--yellow); box-shadow: 6px 6px 0 var(--ink); }
+.climb .anchor small { color: var(--ink); }
+.climb .skip { opacity: 0.55; }
+.slide.s1 .climb .s-card { opacity: 1; background: var(--yellow); box-shadow: 6px 6px 0 var(--ink); }
+.slide.s1 .climb .s-card small { color: var(--ink); }
+.climb .s-card .pre { display: inline; } .slide.s1 .climb .s-card .pre { display: none; }
+.climb .ind1 { margin-left: 40px; } .climb .ind2 { margin-left: 80px; } .climb .ind3 { margin-left: 120px; } .climb .ind4 { margin-left: 160px; }
+
+/* z-index stack */
+.zstack { position: relative; height: 330px; }
+.zstack div { position: absolute; width: 300px; height: 190px; border: 3px solid var(--ink); border-radius: 14px; padding: 16px 20px; font: 700 24px var(--font-mono); box-shadow: 6px 6px 0 var(--ink); }
+.zstack .z1 { left: 0; top: 0; background: #cfe0ff; }
+.zstack .z2 { left: 120px; top: 60px; background: #ffe7a3; }
+.zstack .z3 { left: 240px; top: 120px; background: #ffc9bb; z-index: 0; }
+.slide.s1 .zstack .z1 { z-index: 5; }
+
+/* axes diagram */
+.axes2 { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+.axbox { position: relative; background: var(--white); border: 3px solid var(--ink); border-radius: 16px; padding: 70px 30px 30px 70px; height: 380px; box-shadow: 8px 8px 0 var(--ink); }
+.axbox h3 { position: absolute; left: 24px; bottom: 16px; font: 800 26px var(--font-mono); margin: 0; }
+.axrow { display: flex; gap: 14px; }
+.axcol { display: flex; flex-direction: column; gap: 10px; width: 160px; }
+.axrow i, .axcol i { font-style: normal; display: grid; place-items: center; width: 90px; height: 70px; border: 3px solid var(--ink); border-radius: 10px; background: #ffe7a3; font-size: 34px; }
+.axcol i { height: 58px; }
+.ax { position: absolute; font: 800 20px var(--font-mono); }
+.ax.main { color: var(--tomato); } .ax.cross { color: var(--blue); }
+.ax.h { left: 70px; right: 30px; top: 30px; border-top: 5px solid currentColor; }
+.ax.h::after { content: ""; position: absolute; right: -4px; top: -13px; border: 10px solid transparent; border-left: 16px solid currentColor; border-right: 0; }
+.ax.v { top: 70px; bottom: 60px; left: 30px; border-left: 5px solid currentColor; }
+.ax.v::after { content: ""; position: absolute; left: -13px; bottom: -4px; border: 10px solid transparent; border-top: 16px solid currentColor; border-bottom: 0; }
+.ax.cross.h, .ax.cross.v { border-style: dashed; }
+.ax span { position: absolute; white-space: nowrap; }
+.ax span b { color: #fff; padding: 4px 8px; display: block; }
+.ax.h span { left: 12px; top: -40px; background: none; }
+.ax.v span { left: 16px; top: 50%; background: none; }
+.ax b { font-weight: 800; }
+.ax.main b { background: var(--tomato); } .ax.cross b { background: var(--blue); }
+
+/* leftover bar */
+.leftover { display: grid; gap: 12px; }
+.lrow { display: flex; box-sizing: content-box; height: 64px; border: 3px solid var(--ink); border-radius: 12px; overflow: hidden; background: repeating-linear-gradient(45deg, #fff 0 10px, #f1e9da 10px 20px); }
+.lrow > div { display: grid; place-items: center; font: 700 22px var(--font-mono); border-right: 3px solid var(--ink); text-align: center; line-height: 1.2; }
+.lrow .a { background: #ffe7a3; } .lrow .b { background: #cfe0ff; } .lrow .c { background: #c9f0d9; }
+.lrow .free { border-right: 0; background: none; color: var(--muted); flex: 1; }
+.lrow > div:last-child { border-right: 0; }
+.lwrap { display: flex; align-items: center; gap: 24px; }
+.lnote { font: 700 22px var(--font-mono); color: var(--muted); }
+.lrow.grown .a { flex: 1 1 0; } .lrow.grown .b { flex: 1 1 0; } .lrow.grown .c { flex: 1 1 0; }
+.lrow .plus { color: #d23a17; }
+.llabel { font: 700 22px var(--font-mono); color: var(--muted); margin: 0 0 -8px; }
+
+/* flex vs grid on the slide itself */
+.fvg { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+.fvg h3 { font-size: 34px; }
+.fvg .demo { border: 3px solid var(--ink); border-radius: 14px; padding: 14px; background: var(--white); box-shadow: 6px 6px 0 var(--ink); min-height: 190px; }
+.fvg .demo i { font: 700 22px var(--font-sans); font-style: normal; background: #ffe7a3; border: 3px solid var(--ink); border-radius: 10px; padding: 16px 12px; text-align: center; }
+.fvg .fx { display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start; }
+.fvg .fx i { flex: 1 1 190px; }
+.fvg .gx { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; align-content: start; }
+.fvg p { font-size: 26px; margin-top: 16px; }
+
+/* decision + synthesis tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 27px; }
+.dtable td, .dtable th { padding: 12px 16px; border-bottom: 2px solid var(--line); text-align: left; vertical-align: middle; }
+.dtable th { font: 700 18px var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.dtable td:first-child { font-weight: 700; }
+.dtable .f, .dtable .g { font: 800 22px var(--font-mono); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--ink); }
+.dtable .f { background: var(--tomato); } .dtable .g { background: var(--violet); color: #fff; }
+.dtable.syn td:first-child code { font: 800 26px var(--font-mono); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--ink); background: var(--white); }
+.dtable.syn td { font-size: 25px; }
+.dtable.syn td:first-child { white-space: nowrap; }
+.dtable.syn tr.r1 td:first-child code { background: #cfe0ff; } .dtable.syn tr.r2 td:first-child code { background: var(--yellow); }
+.dtable.syn tr.r3 td:first-child code { background: var(--tomato); } .dtable.syn tr.r4 td:first-child code { background: var(--violet); color: #fff; }
+
+/* magic line */
+.magic { font: 700 50px/1.5 var(--font-mono); background: var(--code-bg); color: var(--code-ink); border: 3px solid var(--ink); border-radius: 18px; padding: 30px 40px; white-space: pre; }
+.magic span { border-radius: 8px; transition: background 0.2s, box-shadow 0.2s; }
+.magic .p { color: var(--hl-prop); } .magic .f { color: var(--hl-val); } .magic .n { color: var(--hl-num); }
+.slide.s1:not(.s2) .magic .m-mm, .slide.s2:not(.s3) .magic .m-af, .slide.s3 .magic .m-all { background: rgb(255 210 63 / 0.22); box-shadow: 0 0 0 6px rgb(255 210 63 / 0.55); }
+.explain { display: grid; gap: 12px; margin-top: 26px; }
+.explain div { font-size: 30px; padding: 14px 20px; background: var(--white); border: 3px solid var(--ink); border-radius: 12px; }
+.explain code { font-size: 28px; }
+
+/* checklist */
+.checklist { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; }
+.checklist li { font-size: 26px; }
+.checklist li::before { content: "☐" !important; background: none !important; border: 0 !important; top: -4px !important; left: 0 !important; width: auto !important; height: auto !important; font-size: 32px; color: var(--yellow) !important; }
+.acts4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.acts4 > div { border: 2px solid #4a453c; border-radius: 14px; padding: 16px 18px; }
+.acts4 h3 { font-size: 26px; color: var(--yellow); }
+.acts4 ul { margin: 0; }
+.acts4 li { font-size: 22px; padding-left: 30px; margin-bottom: 8px; }
+.acts4 li::before { width: 12px !important; height: 12px !important; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; }
+.slide.breakslide::before { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 32px; color: #dfe4ff; max-width: none; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+/* one slide per position value */
+.pos1 { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: stretch; }
+.pos1 ul { align-self: center; }
+.pos1 li { margin-bottom: 18px; }
+.pos1 .live { font-size: 24px; grid-template-rows: minmax(0, 0.75fr) minmax(0, 1.25fr) auto; }
+
+/* further-reading slides */
+.slide ul.reading li { font-size: 30px; margin-bottom: 20px; }
+.slide ul.reading li:first-child { font-size: 36px; }
+.slide ul.reading li:first-child a { font-weight: 800; }
+.slide ul.reading .muted { font-size: 24px; }
+
+/* labs on slides */
+.slide .flex-lab, .slide .pos-lab { font-size: 28px; }
+.slide .flex-lab { grid-template-columns: 520px minmax(0, 1fr); }
+.slide .pos-lab { grid-template-columns: 500px minmax(0, 1fr); }
+.slide .fl-code { max-height: 200px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="title no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-title="Layout — or where things go">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 3</p>
+      <h1 class="title-h1">Layout,<br><em class="s">or where</em><br>things go</h1>
+      <p class="title-sub">flow recap · position · flexbox · grid</p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <div class="frame scaled"><iframe data-src="project/showcase/index.html?step=0&amp;bare" tabindex="-1" title=""></iframe></div>
+      <div class="frame scaled"><iframe data-src="project/showcase/index.html?step=4&amp;bare" tabindex="-1" title=""></iframe></div>
+      <span class="sticker s1">start: flow only</span>
+      <span class="sticker s2">end: layout.css</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Welcome back. Last time the market got an outfit. Today it gets furniture: where things go. Same three hours, break at 1:11, between position and flexbox.</p>
+    <p>The two frames: the page at the start of today and at the end. Same HTML, same outfit. The only difference is one new stylesheet.</p>
+    <p>Keys: <code>p</code> presenter view, <code>m</code> slide menu, <code>n</code> notes, <code>Esc</code> leaves an editor so arrows work again.</p>
+  </aside>
+</section>
+
+<section data-title="Nice, but a receipt">
+  <p class="kicker">Where we left off</p>
+  <h2>The Harbour Night Market page is nice. It also looks like a receipt.</h2>
+  <p class="lede">Everything sits in one long column, top to bottom. Three things are wrong with it:</p>
+  <ol class="problems">
+    <li>The Sold out stamps look like text, and the menu vanishes when you scroll.</li>
+    <li>The menu goes down instead of across, and the “Find the stall” links sit at random heights.</li>
+    <li>Six vendors in one long column, where the stalls should stand in rows. And the map is missing.</li>
+  </ol>
+  <p class="mt"><code>git pull</code> the exercises repo (or download the ZIP again) and open <code>03-layout/index.html</code>.</p>
+  <aside class="notes">
+    <p>Three problems = three acts: position, flex, grid. Each act opens with the problem it solves.</p>
+    <p>Say it out loud: <b>pull the repo now</b>, so Exercise 1 at 0:20 starts with typing, not downloading. The HTML changed a little (a map section, card links, a back-to-top button). Everyone gets it in the new starter: <code>03-layout/project/starter/</code>. Last time's outfit can be swapped in.</p>
+  </aside>
+</section>
+
+<section data-title="The receipt">
+  <p class="kicker">Where we start · press 0–4 inside the page</p>
+  <h2>Same HTML, same outfit. <em class="s">One file</em> apart.</h2>
+  <div class="frame fill"><iframe data-src="project/showcase/index.html?step=0" title="The Night Market page, layout step by step"></iframe></div>
+  <aside class="notes">
+    <p>Step 0 is the outfit only. Scroll: the nav is a vertical list, the lead paragraph runs across the whole screen, the ticket inputs stick out of the form on the right, the stamps sit in the text, the map is a stack of coloured bars.</p>
+    <p>Click <b>4</b>: the goal. Then back to <b>0</b>. "By the end of today, yours looks like 4. Nothing in the HTML changes."</p>
+    <p>Buttons 1–4 are the four acts. Acts 2, 3 and 4 open with this page at their step: "here's where this act is going".</p>
+  </aside>
+</section>
+
+<section data-title="Four ways to place a box">
+  <p class="kicker">The plan · 3 hours</p>
+  <h2>Four ways to place a box</h2>
+  <div class="map">
+    <div class="m1"><b>Act 1</b><span class="glyph">↓</span><strong>Flow</strong>the layout you already have<time>0:05</time></div>
+    <div class="m2"><b>Act 2</b><span class="glyph">📌</span><strong>Pin it</strong>position<time>0:35</time></div>
+    <div class="mb"><b>☕</b><span class="glyph"> </span><strong>Break</strong>15 min<time>1:11</time></div>
+    <div class="m3"><b>Act 3</b><span class="glyph">↔</span><strong>Line them up</strong>flexbox<time>1:26</time></div>
+    <div class="m4"><b>Act 4</b><span class="glyph">▦</span><strong>Draw the floor plan</strong>grid<time>2:11</time></div>
+    <div class="m6"><b>Finale</b><span class="glyph">🏮</span><strong>Open the market</strong>your layout.css<time>2:41</time></div>
+  </div>
+  <p class="mt">Every box is placed by <strong>one layout algorithm</strong>. The parent's <code>display</code> and the box's own <code>position</code> pick which. <span class="hl">One question every act: who decides the width?</span></p>
+  <aside class="notes">
+    <p>This is the spine of the lecture. Flow is not "no layout": it's the default layout algorithm, and it has rules. Position, flex and grid are three more algorithms. The same property (<code>width</code>, <code>margin: auto</code>, <code>z-index</code>) behaves differently depending on which algorithm is in charge.</p>
+    <p>Half of today is you typing: an exercise in every act, a game, and the finale in your own project.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · FLOW
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Flow" data-at="0:05" data-title="Act 1 — Flow">
+  <div class="act-deco">↓</div>
+  <div class="act-num">Act 1</div>
+  <h1>Flow</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:35</span><span>the layout you already have</span></div>
+  <div class="act-list"><span>cascade recap</span><span>block &amp; inline</span><span>width</span><span>height</span><span>box model</span></div>
+</section>
+
+<section class="quiz" data-title="Warm-up: why doesn't my layout apply?">
+  <p class="kicker">Warm-up · last time's cascade, today's problem</p>
+  <h2>Flex or block?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="css">/* line 12 */
+main section .card { display: block; }
+
+/* line 80, yours */
+.card { display: flex; }</script>
+    <div class="stack">
+      <div class="reveal-box solid step"><strong>block.</strong> (0,1,2) beats (0,1,0), even though yours comes later. Your layout "does nothing": DevTools shows it crossed out.</div>
+      <div class="rounds step"><span>① origin &amp; <code>!important</code></span><i>→</i><span>② specificity</span><i>→</i><span>③ order</span></div>
+    </div>
+  </div>
+  <p class="small mt">How would you win <em>without</em> ids or <code>!important</code>? Hold that thought: it's case 6 in Exercise 1. Layout properties are ordinary properties: <code>display</code>, <code>width</code>, <code>position</code> go through the same tournament.</p>
+  <aside class="notes">
+    <p><b>3 minutes.</b> Hands up: flex or block? Reveal (→): block. Next step: the three rounds in one line. Don't give the fix: "how would you win without ids?" is case 6 of Exercise 1. Inherited values lose to any direct rule; mention only if last time's exit ticket showed trouble.</p>
+  </aside>
+</section>
+
+<section data-title="How wide? How tall?">
+  <p class="kicker">Live · drag the window width · then uncomment one line at a time</p>
+  <h2>How wide is a block? How tall?</h2>
+  <div class="fill live" data-measure=".card, section" data-resizable="400-900-700" data-zoom="1.2">
+    <script type="text/plain" data-role="html"><section><article class="card"><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></article></section></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 16px 16px;background:#12151d;color:#f3ecdf;font-family:system-ui} section{padding:20px;background:#171b25} .card{background:#1b202b;border:2px solid #3a4254;border-radius:14px;padding:16px 20px} h3{margin:0 0 6px} p{margin:0;color:#c9c1b3}</script>
+    <textarea>
+.card {
+  /* width: 50%; */
+  /* height: 50%; */
+}
+/* bigger text → taller card: */
+/* p { font-size: 3rem; } */
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>(Blocks vs inline in one breath: blocks stack and fill the line; inline boxes flow like words and ignore <code>width</code>. Masters know this — don't linger.)</p><p>Drag the width slider: the card's width follows the section. Width comes from the <b>parent</b>. Uncomment <code>p { font-size: 3rem }</code>: the text wraps, the card gets taller. Height comes from the <b>children</b>.</p>
+    <p>Uncomment <code>width: 50%</code>: works, 50% of the parent's width. Uncomment <code>height: 50%</code>: nothing. Ask why. Answer on the next slide.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Width flows down, height grows up">
+  <p class="kicker">The rule of flow</p>
+  <div class="dirs">
+    <div class="dir"><h3>Width flows <em class="s">down</em></h3>
+      <div class="nest">section · 900px<div class="nest">.card · fills it<div class="nest">p · fills that</div></div></div>
+      <p>A block fills its parent. The parent knows its width first.</p>
+      <span class="arrow"></span>
+    </div>
+    <div class="dir up"><h3>Height grows <em class="s">up</em></h3>
+      <div class="nest">section · sum of its children<div class="nest">.card · sum of its children<div class="nest">p · 2 lines of text</div></div></div>
+      <p>A block is as tall as its content. The children know first.</p>
+      <span class="arrow"></span>
+    </div>
+  </div>
+  <p class="mt step"><code>height: 50%</code> asks the parent, but the parent is waiting for the child. Nobody knows, so the browser <strong>ignores it</strong>.</p>
+  <aside class="notes">
+    <p>The single most useful sentence about CSS layout. It explains: why <code>height: 100%</code> "doesn't work", why the hero doesn't fill the screen, why centring vertically was hard for 20 years, why percentage heights work only when the parent has a fixed height.</p>
+    <p>Fixes: <code>min-height: 100vh</code> (the window always has a height), or let flex/grid stretch the child. Case 3 of the exercise.</p>
+  </aside>
+</section>
+
+<section data-title="Intrinsic sizes">
+  <p class="kicker">Deeper · CSS Sizing · the vocabulary for the rest of today</p>
+  <h2>Every box knows two sizes of its own</h2>
+  <div class="fill live" data-measure=".box" data-resizable="360-900-700" data-zoom="1.15" data-layout="wide-code">
+    <script type="text/plain" data-role="html"><div class="box a">auto · Night market on the waterfront</div><div class="box b">min-content · Night market on the waterfront</div><div class="box c">max-content · Night market on the waterfront</div><div class="box d">fit-content · Night market on the waterfront</div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:16px/1.4 system-ui}  .box{background:#1b202b;border:2px solid #ffb547;border-radius:8px;padding:6px 10px 26px;margin:0 0 16px;font-weight:700}</script>
+    <textarea>
+.a { width: auto; }        /* fills: extrinsic */
+.b { width: min-content; } /* longest word */
+.c { width: max-content; } /* never wraps */
+.d { width: fit-content; } /* max, capped */
+</textarea>
+  </div>
+  <p class="small"><strong>fit-content</strong> = min(max-content, max(min-content, available)) — the “shrink-to-fit” width of absolute boxes, inline-blocks and floats. Flex items start at <strong>max-content</strong> and shrink to a min-content floor; <code>auto</code> grid tracks sit between min- and max-content.</p>
+  <aside class="notes">
+    <p><b>~3 min.</b> Drag the width down: <code>.c</code> overflows (it refuses to wrap), <code>.b</code> never changes, <code>.d</code> tracks max-content until the space runs out, then wraps like auto. This is the vocabulary for every "who decides the width?" answer today: flow blocks are <em>extrinsic</em> (the container decides), everything else starts <em>intrinsic</em> (the content decides) and then gets stretched or squeezed.</p>
+    <p>Precise: flex items with <code>flex-basis: auto/content</code> start from max-content (Flexbox §9.2) and are floored by the automatic minimum; <code>auto</code> tracks resolve between a min-content-based minimum and max-content, then stretch (Grid §12). Spec: CSS Box Sizing 3 (min-content / max-content / fit-content). Also usable in tracks: <code>grid-template-columns: max-content 1fr</code> (the form in Ex 4), <code>fit-content(20ch)</code>.</p>
+  </aside>
+</section>
+
+<section data-title="min- and max- sizes">
+  <p class="kicker">Limits · width and height</p>
+  <h2>Set limits, not sizes: <code>min-</code> and <code>max-</code></h2>
+  <div class="split fill pos1">
+    <ul class="small">
+      <li><code>max-width</code>: grow with the space, but <strong>stop</strong> here. The readable column, the image that never overflows (<code>max-width: 100%</code>).</li>
+      <li><code>min-width</code>: shrink with the space, but <strong>never below</strong> this. Same pair for height: <code>min-height</code>, <code>max-height</code>.</li>
+      <li>Conflict? <strong><code>min</code> beats <code>max</code> beats <code>width</code></strong>. Shortcut: <code>width: clamp(20rem, 50%, 36rem)</code>.</li>
+    </ul>
+    <div class="live" data-measure=".card" data-resizable="300-1100-900" data-zoom="1" data-layout="stack" style="grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto">
+      <script type="text/plain" data-role="html"><article class="card"><h3>Dumpling Dynasty</h3><p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience.</p></article></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 16px 16px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .card{background:#1b202b;border:2px solid #ffb547;border-radius:12px;padding:14px 18px} h3{margin:0 0 4px} p{margin:0;color:#c9c1b3} </script>
+      <textarea>
+.card {
+  width: 50%;
+  max-width: 28rem; /* 448px */
+  min-width: 18rem; /* 288px */
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>~2 min.</b> Drag the window width. Around 900px: 50% would be 434, under the max → 434. Wider than ~900: 50% passes 448 → capped at 448 (max wins over width). Narrower than ~580: 50% drops under 288 → held at 288 (min wins). Below ~320 the card overflows the window: that is the price of <code>min-width</code>.</p>
+    <p>Why limits instead of sizes: a fixed <code>width</code> breaks on the screen you didn't test. Limits let the box adapt and only say "not narrower than, not wider than". Heights: remember "height grows up" — <code>min-height</code> (the hero, <code>100vh</code>) is safe, a fixed <code>height</code> cuts content off. Precedence rule (CSS 2.2 §10.4): compute width, clamp to max, then clamp to min — so min wins a conflict. <code>clamp(MIN, VAL, MAX)</code> = <code>max(MIN, min(VAL, MAX))</code>, handy for fluid font sizes too.</p>
+  </aside>
+</section>
+
+<section data-title="Auto margins eat free space">
+  <p class="kicker">The most common layout on the web · drag the window</p>
+  <h2>Leftover space goes <em class="s">somewhere</em></h2>
+  <div class="split fill pos1">
+    <ul class="small">
+      <li>By default margins are <code>0</code>: the box sits at the <strong>left</strong>, and all the leftover ends up on the <strong>right</strong> (the end side).</li>
+      <li>An <code>auto</code> margin <strong>claims the leftover</strong>. On one side it pushes the box away: <code>margin-left: auto</code> → right.</li>
+      <li>On both sides it splits the leftover in two: <code>margin-inline: auto</code> → <strong>centred</strong>. With <code>max-width</code>, the classic column.</li>
+    </ul>
+    <div class="live" data-measure="main" data-resizable="500-1400-1100" data-zoom="1" data-layout="stack" style="grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto">
+      <script type="text/plain" data-role="html"><main><h3>Harbour Night Market</h3><p>Forty stalls, three stages and one very long table on the waterfront.</p></main></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 0 16px;color:#f3ecdf;font:16px/1.5 system-ui;background:repeating-linear-gradient(45deg,#12151d 0 10px,#1a1f2a 10px 20px)} main{background:#1b202b;border:2px solid #ffb547;border-radius:12px;padding:14px 18px} h3{margin:0 0 4px} p{margin:0;color:#c9c1b3} </script>
+      <textarea>
+main {
+  max-width: 30rem;
+  /* margin-left: auto; */
+  /* margin-inline: auto; */
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>~2 min.</b> The hatched background is the leftover space. Start as is: <code>max-width</code> caps the box, it sits on the left, the leftover is all on the right. Why: in flow, margin + border + padding + width + padding + border + margin must add up to the parent's width; with fixed margins that can't work, so the browser lets the <em>end</em> margin (the right, in left-to-right text) absorb the difference (CSS 2.2 §10.3.3).</p>
+    <p>Uncomment <code>margin-left: auto</code>: the left margin claims everything → box on the right. Swap for <code>margin-inline: auto</code> (the modern left + right): split in two → centred. Drag the window: it stays centred at every width, and shrinks on narrow screens because it is <code>max-width</code>, not <code>width</code>. This is the "text runs from edge to edge" fix and step 1 of the showcase.</p>
+    <p>In flow this only works sideways: height grows from content, so there is never leftover height. Don't explain the vertical case yet — it's the break mystery; in a flex column the same <code>margin-top: auto</code> pushes the link down.</p>
+  </aside>
+</section>
+
+<section data-title="Two box-model traps">
+  <p class="kicker">Box model · the traps, and the mechanism behind trap 2</p>
+  <h2>Why 40px too wide? Why did the margin leak?</h2>
+  <div class="grid-3 traps">
+    <div class="card">
+      <span class="label">trap 1 · sideways scroll</span>
+      <script type="text/x-code" data-lang="css" class="small">input { width: 100%; padding: 20px; }</script>
+      <p class="small">Width is the <em>content</em>: 100% + 40px.</p>
+      <script type="text/x-code" data-lang="css" class="small step">*, *::before, *::after {
+  box-sizing: border-box;
+}</script>
+    </div>
+    <div class="card">
+      <span class="label">trap 2 · margin collapse</span>
+      <script type="text/x-code" data-lang="css" class="small">.a { margin-bottom: 30px; }
+.b { margin-top: 20px; }</script>
+      <p class="small">Adjacent vertical margins <strong>collapse</strong>: max, not sum (with negatives: biggest positive + most negative). 30. And a first child's margin leaks <em>through</em> a parent with no padding/border.</p>
+    </div>
+    <div class="card step">
+      <span class="label">the mechanism · BFC</span>
+      <script type="text/x-code" data-lang="css" class="small">.card { display: flow-root; }</script>
+      <p class="small">Collapsing happens <em>inside one block formatting context</em>. Start a new one and nothing collapses through it. So do flex and grid containers.</p>
+    </div>
+  </div>
+  <p class="small mt step">Bonus trap: <code>padding: 10%</code> is 10% of the containing block's <strong>width</strong> — even <code>padding-top</code>. (That's how the old 16:9 video hack worked; today: <code>aspect-ratio</code>.)</p>
+  <aside class="notes">
+    <p>Trap 1 is visible on the receipt: the ticket inputs stick out of the form. Trap 2 is case 4 of the exercise. The BFC card is theory only: say it, don't drill it — <code>flow-root</code> is rare in practice, but the mechanism explains why flex/grid never collapse margins.</p>
+    <p>New BFC: <code>display: flow-root</code> (made for exactly this), <code>overflow</code> other than visible/clip, floats, absolute/fixed, inline-block, table cells, flex/grid <em>items</em>; flex/grid containers establish flex/grid formatting contexts, where margins never collapse. Spec: CSS 2.2 §8.3.1 (collapsing margins), §9.4.1 (BFC). <code>flow-root</code> beats the old <code>overflow: hidden</code> trick because it doesn't clip shadows or focus rings.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Flow detective">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 1 · solo · 10 min</p>
+  <div class="ex-head"><h2>Flow detective</h2><button class="timer" data-min="10"></button></div>
+  <p>Seven bugs from the market page. Each is one of: width flows down, height grows up, the box model, intrinsic sizing, or the cascade.</p>
+  <ol>
+    <li><strong>Predict</strong> what's wrong before you touch the code.</li>
+    <li>Fix it. The chips turn green when the case is closed.</li>
+    <li>Cases <strong>1–4</strong> in class. 5–7 if you finish early.</li>
+  </ol>
+  <p class="where mt">The repo you pulled during the intro → <b>03-layout/index.html</b> → <b>Exercise 1</b>. The blue labels show every box's size.</p>
+  <aside class="notes">
+    <p>Walk around. Case 3 (hero height) is where the "width down, height up" sentence gets real. Ask: "what's the parent's height?" Case 6 is the cascade recap; the id-free way is to match (0,1,2) or beat it with two classes.</p>
+    <p>Debrief (1 minute): ask one person for case 3's reason in one sentence.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Flow can't say “put this there”">
+  <p class="kicker">Why we leave the flow</p>
+  <h2>Flow is great for documents. It can't say <em class="s">“put this there.”</em></h2>
+  <div class="row wrap mt">
+    <span class="chip act" style="background:var(--yellow);color:var(--ink);font-size:26px;padding:14px 20px">📌 pin it to a spot → position</span>
+    <span class="chip act" style="background:var(--tomato);color:var(--ink);font-size:26px;padding:14px 20px">↔ line up side by side → flex</span>
+    <span class="chip act" style="background:var(--violet);color:#fff;font-size:26px;padding:14px 20px">▦ rows and columns → grid</span>
+  </div>
+  <aside class="notes">
+    <p>Bridge. Everything so far was flow. The three problems need three things flow can't do. One algorithm each.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · POSITION
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Pin it" data-at="0:35" data-title="Act 2 — Pin it">
+  <div class="act-deco">top: 0</div>
+  <div class="act-num">Act 2</div>
+  <h1>Pin it</h1>
+  <div class="act-meta"><span class="chip">0:35 – 1:11</span><span>position</span></div>
+  <div class="act-list"><span>relative</span><span>absolute</span><span>containing block</span><span>fixed</span><span>sticky</span><span>z-index</span></div>
+</section>
+
+<section data-title="This act's goal: step 2">
+  <p class="kicker">Problem 1 · the stamps look like text, the menu vanishes</p>
+  <h2>Where this act is going</h2>
+  <div class="frame fill"><iframe data-src="project/showcase/index.html?step=2" title="The market page at step 2: positioned"></iframe></div>
+  <aside class="notes">
+    <p>30 seconds. Click inside and scroll slowly: the header sticks — and yes, it's huge, because the menu is still a vertical list (teaser: Act 3 puts it in a row). Keep scrolling to Churros (4th card) for the stamp, then the 📍 on the map; the round ↑ is bottom-right all along. Toggle 1 ↔ 2 to compare. Four things change: stamps on the card corners, the header sticks when you scroll, the 📍 sits on the map, a round ↑ button in the corner. Scroll to show sticky and fixed.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="position: five values">
+  <p class="kicker">One property, five behaviours</p>
+  <h2><code>position</code>: where is it measured from?</h2>
+  <table class="ptable">
+    <tr><th>value</th><th>in the flow?</th><th>top / right / bottom / left measured from</th><th>use it for</th></tr>
+    <tr><td><code>static</code></td><td class="yes">yes</td><td>nothing: offsets are ignored</td><td>the default</td></tr>
+    <tr><td><code>relative</code></td><td class="yes">yes</td><td>its own seat, which stays reserved</td><td>small nudges · an anchor for children</td></tr>
+    <tr><td><code>absolute</code></td><td class="no">no</td><td>the nearest <strong>positioned</strong> ancestor · none? the first screen of the page</td><td>stamps, badges, pins</td></tr>
+    <tr><td><code>fixed</code></td><td class="no">no</td><td>the window</td><td>back-to-top, cookie banners</td></tr>
+    <tr><td><code>sticky</code></td><td class="yes">yes</td><td>the window, once you scroll to it</td><td>headers, table heads</td></tr>
+  </table>
+  <aside class="notes">
+    <p>Sticky, precisely: it sticks relative to its nearest <em>scroll container</em> (any ancestor with overflow other than visible/clip), and it can never leave its containing block. That is why an ancestor with <code>overflow: hidden</code> breaks it. Modern names: <code>inset: 0</code> = top/right/bottom/left; logical <code>inset-inline-start</code> follows the writing direction (flips in RTL). "Positioned" = anything except static. "Out of the flow" = the others close the gap, as if it weren't there. Don't explain every row now: the next slides take one value each, and the lab puts them side by side.</p>
+  </aside>
+</section>
+
+<section data-title="position: static">
+  <p class="kicker">position · 1 of 5 · the default</p>
+  <h2><code>static</code>: just the flow</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Every element starts here. The box sits where normal flow puts it.</li><li><code>top</code>, <code>right</code>, <code>bottom</code>, <code>left</code> are <strong>ignored</strong>. So is <code>z-index</code> (except on flex/grid items).</li><li>Not an anchor: absolute children look past it.</li></ul>
+    <div class="live" data-zoom="1.1" data-layout="stack">
+      <script type="text/plain" data-role="html"><article class="card"><h3>Churros Till Late</h3><p>Crisp, sugared, dunked in chocolate.</p><strong class="badge">Sold out</strong> <span>Open until the last dancer leaves.</span></article><article class="card"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></article></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:24px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .card{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:14px 18px;margin:0 0 14px} h3{margin:0 0 4px;font-size:19px} p{margin:0 0 6px;color:#c9c1b3} .badge{display:inline-block;font:800 12px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em;color:#ff6b4a;border:3px double #ff6b4a;padding:5px 7px;border-radius:6px;background:#1b202b} </script>
+      <textarea>
+.badge {
+  position: static;
+  top: 20px;   /* ignored */
+  left: 40px;  /* ignored */
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1 min.</b> Change the offsets: nothing happens. Then change <code>static</code> to <code>relative</code>: now they work. That is the whole difference between "static" and "positioned". You rarely write <code>position: static</code>; you use it to <em>undo</em> a position inherited from a framework or a media query.</p></aside>
+</section>
+
+<section data-title="position: relative">
+  <p class="kicker">position · 2 of 5</p>
+  <h2><code>relative</code>: move it, keep its seat</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Stays in the flow. Offsets nudge it from <strong>where it would have been</strong>.</li><li>The space it left stays reserved: <strong>nothing around it moves</strong>.</li><li>Its real job: an <strong>anchor</strong> for absolute children (with no offsets it moves nothing).</li></ul>
+    <div class="live" data-zoom="1.1" data-layout="stack">
+      <script type="text/plain" data-role="html"><article class="card"><h3>Churros Till Late</h3><p>Crisp, sugared, dunked in chocolate.</p><strong class="badge">Sold out</strong> <span>Open until the last dancer leaves.</span></article><article class="card"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></article></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:24px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .card{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:14px 18px;margin:0 0 14px} h3{margin:0 0 4px;font-size:19px} p{margin:0 0 6px;color:#c9c1b3} .badge{display:inline-block;font:800 12px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em;color:#ff6b4a;border:3px double #ff6b4a;padding:5px 7px;border-radius:6px;background:#1b202b} </script>
+      <textarea>
+.badge {
+  position: relative;
+  top: -10px;
+  left: 30px;
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> Change the numbers: the badge moves, the text after it doesn't budge — there is a hole where the badge "should" be. Offsets are relative to its own seat: <code>top: -10px</code> = up. Real use: tiny nudges (an icon 1px down), and mostly <code>position: relative</code> with no offsets on a parent, so absolute children measure from it. Also: a relative element with a <code>z-index</code> creates a stacking context.</p></aside>
+</section>
+
+<section class="quiz" data-title="The flying stamp">
+  <p class="kicker">Predict · place your bets</p>
+  <h2>Where does the stamp go?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="css" class="big">.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+}</script>
+    <div class="stack">
+      <p>The badge lives inside a vendor card, somewhere in the middle of the page.</p>
+      <div class="bets"><span class="chip">A · top-right of the card</span><span class="chip">B · top-right of the page</span><span class="chip">C · stays where it was</span></div>
+      <div class="reveal-box solid step"><strong>B.</strong> It flies to the top-right corner of the page (precisely: of the <strong>first screen</strong>, the “initial containing block”). Nobody told it which box to measure from.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Hands up for A, B, C. Most people pick A. Reveal. The next slide shows it live: delete the card's <code>position: relative</code> and watch the stamp fly to the first screen; put it back and it lands.</p>
+  </aside>
+</section>
+
+<section data-title="position: absolute">
+  <p class="kicker">position · 3 of 5</p>
+  <h2><code>absolute</code>: out of the flow, pinned to an anchor</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Removed from the flow: the card closes the gap, as if the badge weren't there.</li><li>Offsets are measured from the nearest <strong>positioned</strong> ancestor (else the first screen).</li><li>Shrinks to its content. <code>left</code> + <code>right</code> stretch it.</li></ul>
+    <div class="live" data-zoom="1.1" data-layout="stack">
+      <script type="text/plain" data-role="html"><article class="card"><h3>Churros Till Late</h3><p>Crisp, sugared, dunked in chocolate.</p><strong class="badge">Sold out</strong> <span>Open until the last dancer leaves.</span></article><article class="card"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></article></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:24px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .card{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:14px 18px;margin:0 0 14px} h3{margin:0 0 4px;font-size:19px} p{margin:0 0 6px;color:#c9c1b3} .badge{display:inline-block;font:800 12px/1 ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em;color:#ff6b4a;border:3px double #ff6b4a;padding:5px 7px;border-radius:6px;background:#1b202b} </script>
+      <textarea>
+.card { position: relative; }
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  transform: rotate(8deg);
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> The stamp from the bet you just made. Delete the first line (<code>.card { position: relative }</code>): the stamp flies to the top-right of the preview — no anchor. Put it back. Notice the text "Open until…" moved left: the badge no longer takes space in the line. Uses: badges, stamps, ribbons, close buttons, dropdowns, overlays with <code>inset: 0</code>.</p></aside>
+</section>
+
+<section data-title="position: fixed">
+  <p class="kicker">position · 4 of 5 · scroll the preview</p>
+  <h2><code>fixed</code>: pinned to the window</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Out of the flow, measured from the <strong>viewport</strong>. Scroll: it stays put.</li><li>Its parent's position doesn't matter…</li><li>…unless an ancestor has <code>transform</code>, <code>filter</code> or <code>contain</code>: then it is trapped there.</li></ul>
+    <div class="live" data-zoom="1" data-layout="stack">
+      <script type="text/plain" data-role="html"><header class="top">🏮 Night Market</header><p>Scroll line 1 — street food, vinyl, handmade things.</p><p>Scroll line 2 — street food, vinyl, handmade things.</p><p>Scroll line 3 — street food, vinyl, handmade things.</p><p>Scroll line 4 — street food, vinyl, handmade things.</p><p>Scroll line 5 — street food, vinyl, handmade things.</p><p>Scroll line 6 — street food, vinyl, handmade things.</p><p>Scroll line 7 — street food, vinyl, handmade things.</p><p>Scroll line 8 — street food, vinyl, handmade things.</p><p>Scroll line 9 — street food, vinyl, handmade things.</p><p>Scroll line 10 — street food, vinyl, handmade things.</p><p>Scroll line 11 — street food, vinyl, handmade things.</p><p>Scroll line 12 — street food, vinyl, handmade things.</p><p>Scroll line 13 — street food, vinyl, handmade things.</p><p>Scroll line 14 — street food, vinyl, handmade things.</p><p>Scroll line 15 — street food, vinyl, handmade things.</p><p>Scroll line 16 — street food, vinyl, handmade things.</p><p>Scroll line 17 — street food, vinyl, handmade things.</p><p>Scroll line 18 — street food, vinyl, handmade things.</p><a class="to-top" href="#">↑</a></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:24px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .top{background:#171b25;padding:12px 16px;font-weight:800;border-bottom:2px solid #3a4254} .to-top{display:inline-block;width:46px;height:46px;line-height:46px;text-align:center;font-size:20px;font-weight:800;text-decoration:none;color:#12151d;background:#5ec8d8;border-radius:50%} </script>
+      <textarea>
+.top { position: fixed; top: 0; left: 0; right: 0; }
+.to-top { position: fixed; right: 16px; bottom: 16px; }
+body { padding-top: 64px; } /* fixed takes no space */
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> Scroll inside the preview: the header and the ↑ button both stay put. Delete <code>body { padding-top }</code>: the first lines hide under the header — fixed takes no space in the flow (sticky does, which is why sticky headers are the modern default). Delete <code>left</code>/<code>right</code>: the header shrinks to its content, like any out-of-flow box. Uses: back-to-top buttons, chat bubbles, cookie banners, toasts. Unlike sticky, it takes no space in the flow, so a fixed header needs padding on the page below it. The transform trap was on the lab slide and comes back in Exercise 2, case 6.</p></aside>
+</section>
+
+<section data-title="position: sticky">
+  <p class="kicker">position · 5 of 5 · scroll the preview</p>
+  <h2><code>sticky</code>: flow first, then it sticks</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Behaves like <code>relative</code> until you scroll it to its <code>top</code> value; then it sticks.</li><li>It sticks only while its <strong>parent</strong> is on screen: the next section pushes it away.</li><li>Needs <code>top</code> (or bottom). Breaks if an ancestor has <code>overflow: hidden</code>.</li></ul>
+    <div class="live" data-zoom="1" data-layout="stack">
+      <script type="text/plain" data-role="html"><section><h2>Friday</h2><p>19:00 Doors open — stage 1</p><p>19:30 Dumpling class — stage 2</p><p>20:30 Los Faroles — stage 3</p><p>21:30 Zine workshop — stage 1</p><p>22:30 Brass band — stage 2</p><p>00:00 Silent disco — stage 3</p></section><section><h2>Saturday</h2><p>12:00 Flea market — stage 1</p><p>14:00 Plant swap — stage 2</p><p>16:00 Kids' lanterns — stage 3</p><p>18:00 Sunset DJ — stage 1</p><p>20:00 Paella for 200 — stage 2</p><p>22:00 Closing parade — stage 3</p></section><section><h2>Sunday</h2><p>11:00 Harbour run — stage 1</p><p>13:00 Long lunch — stage 2</p><p>15:00 Repair café — stage 3</p><p>17:00 Last market hour — stage 1</p><p>18:00 Lantern send-off — stage 2</p></section></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:24px;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} h2{margin:0 -24px 8px;padding:8px 24px;background:#ffb547;color:#12151d;font-size:18px} section{margin-bottom:24px} p{margin:0 0 12px;color:#c9c1b3} </script>
+      <textarea>
+h2 {
+  position: sticky;
+  top: 0;
+}
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> Scroll slowly: "Friday" sticks at the top… until the Friday section ends and "Saturday" pushes it away — sticky never leaves its parent (its containing block). Delete <code>top: 0</code>: it stops sticking. Precisely: it sticks relative to its nearest scroll container. Uses: headers, table heads, day headings in schedules, sidebars. It keeps its seat, so nothing jumps when it starts sticking.</p></aside>
+</section>
+
+<section data-title="Position lab">
+  <p class="kicker">Live · all five together · scroll the little page</p>
+  <h2>One badge, five positions</h2>
+  <div class="fill pos-lab" data-zoom="1.25"></div>
+  <aside class="notes">
+    <p><b>~2 min</b> — all five values, side by side, after their own slides: a quick recap tour, plus the one new thing, the transform trap. Order: <b>relative</b> + top 20px (the blue ghost = its seat; nothing else moves) → <b>absolute</b> + top 0 + right 0 (flies to the first screen of the page; yellow box = containing block) → card <b>relative</b> (lands on the card) → <b>fixed</b> and scroll (stays in the window) → <b>sticky</b> + top 0 and scroll (sticks, but only while the card is on screen).</p>
+    <p>While on fixed and sticky: fixed = pinned to the window, out of the flow (back-to-top, chat bubbles, cookie banners). Sticky = keeps its seat, sticks at <code>top</code> while its parent is on screen. Sticky doesn't stick? No <code>top</code> · parent too short · an ancestor with <code>overflow: hidden</code>. Both are in Exercise 2.</p><p>Also in <code>playgrounds/position.html</code> for later.</p>
+  </aside>
+</section>
+
+<section data-steps="2" data-title="Absolute climbs the tree">
+  <p class="kicker">The containing block</p>
+  <h2>Absolute climbs up until it finds an anchor</h2>
+  <div class="split">
+    <div class="climb">
+      <div class="me">.badge <small>position: absolute</small></div>
+      <div class="ind1 skip s-card">.vendor-card <small class="pre">static · skip</small><small class="step fade-only">position: relative ⚓ stop!</small></div>
+      <div class="ind2 skip">ul.vendor-list <small>static · skip</small></div>
+      <div class="ind3 skip">section#vendors <small>static · skip</small></div>
+      <div class="ind4 skip">main · body · html <small>→ first screen</small></div>
+    </div>
+    <div class="stack">
+      <p>The badge asks each ancestor: <em>are you positioned?</em> No one says yes → the <strong>first screen of the page</strong> (the initial containing block).</p>
+      <p class="small"><strong>Also an anchor:</strong> any ancestor with <code>transform</code>, <code>filter</code>, <code>perspective</code>, <code>contain: layout/paint</code>, <code>container-type</code>… — and for <code>fixed</code>, those are the <em>only</em> anchors besides the window.</p>
+      <script type="text/x-code" data-lang="css" class="step small">.vendor-card { position: relative; }
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+}</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Precisely (CSS Position 3): the containing block of an absolute box is the <em>padding box</em> of the nearest ancestor that is positioned or has a transform/filter/perspective/contain/will-change of those. For fixed, only the latter list — which is why a modal with <code>position: fixed</code> inside an animated (<code>transform</code>ed) parent suddenly scrolls away. Show it in the lab: <code>.card</code> → transform, badge → fixed. "First screen of the page" = the initial containing block: with <code>bottom: 0</code> the badge lands at the bottom of the first screen, not of the page. <code>position: relative</code> with no offsets doesn't move the card at all. It only says "measure from me". That's its main job in real code.</p>
+    <p>Where "pin it" is going: CSS anchor positioning (<code>anchor-name</code>, <code>position-anchor</code>, <code>anchor()</code>) lets an absolute box be placed relative to <em>any</em> element, not just its containing block — tooltips and menus without JS. Shipped in Chromium; check current support before promising it. Absolute is out of the flow: the card no longer makes room for the badge. That's why it can overlap the corner.</p>
+  </aside>
+</section>
+
+<section data-title="Who decides the width? absolute">
+  <p class="kicker">Who decides the width? · absolute</p>
+  <h2>Out of the flow, width stops flowing down</h2>
+  <div class="fill live" data-measure=".awning, .card" data-zoom="1.3">
+    <script type="text/plain" data-role="html"><article class="card"><span class="awning">Tonight only</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></article></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:30px 24px;background:#12151d;color:#f3ecdf} .card{position:relative;background:#1b202b;border:2px solid #3a4254;border-radius:14px;padding:44px 20px 18px} h3{margin:0 0 6px} p{margin:0;color:#c9c1b3} .awning{display:block;background:repeating-linear-gradient(90deg,#ff6b4a 0 14px,#ffb547 14px 28px);color:#12151d;font:800 13px/1 ui-monospace,monospace;text-transform:uppercase;padding:6px 10px}</script>
+    <textarea>
+.awning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* right: 0; */
+}
+</textarea>
+  </div>
+  <p class="small">An absolute box is as wide as its <strong>content</strong>. Give it both <code>left</code> and <code>right</code> and it stretches between them. <code>inset: 0</code> = all four = fill the anchor.</p>
+  <aside class="notes">
+    <p>First recurring-question slide. In flow: width from the parent. Absolute: width from the content ("shrink to fit"), unless you pin two opposite sides. Uncomment <code>right: 0</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Who's painted on top?">
+  <p class="kicker">z-index · 1 of 3 · when boxes overlap</p>
+  <h2>Overlap: who's painted on top?</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Among boxes of the same kind, <strong>later in the HTML</strong> paints on top: <code>.c</code> covers <code>.b</code> covers <code>.a</code>.</li><li><strong>Positioned</strong> boxes paint above normal ones — even when the normal one comes later.</li><li>No CSS needed for any of this: it is the default <em>paint order</em>.</li></ul>
+    <div class="live" data-zoom="1" data-layout="stack">
+      <script type="text/plain" data-role="html"><div class="stage"><div class="box a">.a — first</div><div class="box b">.b</div><div class="box c">.c — last box</div></div><div class="flyer">.flyer<br>normal block,<br>last in the HTML</div></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:20px;background:#12151d;color:#12151d;font:700 16px/1.3 system-ui} .stage{position:relative;height:210px} .box{position:absolute;width:190px;height:110px;border:3px solid #12151d;border-radius:12px;padding:10px 12px;box-shadow:0 8px 20px rgb(0 0 0/.45)} .a{left:0;top:0;background:#ffb547} .b{left:95px;top:45px;background:#5ec8d8} .c{left:190px;top:90px;background:#f0a6d8} .flyer{margin-top:-60px;margin-left:300px;width:230px;background:#b8e0a0;border:3px dashed #12151d;border-radius:12px;padding:12px 14px} </script>
+      <textarea>
+/* boxes: absolute. .flyer: normal, last. */
+/* .flyer { position: relative; } */
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> Why this slide: position lets boxes overlap — flow never did. So now we need a rule for who is in front. Point at <code>.c</code> over <code>.b</code> over <code>.a</code>: HTML order. Then the green flyer: it is last in the HTML but painted under <code>.c</code>, because positioned boxes paint in a later layer. Uncomment the line: the flyer becomes positioned and, being last in the HTML, jumps on top. That is exactly the sticky-header-vs-stamps bug in Exercise 2.</p></aside>
+</section>
+
+<section data-title="z-index">
+  <p class="kicker">z-index · 2 of 3</p>
+  <h2><code>z-index</code>: bring one forward</h2>
+  <div class="split fill pos1">
+    <ul class="small"><li>Only works on <strong>positioned</strong> elements (and flex/grid items). On a normal block it does nothing.</li><li>Default <code>auto</code>. Bigger number = closer to you. A tie → HTML order decides.</li><li>Negative values go <strong>behind</strong> the normal content of the page.</li></ul>
+    <div class="live" data-zoom="1" data-layout="stack">
+      <script type="text/plain" data-role="html"><div class="stage"><div class="box a">.a — first</div><div class="box b">.b</div><div class="box c">.c — last box</div></div><div class="flyer">.flyer<br>normal block,<br>last in the HTML</div></script>
+      <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:20px;background:#12151d;color:#12151d;font:700 16px/1.3 system-ui} .stage{position:relative;height:210px} .box{position:absolute;width:190px;height:110px;border:3px solid #12151d;border-radius:12px;padding:10px 12px;box-shadow:0 8px 20px rgb(0 0 0/.45)} .a{left:0;top:0;background:#ffb547} .b{left:95px;top:45px;background:#5ec8d8} .c{left:190px;top:90px;background:#f0a6d8} .flyer{margin-top:-60px;margin-left:300px;width:230px;background:#b8e0a0;border:3px dashed #12151d;border-radius:12px;padding:12px 14px} </script>
+      <textarea>
+.a { z-index: 2; }      /* works */
+.flyer { z-index: 99; } /* ignored */
+/* .c { z-index: -1; } */
+</textarea>
+    </div>
+  </div>
+  <aside class="notes"><p><b>~1.5 min.</b> <code>.a</code> jumps to the front with just 2 — the others are <code>auto</code>. <code>.flyer { z-index: 99 }</code> does nothing: it is not positioned. Add <code>position: relative</code> to it and 99 works. Uncomment <code>.c { z-index: -1 }</code>: it drops behind everything, even the page background of its stacking context. Habit: small numbers (1, 2, 10), not 9999 — and the next slide shows why even 9999 can lose.</p></aside>
+</section>
+
+<section data-title="Stacking contexts">
+  <p class="kicker">z-index · 3 of 3 · deeper · stacking contexts</p>
+  <h2>Why <code>z-index: 9999</code> loses to 10</h2>
+  <div class="fill live" data-zoom="1.2" data-layout="wide-code">
+    <script type="text/plain" data-role="html"><header class="top">🏮 header · z-index: 10</header><article class="card"><h3>Churros Till Late</h3><p>Click “menu” and a dropdown opens…</p><div class="dropdown">dropdown · z-index: 9999</div></article></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:16px/1.4 system-ui}  .top{position:relative;z-index:10;background:#ffb547;color:#12151d;font-weight:800;padding:14px 16px;border-radius:8px} .card{position:relative;background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:12px 16px;margin-top:10px} h3{margin:0 0 4px} p{margin:0;color:#c9c1b3} .dropdown{display:flex;align-items:flex-end;position:absolute;left:40px;top:-40px;width:240px;height:90px;background:#ff6b4a;color:#12151d;font-weight:800;padding:10px;border-radius:8px;box-shadow:0 10px 30px rgb(0 0 0/.5)}</script>
+    <textarea>
+/* .card is position: relative (base) */
+.dropdown { z-index: 9999; }
+
+/* a harmless-looking animation hook: */
+.card { transform: translateY(0); }
+
+/* fix A: delete the transform
+   fix B: .card { z-index: 11; } */
+</textarea>
+  </div>
+  <p class="small">A stacking context seals its children into one layer: <code>transform</code>, <code>filter</code>, <code>opacity</code> &lt; 1, <code>isolation: isolate</code>, <code>position: fixed/sticky</code>, a positioned element or flex/grid <em>item</em> with a <code>z-index</code>, <code>container-type</code>… Inside, 9999 is huge; outside, the whole layer sits at 0 — below 10.</p>
+  <aside class="notes">
+    <p><b>~2.5 min</b> (slides 26–27 set it up). The dropdown pokes up over the header's edge — and is painted <em>under</em> it. The card is <code>position: relative</code> (base) and has a <code>transform</code>, so the card is a stacking context at level 0/auto. The dropdown's 9999 only ranks it among the card's children; the whole card paints below the header's 10. Fix A: delete the transform — the card stops being a context (positioned, no z-index), the dropdown's 9999 now competes at the root and wins. Nothing moves: only stacking changes. Fix B: keep the transform, lift the context: <code>.card { z-index: 11 }</code>.</p>
+    <p>Paint order inside a context (CSS 2.2 Appendix E, simplified): background → negative z → in-flow blocks → floats → inline content → z-index auto/0 positioned (DOM order) → positive z. Contexts are not directly visible in DevTools (Chrome's Layers panel shows compositing layers, a different set); Edge's 3D View in z-index mode comes closest. For components: <code>isolation: isolate</code> on the root keeps internal z-indexes local.</p>
+    <p><b>Bridge to the exercise:</b> "Exercise 2 has both: the sticky header vs the stamps, and a 9999 that loses."</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Pin it">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 2 · solo · 12 min · core 1–3 + 5 · bonus 4, 6</p>
+  <div class="ex-head"><h2>Pin it</h2><button class="timer" data-min="12"></button></div>
+  <ol>
+    <li><strong>The stamp</strong> on the card's corner. Relative parent, absolute child.</li>
+    <li><strong>The menu that runs away</strong>: sticky. Then scroll: who's painted on top?</li>
+    <li><strong>You are here</strong>: the 📍 on the map's entrance.</li>
+    <li><strong>z-index: 9999 still loses</strong>: fix the stacking context, not the number.</li>
+    <li><span class="muted">Bonus:</span> <strong>Back to top</strong> (fixed) · <strong>the fixed button that scrolls away</strong>.</li>
+  </ol>
+  <p class="where mt">03-layout → <b>Exercise 2 · Pin it</b>. Press <b>◌ target</b> in an editor to see the chalk outline of where it should go. Done? <b>Stall Setter · Position</b>, six levels.</p>
+  <aside class="notes">
+    <p>Typical: forgetting <code>position: relative</code> on the card (the target mismatch shows it), sticky without <code>top</code>, putting <code>bottom</code> on the wrong element. Debrief 1 minute: "what does relative on the card do, if it doesn't move the card?"</p><p><b>Bridge:</b> "Position pins one box. The next problem is about a whole row of boxes: the menu. Pinning each link by hand would be madness — we need a parent that lines its children up." — then straight into the break.</p>
+    <p>At 1:09 warn: two minutes to the break.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:11" data-title="Break">
+  <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break <em>time</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: flexbox. And a mystery to take with you: <code>margin-top: auto</code> does <em>nothing</em> in normal flow — yet in flex, that one line fixes the wobbly links on the cards. Why?</p>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · FLEX
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Line them up" data-at="1:26" data-title="Act 3 — Line them up">
+  <div class="act-deco">↔</div>
+  <div class="act-num">Act 3</div>
+  <h1>Line them up</h1>
+  <div class="act-meta"><span class="chip">1:26 – 2:11</span><span>flexbox</span></div>
+  <div class="act-list"><span>display: flex</span><span>two axes</span><span>justify</span><span>align</span><span>gap</span><span>grow &amp; shrink</span><span>wrap</span></div>
+</section>
+
+<section data-title="This act's goal: step 3">
+  <p class="kicker">Problem 2 · the menu goes down, the links wobble</p>
+  <h2>Where this act is going</h2>
+  <div class="frame fill"><iframe data-src="project/showcase/index.html?step=3" title="The market page at step 3: flex"></iframe></div>
+  <aside class="notes">
+    <p>30 seconds. Toggle 2 ↔ 3: logo left and menu right on one line, the hero text centred in its space, the footer's two ends. The wobbly links can't show yet: the cards are still stacked. That's a job for the next act — and the break's mystery.</p>
+    <p><b>Bridge:</b> "All of this is one idea: a parent that lines up its children. One line of CSS."</p>
+  </aside>
+</section>
+
+<section data-title="One line on the parent">
+  <p class="kicker">Problem 2 · the menu goes down instead of across</p>
+  <h2>One line, on the <em class="s">parent</em></h2>
+  <div class="fill live" data-flex=".main-nav ul, .site-header" data-zoom="1.4">
+    <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav class="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Schedule</a></li><li><a href="#">Tickets</a></li></ul></nav></header></script>
+    <script type="text/plain" data-role="base">body{margin:0;padding:26px 0 0 22px;background:#12151d;color:#f3ecdf;font-family:system-ui} .site-header{padding:14px 18px;background:#171b25} .logo{color:#f3ecdf;font-weight:800;text-decoration:none} ul{list-style:none;margin:0;padding:0} li{background:#262c3a;border:2px dashed #5ec8d8;border-radius:6px;padding:4px 8px;margin:4px 0} a{color:#ffb547;text-decoration:none;font-weight:700}</script>
+    <textarea>
+.main-nav ul {
+  /* display: flex; */
+  /* gap: 1rem; */
+}
+.site-header {
+  /* display: flex; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Uncomment one line at a time. <code>display: flex</code> on the <code>ul</code>: the <code>li</code>s (its <em>direct children</em>) line up. Not the <code>a</code>s: grandchildren don't care. The arrows are the axes of each flex container: red = main, blue = cross.</p>
+    <p>Then the header: logo and nav are its children. <code>space-between</code> pushes them apart. <code>align-items: center</code> lines them up vertically. That's every nav bar on the internet.</p>
+  </aside>
+</section>
+
+<section data-title="Two axes">
+  <p class="kicker">The one idea that makes flex make sense</p>
+  <h2><code>justify</code> goes along. <code>align</code> goes across.</h2>
+  <div class="axes2">
+    <div class="axbox">
+      <span class="ax main h"><span><b>main axis · justify-content</b></span></span>
+      <span class="ax cross v"><span><b>cross · align-items</b></span></span>
+      <div class="axrow"><i>🥟</i><i>🎸</i><i>🌵</i></div>
+      <h3>flex-direction: row</h3>
+    </div>
+    <div class="axbox">
+      <span class="ax cross h"><span><b>cross axis · align-items</b></span></span>
+      <span class="ax main v"><span><b>main · justify-content</b></span></span>
+      <div class="axcol"><i>🥟</i><i>🎸</i><i>🌵</i></div>
+      <h3>flex-direction: column</h3>
+    </div>
+  </div>
+  <p class="mt"><code>flex-direction</code> picks the main axis. <span class="hl">Turn it, and justify and align swap jobs.</span></p>
+  <aside class="notes">
+    <p>The #1 flexbox confusion: "justify-content: center doesn't centre vertically". It does, in a column. Say it three times: justify = along the main axis, align = across it.</p>
+  </aside>
+</section>
+
+<section data-title="Flex lab">
+  <p class="kicker">Live · every button is one declaration</p>
+  <h2>Flex lab</h2>
+  <div class="fill flex-lab" data-show="direction,justify,align,wrap,gap,width"></div>
+  <aside class="notes">
+    <p>Go: justify through its values → align-items (stretch is the default: that's why flex items are the same height) → column (watch both arrows turn; justify now vertical) → wrap + shrink the container → gap.</p>
+    <p>Grow/shrink per item comes a little later, after the wobbly links (same lab in <code>playgrounds/flex.html</code>, with item controls).</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="The axis trap">
+  <p class="kicker">Predict</p>
+  <h2>Centred vertically or horizontally?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="css" class="big">.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}</script>
+    <div class="stack">
+      <div class="bets"><span class="chip">A · vertically</span><span class="chip">B · horizontally</span><span class="chip">C · both</span></div>
+      <div class="reveal-box solid step"><strong>B · horizontally.</strong> In a column the main axis points down, so <code>align-items</code> (across) is horizontal. For vertical: <code>justify-content: center</code>.</div>
+    </div>
+  </div>
+  <aside class="notes"><p>30 seconds. This is case 3 of Exercise 3b and level 7 of the game ("the axis trap").</p></aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3a — Stall Setter">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 3a · solo · 8 min · a game</p>
+  <div class="ex-head"><h2>Stall Setter · Flexbox</h2><button class="timer" data-min="8"></button></div>
+  <div class="split l2 fill">
+    <figure class="shot" style="box-shadow:8px 8px 0 var(--yellow)"><img src="images/stall-setter.png" alt="Stall Setter: level list and editor on the left, a wooden pier with dashed chalk marks and stalls on the right."></figure>
+    <div class="stack">
+      <p>Put every stall on its chalk mark. Any CSS that lands them all counts.</p>
+      <p>Levels <strong>1–8</strong> now. 9–13 at home.</p>
+      <p class="small">Stuck? 💡 Hint. Really stuck? 🏳 shows an answer: type it yourself anyway.</p>
+    </div>
+  </div>
+  <p class="where">03-layout → <b>Stall Setter</b> → Flexbox.</p>
+  <aside class="notes">
+    <p>Level 4 is align-items, level 7 the axis trap. Level 8 (margin-left: auto) teases the break mystery: let them solve it with the hint, don't explain why yet.</p>
+  </aside>
+</section>
+
+<section data-title="The wobbly links">
+  <p class="kicker">Problem 2 · the links sit at random heights</p>
+  <h2>Same-height cards, wobbly links</h2>
+  <div class="fill live" data-flex=".vendor-list, .vendor-card" data-zoom="1.2">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B</h3><p>Vinyl, sorted by mood.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Posters of the port, signed while you wait.</p><a class="card-link" href="#">Find the stall →</a></li></ul></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font-family:system-ui} .vendor-list{list-style:none;margin:0;padding:0;display:flex;gap:14px} .vendor-card{flex:1;background:#1b202b;border:2px solid #3a4254;border-radius:14px;padding:16px} h3{margin:8px 0 4px} p{margin:0 0 12px;color:#c9c1b3;font-size:15px} .tag{font:700 11px ui-monospace,monospace;text-transform:uppercase;background:#262c3a;color:#5ec8d8;padding:4px 6px;border-radius:5px} .card-link{color:#ffb547;font-weight:700;text-decoration:none}</script>
+    <textarea>
+/* .vendor-list is already display: flex */
+.vendor-card {
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* align-items: flex-start; */
+}
+.card-link {
+  /* margin-top: auto; */
+}
+</textarea>
+  </div>
+  <p class="small step"><strong>Mystery solved:</strong> in flow there is no free height (height grows up from content). The cards are stretched by the flex row, so each column <em>has</em> free space — and an auto margin takes all of it, before <code>justify-content</code> gets any.</p>
+  <aside class="notes">
+    <p><b>~1:45.</b> The mystery from the break slide gets solved on this slide's last step (→); first set it up. Question 1: why are the cards the same height? Nobody asked for it. <code>align-items: stretch</code> is the default: items stretch across the cross axis. That's how "equal-height columns" became one line.</p>
+    <p>Second: each card becomes a column (uncomment line by line). The tag and link stretch to full width → <code>align-items: flex-start</code>. Then <code>margin-top: auto</code> on the link: it eats all the free space above it. Links line up.</p>
+  </aside>
+</section>
+
+<section data-title="Flex tricks">
+  <p class="kicker">Two things every flex user gets wrong</p>
+  <h2>The shorthand, and pixels vs Tab order</h2>
+  <div class="split">
+    <div class="card"><span class="label">the shorthand</span><table class="dtable" style="font-size:24px"><tr><td><code>initial</code></td><td>0 1 auto</td><td class="small muted">content-sized, may shrink</td></tr><tr><td><code>flex: auto</code></td><td>1 1 auto</td><td class="small muted">content-proportional</td></tr><tr><td><code>flex: 1</code></td><td>1 1 0%</td><td class="small muted">equal shares</td></tr><tr><td><code>flex: none</code></td><td>0 0 auto</td><td class="small muted">rigid</td></tr></table></div>
+    <div class="card"><span class="label">order ≠ reading order</span><p class="small"><code>order</code>, <code>row-reverse</code>, <code>column-reverse</code> (and grid placement, <code>dense</code>) move <strong>pixels</strong>. Screen readers and <kbd>Tab</kbd> follow the <strong>DOM</strong>.</p><p class="small muted">WCAG 1.3.2 meaningful sequence · 2.4.3 focus order. If the order means something, change the HTML.</p></div>
+  </div>
+  <aside class="notes">
+    <p>Auto margins are resolved before justify-content (Flexbox §8.1): that's why <code>margin-left: auto</code> on "Log in" beats <code>justify-content: center</code>. <code>flex: 1</code> vs <code>flex: auto</code>: basis 0 vs basis auto.</p>
+    <p>Say, don't show: <code>align-items: baseline</code> lines up text baselines of items with different font sizes (logo + nav links); <code>align-content</code> distributes the <em>lines</em> of a wrapped container.</p>
+  </aside>
+</section>
+
+<section data-title="The flex algorithm, with numbers">
+  <p class="kicker">Deeper · who decides the width? · flex items</p>
+  <h2>Basis first. Then grow by <em class="s">share</em>, shrink by <em class="s">weight</em>.</h2>
+  <div class="leftover">
+    <p class="llabel">① container 900 · start from <code>flex-basis</code>: 200 + 300 + 250 = 750</p>
+    <div class="lrow" style="width:1350px"><div class="a" style="width:300px">A 200</div><div class="b" style="width:450px">B 300</div><div class="c" style="width:375px">C 250</div><div class="free">150 free</div></div>
+    <div class="step leftover">
+      <p class="llabel">② grow 1 : 2 : 0 → free space split by <strong>share</strong>: +50, +100, +0</p>
+      <div class="lrow" style="width:1350px"><div class="a" style="width:375px">A 250</div><div class="b" style="width:600px">B 400</div><div class="c" style="width:375px">C 250</div></div>
+    </div>
+    <div class="step leftover">
+      <p class="llabel">③ container 600 → −150 · shrink 1 : 1 : 1 <strong>weighted by basis</strong> → −40, −60, −50</p>
+      <div class="lwrap"><div class="lrow" style="width:900px"><div class="a" style="width:240px">A 160</div><div class="b" style="width:360px">B 240</div><div class="c" style="width:300px">C 200</div></div><span class="lnote">← bigger items shrink more</span></div>
+    </div>
+  </div>
+  <p class="small mt step">Good to know: only the <strong>content</strong> shrinks, never padding or border. An item never gets narrower than its <strong>longest word</strong>. And <code>flex: 1</code> means “start from zero, share everything”, so all items end up equal, unless a long word stops one from shrinking.</p>
+  <aside class="notes">
+    <p><b>~3 min.</b> Step ①: basis auto → the item's width, else its content size. Flexbox §9.7 "Resolving flexible lengths", simplified. Grow distributes free space in proportion to <code>flex-grow</code>. Shrink distributes the <em>negative</em> free space in proportion to <code>flex-shrink × flex-basis</code> ("scaled flex shrink factor") — so a 300px item shrinks 1.5× as much as a 200px one with the same shrink factor. Then items are clamped by min/max; clamped items freeze and the loop re-runs for the rest.</p>
+    <p>Exit ticket Q3 is step ③. Ask the room to compute B before revealing.</p>
+  </aside>
+</section>
+
+<section data-title="The automatic minimum size">
+  <p class="kicker">Deeper · the #1 flex bug in production</p>
+  <h2>Why won't it truncate?</h2>
+  <div class="fill live" data-measure=".info" data-flex=".row" data-resizable="360-900-620" data-zoom="1.2">
+    <script type="text/plain" data-role="html"><div class="row"><span class="icon">🥟</span><div class="info"><h3>Dumpling Dynasty — hand-folded xiaolongbao, steamed in front of you</h3><p>Food · stall 12</p></div><a class="btn" href="#">Menu</a></div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:16px/1.4 system-ui}  .row{display:flex;gap:12px;align-items:center;background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:12px} .icon{font-size:28px} h3{margin:0;font-size:17px} p{margin:2px 0 0;color:#c9c1b3;font-size:13px} .btn{background:#ffb547;color:#12151d;font-weight:800;padding:8px 14px;border-radius:99px;text-decoration:none}</script>
+    <textarea>
+.info {
+  flex: 1;
+  /* min-width: 0; */
+}
+.info h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</textarea>
+  </div>
+  <p class="small">The flex item is <code>.info</code>, and flex items default to <code>min-width: auto</code> = their min-content. Its <code>nowrap</code> title makes that the <em>whole sentence</em>, so <code>.info</code> refuses to shrink and shoves the button out. <code>min-width: 0</code> on the <strong>item</strong> removes the floor.</p>
+  <aside class="notes">
+    <p><b>~3 min.</b> At 620px the Menu button is pushed half out of the card (drag narrower and it leaves the view entirely). Ask: "the h3 has overflow hidden and ellipsis — why no ellipsis?" Because the h3 is never narrower than its text: its parent, the flex item, won't shrink below the h3's min-content. Uncomment <code>min-width: 0</code>: ellipsis. Drag the width.</p>
+    <p>Spec detail (Flexbox §4.5): the automatic minimum only applies to flex items that are <em>not scroll containers</em> — so <code>overflow: hidden</code> on the item itself would also fix it (but clips focus rings and shadows). Habit: <code>min-width: 0</code> on flex items that hold text you truncate, long URLs or code.</p>
+    <p>Grid has the same floor: <code>1fr</code> = <code>minmax(auto, 1fr)</code> → a column with a long word blows out. Fix: <code>minmax(0, 1fr)</code>. Shown on the Tracks slide.</p>
+  </aside>
+</section>
+
+<section data-title="Where flex ends">
+  <p class="kicker">Problem 3, first attempt · stalls in rows</p>
+  <h2>Wrap them? Look at the last row.</h2>
+  <div class="fill live" data-flex=".vendor-list" data-resizable="360-900-700" data-zoom="1.1">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li>🥟 Dumpling Dynasty</li><li>🎸 Side B Records</li><li>🖨 Salt &amp; Ink</li><li>🍩 Churros Till Late</li><li>🌵 The Plant Swap</li></ul></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:700 16px system-ui} .vendor-list{list-style:none;margin:0;padding:0} li{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:30px 16px}</script>
+    <textarea>
+.vendor-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+li {
+  flex: 1 1 14rem;
+}
+</textarea>
+  </div>
+  <p class="small">Flex lays out <strong>each line on its own</strong>. The two cards on the last line grow to fill it. Columns don't line up across lines. <span class="hl">That's a job for grid.</span></p>
+  <aside class="notes">
+    <p>Drag the width: the last line always has fat orphans. Flex is one-dimensional: it only thinks about one line at a time. For rows AND columns that line up, next act.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3b — Line them up">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 3b · solo · 10 min</p>
+  <div class="ex-head"><h2>Line them up</h2><button class="timer" data-min="10"></button></div>
+  <ol>
+    <li><strong>Logo left, menu right</strong>: two flex containers.</li>
+    <li><strong>The wobbly links</strong>: a column, and an auto margin.</li>
+    <li><strong>Centre the hero</strong>: which axis is vertical in a column?</li>
+    <li><strong>The name that won't truncate</strong>: the automatic minimum.</li>
+    <li><span class="muted">Bonus:</span> the footer (wrap) · the subscribe row (<code>flex: 1</code>).</li>
+  </ol>
+  <p class="where mt">03-layout → <b>Exercise 3 · Line them up</b>. Before typing, ask: ① who is the parent? ② along or across?</p>
+  <aside class="notes">
+    <p>Most common mistake: <code>display: flex</code> on the element they want to move instead of its parent. Second: justify vs align in a column. The arrows on the preview show the axes. Debrief: one person explains case 2 in one sentence.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · GRID
+     ===================================================================== -->
+
+<section class="vc" data-title="Go deeper: flexbox">
+  <p class="kicker">Extra materials · flexbox</p>
+  <h2>Go deeper: flexbox</h2>
+  <ul class="reading"><li><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank" rel="noopener">CSS-Tricks · A Complete Guide to Flexbox</a> <span class="muted">— the ultimate cheat sheet: every property, with pictures</span></li><li><a href="https://www.joshwcomeau.com/css/interactive-guide-to-flexbox/" target="_blank" rel="noopener">Josh Comeau · An Interactive Guide to Flexbox</a> <span class="muted">— the mental model, with sliders to play with</span></li><li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox" target="_blank" rel="noopener">MDN · Basic concepts of flexbox</a> <span class="muted">— the reference, axis by axis</span></li><li><a href="https://web.dev/learn/css/flexbox" target="_blank" rel="noopener">web.dev · Learn CSS: Flexbox</a> <span class="muted">— a short course chapter with demos</span></li><li><a href="https://flexboxfroggy.com/" target="_blank" rel="noopener">Flexbox Froggy</a> <span class="muted">— a game, 24 levels</span></li><li><a href="https://www.w3.org/TR/css-flexbox-1/" target="_blank" rel="noopener">W3C · CSS Flexbox spec</a> <span class="muted">— §9 is the algorithm we did with numbers</span></li></ul>
+  <aside class="notes"><p>10 seconds: "everything's on this slide, and in the hub page." Don't read it out. The CSS-Tricks guide is the one to bookmark.</p></aside>
+</section>
+
+<section class="act" data-act="4" data-act-name="Draw the floor plan" data-at="2:11" data-title="Act 4 — Draw the floor plan">
+  <div class="act-deco">▦</div>
+  <div class="act-num">Act 4</div>
+  <h1>Draw the floor plan</h1>
+  <div class="act-meta"><span class="chip">2:11 – 2:41</span><span>grid</span></div>
+  <div class="act-list"><span>tracks</span><span>fr</span><span>the magic line</span><span>lines &amp; span</span><span>areas</span><span>@media</span></div>
+</section>
+
+<section data-title="This act's goal: step 4">
+  <p class="kicker">Problem 3 · stalls in rows</p>
+  <h2>Where this act is going</h2>
+  <div class="frame fill"><iframe data-src="project/showcase/index.html?step=4#vendors" title="The market page at step 4: grid"></iframe></div>
+  <aside class="notes">
+    <p>30 seconds. It opens scrolled to Vendors. Toggle 3 ↔ 4 (click inside, press the keys): the vendors become a grid (and now the wobbly-link fix shows: cards side by side, links on one line), Dumpling Dynasty spans two columns, the map appears, the form gets two columns.</p>
+    <p><b>Bridge:</b> "Remember the fat orphans when flex wrapped? Flex thinks one line at a time. Grid draws the rows and columns first, then moves the children in."</p>
+  </aside>
+</section>
+
+<section data-title="Tracks and fr">
+  <p class="kicker">Live · the purple lines are what DevTools draws</p>
+  <h2>Columns, rows, and the <code>fr</code> unit</h2>
+  <div class="fill live" data-grid=".vendor-list" data-zoom="1.2">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li>🥟</li><li>🎸</li><li>🖨</li><li>🍩</li><li>🌵</li><li>🍹</li></ul></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 18px 18px 40px;background:#12151d;color:#f3ecdf;font:700 26px system-ui} .vendor-list{list-style:none;margin:0;padding:0} li{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:18px;text-align:center}</script>
+    <textarea>
+.vendor-list {
+  display: grid;
+  grid-template-columns: 200px 1fr 2fr;
+  gap: 16px;
+}
+/* blowout: a long word in a 1fr column */
+/* li:nth-child(2)::after {
+  content: " Supercalifragilisticexpialidocious";
+} */
+/* fix: minmax(0, 1fr) minmax(0, 2fr) */
+</textarea>
+  </div>
+  <p class="small"><code>fr</code> = a share of the <strong>leftover</strong> space, after fixed tracks and gaps (<code>flex-grow</code> for columns). But <code>1fr</code> is really <code>minmax(auto, 1fr)</code>: never below its content.</p>
+  <aside class="notes">
+    <p>Blowout demo: uncomment the long word: the 1fr column grows, the ratios break. <code>1fr</code> = <code>minmax(auto, 1fr)</code>, and <code>auto</code> as a minimum means min-content (Grid §7.2.4). Fix with <code>minmax(0, 1fr)</code> (and then handle overflow: <code>overflow-wrap: anywhere</code>). Track sizing algorithm (Grid §12), in one breath: fixed tracks first, then intrinsic tracks get their content sizes, then leftover goes to fr tracks.</p><p>First point out: we never wrote any rows, yet there are two — grid makes rows as needed ("implicit" rows, as tall as their content). Items fill cells left to right, top to bottom.</p><p>Then try: <code>1fr 1fr 1fr</code> → <code>repeat(3, 1fr)</code> → <code>repeat(4, 1fr)</code> → add <code>grid-template-rows: 100px 50px</code>: now the rows are "explicit", with the sizes you chose.</p>
+  </aside>
+</section>
+
+<section data-steps="3" data-title="Decode the magic line">
+  <p class="kicker">Last time I promised · three steps</p>
+  <h2>Decode the magic line</h2>
+  <pre class="magic"><span class="p">grid-template-columns</span>:
+  <span class="m-all"><span class="m-af"><span class="f">repeat</span>(auto-fill,</span> <span class="m-mm"><span class="f">minmax</span>(<span class="n">16rem</span>, <span class="n">1fr</span>)</span>)</span>;</pre>
+  <div class="explain">
+    <div class="step"><code>minmax(16rem, 1fr)</code> · one column: never narrower than 16rem, and takes a share of what's left</div>
+    <div class="step"><code>repeat(auto-fill, …)</code> · as many of those columns as fit in the row</div>
+    <div class="step">Wide screen → more columns. Phone → one. <strong>Responsive, without a media query.</strong> <span class="muted">auto-<strong>fit</strong> collapses empty tracks, so 2 items on a wide screen stretch; auto-<strong>fill</strong> keeps the empty columns.</span></div>
+  </div>
+  <aside class="notes">
+    <p>The payoff. Everyone pasted this line last time as "layout magic". Read it inside out. <code>auto-fit</code> vs <code>auto-fill</code>: only differ when there are fewer items than columns (auto-fit collapses the empty tracks, so items stretch). Next slide: watch it.</p>
+  </aside>
+</section>
+
+<section data-title="Watch the magic line">
+  <p class="kicker">Live · drag the window width</p>
+  <h2>Columns come and go</h2>
+  <div class="fill live" data-grid=".vendor-list" data-resizable="360-1400-760" data-zoom="1.1">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="featured">🥟 Dumpling Dynasty</li><li>🎸 Side B Records</li><li>🖨 Salt &amp; Ink</li><li>🍩 Churros Till Late</li><li>🌵 The Plant Swap</li><li>🍹 Mezcal Moon</li></ul></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 18px 18px 40px;background:#12151d;color:#f3ecdf;font:700 17px system-ui} .vendor-list{list-style:none;margin:0;padding:0} li{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:26px 16px} .featured{border-color:#ffb547}</script>
+    <textarea>
+.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(16rem, 1fr)
+  );
+  gap: 16px;
+}
+/* .featured {
+  grid-column: span 2;
+} */
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Drag from 1400 down to 360: 4, 3, 2, 1 columns. Then uncomment <code>.featured</code>: the star stall takes two columns and the others flow around it. Careful at one column: span 2 forces a second column and it overflows. (That's what the finale's <code>@media</code> is for.)</p>
+  </aside>
+</section>
+
+<section data-title="Lines, not cells">
+  <p class="kicker">Placing items · the numbers are lines</p>
+  <h2>Grid counts <em class="s">lines</em>, not cells</h2>
+  <div class="fill live" data-grid=".g" data-zoom="1.2">
+    <script type="text/plain" data-role="html"><div class="g"><div class="banner">🏮 banner</div><div>🥟</div><div>🎸</div><div class="stage">🎤 stage</div><div>🌵</div><div>🍹</div><div>🍩</div></div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 18px 18px 40px;background:#12151d;color:#f3ecdf;font:700 22px system-ui} .g > div{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:14px;text-align:center} .banner{background:#ffb547 !important;color:#12151d} .stage{background:#ff8a6b !important;color:#12151d}</script>
+    <textarea>
+.g {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.banner { grid-column: 1 / -1; }
+.stage {
+  grid-column: 2 / 4;
+  grid-row: span 2;
+}
+</textarea>
+  </div>
+  <p class="small"><code>1 / -1</code> = first line to last line · <code>span 2</code> = two tracks from wherever you land · 4 columns have <strong>5</strong> lines.</p>
+  <aside class="notes">
+    <p>The off-by-one everyone hits: 4 columns → lines 1 to 5. Negative numbers count from the end. Change <code>2 / 4</code> to <code>2 / 5</code>, and the stage's rows with <code>grid-row: 2 / 4</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Draw it with words">
+  <p class="kicker">Problem 3 · the map</p>
+  <h2>Draw the map with words</h2>
+  <div class="fill live" data-grid=".market-map" data-zoom="1.05" data-layout="wide-code" style="font-size:26px">
+    <script type="text/plain" data-role="html"><div class="market-map"><div class="zone stage">🎤 stage</div><div class="zone food">🥟 food</div><div class="zone table">🍽 table</div><div class="zone crafts">🖨 crafts</div><div class="zone drinks">🍹 drinks</div><div class="zone pier">⚓ pier</div><div class="zone gate">gate</div></div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 18px 18px 40px;background:#12151d;font:800 18px system-ui} .market-map{background:#0c1f2b;border:2px solid #3a4254;border-radius:12px;padding:10px} .zone{border-radius:8px;padding:10px;color:#12151d} .stage{background:#ff8a6b} .food{background:#ffc46b} .table{background:#e8d9b8} .crafts{background:#b8e0a0} .drinks{background:#f0a6d8} .pier{background:#a77a4f;color:#f3ecdf} .gate{background:#262c3a;color:#f3ecdf;text-align:center} .stage{grid-area:stage} .food{grid-area:food} .table{grid-area:table} .crafts{grid-area:crafts} .drinks{grid-area:drinks} .pier{grid-area:pier} .gate{grid-area:gate}</script>
+    <textarea>
+/* each zone already has a name:
+   .stage { grid-area: stage; } … */
+.market-map {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 90px 90px 90px 50px;
+  gap: 8px;
+  grid-template-areas:
+    "stage  stage  pier"
+    "food   table  pier"
+    "food   crafts drinks"
+    "gate   gate   gate";
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>The showpiece: ASCII art is the layout. Live: swap <code>pier</code> and <code>drinks</code> in the strings; move the stage to the bottom; make the pier an L-shape (write <code>pier</code> in the bottom-left) → the whole declaration is invalid and dropped. The zones still ask for areas that no longer exist, so they all pile into one extra cell in the corner: "where did my map go?" Areas must be rectangles, every row needs the same number of cells. <code>.</code> = an empty cell.</p>
+  </aside>
+</section>
+
+</script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:16px/1.4 system-ui}  .hero{border-radius:14px;overflow:hidden} .photo{min-height:220px;background:radial-gradient(circle at 25% 30%,#ffb547 0 18px,transparent 19px),radial-gradient(circle at 60% 20%,#ff6b4a 0 14px,transparent 15px),radial-gradient(circle at 80% 40%,#ffb547 0 16px,transparent 17px),linear-gradient(#0c1f2b,#1b3a4b)} .caption{padding:16px 20px;background:rgb(18 21 29/.75)} h1{margin:0;font:400 38px/1 Georgia,serif} p{margin:4px 0 0;color:#c9c1b3}</script>
+    <textarea>
+.hero { display: grid; }
+.photo, .caption {
+  /* grid-area: 1 / 1; */
+}
+.caption {
+  /* align-self: end; */
+}
+</textarea>
+  </div>
+  <p class="small">Both children in cell 1/1: they overlap, later paints on top. Unlike <code>absolute</code>, the caption still <strong>takes part in sizing</strong>: a long caption makes the hero taller instead of spilling out.</p>
+  <aside class="notes">
+    <p>Uncomment line by line. Then make the caption long (add text in the index.html… or bump <code>font-size</code>): the hero grows to fit it. With absolute positioning it would overflow the photo. Great for cards with image + text, stacked "badge on image", or crossfading slides. Use <code>z-index</code> on grid items if order matters (grid items can take z-index without position).</p>
+  </aside>
+</section>
+
+<section data-title="subgrid">
+  <p class="kicker">Deeper · the wobbly links, solved at the grid level</p>
+  <h2><code>subgrid</code>: children line up across cards</h2>
+  <div class="fill live" data-grid=".vendor-list" data-zoom="1.05">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty, a very long stall name</h3><p>Hand-folded, steamed in front of you.</p><a href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B</h3><p>Vinyl sorted by mood instead of genre, ask for rainy Sunday.</p><a href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Posters.</p><a href="#">Find the stall →</a></li></ul></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px 18px 26px;background:#12151d;color:#f3ecdf;font:16px/1.4 system-ui}  .vendor-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .vendor-card{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:12px} .tag{font:700 11px ui-monospace,monospace;text-transform:uppercase;color:#5ec8d8} h3{margin:4px 0;font-size:17px} p{margin:0 0 8px;color:#c9c1b3;font-size:14px} a{color:#ffb547;font-weight:700;text-decoration:none}</script>
+    <textarea>
+.vendor-card {
+  /* display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid; */
+}
+</textarea>
+  </div>
+  <p class="small">Each card spans 4 rows of the <em>outer</em> grid and uses those rows for its own children. Now every title, every text and every link shares one row line across all cards. Flex could only push the links down.</p>
+  <aside class="notes">
+    <p><b>~3 min.</b> Uncomment: titles of different lengths now align, texts start on the same line, links sit on one line. The outer grid gets 4 implicit rows sized by the tallest title/text across the row of cards. Support: all evergreen browsers since late 2023 (Firefox 71, Safari 16, Chrome 117). Grid Level 2 spec. A subgrid inherits the parent's gaps unless it sets its own. Mention: <code>grid-template-columns: subgrid</code> works the same horizontally (forms with aligned labels across fieldsets).</p>
+  </aside>
+</section>
+
+<section data-title="Who decides the width? grid">
+  <p class="kicker">Who decides the width? · grid items</p>
+  <h2>The track decides. The item stretches.</h2>
+  <div class="fill live" data-grid=".g" data-measure=".g > div" data-zoom="1.25">
+    <script type="text/plain" data-role="html"><div class="g"><div>🥟 Dumplings</div><div>🎸 Vinyl</div><div>🍹 Mezcal Moon</div></div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:40px 18px 18px 40px;background:#12151d;color:#f3ecdf;font:700 18px system-ui} .g{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:140px;gap:12px} .g > div{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:12px}</script>
+    <textarea>
+.g {
+  /* justify-items: start; */
+  /* align-items: start; */
+  /* place-items: center; */
+}
+</textarea>
+  </div>
+  <p class="small">By default a grid item <strong>stretches</strong> to its cell, both ways — and a stretched item has a <em>definite</em> height, so <code>height: 100%</code> inside it finally works (the payoff from “height grows up”). <code>justify-items</code> / <code>align-items</code> give the size back to the content. <code>place-items: center</code> = both at once: the famous two-line centring.</p>
+  <aside class="notes">
+    <p>Closing the loop from Act 1: a stretched flex or grid item is treated as definite (Flexbox §9.8, Grid §11.5 / CSS Sizing), so percentage heights of its children resolve. That is why "make the child fill the card" suddenly works inside flex/grid.</p>
+    <p>Read the blue labels: every item is exactly its track wide and its row tall. Uncomment <code>justify-items: start</code>: the widths shrink to the content. Then <code>align-items: start</code>: the heights too. Then only <code>place-items: center</code>. Fourth answer to the question of the day: the track decides, unless you hand it back to the content.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="Flex or grid?">
+  <p class="kicker">The question you'll ask every day</p>
+  <h2>Flex or grid?</h2>
+  <table class="dtable">
+    <tr><th>on the market page</th><th>use</th><th>because</th></tr>
+    <tr><td>nav links · logo + nav</td><td><span class="f">flex</span></td><td>one line of things, sized by their content</td></tr>
+    <tr><td>inside a card · the hero</td><td><span class="f">flex</span></td><td>one column, push the last item down</td></tr>
+    <tr><td>the vendor cards</td><td><span class="g">grid</span></td><td>rows and columns that must line up</td></tr>
+    <tr><td>the map · the form</td><td><span class="g">grid</span></td><td>a drawing, two dimensions</td></tr>
+  </table>
+  <p class="mt">They nest: <span class="hl">a grid of cards, and each card is a flex column.</span> Not a contest — a toolbox.</p>
+  <aside class="notes">
+    <p>Rule of thumb: if you're thinking "a row of things" → flex. If you're thinking "a table without a table" → grid. When unsure, try one; changing is one line.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 4 — Draw the floor plan">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 4 · solo · 11 min</p>
+  <div class="ex-head"><h2>Draw the floor plan</h2><button class="timer" data-min="11"></button></div>
+  <ol>
+    <li><strong>The magic line</strong>, from memory. Then drag the width.</li>
+    <li><strong>The star stall</strong>: two columns wide.</li>
+    <li><strong>Draw the map</strong>: <code>grid-template-areas</code> from the floor plan.</li>
+    <li><strong>Line up the insides</strong>: <code>subgrid</code>.</li>
+    <li><span class="muted">Bonus:</span> the form (<code>max-content</code>) · a caption on a photo without <code>position</code>.</li>
+  </ol>
+  <p class="where mt">03-layout → <b>Exercise 4 · Draw the floor plan</b>. Done? <b>Stall Setter · Grid</b> and <b>Deep cuts</b>.</p>
+  <aside class="notes">
+    <p>Case 3 is the fun one. Common bugs: different number of cells per row, a missing quote, an L-shape. All three make the whole declaration invalid: DevTools shows it crossed out with ⚠. Callback to "CSS fails silently" from last time.</p>
+  <p><b>Bridge after the debrief:</b> "You now have all four algorithms. Time to open the market: your page, your layout.css."</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     FINALE
+     ===================================================================== -->
+
+<section class="vc" data-title="Go deeper: grid">
+  <p class="kicker">Extra materials · grid</p>
+  <h2>Go deeper: grid</h2>
+  <ul class="reading"><li><a href="https://css-tricks.com/snippets/css/complete-guide-grid/" target="_blank" rel="noopener">CSS-Tricks · A Complete Guide to CSS Grid</a> <span class="muted">— the ultimate cheat sheet: every property, with pictures</span></li><li><a href="https://www.joshwcomeau.com/css/interactive-guide-to-grid/" target="_blank" rel="noopener">Josh Comeau · An Interactive Guide to CSS Grid</a> <span class="muted">— the mental model, interactive</span></li><li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Basic_concepts_of_grid_layout" target="_blank" rel="noopener">MDN · Basic concepts of grid layout</a> <span class="muted">— the reference: tracks, lines, areas</span></li><li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid" target="_blank" rel="noopener">MDN · Subgrid</a> <span class="muted">— the card-alignment trick, in depth</span></li><li><a href="https://web.dev/learn/css/grid" target="_blank" rel="noopener">web.dev · Learn CSS: Grid</a> <span class="muted">— a short course chapter with demos</span></li><li><a href="https://cssgridgarden.com/" target="_blank" rel="noopener">Grid Garden</a> <span class="muted">— a game, 28 levels</span></li></ul>
+  <aside class="notes"><p>10 seconds, then straight to the finale. The CSS-Tricks guide is the one to bookmark.</p></aside>
+</section>
+
+<section class="act" data-act="6" data-act-name="Open the market" data-at="2:41" data-title="Finale — Open the market">
+  <div class="act-deco">🏮</div>
+  <div class="act-num">Finale</div>
+  <h1>Open the market</h1>
+  <div class="act-meta"><span class="chip">2:41 – 3:00</span><span>your layout.css</span></div>
+  <div class="act-list"><span>15 minutes</span><span>who decides?</span><span>exit ticket</span></div>
+</section>
+
+<section class="exercise" data-title="Exercise 5 — Open the market">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 5 · solo · 15 min · your project · recap by building</p>
+  <div class="ex-head"><h2>Rebuild the lecture in layout.css</h2><button class="timer" data-min="15"></button></div>
+  <div class="acts4 mt">
+    <div><h3>Flow</h3><ul><li>box-sizing reset</li><li><code>main</code> max-width + auto</li><li>hero <code>min-height</code></li></ul></div>
+    <div><h3>Position</h3><ul><li>stamps on corners</li><li>sticky header</li><li>📍 on the map</li><li>fixed ↑ button</li></ul></div>
+    <div><h3>Flex</h3><ul><li>header + nav in a row</li><li>card links at the bottom</li><li>hero centred</li></ul></div>
+    <div><h3>Grid</h3><ul><li>the magic line</li><li>featured spans 2</li><li>the map, in words</li><li class="muted">stretch: form, @media</li></ul></div>
+  </div>
+  <p class="mt">One act at a time, <strong>from memory</strong> — then check yourself against that showcase step (1 → 4). Stuck? The exercise page of that act has your solution.</p>
+  <p class="where">Copy <b>03-layout/project/starter/</b> out of the repo → <b>css/layout.css</b>. In class: <b>Acts 1–3 + the magic line</b>; the map and the form at home.</p>
+  <aside class="notes">
+    <p>Frame it as the recap: "Everything you did today, once more, on your own page, without the editor telling you when you're right." They walk layout.css top to bottom — flow, position, flex, grid — and check each act against the showcase switcher (1–4). If someone is stuck, send them to that act's exercise page first, then help.</p>
+    <p>Walk around. For every box you point at, ask: "which algorithm places this box — and who decides its width?" At 2:53 give a 2-minute warning. The DevTools flex/grid badges in the Elements panel draw the lines on the real page: show one person, then the room.</p>
+    <p>If someone brings last time's style.css: its "layout magic" line and any <code>display</code> rules may fight their layout.css; the cascade decides (later file wins at equal specificity).</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="Who decides?">
+  <p class="kicker">The question of the day, answered</p>
+  <h2>Who decides the width?</h2>
+  <table class="dtable syn">
+    <tr><th>algorithm</th><th>width ⟷</th><th>height ↕</th><th>in the flow?</th></tr>
+    <tr class="r1"><td><code>flow</code></td><td>the parent: fills it</td><td>the content</td><td>it <em>is</em> the flow</td></tr>
+    <tr class="r2"><td><code>absolute</code></td><td>fit-content · or <code>left</code> + <code>right</code></td><td>the content · or <code>top</code> + <code>bottom</code></td><td>no: measured from its anchor</td></tr>
+    <tr class="r3"><td><code>flex&nbsp;item</code> <small class="muted">row</small></td><td>basis, then grow (share) / shrink (weight), floor min-content</td><td>stretches to the line</td><td>yes, along one axis</td></tr>
+    <tr class="r4"><td><code>grid&nbsp;item</code></td><td>its track (stretch) · <code>1fr</code> floor min-content</td><td>its track (stretch)</td><td>yes, in its cell</td></tr>
+  </table>
+  <p class="small muted">Flex column? The two swap: height from content + grow, width stretches.</p>
+  <p class="mt">Same <code>width</code>, same <code>margin: auto</code>, four different answers. <span class="hl">When a layout surprises you, first ask: which algorithm is in charge?</span></p>
+  <aside class="notes">
+    <p><b>~2:59.</b> Flex row: width = main axis, height = cross axis. In a column they swap: inside the wobbly-link cards the tag and the link stretched to full width until <code>align-items: flex-start</code>. Read the table as a story: every act answered one row. This is the takeaway. If only one slide stays in their heads, it's this one.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Exit ticket">
+  <p class="kicker">Exit ticket · answer on paper, then reveal</p>
+  <h2>Three questions before you go</h2>
+  <ol>
+    <li>A <code>position: fixed</code> modal lives inside a card with <code>transform: scale(1)</code>. Scroll. What happens? <span class="step chip act">it scrolls away: the card is its containing block</span></li>
+    <li>In <code>flex-direction: column</code>, which property centres items <em>vertically</em>? <span class="step chip act">justify-content</span></li>
+    <li>A 600px flex row, three items with <code>flex-basis</code> 200, 300, 250, default shrink. Widths? <span class="step chip act">160 · 240 · 200</span></li>
+  </ol>
+  <p class="mt small muted">Today: flow · pin it · line them up · draw the floor plan · open the market.</p>
+  <aside class="notes">
+    <p>Hands up per question.  If fewer than half get #2, open next lecture with the axes slide. Q1: a transformed ancestor becomes the containing block for fixed descendants. Q3: overflow 150, shrink weighted by basis 200:300:250 → −40, −60, −50.</p>
+  </aside>
+</section>
+
+<section data-title="One more thing: @media">
+  <p class="kicker">If there's time · a preview · drag the window below 640px</p>
+  <h2>Same areas, redrawn for a phone</h2>
+  <div class="fill live" data-grid=".market-map" data-resizable="360-900-760" data-zoom="1" style="font-size:26px">
+    <script type="text/plain" data-role="html"><div class="market-map"><div class="zone stage">🎤 stage</div><div class="zone food">🥟 food</div><div class="zone table">🍽 table</div><div class="zone crafts">🖨 crafts</div><div class="zone drinks">🍹 drinks</div><div class="zone pier">⚓ pier</div><div class="zone gate">gate</div></div></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:34px 18px 18px 40px;background:#12151d;font:800 18px system-ui} .market-map{background:#0c1f2b;border:2px solid #3a4254;border-radius:12px;padding:10px;display:grid;gap:8px;grid-template-columns:1fr 2fr 1fr;grid-auto-rows:70px;grid-template-areas:"stage stage pier" "food table pier" "food crafts drinks" "gate gate gate"} .zone{border-radius:8px;padding:10px;color:#12151d} .stage{background:#ff8a6b;grid-area:stage} .food{background:#ffc46b;grid-area:food} .table{background:#e8d9b8;grid-area:table} .crafts{background:#b8e0a0;grid-area:crafts} .drinks{background:#f0a6d8;grid-area:drinks} .pier{background:#a77a4f;color:#f3ecdf;grid-area:pier} .gate{background:#262c3a;color:#f3ecdf;text-align:center;grid-area:gate}</script>
+    <textarea>
+/* the desktop map is already drawn.
+   On a narrow window, redraw it: */
+@media (max-width: 40rem) {
+  .market-map {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "stage  stage"
+      "food   table"
+      "food   crafts"
+      "drinks pier"
+      "gate   gate";
+  }
+}
+</textarea>
+  </div>
+  <p class="small"><code>@media</code> asks the <strong>window</strong>. Its modern sibling <code>@container</code> asks the nearest <strong>query container</strong> (an ancestor with <code>container-type: inline-size</code>): a card that adapts wherever you drop it — sidebar or main column.</p>
+  <aside class="notes">
+    <p>Trap: <code>container-type</code> applies layout containment, so the container becomes a containing block for absolute/fixed descendants and a stacking context — the same trap as slides 19 and 21.</p>
+    <p><code>@media (max-width: 40rem)</code> = "only when the window is at most 40rem wide". Inside it, ordinary rules that win by coming later. The HTML order never changes; only the drawing. Only if there are 2 spare minutes after the exit ticket; otherwise go straight to homework — it is a stretch goal on the finale page.</p>
+  </aside>
+</section>
+
+<section data-title="Homework">
+  <p class="kicker">Until next time</p>
+  <h2>Homework &amp; reading</h2>
+  <div class="split">
+    <div>
+      <h3>Homework</h3>
+      <ul>
+        <li>Finish <code>layout.css</code>: every item on the Exercise 5 checklist.</li>
+        <li>Submit on <strong>Google Classroom</strong> before <strong>next time</strong>: a zip of your <code>starter/</code> folder or a link to your repo.</li>
+        <li>Stall Setter: the rest of <strong>Flexbox</strong>, all of <strong>Grid</strong>, <strong>Position</strong> and <strong>Deep cuts</strong> (weighted shrink, blowout, auto-fit, dense, named lines, trapped fixed).</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Read &amp; play</h3>
+      <ul class="small">
+        <li>Josh Comeau — <a href="https://www.joshwcomeau.com/css/interactive-guide-to-flexbox/" target="_blank" rel="noopener">An interactive guide to flexbox</a> · <a href="https://www.joshwcomeau.com/css/interactive-guide-to-grid/" target="_blank" rel="noopener">…to grid</a></li>
+        <li>web.dev Learn CSS — <a href="https://web.dev/learn/css/layout" target="_blank" rel="noopener">Layout</a> · <a href="https://web.dev/learn/css/flexbox" target="_blank" rel="noopener">Flexbox</a> · <a href="https://web.dev/learn/css/grid" target="_blank" rel="noopener">Grid</a></li>
+        <li>MDN — <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/position" target="_blank" rel="noopener">position</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block" target="_blank" rel="noopener">containing block</a></li>
+        <li>The specs, for the curious — <a href="https://www.w3.org/TR/css-flexbox-1/#resolve-flexible-lengths" target="_blank" rel="noopener">Flexbox §9.7</a> · <a href="https://www.w3.org/TR/css-grid-1/#algo-overview" target="_blank" rel="noopener">Grid §12</a> · <a href="https://www.w3.org/TR/CSS22/zindex.html" target="_blank" rel="noopener">CSS 2.2 App. E (paint order)</a></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Point them to github.com/nlopin/programming-interactivity-exercises → 03-layout: every exercise, playground, the game and the printable cheat sheet.</p>
+  </aside>
+</section>
+
+<section class="title no-chrome" data-title="Same HTML. Now it has a floor plan.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="title-h1 sm">Same HTML.<br><em class="s">Now with</em><br>a floor plan.</h1>
+      <p class="title-sub">exercises · playgrounds · game · cheat sheet →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/<br>programming-interactivity-exercises</a></p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <div class="frame scaled"><iframe data-src="project/showcase/index.html?step=3&amp;bare" tabindex="-1" title=""></iframe></div>
+      <div class="frame scaled"><iframe data-src="project/showcase/index.html?step=4&amp;bare" tabindex="-1" title=""></iframe></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

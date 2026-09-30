@@ -1,0 +1,59 @@
+/* Act 4 · Grid — draw the floor plan */
+
+/* the magic line from last time */
+.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.25rem;
+}
+.featured { grid-column: span 2; }
+
+/* the map, drawn with words */
+.market-map {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 7rem 7rem 7rem 4.5rem;
+  grid-template-areas:
+    "stage  stage  pier"
+    "food   table  pier"
+    "food   crafts drinks"
+    "gate   gate   gate";
+  gap: 0.75rem;
+}
+.zone { margin: 0; }
+.stage  { grid-area: stage; }
+.food   { grid-area: food; }
+.table  { grid-area: table; }
+.crafts { grid-area: crafts; }
+.drinks { grid-area: drinks; }
+.pier   { grid-area: pier; }
+.gate   { grid-area: gate; display: grid; place-items: center; }
+
+/* the form: labels left, fields right */
+.ticket-form {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 0.9rem 1.5rem;
+  max-width: 44rem;
+}
+.ticket-form label { margin: 0; }
+.ticket-form .check,
+.ticket-form button { grid-column: 2; justify-self: start; }
+
+/* on a phone: one column, the map redrawn */
+@media (max-width: 40rem) {
+  .featured { grid-column: auto; }
+  .market-map {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(5, 5rem);
+    grid-template-areas:
+      "stage  stage"
+      "food   table"
+      "food   crafts"
+      "drinks pier"
+      "gate   gate";
+  }
+  .ticket-form { grid-template-columns: 1fr; }
+  .ticket-form .check, .ticket-form button { grid-column: 1; }
+}

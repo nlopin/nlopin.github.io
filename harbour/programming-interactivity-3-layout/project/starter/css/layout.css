@@ -1,0 +1,99 @@
+/* ==========================================================================
+   Harbour Night Market — layout.css
+   Where things GO. outfit.css already decides how they look.
+
+   This is YOUR copy: keep the starter folder outside the course repo, so
+   the next git pull never touches your work.
+
+   Work top to bottom, one act at a time. Each block lists what is wrong
+   and the selectors you'll need. Write the declarations yourself.
+   Check every step in DevTools: Elements → the "flex" / "grid" badges
+   next to an element draw its layout on the page.
+   ========================================================================== */
+
+
+/* ---------- Act 1 · Flow ----------------------------------------------------
+   · The ticket form's inputs stick out of the box.
+   · On a big monitor the text runs from edge to edge.
+   · The hero is tiny; it should fill most of the screen.
+
+   *, *::before, *::after  → width means the whole visible box
+   main                    → a max width, centred with auto margins
+   .lead                   → a readable measure (ch)
+   .hero                   → at least 80% of the window's height (vh)
+
+   Watch out: height: 80% does nothing here. Why? (Exercise 1, case 3.)      */
+
+
+
+/* ---------- Act 2 · Position ------------------------------------------------
+   · The Sold out stamps should sit on the corner of the card, like a stamp.
+   · Scroll down and the menu disappears.
+   · The 📍 should be ON the map, at the entrance.
+   · The round back-to-top button should always sit in the bottom-right corner.
+
+   .vendor-card + .badge     → relative parent, absolute child
+   .site-header              → sticky (don't forget top, and z-index)
+   .market-map + .you-are-here
+   .to-top                   → fixed
+
+   Watch out: the stamps are positioned and come after the header in the
+   HTML, so they paint over your sticky header. z-index: 10 on the header.
+   Click "Map" in the menu: the heading hides under the sticky header.
+   html { scroll-padding-top: 5rem; } tells in-page links to stop earlier.
+   Until Act 3 puts the menu in a row, the sticky header is TALL and covers a
+   lot of the page. That's expected, not broken: keep going.
+   outfit.css gives .to-top a margin; set it to 0 once it's fixed.            */
+
+
+
+/* ---------- Act 3 · Flex ----------------------------------------------------
+   · Logo on the left, menu on the right, on one line.
+   · The menu is a list going down.
+   · The "Find the stall" links sit at random heights.
+   · The hero text should be centred vertically.
+
+   .site-header, .main-nav ul    → a row; space-between; gap
+   .vendor-card + .card-link     → a column; margin-top: auto
+   .hero                         → a column; justify-content
+   .site-footer                  → a row, wrapping
+
+   Watch out: flex only lines up DIRECT children. The links are children of
+   the ul, not of the nav. In a column, justify-content is the vertical one.
+   outfit.css gives .main-nav ul a top margin (for the receipt): set it to 0,
+   or the menu sits a little below the logo.
+   margin-top: auto on .card-link shows nothing while the cards are stacked:
+   each card is only as tall as its content. Do the magic line (Act 4) first
+   and the wobbly links appear; then fix them.                                */
+
+
+
+/* ---------- Act 4 · Grid ----------------------------------------------------
+   · Six vendors in one long column; the stalls should stand in rows.
+   · Dumpling Dynasty is the featured stall: its card is twice as wide.
+   · The map should look like the market (floor plan on Exercise 4).
+
+   .vendor-list     → last time's magic line, now you know why
+   .featured        → span 2 columns
+   .market-map      → grid-template-areas; give each .zone a grid-area
+   .ticket-form     → stretch goal: labels left, fields right
+   .gate            → centre its text: a grid inside the grid,
+                      display: grid; place-items: center
+   .vendor-card     → deeper stretch: subgrid, so tags, titles, texts and
+                      links line up across cards (Exercise 4, case 4)
+
+   Watch out: outfit.css spaced things out for a one-column page (margins on
+   the cards, the map zones, the form labels). In a grid, gap does that job.
+   Uncomment this when you start Act 4:                                       */
+
+/* .vendor-card, .zone, .ticket-form label { margin: 0; } */
+
+/* The form has one extra label (the checkbox) and a button: without help
+   they land in the label column. Give .check and button grid-column: 2.    */
+
+
+
+/* ---------- Stretch · @media ------------------------------------------------
+   Redraw the map for a phone: two columns instead of three.
+   And the featured card: span 2 on a one-column phone grid forces a second
+   column. Set it back to grid-column: auto inside the same @media.         */

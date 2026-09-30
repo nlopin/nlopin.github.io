@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flex lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.flex-lab{font-size:1.35rem;align-items:start}.fl-right{grid-template-rows:26rem auto}</style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Flexbox</span>
+    <h1>Line up the <em>stalls</em></h1>
+    <p class="intro">Every button is one declaration. The red arrow is the <strong>main axis</strong> (justify-content works along it), the blue one the <strong>cross axis</strong> (align-items). Flip the direction and watch both arrows turn. Click a stall to grow, shrink or push just that one.</p>
+    <div class="flex-lab"></div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Set <code>justify-content: center</code>, then switch to <code>column</code>. Where did the centring go?</li>
+      <li>Set <code>align-items: flex-start</code>. Why did the stalls stop being the same height?</li>
+      <li>Give stall 1 <code>flex-grow: 1</code>. Then stall 2 too. Then stall 2 <code>flex-grow: 2</code>. Is stall 2 now twice as wide? (Read the blue numbers.)</li>
+      <li>Shrink the container to 30%. Which stalls get squashed? Now give one <code>flex-shrink: 0</code>.</li>
+      <li>Select the last stall and turn on <strong>push it</strong>. That's how a "Log in" button ends up on the right of a nav bar.</li>
+    </ol>
+  </div>
+</body>
+</html>

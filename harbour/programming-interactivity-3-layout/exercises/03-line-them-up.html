@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 3 · Line them up</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Exercise 3b · 10 min · cases 1–3 + 6 in class</span></div>
+    <span class="eyebrow-tag">Act 3 · Flexbox</span>
+    <h1>Line them <em>up</em></h1>
+    <p class="intro">The flex problems of the market page, one per case. The red arrow on each flex container is its <strong>main axis</strong> (<code>justify-content</code>), the blue one the <strong>cross axis</strong> (<code>align-items</code>). Cases 1–3 and 6 in class; 4 and 5 if you finish early.</p>
+    <div class="tip"><p style="margin:0"><strong>Before you type, ask two questions.</strong> ① Which element is the <em>parent</em> of the things I want to line up? <code>display: flex</code> goes there. ② Which way do I want to move them: along the main axis or across it?</p></div>
+    <section class="case">
+      <header><b>1</b><h2>Logo left, menu right</h2></header>
+      <p class="complaint">The menu is a list going down. It should be logo on the left, menu on the right, all on one line.</p>
+      <p>Two flex containers: the header <code>.site-header</code> (its children: logo + nav) and the list <code>.main-nav ul</code> (its children: the links). Links <strong>1.5rem apart</strong>, the logo and the menu <strong>vertically centred</strong> on each other.</p>
+    <div class="live panel" data-solved="✓ Two containers, two axes. The classic nav bar." data-show-html data-flex=".site-header, .main-nav ul" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav class="main-nav" aria-label="Main"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Schedule</a></li><li><a href="#">Tickets</a></li></ul></nav></header><section><p>Page content.</p></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 24px 0 0 24px; }</script>
+      <script type="text/plain" data-role="solution">.site-header { display: flex; justify-content: space-between; align-items: center; } .main-nav ul { display: flex; gap: 1.5rem; }</script>
+      <textarea>/* two parents, two rules */
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Logo on the left, menu on the right", "match": ".logo, .main-nav"}, {"label": "Links in a row, 1.5rem apart", "match": ".main-nav li"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>display: flex</code> only lines up <strong>direct children</strong>. The header's children are the logo and the nav, so the header gets <code>justify-content: space-between</code>. The links are children of the <code>ul</code>, so the <code>ul</code> is the second flex container. <code>align-items: center</code> centres across the main axis (vertically, in a row).</p><pre class="code" data-lang="css">.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-nav ul {
+  display: flex;
+  gap: 1.5rem;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>The wobbly links</h2></header>
+      <p class="complaint">The cards are the same height, but the “Find the stall” links sit at random heights.</p>
+      <p>The row of cards is already flex (read-only). First: why are the cards the same height? Then pin every link (<code>.card-link</code>) to the <strong>bottom</strong> of its card (<code>.vendor-card</code>). Keep the tags their natural width.</p>
+    <div class="live panel" data-solved="✓ margin-top: auto eats the leftover space — like centring, but on one side." data-show-html data-flex=".vendor-list, .vendor-card" data-zoom="1">
+      <script type="text/plain" data-role="html"><section><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience, and so is the chilli oil.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B</h3><p>Vinyl, sorted by mood.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Risograph posters of the port, signed while you wait.</p><a class="card-link" href="#">Find the stall →</a></li></ul></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.vendor-card { flex: 1; margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.vendor-list {
+  display: flex;
+  gap: 1rem;
+}</script>
+      <textarea>.vendor-card {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "All links on one line", "expr": "new Set([...d.querySelectorAll('.card-link')].map(a => Math.round(a.getBoundingClientRect().bottom))).size === 1"}, {"label": "…at the bottom of the cards", "expr": "[...d.querySelectorAll('.card-link')].every(a => a.closest('.vendor-card').getBoundingClientRect().bottom - a.getBoundingClientRect().bottom < 30)"}, {"label": "Title and text stay together", "expr": "[...d.querySelectorAll('.vendor-card')].every(c => c.querySelector('p').getBoundingClientRect().top - c.querySelector('h3').getBoundingClientRect().bottom < 24)"}, {"label": "Tags keep their natural width", "expr": "r('.tag').width < 80"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Cards are the same height because flex items <strong>stretch</strong> across the cross axis by default (<code>align-items: stretch</code>). Inside each card, make a column; the link's <code>margin-top: auto</code> takes all the free space above it and pushes it down. <code>align-items: flex-start</code> stops the tag and link from stretching to full width.</p><pre class="code" data-lang="css">.vendor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.card-link {
+  margin-top: auto;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Centre the hero</h2></header>
+      <p class="complaint">The title sits at the top of the big hero instead of in its middle.</p>
+      <p>The hero is already <code>min-height: 100vh</code> (read-only). With <strong>flex</strong>, centre its content <strong>vertically</strong>. The button must keep its own width. Careful: which axis is vertical in a column?</p>
+    <div class="live panel" data-solved="✓ In a column, justify-content is the vertical one." data-show-html data-flex=".hero" data-zoom="1">
+      <script type="text/plain" data-role="html"><section class="hero"><p class="eyebrow">Friday 16 October · 19:00 – 01:00</p><h1>Harbour Night Market</h1><p>Forty stalls, three stages and one very long table.</p><a class="button" href="#">Get a free ticket</a></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { margin: 0; } .hero { background: radial-gradient(circle at 80% 20%, rgb(255 181 71 / 0.35), transparent 45%), #171b25; } .hero h1 { font: 400 3.2rem/0.9 'Instrument Serif', serif; margin: 0.5rem 0; } .eyebrow { color: #5ec8d8; margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.hero { min-height: 100vh; }</script>
+      <textarea>.hero {
+  display: flex;
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Content stacked in a column", "sel": ".hero", "prop": "flex-direction", "is": "column"}, {"label": "Centred vertically", "expr": "r('.eyebrow').top > r('.hero').top + 60 && near((r('.eyebrow').top + r('.button').bottom) / 2, (r('.hero').top + r('.hero').bottom) / 2, 24)"}, {"label": "The button keeps its size", "expr": "r('.button').width < 260 && r('.button').height < 80"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>flex-direction: column</code> turns the main axis downwards. <code>justify-content</code> always works along the main axis, so now it centres <em>vertically</em>. <code>align-items</code> works across, now horizontally: <code>flex-start</code> keeps everything left-aligned and stops the button from stretching.</p><pre class="code" data-lang="css">.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>The footer</h2></header>
+      <p>Put the two lines at the two ends of the footer. When the window is narrow they should <strong>wrap</strong> onto two lines instead of squashing. Drag the width slider down to 400px to test.</p>
+    <div class="live panel" data-solved="✓ space-between + wrap." data-show-html data-flex=".site-footer" data-resizable="360-1200-1000" data-zoom="1">
+      <script type="text/plain" data-role="html"><footer class="site-footer"><p>Harbour Night Market · Moll de la Fusta, Barcelona</p><p>Made with HTML, CSS and too many dumplings.</p></footer></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+</script>
+      <textarea>.site-footer {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "One at each end", "expr": "w.innerWidth < 640 ? r('p:last-child').top > r('p').top : (near(r('p').top, r('p:last-child').top, 2) && near(r('p:last-child').right, r('footer').right - 20, 2))"}, {"label": "Wraps instead of squashing", "sel": ".site-footer", "prop": "flex-wrap", "is": "wrap"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Flex items shrink before they wrap. <code>flex-wrap: wrap</code> lets them take a new line instead; <code>gap</code> keeps them apart on either line.</p><pre class="code" data-lang="css">.site-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>The subscribe row</h2></header>
+      <p>Input and button on one line, <strong>0.5rem apart</strong>. The input takes <strong>all the remaining space</strong>; the button stays as wide as its text.</p>
+    <div class="live panel" data-solved="✓ flex: 1 = grow into the leftover space." data-show-html data-flex=".subscribe" data-zoom="1.2">
+      <script type="text/plain" data-role="html"><form class="subscribe"><label for="m" class="sr">Email</label><input id="m" type="email" placeholder="you@example.com"><button>Subscribe</button></form></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.subscribe { padding: 20px; } .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }</script>
+      <textarea>.subscribe {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "One line", "expr": "near(r('input').top + r('input').height / 2, r('button').top + r('button').height / 2, 4)"}, {"label": "The input fills the rest", "expr": "near(r('button').right, r('form').right - 20, 2) && near(r('button').left - r('input').right, 8, 1)"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>flex: 1</code> is short for <code>flex-grow: 1; flex-shrink: 1; flex-basis: 0</code>: start from zero and take all the free space. The button keeps its default (<code>flex: 0 1 auto</code>): as wide as its content.</p><pre class="code" data-lang="css">.subscribe {
+  display: flex;
+  gap: 0.5rem;
+}
+.subscribe input {
+  flex: 1;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>6</b><h2>The name that won't truncate</h2></header>
+      <p class="complaint">On a phone the Menu button falls off the card. The long name should end with “…” instead.</p>
+      <p>The row (<code>.row</code>) is flex. The title (<code>.info h3</code>) already has the ellipsis recipe. The button must stay inside the row at every width, and the title must end in “…”. Drag the width. Why doesn't the recipe work?</p>
+    <div class="live panel" data-solved="✓ min-width: 0 removes the flex item's automatic minimum." data-show-html data-flex=".row" data-measure=".info" data-resizable="360-900-560" data-zoom="1">
+      <script type="text/plain" data-role="html"><div class="row"><span class="icon">🥟</span><div class="info"><h3>Dumpling Dynasty — hand-folded xiaolongbao, steamed in front of you</h3><p>Food · stall 12</p></div><a class="btn" href="#">Menu</a></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.row { display: flex; gap: 12px; align-items: center; background: #1b202b; border: 2px solid #3a4254; border-radius: 12px; padding: 12px; margin: 1.25rem; } .icon { font-size: 28px; } h3 { margin: 0; font-size: 1.05rem; } .info p { margin: 2px 0 0; font-size: 0.8rem; } .btn { background: #ffb547; color: #12151d; font-weight: 800; padding: 8px 14px; border-radius: 99px; text-decoration: none; }</script>
+      <textarea>.info {
+  flex: 1;
+}
+.info h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The button stays inside the row", "expr": "r('.btn').right <= r('.row').right - 8"}, {"label": "The title is truncated", "expr": "q('.info h3').scrollWidth > q('.info h3').clientWidth"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>.info</code> is the flex item, and flex items get <code>min-width: auto</code>: never narrower than their min-content. A <code>nowrap</code> title makes that the whole sentence, so the item won't shrink and the h3 never gets narrower than its text — nothing to truncate. <code>min-width: 0</code> on the item removes the floor. (<code>overflow: hidden</code> on <code>.info</code> would too: scroll containers have no automatic minimum.)</p><pre class="code" data-lang="css">.info {
+  flex: 1;
+  min-width: 0;
+}
+.info h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">more</b><h2>Want more?</h2></header>
+      <p>Play with every flex property at once in the <a href="../playgrounds/flex.html">Flex lab</a>. The <a href="../playgrounds/stall-setter.html?set=flex">Stall Setter · Flexbox</a> set has thirteen levels (1–8 in class). At home, 9–13 revisit <code>justify-content</code>, then add <code>gap</code>, <code>flex-wrap</code> and <code>flex-grow</code> — everything from after the break.</p>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+/* Act 1 · Flow — fix the flow before leaving it */
+
+/* width means the whole visible box: inputs stop poking out */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* a readable column: a max width, and auto margins eat the rest */
+main { max-width: 72rem; margin-inline: auto; }
+.lead { max-width: 60ch; }
+
+/* height grows from the content, unless we ask for more */
+.hero { min-height: 80vh; }

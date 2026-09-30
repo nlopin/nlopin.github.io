@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 4 · Draw the floor plan</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .drawing { font: 700 1.05rem/1.5 var(--font-mono); background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.8rem 1.1rem; display: inline-block; white-space: pre; box-shadow: 4px 4px 0 var(--ink); }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Exercise 4 · 11 min · cases 1–4 in class</span></div>
+    <span class="eyebrow-tag">Act 4 · Grid</span>
+    <h1>Draw the <em>floor plan</em></h1>
+    <p class="intro">Grid is the parent drawing lines and the children moving in. The purple dashed lines are the grid lines, with their numbers. Cases 1–4 in class; 5 and 6 if you finish early.</p>
+    <section class="case">
+      <header><b>1</b><h2>The magic line</h2></header>
+      <p class="complaint">Six vendors in one long column. The stalls should stand in rows.</p>
+      <p>Last time you pasted a line you didn't understand. Now write it yourself: as many columns as fit, each <strong>at least 16rem</strong>, sharing the leftover space, with a <strong>1rem gap</strong>. Then drag the window width and watch the columns come and go.</p>
+    <div class="live panel tall" data-solved="✓ You wrote the magic line. It's not magic any more." data-show-html data-grid=".vendor-list" data-resizable="360-1400-1100" data-zoom="1">
+      <script type="text/plain" data-role="html"><section><ul class="vendor-list"><li class="vendor-card featured"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3></li><li class="vendor-card"><span class="tag">Food</span><h3>Churros Till Late</h3></li><li class="vendor-card"><span class="tag">Crafts</span><h3>The Plant Swap</h3></li><li class="vendor-card"><span class="tag">Drinks</span><h3>Mezcal Moon</h3></li></ul></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.vendor-card { margin: 0; }</script>
+      <script type="text/plain" data-role="solution">.vendor-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; }</script>
+      <textarea>.vendor-list {
+  display: grid;
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Cards on the chalk marks", "match": ".vendor-card"}, {"label": "Uses repeat(auto-fill, …)", "require": "repeat\\(\\s*auto-(fill|fit)"}, {"label": "Uses minmax(16rem, 1fr)", "require": "minmax\\(\\s*(16rem|256px)\\s*,\\s*1fr\\s*\\)"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Read it inside out. <code>minmax(16rem, 1fr)</code>: a column is never narrower than 16rem, and shares the leftover space as <code>1fr</code>. <code>repeat(auto-fill, …)</code>: make as many of those columns as fit in the row. Wide window → more columns; phone → one. No media query needed.</p><pre class="code" data-lang="css">.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>The star stall</h2></header>
+      <p class="complaint">Dumpling Dynasty is the featured stall: its card should be twice as wide.</p>
+    <div class="live panel tall" data-solved="✓ span 2: take two columns from wherever you land." data-show-html data-grid=".vendor-list" data-zoom="1">
+      <script type="text/plain" data-role="html"><section><ul class="vendor-list"><li class="vendor-card featured"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3></li><li class="vendor-card"><span class="tag">Food</span><h3>Churros Till Late</h3></li><li class="vendor-card"><span class="tag">Crafts</span><h3>The Plant Swap</h3></li><li class="vendor-card"><span class="tag">Drinks</span><h3>Mezcal Moon</h3></li></ul></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.vendor-card { margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+}</script>
+      <script type="text/plain" data-role="solution">.featured { grid-column: span 2; }</script>
+      <textarea>.featured {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "The featured card spans two columns", "match": ".vendor-card"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>grid-column: span 2</code> means: whatever column I start in, cover two. The other cards flow around it into the next free cells.</p><pre class="code" data-lang="css">.featured {
+  grid-column: span 2;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Draw the map</h2></header>
+      <p class="complaint">The map should look like the market: here is the floor plan.</p>
+      <div class="drawing">┌──────────────────┬───────┐
+│      stage       │       │
+├───────┬──────────┤ pier  │
+│       │  table   │       │
+│ food  ├──────────┼───────┤
+│       │  crafts  │drinks │
+├───────┴──────────┴───────┤
+│           gate           │
+└──────────────────────────┘</div>
+      <p>The grid's columns and rows are set (read-only), and every zone already has a <code>grid-area</code> name. Draw the map with <strong>words</strong>: one string per row, one name per cell. Press <strong>◌ target</strong> to check against the chalk.</p>
+    <div class="live panel tall" data-solved="✓ The map is drawn in words. Grid reads ASCII art." data-show-html data-grid=".market-map" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><section><div class="market-map"><div class="zone stage">stage</div><div class="zone food">food</div><div class="zone table">table</div><div class="zone crafts">crafts</div><div class="zone drinks">drinks</div><div class="zone pier">pier</div><div class="zone gate">gate</div></div></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.zone { margin: 0; }</script>
+      <script type="text/plain" data-role="locked">.market-map {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 5rem 5rem 5rem 3rem;
+  gap: 0.6rem;
+}
+.stage { grid-area: stage; }   .food { grid-area: food; }
+.table { grid-area: table; }   .crafts { grid-area: crafts; }
+.drinks { grid-area: drinks; } .pier { grid-area: pier; }
+.gate { grid-area: gate; }</script>
+      <script type="text/plain" data-role="solution">.market-map { grid-template-areas: "stage stage pier" "food table pier" "food crafts drinks" "gate gate gate"; }</script>
+      <textarea>.market-map {
+  grid-template-areas:
+    ". . ."
+    ". . ."
+    ". . ."
+    ". . .";
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Every zone on its chalk mark", "match": ".zone"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Each string is a row; each word is a cell. Repeating a name makes the area cover several cells. Every row needs the same number of cells, and every area must be a rectangle (an L-shape makes the whole declaration invalid). A <code>.</code> is an empty cell.</p><pre class="code" data-lang="css">.market-map {
+  grid-template-areas:
+    "stage  stage  pier"
+    "food   table  pier"
+    "food   crafts drinks"
+    "gate   gate   gate";
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>4</b><h2>Line up the insides</h2></header>
+      <p class="complaint">The titles have different lengths, so the texts start at different heights. It looks messy.</p>
+      <p>Make every card's four children (tag, title, text, link) share <strong>row lines across all three cards</strong>, like the chalk outline. <code>margin-top: auto</code> can't do this: each card only knows itself. The outer grid can. (A subgrid inherits the list's gaps unless you set your own. The target outline uses the inherited ones; any gap passes.)</p>
+    <div class="live panel tall" data-solved="✓ subgrid: the card borrows the list's rows." data-show-html data-grid=".vendor-list" data-zoom="1">
+      <script type="text/plain" data-role="html"><section><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty, a very long stall name</h3><p>Hand-folded, steamed in front of you.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B</h3><p>Vinyl sorted by mood instead of genre. Ask for rainy Sunday.</p><a class="card-link" href="#">Find the stall →</a></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Posters.</p><a class="card-link" href="#">Find the stall →</a></li></ul></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.vendor-card { margin: 0; } .vendor-card h3, .vendor-card p { margin: 0; } .card-link { align-self: end; }</script>
+      <script type="text/plain" data-role="locked">.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem 1rem;
+}</script>
+      <script type="text/plain" data-role="solution">.vendor-card { display: grid; grid-row: span 4; grid-template-rows: subgrid; }</script>
+      <textarea>.vendor-card {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Titles start on one line", "expr": "new Set([...d.querySelectorAll('.vendor-card h3')].map(e => Math.round(e.getBoundingClientRect().top))).size === 1"}, {"label": "Texts start on one line", "expr": "new Set([...d.querySelectorAll('.vendor-card p')].map(e => Math.round(e.getBoundingClientRect().top))).size === 1"}, {"label": "Links on one line", "expr": "new Set([...d.querySelectorAll('.card-link')].map(e => Math.round(e.getBoundingClientRect().top))).size === 1"}, {"label": "Parts stacked in order inside each card", "expr": "[...d.querySelectorAll('.vendor-card')].every(c => { const k = [...c.children].map(e => e.getBoundingClientRect()); return k.every((b, i) => i === 0 || b.top >= k[i - 1].bottom - 0.5); })"}, {"label": "Uses subgrid", "require": "subgrid"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Each card spans 4 rows of the list's grid and, with <code>grid-template-rows: subgrid</code>, lays its own children on <em>those</em> rows instead of making its own. The row with the longest title is as tall as that title, in every card. A subgrid inherits the parent's gaps unless it sets its own.</p><pre class="code" data-lang="css">.vendor-card {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>The form, in two columns</h2></header>
+      <p>Labels in a column on the left, <strong>as wide as the longest label</strong>. Fields fill the rest. <code>0.8rem</code> between rows, <code>1.5rem</code> between columns, labels vertically centred on their fields. The button sits under the fields, as wide as its text.</p>
+    <div class="live panel" data-solved="✓ max-content: the column is as wide as its widest label." data-show-html data-grid=".ticket-form" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><form class="ticket-form"><label for="n">Name</label><input id="n"><label for="e">Email</label><input id="e" type="email"><label for="a">Arriving</label><select id="a"><option>Early — for the food</option></select><button>Reserve my spot</button></form></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.ticket-form { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.25rem; margin: 1.25rem; } .ticket-form input, .ticket-form select { width: 100%; }</script>
+      <script type="text/plain" data-role="solution">.ticket-form { display: grid; grid-template-columns: max-content 1fr; gap: 0.8rem 1.5rem; align-items: center; } .ticket-form button { grid-column: 2; justify-self: start; }</script>
+      <textarea>.ticket-form {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Everything on its chalk mark", "match": "label, input, select, button"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p><code>max-content</code> sizes the first column to its widest content, so all the fields line up. The form's children fill the cells in order: label, field, label, field… The button would land in column 1, so it's moved to column 2; <code>justify-self: start</code> stops it from stretching across the cell.</p><pre class="code" data-lang="css">.ticket-form {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.8rem 1.5rem;
+  align-items: center;
+}
+.ticket-form button {
+  grid-column: 2;
+  justify-self: start;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">6 · bonus</b><h2>Caption on the photo, no position</h2></header>
+      <p>Lay the caption over the <strong>bottom</strong> of the photo, full width, without <code>position</code>. The hero must still grow if the caption gets longer.</p>
+    <div class="live panel" data-solved="✓ One cell, two layers, still in the flow." data-show-html data-grid=".hero" data-zoom="1.1">
+      <script type="text/plain" data-role="html"><section class="hero"><div class="photo" role="img" aria-label="Lanterns over the harbour"></div><div class="caption"><h1>Harbour Night Market</h1><p>Friday 16 October · 19:00</p></div></section></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+.hero { margin: 1.25rem; border-radius: 14px; overflow: hidden; } .photo { min-height: 220px; background: radial-gradient(circle at 25% 30%, #ffb547 0 18px, transparent 19px), radial-gradient(circle at 70% 25%, #ff6b4a 0 14px, transparent 15px), linear-gradient(#0c1f2b, #1b3a4b); } .caption { padding: 1rem 1.25rem; background: rgb(18 21 29 / 0.75); } .caption h1 { margin: 0; font: 400 2.2rem/1 'Instrument Serif', serif; } .caption p { margin: 0.3rem 0 0; }</script>
+      <script type="text/plain" data-role="solution">.hero { display: grid; } .photo, .caption { grid-area: 1 / 1; } .caption { align-self: end; }</script>
+      <textarea>.hero {
+  
+}
+</textarea>
+      <script type="application/json" data-role="checks">[{"label": "Caption on the bottom of the photo", "match": ".photo, .caption"}, {"label": "No position", "forbid": "position"}]</script>
+    </div>
+      <details><summary>Why it works</summary><p>Items placed in the same cell overlap; later in the HTML paints on top (grid items also accept <code>z-index</code> without <code>position</code>). <code>align-self: end</code> drops the caption to the bottom of the cell. Unlike an absolute caption, it still contributes to the row's height.</p><pre class="code" data-lang="css">.hero { display: grid; }
+.photo, .caption { grid-area: 1 / 1; }
+.caption { align-self: end; }</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">more</b><h2>Want more?</h2></header>
+      <p><a href="../playgrounds/grid.html">Grid lab</a>: type any grid and see its lines. <a href="../playgrounds/stall-setter.html?set=grid">Stall Setter · Grid</a>: ten levels, from <code>1fr</code> to the magic line.</p>
+    </section>
+  </div>
+</body>
+</html>

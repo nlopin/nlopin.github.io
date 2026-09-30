@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Layout · cheat sheet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <script src="assets/kit.js" defer></script>
+  <style>
+    .sheet { columns: 3 19rem; column-gap: 1.25rem; }
+    .box { break-inside: avoid; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.8rem 1rem 0.9rem; margin: 0 0 1.25rem; }
+    .box h2 { margin: 0 0 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .box h2 span { font: 800 0.7rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.2rem 0.45rem; border-radius: 0.25rem; }
+    .box pre.code { font-size: 0.78rem; padding: 0.6rem 0.75rem; margin: 0.4rem 0; }
+    .box table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .box td { padding: 0.25rem 0.3rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .box td:first-child { white-space: nowrap; }
+    .box p, .box li { font-size: 0.88rem; margin: 0.3rem 0; }
+    .box ol, .box ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+    .print { font: 700 0.85rem var(--font-mono); border: 2px solid var(--ink); background: var(--yellow); padding: 0.5rem 0.9rem; border-radius: 0.4rem; cursor: pointer; }
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .page { background: #fff; font-size: 10pt; }
+      .page-top, .print, .intro { display: none; }
+      .page-wrap { padding: 0; max-width: none; }
+      .page h1 { font-size: 20pt; margin-bottom: 4mm; }
+      .sheet { columns: 3; column-gap: 5mm; }
+      .box { padding: 2.5mm 3mm; margin-bottom: 3mm; border-width: 1px; }
+      .box pre.code { font-size: 7pt; }
+      .box td, .box p, .box li { font-size: 8pt; }
+    }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Layout · all materials</a><button class="print" type="button" onclick="print()">🖨 Print (A4 landscape)</button></div>
+    <h1>Layout <em>on one page</em></h1>
+    <p class="intro">Everything from Lecture 3, condensed. Print it, stick it next to your screen.</p>
+
+    <div class="sheet">
+      <section class="box">
+        <h2><span>0</span> Who decides the width?</h2>
+        <table>
+          <tr><td><b>flow</b></td><td>the parent (fills it) · height from content</td></tr>
+          <tr><td><b>absolute</b></td><td>content · or <code>left</code> + <code>right</code></td></tr>
+          <tr><td><b>flex item</b></td><td>content, then grow / shrink · stretches across</td></tr>
+          <tr><td><b>grid item</b></td><td>its track, both ways</td></tr>
+        </table>
+        <p>Layout surprises you? First ask: <b>which algorithm is in charge?</b> The parent's <code>display</code> and the box's own <code>position</code> decide.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>1</span> Flow</h2>
+        <pre class="code" data-lang="css">*, *::before, *::after { box-sizing: border-box; }
+main { max-width: 72rem; margin-inline: auto; }
+.hero { min-height: 100vh; }</pre>
+        <ul>
+          <li>Blocks stack down, inline boxes flow along the line.</li>
+          <li><b>Width flows down</b> (from the parent), <b>height grows up</b> (from the children). So <code>height: 50%</code> of an <code>auto</code>-height parent is ignored.</li>
+          <li><code>auto</code> margins eat leftover space → centring.</li>
+          <li>Vertical margins between blocks collapse: the bigger wins.</li>
+          <li><code>inline-block</code>: sits in the line, sized like a block.</li>
+        </ul>
+      </section>
+
+      <section class="box">
+        <h2><span>2</span> Position</h2>
+        <table>
+          <tr><td><code>static</code></td><td>default, offsets ignored</td></tr>
+          <tr><td><code>relative</code></td><td>nudge from its seat; seat kept. Anchor for children</td></tr>
+          <tr><td><code>absolute</code></td><td>out of flow; from nearest <b>positioned</b> ancestor, else the first screen of the page</td></tr>
+          <tr><td><code>fixed</code></td><td>out of flow; from the window</td></tr>
+          <tr><td><code>sticky</code></td><td>flow, then sticks at <code>top</code> while its parent is visible</td></tr>
+        </table>
+        <pre class="code" data-lang="css">.card  { position: relative; }
+.badge { position: absolute; top: 0; right: 0; }
+.cover { position: absolute; inset: 0; }</pre>
+        <p>Who's in front: ① positioned elements paint above normal ones ② then later in the HTML wins ③ <code>z-index</code> overrides (positioned or flex/grid items only; bigger = in front).</p>
+      </section>
+
+      <section class="box">
+        <h2><span>3</span> Flexbox · the container</h2>
+        <pre class="code" data-lang="css">.nav {
+  display: flex;
+  flex-direction: row;       /* main axis */
+  justify-content: space-between; /* along */
+  align-items: center;       /* across */
+  flex-wrap: wrap;
+  gap: 1rem;
+}</pre>
+        <p><b>justify</b> = along the main axis, <b>align</b> = across. In a column they swap: <code>justify-content: center</code> centres <em>vertically</em>.</p>
+        <p>Only <b>direct children</b> become flex items.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>4</span> Flexbox · the items</h2>
+        <table>
+          <tr><td><code>flex: 1</code></td><td>take an equal share (a very long word still won't shrink: add <code>min-width: 0</code>)</td></tr>
+          <tr><td><code>flex-grow: 1</code></td><td>take leftover space</td></tr>
+          <tr><td><code>flex-shrink: 0</code></td><td>never squash me</td></tr>
+          <tr><td><code>flex-basis</code></td><td>starting size (default: content)</td></tr>
+          <tr><td><code>margin-left: auto</code></td><td>push me (and what follows) to the end</td></tr>
+          <tr><td><code>margin-top: auto</code></td><td>push me to the bottom of a column</td></tr>
+          <tr><td><code>align-self</code></td><td>my own cross-axis alignment</td></tr>
+        </table>
+      </section>
+
+      <section class="box">
+        <h2><span>5</span> Grid · tracks</h2>
+        <pre class="code" data-lang="css">.list {
+  display: grid;
+  grid-template-columns: 200px 1fr 2fr;
+  grid-template-rows: auto 10rem;
+  gap: 1rem 2rem; /* rows columns */
+}
+/* the magic line */
+grid-template-columns:
+  repeat(auto-fill, minmax(16rem, 1fr));</pre>
+        <p><code>fr</code> = a share of the leftover space. <code>max-content</code> = as wide as the widest content.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>6</span> Grid · placing</h2>
+        <pre class="code" data-lang="css">.featured { grid-column: span 2; }
+.banner   { grid-column: 1 / -1; }
+.stage    { grid-column: 2 / 4; grid-row: 1 / 3; }</pre>
+        <p>Numbers are <b>lines</b>: 4 columns have 5 lines. <code>-1</code> = the last line.</p>
+        <pre class="code" data-lang="css">.map {
+  grid-template-areas:
+    "stage stage pier"
+    "food  table pier";
+}
+.stage { grid-area: stage; }</pre>
+        <p>Same number of cells per row, rectangles only, <code>.</code> = empty. One mistake → whole declaration ignored.</p>
+        <p><code>place-items: center</code> centres every item in its cell.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>8</span> Deeper · the mechanics</h2>
+        <table>
+          <tr><td><b>intrinsic</b></td><td><code>min-content</code> (longest word) · <code>max-content</code> (no wrap) · <code>fit-content</code> = min(max, max(min, available))</td></tr>
+          <tr><td><b>BFC</b></td><td>margins collapse inside one; <code>display: flow-root</code> starts a new one. Flex/grid never collapse</td></tr>
+          <tr><td><b>containing block</b></td><td>absolute: padding box of nearest positioned <em>or transformed/filtered/contained</em> ancestor. fixed: the viewport, unless such an ancestor traps it</td></tr>
+          <tr><td><b>stacking</b></td><td><code>z-index</code> only ranks inside its context. Contexts: positioned+z, opacity&lt;1, transform, filter, <code>isolation: isolate</code></td></tr>
+          <tr><td><b>flex</b></td><td>basis → grow by <em>share</em> → shrink by <code>shrink × basis</code>. Floor: <code>min-width: auto</code> (min-content) → <code>min-width: 0</code></td></tr>
+          <tr><td><b>grid</b></td><td><code>1fr</code> = <code>minmax(auto, 1fr)</code> → <code>minmax(0, 1fr)</code>. <code>auto-fit</code> collapses empty tracks, <code>auto-fill</code> keeps them. <code>dense</code> back-fills holes</td></tr>
+          <tr><td><b>tricks</b></td><td>overlap: <code>grid-area: 1 / 1</code> on both · <code>grid-template-rows: subgrid</code> · <code>@container</code> asks the parent</td></tr>
+          <tr><td><b>a11y</b></td><td><code>order</code>, <code>*-reverse</code>, <code>dense</code> move pixels, not Tab order (WCAG 1.3.2, 2.4.3)</td></tr>
+        </table>
+      </section>
+
+      <section class="box">
+        <h2><span>7</span> Flex or grid?</h2>
+        <ul>
+          <li>A <b>line</b> of things, sized by their content → <b>flex</b> (nav, buttons, card insides).</li>
+          <li><b>Rows and columns</b> that must line up → <b>grid</b> (cards, maps, forms, page skeleton).</li>
+          <li>They nest: a grid of cards, each card a flex column.</li>
+        </ul>
+        <pre class="code" data-lang="css">@media (max-width: 40rem) {
+  .market-map {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "stage  stage"
+      "food   table"
+      "food   crafts"
+      "drinks pier"
+      "gate   gate";
+  }
+}</pre>
+        <p>Redraw <b>every</b> area and reset the columns: a zone whose area is missing lands in a stray corner cell.</p>
+        <p><b>DevTools:</b> click the <code>flex</code> / <code>grid</code> badge next to an element in the Elements panel to draw its layout.</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

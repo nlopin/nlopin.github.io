@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 5 · Open the market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    
+    .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 1rem 0; }
+    .steps li { background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; padding: 1rem 1.1rem; box-shadow: 4px 4px 0 var(--ink); }
+    .steps b { display: block; font: 800 0.75rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .steps h3 { margin: 0.2rem 0 0.5rem; font-size: 1.2rem; }
+    .steps ul { margin: 0; padding-left: 1.1rem; }
+    .steps li li { border: 0; box-shadow: none; padding: 0; background: none; margin: 0.25rem 0; font-size: 0.95rem; }
+    .steps a { font: 700 0.85rem var(--font-mono); }
+    .trouble { width: 100%; max-width: 70rem; border-collapse: collapse; background: var(--white); border: 2px solid var(--ink); }
+    .trouble th, .trouble td { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); }
+    .trouble th { font: 700 0.8rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; background: var(--ink); color: var(--yellow); }
+    .trouble td:first-child { font-weight: 700; width: 30%; }
+
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Exercise 5 · finale · 15 min + homework</span></div>
+    <span class="eyebrow-tag">Finale</span>
+    <h1>Open the <em>market</em></h1>
+    <p class="intro">This is the recap of the lecture — by building it. You rebuild everything from today, act by act, in your own project: one file, <code>css/layout.css</code>. The look stays in <code>css/outfit.css</code>.</p>
+    <div class="tip"><p style="margin:0"><strong>How to recap.</strong> Take one act at a time, in order. Write it <strong>from memory</strong> first, then compare with the <a href="../project/showcase/index.html?step=1">showcase</a> at that step (switcher 1–4). Only when you're stuck, reopen that act's exercise page: your solution is still there. For every box, ask: <em>which algorithm places it, and who decides its width?</em></p></div>
+
+    <h2>Set up (1 minute)</h2>
+    <ol class="tasks">
+      <li><strong>Copy</strong> <code>03-layout/project/starter/</code> out of the course repo into your own folder (or unzip <a href="../project/starter.zip">starter.zip</a> there), and open that copy in your editor. Don't edit inside the repo: the next <code>git pull</code> would fight your changes. New in the HTML: a <strong>map</strong>, <strong>"Find the stall" links</strong> on the cards, a <strong>back-to-top</strong> button.</li>
+      <li>Open <code>css/layout.css</code>. Every act has a block with its problems, the selectors you'll need and a "watch out" line.</li>
+      <li>Keep the <a href="../project/showcase/index.html?step=4">finished showcase</a> open in a tab. Its switcher (0–4) shows the page act by act.</li>
+    </ol>
+    <p><small><strong>At home, optional:</strong> use your own look from last time. Copy your <code>style.css</code> into <code>css/</code>, point the first <code>&lt;link&gt;</code> at it, and delete its "layout magic" line. Expect a few cascade fights: that's Exercise 1, case 6.</small></p>
+
+    <h2>The checklist</h2>
+    <ul class="steps">
+      <li><b>Act 1 · Flow</b><h3>Fix the flow</h3><ul><li>box-sizing reset</li><li><code>main</code>: max-width + auto margins</li><li>hero: <code>min-height</code> in <code>vh</code></li></ul><a href="../project/showcase/index.html?step=1">see step 1 →</a></li>
+      <li><b>Act 2 · Position</b><h3>Pin things</h3><ul><li>stamps on the card corners</li><li>sticky header (with z-index)</li><li>📍 on the map's entrance</li><li>fixed back-to-top</li></ul><a href="../project/showcase/index.html?step=2">see step 2 →</a></li>
+      <li><b>Act 3 · Flex</b><h3>Line things up</h3><ul><li>header: logo left, nav right</li><li>nav links in a row</li><li>card links at the bottom <small>(do the magic line first: stacked cards have no wobble to fix)</small></li><li>hero centred vertically</li><li>footer: two ends, wrapping</li></ul><a href="../project/showcase/index.html?step=3">see step 3 →</a></li>
+      <li><b>Act 4 · Grid</b><h3>Draw the floor plan</h3><ul><li>vendor grid (the magic line)</li><li>featured card spans 2</li><li>the map with <code>grid-template-areas</code></li><li>stretch: the form in two columns</li><li>stretch: <code>@media</code> map for phones</li><li>deeper stretch: <code>subgrid</code> cards · <code>@container</code> instead of <code>@media</code></li></ul><a href="../project/showcase/index.html?step=4">see step 4 →</a></li>
+    </ul>
+    <p><strong>In class: Acts 1–3 + the magic line.</strong> Then finish the recap at home: the map, the form and <code>@media</code>. Submit on Google Classroom before next time: a zip of your <code>starter/</code> folder or a link to your repo.</p>
+
+    <h2>Use the layout inspector</h2>
+    <p>DevTools → Elements. Next to every flex or grid container there's a little <code>flex</code> / <code>grid</code> badge. Click it: the browser draws the lines, the gaps and the area names on the page. Firefox's grid inspector is even better.</p>
+
+    <h2>When it doesn't work</h2>
+    <table class="trouble">
+      <tr><th>Symptom</th><th>Usual reason</th></tr>
+      <tr><td>My absolute element flew to the corner of the page</td><td>No ancestor has <code>position</code> other than <code>static</code>. Put <code>position: relative</code> on the one you mean.</td></tr>
+      <tr><td>Sticky doesn't stick</td><td>No <code>top</code> value. Or its parent is only as tall as it is (sticky can't leave its parent). Or an ancestor has <code>overflow: hidden</code>.</td></tr>
+      <tr><td><code>justify-content</code> does nothing</td><td>You put it on the item, not the flex container. Or you're in a column and wanted <code>align-items</code>. Or there's no free space to distribute (an item has <code>flex: 1</code>).</td></tr>
+      <tr><td>Flex items squash their text</td><td>They shrink by default. <code>flex-shrink: 0</code> on the one that must keep its size, or <code>flex-wrap: wrap</code> on the container.</td></tr>
+      <tr><td><code>height: 100%</code> does nothing</td><td>The parent's height is <code>auto</code>. Use <code>min-height</code> with <code>vh</code>, or let flex/grid stretch it.</td></tr>
+      <tr><td>My <code>grid-template-areas</code> is ignored</td><td>Rows have different numbers of cells, an area isn't a rectangle, or a missing quote. One mistake invalidates the whole declaration: DevTools shows it crossed out with ⚠.</td></tr>
+      <tr><td>The layout rule is there but crossed out</td><td>It's losing the cascade. Your old <code>style.css</code> may have a more specific rule. Act 1, case 6.</td></tr>
+      <tr><td>Something sticks out sideways</td><td>No box-sizing reset, or a fixed <code>width</code> in px. Add the reset; prefer <code>max-width</code>.</td></tr>
+    </table>
+  </div>
+</body>
+</html>

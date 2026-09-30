@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grid lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 26rem; margin-top: 1rem; }
+    .case .panel.tall { height: 34rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    .complaint::after { content: none; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Layout · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Grid</span>
+    <h1>Grid <em>lab</em></h1>
+    <p class="intro">Seven numbered boxes in a grid container. Edit anything; the purple lines are the grid lines with their numbers, like DevTools draws them. Drag the window width to see how the tracks respond.</p>
+    <h2>1 · Tracks and fr</h2>
+    <p>Try <code>200px 1fr 2fr</code>, then <code>repeat(4, 1fr)</code>, then <code>repeat(auto-fill, minmax(10rem, 1fr))</code>.</p>
+    <div class="live panel tall" data-solved="✓ Solved" data-show-html data-grid=".g" data-resizable="360-1400-1000" data-zoom="1">
+      <script type="text/plain" data-role="html"><div class="g"><div class="c c1">1</div><div class="c c2">2</div><div class="c c3">3</div><div class="c c4">4</div><div class="c c5">5</div><div class="c c6">6</div><div class="c c7">7</div></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1rem; } .g { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 12px; padding: 0.6rem; } .c { background: #ffc46b; color: #12151d; font-weight: 800; border-radius: 8px; padding: 0.8rem; min-height: 3rem; } .c1 { background: #ff8a6b; } .c2 { background: #e8d9b8; } .c3 { background: #b8e0a0; } .c4 { background: #f0a6d8; }</script>
+      <textarea>.g {
+  display: grid;
+  grid-template-columns: 200px 1fr 2fr;
+  gap: 0.6rem;
+}
+</textarea>
+    </div>
+
+    <h2>2 · Place by line numbers</h2>
+    <p>Box 1 goes from column line 1 to 3 and row line 1 to 3. Try <code>span</code>, try <code>-1</code>.</p>
+    <div class="live panel tall" data-solved="✓ Solved" data-show-html data-grid=".g" data-zoom="1">
+      <script type="text/plain" data-role="html"><div class="g"><div class="c c1">1</div><div class="c c2">2</div><div class="c c3">3</div><div class="c c4">4</div><div class="c c5">5</div><div class="c c6">6</div><div class="c c7">7</div></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1rem; } .g { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 12px; padding: 0.6rem; } .c { background: #ffc46b; color: #12151d; font-weight: 800; border-radius: 8px; padding: 0.8rem; min-height: 3rem; } .c1 { background: #ff8a6b; } .c2 { background: #e8d9b8; } .c3 { background: #b8e0a0; } .c4 { background: #f0a6d8; }</script>
+      <textarea>.g {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+}
+.c1 {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+</textarea>
+    </div>
+
+    <h2>3 · Draw with words</h2>
+    <p>Rename the areas, move them around. An L-shaped area breaks the whole declaration: try it.</p>
+    <div class="live panel tall" data-solved="✓ Solved" data-show-html data-grid=".g" data-zoom="1">
+      <script type="text/plain" data-role="html"><div class="g"><div class="c c1">1</div><div class="c c2">2</div><div class="c c3">3</div><div class="c c4">4</div><div class="c c5">5</div></div></script>
+      <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; } 
+body { margin: 0; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+.site-header { padding: 0.8rem 1.25rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+section, .content { padding: 1.25rem; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 0.8rem; }
+.vendor-card h3 { font-size: 1.3rem; margin: 0.5rem 0 0.3rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.badge { font: 800 0.85rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.35rem 0.5rem; border-radius: 6px; background: #1b202b; }
+.card-link { font-weight: 700; text-decoration: none; }
+.button { display: inline-block; background: #ffb547; color: #12151d; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 99px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.75rem; }
+.zone { font-weight: 700; font-size: 0.9rem; padding: 0.6rem; border-radius: 8px; color: #12151d; margin-bottom: 0.5rem; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.you-are-here { font: 800 0.75rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; background: #5ec8d8; color: #12151d; padding: 0.4rem 0.6rem; border-radius: 99px; }
+.to-top { display: inline-block; width: 3rem; height: 3rem; line-height: 3rem; text-align: center; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #12151d; background: #5ec8d8; border-radius: 50%; }
+.site-footer { padding: 1rem 1.25rem; border-top: 2px solid #3a4254; font-size: 0.9rem; }
+.site-footer p { margin: 0; }
+label { font-weight: 700; }
+input:not([type=checkbox]), select { font: inherit; color: #f3ecdf; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.5rem 0.7rem; }
+button { font: 800 0.95rem "Bricolage Grotesque", system-ui, sans-serif; background: #ffb547; color: #12151d; border: 0; border-radius: 99px; padding: 0.7rem 1.3rem; }
+body { padding: 1rem; } .g { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 12px; padding: 0.6rem; } .c { background: #ffc46b; color: #12151d; font-weight: 800; border-radius: 8px; padding: 0.8rem; min-height: 3rem; } .c1 { background: #ff8a6b; } .c2 { background: #e8d9b8; } .c3 { background: #b8e0a0; } .c4 { background: #f0a6d8; }</script>
+      <textarea>.g {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-areas:
+    "a a d"
+    "b c d"
+    "e e e";
+  gap: 0.6rem;
+}
+.c1 { grid-area: a; }
+.c2 { grid-area: b; }
+.c3 { grid-area: c; }
+.c4 { grid-area: d; }
+.c5 { grid-area: e; }
+</textarea>
+    </div>
+  </div>
+</body>
+</html>
