@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 1 · Pocket check</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 30rem; margin-top: 1rem; }
+    .case .panel.tall { height: 36rem; }
+    .case .panel.huge { height: 46rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .loop { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font: 700 0.95rem var(--font-mono); margin: 0.4rem 0 0; }
+    .loop span { background: var(--white); border: 2px solid var(--ink); border-radius: 99px; padding: 0.35rem 0.8rem; }
+    .loop i { font-style: normal; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Exercise 1 · 12 min · cases 0–3 in class, 4–5 at home</span></div>
+    <span class="eyebrow-tag">Act 1 · Small screens</span>
+    <h1>Pocket <em>check</em></h1>
+    <p class="intro">The market page, one phone problem at a time. Every editor has a window-width slider and three presets (📱 360 · ▭ 800 · 🖥 1200). The checks test <strong>every width at once</strong>, so a fix for the phone that breaks the laptop doesn't pass. A red 🦝 means something makes the page scroll sideways.</p>
+    <div class="tip"><p style="margin:0"><strong>Mobile first.</strong> Rules outside any <code>@media</code> are for the phone. Wider screens get <em>extras</em>, in <code>@media (width &gt;= …)</code>. Breakpoints come from where <em>your content</em> breaks: drag the slider until it looks wrong. Use <code>rem</code>, not device names.</p></div>
+
+    <section class="case">
+      <header><b>0</b><h2>First, the real phone</h2></header>
+      <p class="complaint">On my phone the market is a tiny desktop page. I have to pinch to read anything.</p>
+      <p>This one happens in <strong>your project</strong>, not on this page (a live editor can't fake a phone's browser).</p>
+      <ol class="tasks">
+        <li>Open your copy of <code>04-responsive-dom/project/starter/index.html</code>. In DevTools, turn on the <strong>device toolbar</strong> (<kbd>⌘ ⇧ M</kbd> / <kbd>Ctrl ⇧ M</kbd>) and pick a phone. Tiny, right? That's the browser pretending to be 980px wide.</li>
+        <li>Add the missing line to the <code>&lt;head&gt;</code>: <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code>. Reload. Now the page is as wide as the phone, and it breaks honestly: that's what cases 1–3 fix.</li>
+        <li>Optional, 1 minute: start your server with <code>npx live-server</code>, find the <em>Network</em> address it prints (like <code>http://192.168.1.23:8080</code>) and open it on your phone, on the same Wi-Fi.</li>
+      </ol>
+    </section>
+    <section class="case">
+      <header><b>1</b><h2>The menu runs off the screen</h2></header>
+      <p class="complaint">On a phone the menu runs off the right edge, and the whole page wobbles sideways.</p>
+      <p>This is last time's header. Drag the width to 360px (or press 📱): the red 🦝 marks the element sticking out. Keep the logo and the links on <strong>one line on wide screens</strong>, and let them <strong>wrap</strong> on narrow ones. No media query needed.</p>
+      <div class="live panel" data-show-html data-solved="✓ flex-wrap: the cheapest responsive design there is." data-resizable="320-1400-360" data-presets="360,800,1200" data-burglars data-zoom="1">
+        <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav class="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Schedule</a></li><li><a href="#">FAQ</a></li><li><a href="#">Tickets</a></li></ul></nav></header><p>Page content.</p></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <textarea>
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-nav ul {
+  display: flex;
+  gap: 1.5rem;
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "No sideways scroll at 360px", "noScroll": [360]}, {"label": "Still one line at 1200px", "at": [1200], "expr": "[...d.querySelectorAll('.main-nav li')].every(li => near(li.getBoundingClientRect().top, r('.main-nav li').top, 4)) && near(r('.logo').top + r('.logo').height / 2, r('.main-nav li').top + r('.main-nav li').height / 2, 10)"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>A flex line never breaks unless you let it: <code>flex-wrap: wrap</code>. On the header, the nav drops under the logo when they don't fit side by side; on the list, the links wrap onto a second line. A <code>row-gap</code> keeps the lines apart. The layout adapts <em>without asking the window anything</em>.</p><pre class="code" data-lang="css">.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+}
+.main-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>The featured stall</h2></header>
+      <p class="complaint">On a phone the featured card forces a second column. Everything is squeezed, then the page scrolls sideways.</p>
+      <p>Mobile first: the phone is the default, and the <em>extra</em> (spanning two columns) is only switched on where there's room for it. Wrap the <code>.featured</code> rule in a <code>min-width</code> media query. Where should the breakpoint be? Drag the slider and find the width where two columns first fit.</p>
+      <div class="live panel" data-show-html data-solved="✓ The phone is the base, the span is the extra." data-resizable="320-1400-360" data-presets="360,800,1200" data-burglars data-zoom="1">
+        <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card featured"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Risograph posters of the port.</p></li><li class="vendor-card"><span class="tag">Drinks</span><h3>Mezcal Moon</h3><p>Small-batch mezcal.</p></li></ul></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <textarea>
+.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+.featured {
+  grid-column: span 2;
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "No sideways scroll at 360 or 500px", "noScroll": [360, 500]}, {"label": "One column on a phone", "at": [360], "expr": "near(r('.featured').width, r('.vendor-card:nth-child(2)').width, 2)"}, {"label": "Featured spans 2 at 1200px", "at": [1200], "expr": "r('.featured').width > 1.8 * r('.vendor-card:nth-child(2)').width"}, {"label": "Mobile first: a min-width query", "require": "@media[^{]*(min-width|width\\s*>=?)"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>Outside any <code>@media</code>: the phone. Inside <code>@media (width &gt;= 34rem)</code>: things that only make sense with room. Why about 34rem? Two 15rem columns + a 1rem gap + 2rem of body padding = 33rem, plus a little slack so the cards don't sit at their exact minimum. You'd find it by dragging, not from a list of iPhone sizes. <code>(width &gt;= 34rem)</code> is the newer range syntax; <code>(min-width: 34rem)</code> means the same and works in older browsers too.</p><pre class="code" data-lang="css">.featured {
+  /* nothing: on a phone it's a card like any other */
+}
+@media (width >= 34rem) {
+  .featured {
+    grid-column: span 2;
+  }
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Redraw the map for big screens</h2></header>
+      <p class="complaint">The phone map is fine. On a laptop it's a tall, narrow tower.</p>
+      <p>The phone map is already in the stylesheet (read-only). Inside a media query, redraw it for wide windows: three columns, <code>1fr 2fr 1fr</code>, following the floor plan in the comment. Only the drawing changes; the HTML order never does.</p>
+      <div class="live panel tall" data-show-html data-solved="✓ Same zones, redrawn: grid-template-areas inside a query." data-resizable="320-1400-1200" data-presets="360,800,1200" data-grid=".market-map" data-zoom="1">
+        <script type="text/plain" data-role="html"><div class="market-map"><div class="zone stage">Main stage</div><div class="zone food">Food street</div><div class="zone table">Long table</div><div class="zone crafts">Crafts corner</div><div class="zone drinks">Drinks</div><div class="zone pier">The pier</div><div class="zone gate">Entrance</div></div></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <script type="text/plain" data-role="locked">.market-map {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 4rem;
+  grid-template-areas:
+    "stage  stage"
+    "food   table"
+    "food   crafts"
+    "drinks pier"
+    "gate   gate";
+}
+.stage { grid-area: stage; } .food { grid-area: food; } .table { grid-area: table; }
+.crafts { grid-area: crafts; } .drinks { grid-area: drinks; } .pier { grid-area: pier; } .gate { grid-area: gate; }</script>
+        <textarea>
+/* From 50rem up, the floor plan:
+   stage  stage  pier
+   food   table  pier
+   food   crafts drinks
+   gate   gate   gate        */
+@media (width >= 50rem) {
+  .market-map {
+
+  }
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Phone: two columns, pier in row 4", "at": [360], "expr": "r('.pier').top > r('.crafts').bottom - 2 && near(r('.stage').width, r('.gate').width)"}, {"label": "1200px: pier on the right, two rows tall", "at": [1200], "expr": "near(r('.stage').top, r('.pier').top) && r('.pier').left > r('.table').right - 2 && near(r('.pier').bottom, r('.table').bottom)"}, {"label": "1200px: the gate spans the whole width", "at": [1200], "expr": "near(r('.gate').width, r('.stage').width + r('.pier').width + 8, 3)"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>Inside the query you only override what changes: the columns and the areas. Everything else (the gap, the row height, each zone's <code>grid-area</code>) carries on from the phone rules.</p><pre class="code" data-lang="css">@media (width >= 50rem) {
+  .market-map {
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-areas:
+      "stage  stage  pier"
+      "food   table  pier"
+      "food   crafts drinks"
+      "gate   gate   gate";
+  }
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>4</b><h2>Not every query is about width</h2></header>
+      <p class="complaint">On my phone, a card I tapped stays lifted. And my friend with motion sickness says the page scrolls “like a rollercoaster”.</p>
+      <p>Phones have no hover: after a tap, <code>:hover</code> sticks. Put the lift inside <code>@media (hover: hover)</code>. And some people ask their system for <em>less motion</em>: only turn on smooth scrolling inside <code>@media (prefers-reduced-motion: no-preference)</code>.</p>
+      <div class="live panel" data-show-html data-solved="✓ Queries about the device and the person, not just the width." data-resizable="320-1400-800" data-zoom="1">
+        <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Risograph posters of the port.</p></li></ul></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <textarea>
+.vendor-list {
+  display: grid;
+  gap: 1rem;
+}
+.vendor-card {
+  transition: translate 0.2s;
+}
+.vendor-card:hover {
+  translate: 0 -6px;
+  border-color: #5ec8d8;
+}
+html {
+  scroll-behavior: smooth;
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "The lift only where hover exists", "require": "@media\\s*\\(\\s*hover\\s*:\\s*hover\\s*\\)\\s*\\{[^@]*\\.vendor-card:hover"}, {"label": "Smooth scroll only for no-preference", "require": "@media\\s*\\(\\s*prefers-reduced-motion\\s*:\\s*no-preference\\s*\\)\\s*\\{[^@]*scroll-behavior"}, {"label": "No hover lift outside the query", "forbid": "\\.vendor-card:hover", "outside": true}, {"label": "No smooth scroll outside that query", "forbid": "scroll-behavior", "outside": true}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>Try them without changing your settings: DevTools → ⋮ → More tools → <strong>Rendering</strong> → <em>Emulate CSS media feature</em> <code>prefers-reduced-motion</code>. The same panel emulates <code>prefers-color-scheme</code> and <code>print</code>.</p><pre class="code" data-lang="css">@media (hover: hover) {
+  .vendor-card:hover {
+    translate: 0 -6px;
+    border-color: #5ec8d8;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>One variable, every breakpoint</h2></header>
+      
+      <p>The spacing is hard-coded in three places. Make a custom property <code>--gutter</code> on <code>:root</code>: <code>1rem</code> on phones, <code>2.5rem</code> from <code>50rem</code> up. Use it for the body padding and the list gap. The media query changes <strong>one variable</strong>; everything that uses it follows.</p>
+      <div class="live panel" data-show-html data-solved="✓ Responsive tokens: queries change values, rules just use them." data-resizable="320-1400-1200" data-presets="360,1200" data-zoom="1">
+        <script type="text/plain" data-role="html"><section class="intro-block"><h2>Vendors</h2><p>Forty stalls on the waterfront.</p></section><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><p>Hand-folded, steamed in front of you.</p></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><p>Risograph posters of the port.</p></li><li class="vendor-card"><span class="tag">Drinks</span><h3>Mezcal Moon</h3><p>Small-batch mezcal.</p></li></ul></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <textarea>
+:root {
+
+}
+body {
+  padding: 1rem;
+}
+.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Phone: 16px padding and gap", "at": [360], "expr": "cs('body','padding-left') === '16px' && cs('.vendor-list','column-gap') === '16px'"}, {"label": "1200px: 40px padding and gap", "at": [1200], "expr": "cs('body','padding-left') === '40px' && cs('.vendor-list','column-gap') === '40px'"}, {"label": "Using var(--gutter)", "require": "padding[^;]*var\\(--gutter\\)[\\s\\S]*gap[^;]*var\\(--gutter\\)|gap[^;]*var\\(--gutter\\)[\\s\\S]*padding[^;]*var\\(--gutter\\)"}]</script>
+      </div>
+      <details><summary>Solution</summary><p>Custom properties are real, live values in the cascade: redefine one inside a media query and every <code>var()</code> that reads it updates. One limitation: you can't use <code>var()</code> <em>in</em> the query itself: <code>@media (width &gt;= var(--bp))</code> doesn't work.</p><pre class="code" data-lang="css">:root { --gutter: 1rem; }
+@media (width >= 50rem) {
+  :root { --gutter: 2.5rem; }
+}
+body { padding: var(--gutter); }
+.vendor-list { gap: var(--gutter); }</pre></details>
+    </section>
+  </div>
+</body>
+</html>

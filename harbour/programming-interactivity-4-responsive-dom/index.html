@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responsive + DOM · Programming Interactivity 4</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem; align-items: center; margin-bottom: 2rem; }
+    .hero-row h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .strip { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .strip figure { margin: 0; }
+    .strip img { width: 100%; aspect-ratio: 390 / 600; object-fit: cover; object-position: top left; border: 2px solid var(--ink); border-radius: 0.5rem; display: block; }
+    .strip figcaption { font: 700 0.72rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.35rem; color: var(--muted); }
+    .strip figure:first-child { transform: rotate(-2deg); } .strip figure:last-child { transform: rotate(2deg) translateY(0.6rem); }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .big-links a { font: 800 1.1rem var(--font-sans); color: var(--ink); text-decoration: none; padding: 0.85rem 1.3rem; border: 2px solid var(--ink); border-radius: 99px; background: var(--yellow); box-shadow: 4px 4px 0 var(--ink); }
+    .big-links a.alt { background: var(--white); }
+    .big-links a:hover, .big-links a:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); outline: none; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+    .grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem 1.1rem; background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; color: var(--ink); text-decoration: none; box-shadow: 4px 4px 0 var(--ink); }
+    .grid a:hover, .grid a:focus-visible { background: var(--paper-2); outline: none; }
+    .grid b { display: block; font-size: 1.15rem; margin-bottom: 0.25rem; }
+    .grid small { display: block; font: 700 0.72rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+    .grid span { color: var(--ink-2); font-size: 0.95rem; }
+    .keys { font: 500 0.9rem/1.8 var(--font-mono); }
+    .keys kbd { font: 700 0.8rem var(--font-mono); border: 2px solid var(--ink); border-bottom-width: 4px; border-radius: 0.35rem; padding: 0.05rem 0.4rem; background: var(--white); }
+    @media (max-width: 760px) { .hero-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · Lecture 4</span><span>3 h · theory + practice</span></div>
+    <div class="hero-row">
+      <div>
+        <span class="eyebrow-tag">Lecture 4</span>
+        <h1>Fits every pocket, <em>talks back</em></h1>
+        <p class="intro">Part 1, CSS: the Harbour Night Market page learns to fit a phone: media queries and fluid values. Part 2, JavaScript: it starts listening: the DOM, events, forms. Same page, same HTML, from Lecture 3's floor plan to a page that works in your pocket and answers back.</p>
+        <div class="big-links"><a href="slides.html">▶ Open the slides</a><a class="alt" href="cheatsheet.html">Cheat sheet</a><a class="alt" href="project/starter.zip">Starter project (zip)</a></div>
+      </div>
+      <div class="strip">
+        <figure><img src="images/phone-step0.png" alt="Lecture 3's page on a 390px phone: the menu runs off the right edge."><figcaption>start · Lecture 3 on a phone</figcaption></figure>
+        <figure><img src="images/phone-step4.png" alt="The responsive page on the same phone: logo and a Menu button on one line, the headline fits."><figcaption>end · responsive + JS</figcaption></figure>
+      </div>
+    </div>
+
+    <h2>Part 1 · CSS <em>in class order</em></h2>
+    <ul class="grid">
+      <li><a href="exercises/01-pocket-check.html"><small>Exercise 1 · Act 1 · 12 min</small><b>Pocket check</b><span>The viewport tag, mobile-first media queries, other queries, responsive variables.</span></a></li>
+    </ul>
+
+    <h2>Part 2 · JavaScript <em>in class order</em></h2>
+    <ul class="grid">
+      <li><a href="playgrounds/night-shift.html"><small>Exercise 2 · Act 3 · 8 min + homework</small><b>Night Shift</b><span>A DOM game: 16 messages from the organiser before the doors open at 19:00. 1–5 in class.</span></a></li>
+      <li><a href="exercises/03-wire-it-up.html"><small>Exercise 3 · Act 4 · 14 min</small><b>Wire it up</b><span>The phone menu, saving stalls, the filter with one listener.</span></a></li>
+      <li><a href="exercises/04-tickets-please.html"><small>Exercise 4 · Act 5 · homework</small><b>Tickets, please</b><span>submit, preventDefault, FormData, validation, a safe ticket.</span></a></li>
+      <li><a href="project/starter.zip"><small>Homework</small><b>Your market</b><span>responsive.css for tomorrow; market.js by the next JS lecture.</span></a></li>
+    </ul>
+
+    <h2>Finale · the market <em>jam</em></h2>
+    <p class="intro" style="margin-bottom:1rem">Five groups, five features, HTML + CSS + JS each: 30 minutes to build, 2½ minutes to show. Start from <code>project/jam/</code>.</p>
+    <ul class="grid">
+      <li><a href="jam/index.html"><small>How it works</small><b>The market jam</b><span>Roles, the 30-minute clock, how to present.</span></a></li>
+      <li><a href="jam/01-theme-switcher.html"><small>Task 1 · ★★☆</small><b>Light, auto, dark</b><span>A 3-way theme switch that can follow the system.</span></a></li>
+      <li><a href="jam/02-my-night.html"><small>Task 2 · ★★☆</small><b>My night</b><span>Save stalls, count them, show only those.</span></a></li>
+      <li><a href="jam/03-whats-on.html"><small>Task 3 · ★★☆</small><b>What's on?</b><span>A time slider; the schedule fits a phone.</span></a></li>
+      <li><a href="jam/04-ticket-wizard.html"><small>Task 4 · ★★★</small><b>Ticket wizard</b><span>The ticket form in three steps, with a review before Reserve.</span></a></li>
+      <li><a href="jam/05-talking-map.html"><small>Task 5 · ★★☆</small><b>The map talks</b><span>Click a zone, a panel; a bottom sheet on a phone.</span></a></li>
+      <li><a href="jam/06-find-a-stall.html"><small>Spare task · ★☆☆</small><b>Find a stall</b><span>Search as you type, sticky on a phone.</span></a></li>
+      <li><a href="jam/07-register-a-stall.html"><small>Spare task · ★★★</small><b>Register a stall</b><span>A form that adds a new vendor card, filters and all.</span></a></li>
+    </ul>
+
+    <h2>Playgrounds</h2>
+    <ul class="grid">
+      <li><a href="project/showcase/index.html?step=0"><small>Demo</small><b>The market, step by step</b><span>Lecture 3 → small screens → fluid → components → + JS. Try it at phone width.</span></a></li>
+      <li><a href="playgrounds/devices.html"><small>Mobile</small><b>Viewport lab</b><span>Three phones, the 980px lie, device pixel ratio.</span></a></li>
+      <li><a href="playgrounds/fluid.html"><small>Fluid type</small><b>Fluid calculator</b><span>Two sizes at two widths → a clamp(), with a zoom test.</span></a></li>
+      <li><a href="playgrounds/dom-lab.html"><small>The DOM</small><b>DOM lab</b><span>A page, its live tree and a console to poke it with.</span></a></li>
+      <li><a href="playgrounds/events.html"><small>Events</small><b>Event lab</b><span>Watch a click bubble; see which form events fire, in order.</span></a></li>
+    </ul>
+
+    <h2>For the teacher</h2>
+    <div class="tip">
+      <p class="keys">Slides: <kbd>→</kbd> <kbd>←</kbd> move · <kbd>p</kbd> presenter view (notes, next slide, lecture clock) · <kbd>m</kbd> slide menu · <kbd>n</kbd> notes drawer · <kbd>f</kbd> fullscreen · <kbd>t</kbd> clock in footer · <kbd>Esc</kbd> leave an editor so arrows work again.</p>
+      <p>Run it from a local server (e.g. <code>npx live-server</code>) so presenter view and the live previews work. Timings and answers are in <code>run-sheet.md</code>. All five jam features, working together on one page: <a href="project/jam-reference/index.html">project/jam-reference</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

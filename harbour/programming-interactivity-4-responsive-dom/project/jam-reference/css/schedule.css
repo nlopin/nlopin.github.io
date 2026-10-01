@@ -1,0 +1,16 @@
+/* 3 · What's on? */
+.whats-on { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin: 0 0 1.25rem; }
+.whats-on label { font-weight: 700; }
+.whats-on input { flex: 1 1 12rem; accent-color: var(--lantern); }
+.whats-on output { font: 700 1.2rem ui-monospace, Menlo, monospace; color: var(--lantern); }
+.on-now { flex-basis: 100%; margin: 0; color: var(--ink-2); }
+.schedule tr.now td { background: rgb(255 181 71 / 0.16); }
+.schedule tr.now td:first-child { box-shadow: inset 4px 0 0 var(--lantern); }
+
+/* on a phone, each row becomes a little card: the labels come from data-label */
+@media (width < 40rem) {
+  .schedule thead { display: none; }
+  .schedule tr { display: block; border-bottom: 1px solid var(--line); padding: 0.5rem 0; }
+  .schedule td { display: flex; gap: 0.8rem; border: 0; padding: 0.2rem 0.6rem; }
+  .schedule td::before { content: attr(data-label); min-width: 4rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sea); }
+}

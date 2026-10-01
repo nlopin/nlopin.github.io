@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏁%3C/text%3E%3C/svg%3E">
+  <title>The race</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+  <style>
+    :root {
+      --paper: #f4efe6; --paper-2: #ebe3d3; --white: #fffdf8; --ink: #17140f; --muted: #6f665a; --line: #d3c8b3;
+      --tomato: #ff5a36; --yellow: #ffd23f; --green: #12a26f;
+      --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+      --font-serif: "Instrument Serif", Georgia, serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body { background: var(--paper); color: var(--ink); font: 400 18px/1.4 var(--font-sans); }
+    h1 { font: 800 clamp(2rem, 1rem + 3vw, 4rem)/1 var(--font-sans); letter-spacing: -0.03em; margin: 0; }
+    h1 em { font: italic 400 1.05em var(--font-serif); letter-spacing: 0; }
+    button, .btn { font: 700 1rem var(--font-sans); color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; text-decoration: none; }
+    button.go { background: var(--ink); color: var(--yellow); }
+    .err { color: #c4300f; }
+
+    /* ---- setup ---- */
+    .setup { max-width: 760px; margin: 0 auto; padding: 3rem 16px; }
+    .setup > p { color: var(--muted); margin: 0.8rem 0 2rem; }
+    .setup h2 { font: 700 0.8rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; margin: 2rem 0 0.6rem; }
+    .ex { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0; border-top: 1px solid var(--line); }
+    .ex span { flex: 1; font-weight: 600; }
+    .ex small { font: 400 0.85rem var(--font-mono); color: var(--muted); }
+
+    /* ---- race ---- */
+    .race { height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; gap: 1rem; padding: 1.5rem 2rem 1rem; }
+    .head { display: flex; align-items: center; gap: 2rem; }
+    .head .title { flex: 1; min-width: 0; }
+    .head .title p { margin: 0.5rem 0 0; font: 400 1.05rem var(--font-mono); color: var(--muted); }
+    .code { font: 700 clamp(2.5rem, 1rem + 4vw, 5rem)/1 var(--font-mono); letter-spacing: 0.15em; background: var(--ink); color: var(--yellow); padding: 0.15em 0.35em 0.15em 0.5em; border-radius: 0.15em; }
+    .qr { width: clamp(90px, 10vw, 150px); aspect-ratio: 1; image-rendering: pixelated; background: var(--white); border: 2px solid var(--ink); border-radius: 8px; }
+
+    .track { position: relative; overflow: hidden; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+    .waiting { position: absolute; inset: 0; display: grid; place-items: center; font: italic 400 2.5rem var(--font-serif); color: var(--muted); }
+    .lane { position: absolute; left: 0; right: 0; height: var(--lane); display: grid; grid-template-columns: 3em 9em 1fr 4em; align-items: center;
+      font-size: calc(var(--lane) * 0.36); border-bottom: 1px dashed var(--line); transition: top 0.6s cubic-bezier(.3,1.3,.5,1); }
+    .lane .rank { font: 700 1em var(--font-mono); text-align: center; }
+    .lane .name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 0.5em; }
+    .lane.off { opacity: 0.35; }
+    .road { position: relative; height: 100%; margin-right: 1.5em;
+      background: repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--total) - 2px), var(--line) 0 calc(100% / var(--total))); }
+    .road::after { content: ""; position: absolute; right: -1.5em; top: 0; bottom: 0; width: 1.5em;
+      background: repeating-conic-gradient(var(--ink) 0 25%, var(--white) 0 50%) 0 0 / 0.6em 0.6em; }
+    .car { position: absolute; top: 50%; left: calc(0.7em + var(--p) * (100% - 1.4em)); translate: -50% -50%; font-size: 1.9em; line-height: 1;
+      transition: left 0.8s cubic-bezier(.3,1.4,.5,1); }
+    .car i { display: inline-block; font-style: normal; transform: scaleX(-1); }
+    .score { text-align: right; font: 700 0.8em var(--font-mono); color: var(--muted); }
+    .lane.done { background: color-mix(in srgb, var(--yellow) 35%, transparent); }
+    .lane.flash { animation: flash 1.2s 3; }
+    @keyframes flash { 50% { background: var(--yellow); } }
+
+    .foot { display: flex; gap: 1rem; align-items: center; font: 400 0.9rem var(--font-mono); color: var(--muted); }
+    .foot .grow { flex: 1; }
+    @media (prefers-reduced-motion: reduce) { .lane, .car { transition: none; } .lane.flash { animation: none; } }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+
+  <script type="module">
+    import { db, signIn, newCode, cleanCode, TASK_SEL, ref, get, set, onValue, serverTimestamp } from "./firebase.js";
+
+    // Lessons a race can run on, relative to this page. The races are the pages
+    // linked from each lesson's index.html that load race.js, in that order.
+    const LESSONS = ["../programming-interactivity-4-responsive-dom/"];
+    const MEDALS = ["🥇", "🥈", "🥉"];
+    // Every racer gets one, picked from their uid so it survives reloads. All face left; the board flips them.
+    const RIDES = ["🏎️", "🚗", "🚙", "🚕", "🛻", "🚓", "🚑", "🚒", "🚌", "🏍️", "🛵", "🚜", "🐎", "🐢", "🦄", "🐌"];
+    const ride = (uid) => RIDES[[...uid].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7) % RIDES.length];
+
+    const app = document.getElementById("app");
+    const room = cleanCode(new URLSearchParams(location.search).get("room"));
+    function h(tag, attrs, ...kids) {
+      const el = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs || {})) {
+        if (k === "class") el.className = v;
+        else if (k === "text") el.textContent = v;
+        else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+        else el.setAttribute(k, v);
+      }
+      el.append(...kids);
+      return el;
+    }
+
+    async function page(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`${res.status} ${url.pathname}`);
+      return new DOMParser().parseFromString(await res.text(), "text/html");
+    }
+
+    // Title, number of tasks, and whether the page loads race.js. A page with
+    // its own game loop states its count in <meta name="race-tasks">.
+    async function inspect(url) {
+      const doc = await page(url);
+      const declared = doc.querySelector('meta[name="race-tasks"]');
+      const total = declared ? +declared.content || 0 : [...doc.querySelectorAll(TASK_SEL)].filter((el) => el.querySelector(':scope > script[data-role="checks"]')).length;
+      return { title: doc.title, total, hooked: !!doc.querySelector('script[src$="race/race.js"]') };
+    }
+
+    /* ---- setup: pick an exercise, open a room ---- */
+    async function setup() {
+      const list = h("div");
+      app.append(h("div", { class: "setup" },
+        h("h1", {}, "The ", h("em", { text: "race" })),
+        h("p", { text: "Pick the exercise. Students join from that page with the code on the big screen; every solved panel moves their car." }),
+        list));
+      for (const dir of LESSONS) {
+        const base = new URL(dir, location.href);
+        const head = h("h2", { text: dir });
+        list.append(head);
+        let index;
+        try { index = await page(new URL("index.html", base)); }
+        catch (e) { list.append(h("p", { class: "err", text: e.message })); continue; }
+        head.textContent = index.title;
+        const urls = [...new Set([...index.querySelectorAll("a[href]")]
+          .map((a) => new URL(a.getAttribute("href"), base).href.replace(/[?#].*$/, ""))
+          .filter((href) => href.startsWith(base.href) && href.endsWith(".html")))];
+        const pages = await Promise.all(urls.map((href) => inspect(new URL(href)).then((info) => ({ url: new URL(href), ...info }), () => null)));
+        const races = pages.filter((p) => p && p.hooked);
+        if (!races.length) list.append(h("p", { class: "err", text: "No page in this lesson loads race.js." }));
+        for (const { url, title, total } of races) {
+          const msg = h("small", { text: `${total} task${total === 1 ? "" : "s"}` });
+          const go = h("button", { class: "go", type: "button", text: "Start race", onclick: () => start(url, title, total, msg, go) });
+          if (!total) go.disabled = true;
+          list.append(h("div", { class: "ex" }, h("span", { text: title }), msg, go));
+        }
+      }
+    }
+
+    async function start(url, title, total, msg, btn) {
+      btn.disabled = true;
+      msg.textContent = "opening…";
+      try {
+        const host = await signIn();
+        let code;
+        do code = newCode(); while ((await get(ref(db, `rooms/${code}/meta`))).exists());
+        await set(ref(db, `rooms/${code}/meta`), { host, ex: url.pathname, title, total, created: serverTimestamp() });
+        location.search = `?room=${code}`;
+      } catch (e) {
+        msg.textContent = e.code || e.message;
+        msg.className = "err";
+        btn.disabled = false;
+      }
+    }
+
+    /* ---- race: the board ---- */
+    async function board() {
+      const meta = (await get(ref(db, `rooms/${room}/meta`))).val();
+      if (!meta) {
+        app.append(h("div", { class: "setup" }, h("h1", { text: `No race ${room}` }), h("p", {}, h("a", { class: "btn", href: "board.html", text: "Start a new race" }))));
+        return;
+      }
+      document.title = `${room} · The race`;
+      const joinUrl = new URL(meta.ex, location.href);
+      joinUrl.searchParams.set("race", room);
+      const qr = qrcode(0, "M");
+      qr.addData(joinUrl.href);
+      qr.make();
+
+      const track = h("div", { class: "track" });
+      const count = h("span");
+      const clock = h("span");
+      app.append(h("div", { class: "race" },
+        h("header", { class: "head" },
+          h("div", { class: "title" }, h("h1", { text: meta.title }), h("p", { text: "Open the exercise → 🏁 Join race → type the code" })),
+          h("div", { class: "code", text: room }),
+          h("img", { class: "qr", src: qr.createDataURL(8, 2), alt: "QR code: join the race" })),
+        track,
+        h("footer", { class: "foot" }, count, clock, h("span", { class: "grow" }),
+          h("button", { type: "button", text: "⛶ fullscreen", onclick: toggleFull }),
+          h("a", { class: "btn", href: "board.html", text: "New race" }))));
+      track.style.setProperty("--total", meta.total);
+
+      setInterval(() => {
+        const s = Math.max(0, Math.floor((Date.now() - meta.created) / 1000));
+        clock.textContent = `⏱ ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+      }, 1000);
+
+      const lanes = new Map();      // uid → lane element
+      const finished = new Set();   // uids already celebrated
+      let first = true;
+
+      let players = [];
+      onValue(ref(db, `rooms/${room}/players`), (snap) => {
+        players = Object.entries(snap.val() || {}).map(([uid, p]) => {
+          const times = Object.values(p.solved || {});
+          return { uid, name: p.name || "?", online: !!p.online, score: Math.min(times.length, meta.total), last: times.length ? Math.max(...times) : Infinity };
+        }).sort((a, b) => b.score - a.score || a.last - b.last || a.name.localeCompare(b.name));
+        render();
+        first = false;
+      });
+      new ResizeObserver(() => render()).observe(track);
+
+      function render() {
+        const laneH = Math.max(34, Math.min(84, track.clientHeight / Math.max(players.length, 1)));
+        track.style.setProperty("--lane", laneH + "px");
+        const online = players.filter((p) => p.online).length;
+        count.textContent = `${online} racing · ${players.length} joined`;
+
+        track.querySelector(".waiting")?.remove();
+        if (!players.length) track.append(h("div", { class: "waiting", text: "Waiting for racers…" }));
+
+        players.forEach((p, i) => {
+          let lane = lanes.get(p.uid);
+          if (!lane) {
+            lane = h("div", { class: "lane", style: `top:${i * laneH}px` },
+              h("span", { class: "rank" }), h("span", { class: "name" }),
+              h("div", { class: "road" }, h("span", { class: "car" }, h("i", { text: ride(p.uid) }))), h("span", { class: "score" }));
+            lanes.set(p.uid, lane);
+            track.append(lane);
+          }
+          const done = p.score >= meta.total;
+          lane.style.top = i * laneH + "px";
+          lane.querySelector(".rank").textContent = p.score && MEDALS[i] ? MEDALS[i] : i + 1;
+          lane.querySelector(".name").textContent = p.name;
+          lane.querySelector(".score").textContent = `${p.score}/${meta.total}`;
+          lane.querySelector(".road").style.setProperty("--p", p.score / meta.total);
+          lane.classList.toggle("off", !p.online);
+          lane.classList.toggle("done", done);
+          if (done && !finished.has(p.uid)) {
+            finished.add(p.uid);
+            if (!first) lane.classList.add("flash");
+          }
+        });
+        for (const [uid, lane] of lanes) if (!players.some((p) => p.uid === uid)) { lane.remove(); lanes.delete(uid); }
+      }
+    }
+
+    function toggleFull() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }
+    document.addEventListener("keydown", (e) => { if (e.key === "f" && !e.target.closest("input")) toggleFull(); });
+
+    (room ? board() : setup()).catch((e) => app.append(h("p", { class: "err", text: `Couldn't reach the race server: ${e.code || e.message}` })));
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Step 1 — small screens. Lecture 3's layout, rewritten MOBILE FIRST:
+   the rules outside any @media are the phone. Wider screens get extras,
+   gated behind min-width queries. Breakpoints come from the content
+   (where it starts to look wrong), in rem, not from a list of devices.
+   ========================================================================== */
+
+/* ---------- flow ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+main { max-width: 72rem; margin-inline: auto; }
+.lead { max-width: 60ch; }
+.hero { min-height: 80vh; }
+
+/* ---------- position ---------- */
+.site-header { position: sticky; top: 0; z-index: 10; }
+html { scroll-padding-top: 5rem; }
+.vendor-card { position: relative; }
+.badge { position: absolute; top: -0.8rem; right: 1rem; transform: rotate(8deg); }
+.market-map { position: relative; }
+.you-are-here { position: absolute; left: 1.6rem; bottom: 1.6rem; }
+.to-top { position: fixed; right: 1rem; bottom: 1rem; margin: 0; z-index: 10; }
+
+/* ---------- flex ---------- */
+/* the phone header: logo and menu share a line, the links wrap underneath */
+.site-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.6rem 1.5rem; padding-inline: 1rem; }
+.main-nav ul { display: flex; flex-wrap: wrap; gap: 0.2rem 1.25rem; margin: 0; }
+.hero { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.vendor-card { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 0; height: 100%; }
+.card-link { margin-top: auto; }
+.site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+
+/* ---------- grid: the phone is the base ---------- */
+.vendor-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.25rem; }
+
+.market-map {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, 5rem) 6rem;
+  grid-template-areas:
+    "stage  stage"
+    "food   table"
+    "food   crafts"
+    "drinks pier"
+    "gate   gate";
+  gap: 0.6rem;
+}
+.zone { margin: 0; }
+.stage  { grid-area: stage; }
+.food   { grid-area: food; }
+.table  { grid-area: table; }
+.crafts { grid-area: crafts; }
+.drinks { grid-area: drinks; }
+.pier   { grid-area: pier; }
+.gate   { grid-area: gate; display: grid; place-items: start center; }
+
+.ticket-form { display: grid; gap: 0.4rem; max-width: 44rem; }
+.ticket-form label, .ticket-form .hint { margin: 0.6rem 0 0; }
+.ticket-form .check, .ticket-form button { justify-self: start; }
+
+/* ---------- wider than a phone: the extras ---------- */
+@media (width >= 40rem) {
+  .site-header { padding-inline: 2rem; }
+  .stall:has(.featured) { grid-column: span 2; }
+  .ticket-form { grid-template-columns: max-content 1fr; align-items: center; gap: 0.9rem 1.5rem; }
+  .ticket-form label, .ticket-form .hint { margin: 0; }
+  .ticket-form .check, .ticket-form button, .ticket-form .hint { grid-column: 2; }
+  .to-top { right: 1.5rem; bottom: 1.5rem; }
+}
+
+@media (width >= 56rem) {
+  .market-map {
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 7rem 7rem 7rem 4.5rem;
+    grid-template-areas:
+      "stage  stage  pier"
+      "food   table  pier"
+      "food   crafts drinks"
+      "gate   gate   gate";
+    gap: 0.75rem;
+  }
+  .gate { place-items: center; }
+  .you-are-here { left: 2rem; bottom: 2.4rem; }
+}
+
+/* ---------- other queries: not the size of the window ---------- */
+/* a mouse can hover; a thumb can't, so don't hide anything behind :hover */
+@media (hover: hover) {
+  .vendor-card { transition: translate 0.2s, border-color 0.2s; }
+  .vendor-card:hover { translate: 0 -4px; border-color: var(--sea); }
+}
+/* a finger is ~9mm wide: bigger tap targets */
+@media (pointer: coarse) {
+  .main-nav a { display: inline-block; padding-block: 0.6rem; }
+}
+/* smooth in-page scrolling, but only for people who didn't ask for less motion */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+/* paper has no menu and no buttons */
+@media print {
+  .site-header, .filters, .to-top, .ticket-form, .card-link { display: none; }
+  body { background: #fff; color: #000; }
+}

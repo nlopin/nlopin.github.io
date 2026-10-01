@@ -1,0 +1,64 @@
+/* ==========================================================================
+   Harbour Night Market — layout.css
+   Lecture 3's layout, finished: where things go. Everyone starts from the
+   same version today (yours from last time works too).
+
+   It was drawn on a laptop. Three rules in here only make sense with room,
+   and they break the phone. Mobile first means: move them INTO a
+   min-width media query, so the phone gets the simple version.
+     · .stall:has(.featured)  → span 2 only from ~40rem
+     · .market-map            → the 3-column floor plan only from ~56rem
+                                (write a 2-column phone map as the base)
+     · .ticket-form           → two columns only from ~40rem
+   (Exercise 1, cases 2 and 3.)
+   ========================================================================== */
+
+
+/* flow */
+*, *::before, *::after { box-sizing: border-box; }
+main { max-width: 72rem; margin-inline: auto; }
+.lead { max-width: 60ch; }
+.hero { min-height: 80vh; }
+
+/* position */
+.site-header { position: sticky; top: 0; z-index: 10; }
+html { scroll-padding-top: 5rem; }
+.vendor-card { position: relative; }
+.badge { position: absolute; top: -0.8rem; right: 1rem; transform: rotate(8deg); }
+.market-map { position: relative; }
+.you-are-here { position: absolute; left: 2rem; bottom: 2.4rem; }
+.to-top { position: fixed; right: 1.5rem; bottom: 1.5rem; margin: 0; z-index: 10; }
+
+/* flex */
+.site-header { display: flex; justify-content: space-between; align-items: center; }
+.main-nav ul { display: flex; gap: 1.5rem; margin: 0; }
+.hero { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.vendor-card { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 0; height: 100%; }
+.card-link { margin-top: auto; }
+.site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+
+/* grid */
+.vendor-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.25rem; }
+.stall:has(.featured) { grid-column: span 2; }
+.market-map {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 7rem 7rem 7rem 4.5rem;
+  grid-template-areas:
+    "stage  stage  pier"
+    "food   table  pier"
+    "food   crafts drinks"
+    "gate   gate   gate";
+  gap: 0.75rem;
+}
+.zone { margin: 0; }
+.stage  { grid-area: stage; }
+.food   { grid-area: food; }
+.table  { grid-area: table; }
+.crafts { grid-area: crafts; }
+.drinks { grid-area: drinks; }
+.pier   { grid-area: pier; }
+.gate   { grid-area: gate; display: grid; place-items: center; }
+.ticket-form { display: grid; grid-template-columns: max-content 1fr; align-items: center; gap: 0.9rem 1.5rem; max-width: 44rem; }
+.ticket-form label, .ticket-form .hint { margin: 0; }
+.ticket-form .check, .ticket-form button, .ticket-form .hint { grid-column: 2; justify-self: start; }

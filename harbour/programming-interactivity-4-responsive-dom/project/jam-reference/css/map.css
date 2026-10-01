@@ -1,0 +1,25 @@
+/* 5 · The map talks: zones are buttons, a panel tells you what's there */
+/* buttons don't inherit fonts: hand them the page's font, keep each zone's size */
+.zone { font-family: inherit; font-size: 1rem; font-weight: 700; text-align: left; cursor: pointer; }
+.zone.gate { font-size: 0.85rem; text-align: center; }
+.zone:focus-visible, .zone[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.zone-info {
+  position: relative;
+  margin-top: 1rem;
+  padding: 1.2rem 3rem 1.2rem 1.4rem;
+  background: var(--night-2);
+  border: 2px solid var(--lantern);
+  border-radius: var(--radius);
+}
+.zone-info h3 { margin: 0 0 0.4rem; font-size: 1.5rem; }
+.zone-info p { margin: 0; color: var(--ink-2); }
+.zone-close { position: absolute; top: 0.7rem; right: 0.7rem; font: 700 1rem/1 system-ui; color: var(--ink); background: var(--night-3); border: 0; border-radius: 50%; width: 2rem; height: 2rem; cursor: pointer; }
+
+/* on a phone: a sheet that slides up from the bottom of the screen */
+@media (width < 40rem) {
+  .zone-info { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; margin: 0; border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -10px 40px rgb(0 0 0 / 0.5); }
+  @media (prefers-reduced-motion: no-preference) {
+    .zone-info:not([hidden]) { animation: sheet-up 0.25s ease-out; }
+  }
+}
+@keyframes sheet-up { from { translate: 0 100%; } }

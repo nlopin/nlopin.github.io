@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Step 3 — components. The card stops asking the window how wide it is
+   and asks its own slot instead: the <li class="stall"> around it.
+   ========================================================================== */
+
+/* The killer pattern: a wrapper is the container, the card inside asks it.
+   A container can't restyle itself from its own size (that would be a loop),
+   so the query and the styles live on two different elements. */
+.stall { container: stall / inline-size; }
+
+/* A wide slot (the featured stall spans two columns): text on the right */
+@container stall (width >= 34rem) {
+  .vendor-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "tag   text"
+      "title text"
+      "link  text";
+    column-gap: 2rem;
+    align-items: start;
+  }
+  .vendor-card .tag { grid-area: tag; justify-self: start; }
+  .vendor-card h3 { grid-area: title; font-size: clamp(1.6rem, 1rem + 4cqi, 2.6rem); }
+  .vendor-card p { grid-area: text; font-size: 1.15rem; margin: 0; }
+  .vendor-card .card-link { grid-area: link; align-self: end; }
+}
+
+/* ---------- feature queries: only where the browser supports it ---------- */
+/* Scroll-driven animation: cards rise into view as you scroll.
+   Browsers without animation-timeline skip the whole block: the cards
+   simply sit there. That's progressive enhancement. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stall {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes rise {
+  from { opacity: 0; translate: 0 3rem; }
+}

@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsive + DOM — fits every pocket, talks back</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide kbd { color: var(--ink); white-space: nowrap; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+.slide .card.dark code { background: #2c2924; color: var(--yellow); }
+.slide.statement p.kicker { font-size: 20px; color: var(--act-ink); }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 40px; height: 100%; align-items: center; }
+.title .kicker { color: var(--yellow); }
+.title .kicker::before { background: var(--yellow); border-color: var(--yellow); }
+.slide .title-h1 { font-size: 138px; line-height: 0.88; letter-spacing: -0.04em; margin: 10px 0 48px; }
+.slide .title-h1 em { color: var(--yellow); font-size: 1.02em; letter-spacing: -0.02em; }
+.slide .title-h1 .js { font: 500 0.82em/1 "IBM Plex Mono", var(--font-mono); color: #3ee6ff; letter-spacing: -0.04em; text-shadow: 0 0 40px rgb(62 230 255 / 0.5); }
+.title-sub { font: 500 24px/1.5 var(--font-mono); color: #b9b0a0; max-width: 640px; }
+
+/* phones: a device frame around a scaled iframe. --w is the CSS width the page is laid out at */
+.phone { position: relative; flex: none; width: var(--d, 300px); height: calc(var(--d, 300px) * 2.05); border: 12px solid #0b0a09; border-radius: 40px; background: #0b0a09; overflow: hidden; box-shadow: 10px 10px 0 var(--ink); }
+.phone iframe { position: absolute; left: 0; top: 0; border: 0; width: var(--w, 390px); height: calc(var(--w, 390px) * 2.05); transform: scale(calc((var(--d, 300px) - 24px) / var(--w, 390px))); transform-origin: 0 0; background: #fff; }
+.slide .phone-cap { font: 700 20px var(--font-mono); text-align: center; margin: 26px 0 0; }
+.phones { display: flex; gap: 60px; align-items: flex-start; justify-content: center; }
+.phones.left { justify-content: flex-start; }
+.phone-wrap { display: flex; flex-direction: column; align-items: center; }
+.collage { position: relative; height: 760px; }
+.collage .phone-wrap { position: absolute; }
+.collage .pw1 { left: 20px; top: 40px; transform: rotate(-5deg); }
+.collage .pw2 { right: 50px; top: 90px; transform: rotate(4deg); }
+.collage .phone { box-shadow: 0 30px 60px rgb(0 0 0 / 0.55); }
+.collage .sticker { position: absolute; z-index: 3; }
+.collage .s1 { left: 0; top: 0; background: var(--paper); }
+.collage .s2 { right: 0; bottom: 30px; transform: rotate(3deg); background: #3ee6ff; font-family: "IBM Plex Mono", var(--font-mono); }
+
+/* problems */
+.two-problems { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 60px; align-items: center; }
+.slide ol.problems > li { font-size: 30px; margin-bottom: 16px; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 10px; }
+.map div { border: 3px solid var(--ink); border-radius: 14px; padding: 14px 12px; min-height: 300px; display: flex; flex-direction: column; gap: 8px; font-size: 19px; line-height: 1.3; box-shadow: 6px 6px 0 var(--ink); }
+.map b { font: italic 400 36px/1 var(--font-serif); }
+.map strong { font-size: 23px; line-height: 1.05; }
+.map .glyph { font: 800 54px/1 var(--font-mono); letter-spacing: -0.05em; }
+.map time { font: 700 19px var(--font-mono); margin-top: auto; }
+.map .m1 { background: var(--blue); color: #fff; } .map .m2 { background: var(--green); } .map .m3 { background: var(--violet); color: #fff; }
+.map .mb { background: var(--paper-2); border-style: dashed; box-shadow: none; }
+.map .w { background: #060b17; color: #e3ecff; border-color: #060b17; font-family: "Space Grotesk", sans-serif; }
+.map .w b { font: 500 26px/1 "IBM Plex Mono", monospace; }
+.map .w .glyph { font-family: "IBM Plex Mono", monospace; }
+.map .w4 b, .map .w4 .glyph { color: #3ee6ff; } .map .w5 b, .map .w5 .glyph { color: #ff4fd8; } .map .w6 b, .map .w6 .glyph { color: #b6ff3b; }
+.map .wj { background: var(--yellow); color: var(--ink); border-color: var(--ink); font-family: "Space Grotesk", sans-serif; }
+.map .wj b { font: 500 26px/1 "IBM Plex Mono", monospace; }
+.halves { display: grid; grid-template-columns: 2fr 5fr; gap: 12px; margin-top: 16px; font: 700 21px var(--font-mono); }
+.halves span { border-top: 4px solid var(--ink); padding-top: 10px; }
+.halves span:nth-child(3) { border-color: #060b17; }
+
+/* stat row */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.stats .card { text-align: center; }
+.stats .num { display: block; font: 800 84px/1 var(--font-sans); letter-spacing: -0.04em; margin-bottom: 8px; }
+
+/* anatomy of a media query */
+.anat { font-variant-ligatures: none; font-feature-settings: "calt" 0; font: 700 50px/1.35 var(--font-mono); background: var(--code-bg); color: var(--code-ink); border: 3px solid var(--ink); border-radius: 18px; padding: 24px 40px; white-space: pre; font-variant-ligatures: none; font-feature-settings: "calt" 0; }
+.anat .a { color: var(--hl-at); } .anat .f { color: var(--hl-prop); } .anat .v { color: var(--hl-num); } .anat .p { color: var(--hl-punct); } .anat .c { color: var(--hl-com); font-style: italic; font-weight: 400; }
+.anat span { border-radius: 8px; transition: background 0.2s, box-shadow 0.2s; }
+.slide.s1:not(.s2) .anat .m1, .slide.s2:not(.s3) .anat .m2, .slide.s3 .anat .m3 { background: rgb(255 210 63 / 0.22); box-shadow: 0 0 0 6px rgb(255 210 63 / 0.55); }
+.explain { display: grid; gap: 10px; margin-top: 20px; }
+.explain div { font-size: 26px; padding: 10px 20px; background: var(--white); border: 3px solid var(--ink); border-radius: 12px; }
+
+/* two code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 34px; }
+.vs2 > pre.code { align-self: start; }
+.vs2 pre.code { font-size: 22px !important; }
+.vs2 .tally { font: 700 22px var(--font-mono); margin-top: 12px; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 26px; }
+.dtable td, .dtable th { padding: 11px 16px; border-bottom: 2px solid var(--line); text-align: left; vertical-align: middle; }
+.dtable th { font: 700 18px var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.dtable td:first-child code { font-size: 24px; white-space: nowrap; }
+.dtable td:last-child { color: var(--ink-2); }
+.dtable.syn td:first-child code { font: 800 26px var(--font-mono); padding: 4px 12px; border-radius: 8px; border: 2px solid var(--ink); background: var(--white); }
+.dtable.syn tr.r1 td:first-child code { background: #cfe0ff; } .dtable.syn tr.r2 td:first-child code { background: #d4f5e4; }
+.dtable.syn tr.r3 td:first-child code { background: #e3d8ff; } .dtable.syn tr.r4 td:first-child code { background: var(--yellow); }
+.dtable.syn td:nth-child(2) { font-weight: 700; color: var(--ink); }
+
+/* viewport units: three phones */
+.vhs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.vhs .ph { position: relative; height: 400px; border: 8px solid var(--ink); border-radius: 30px; overflow: hidden; background: #12151d; }
+.vhs .bar { position: absolute; left: 0; right: 0; height: 56px; background: #d9d2c4; display: grid; place-items: center; font: 700 16px var(--font-mono); color: var(--muted); }
+.vhs .bar.top { top: 0; } .vhs .bar.bot { bottom: 0; }
+.vhs .fill { position: absolute; left: 14px; right: 14px; border: 4px dashed var(--yellow); background: rgb(255 210 63 / 0.18); border-radius: 10px; display: grid; place-items: center; font: 800 34px var(--font-mono); color: var(--yellow); }
+.vhs .svh .fill { top: 66px; bottom: 66px; }
+.vhs .lvh .fill { top: 66px; bottom: -60px; border-color: var(--tomato); color: var(--tomato); background: rgb(255 90 54 / 0.15); }
+.vhs .dvh .fill { top: 66px; bottom: 66px; border-color: #82ccff; color: #82ccff; background: rgb(130 204 255 / 0.15); animation: dvh 3s ease-in-out infinite alternate; }
+.vhs .dvh .bar { animation: bar 3s ease-in-out infinite alternate; }
+.vhs .dvh .bar.top { animation-name: bartop; }
+@keyframes dvh { 0%, 30% { top: 66px; bottom: 66px; } 70%, 100% { top: 10px; bottom: 10px; } }
+@keyframes bar { 0%, 30% { transform: none; } 70%, 100% { transform: translateY(100%); } }
+@keyframes bartop { 0%, 30% { transform: none; } 70%, 100% { transform: translateY(-100%); } }
+.vhs h3 { font-size: 30px; margin: 16px 0 4px; }
+.vhs p { font-size: 22px; margin: 0; }
+
+/* clamp number line */
+.numline { position: relative; height: 150px; margin: 30px 20px 10px; }
+.numline .axis { position: absolute; left: 0; right: 0; top: 60px; height: 6px; background: var(--ink); border-radius: 3px; }
+.numline .zone { position: absolute; top: 46px; height: 34px; background: var(--green); border: 3px solid var(--ink); border-radius: 8px; left: 25%; right: 30%; }
+.numline .tick { position: absolute; top: 96px; font: 700 24px var(--font-mono); transform: translateX(-50%); white-space: nowrap; }
+.numline .pin { position: absolute; top: 4px; transform: translateX(-50%); font: 800 22px var(--font-mono); background: var(--yellow); border: 3px solid var(--ink); border-radius: 8px; padding: 2px 10px; white-space: nowrap; }
+
+/* fluid line */
+.fline { width: 100%; height: auto; }
+.fline text { font: 700 20px var(--font-mono); fill: var(--ink); }
+.fline .grid { stroke: var(--line); stroke-width: 2; }
+
+/* loop diagram (part 2) */
+.loop { display: grid; grid-template-columns: 1fr 120px 1fr 120px 1fr; align-items: center; margin: 30px 0 10px; }
+.loop .node { border: 2px solid var(--c); border-radius: 10px; padding: 28px 26px; background: color-mix(in srgb, var(--c) 9%, #060b17); box-shadow: 0 0 40px color-mix(in srgb, var(--c) 25%, transparent); }
+.loop .node b { display: block; font: 600 22px "IBM Plex Mono", monospace; color: var(--c); letter-spacing: 0.08em; }
+.loop .node strong { display: block; font: 700 64px/1 "Space Grotesk", sans-serif; letter-spacing: -0.04em; margin: 10px 0 14px; color: #fff; }
+.loop .node code { font-size: 21px; white-space: nowrap; }
+.loop .wire-l { height: 4px; background: linear-gradient(90deg, var(--a), var(--b)); position: relative; box-shadow: 0 0 14px var(--b); }
+.loop .wire-l::after { content: ""; position: absolute; right: -2px; top: -9px; border: 11px solid transparent; border-left: 16px solid var(--b); border-right: 0; }
+.n-find { --c: #3ee6ff; } .n-listen { --c: #ff4fd8; } .n-change { --c: #b6ff3b; }
+.w1 { --a: #3ee6ff; --b: #ff4fd8; } .w2 { --a: #ff4fd8; --b: #b6ff3b; }
+.loop-back { text-align: center; font: 500 22px "IBM Plex Mono", monospace; color: #8599c2; margin-top: 18px; }
+
+/* boot screen */
+.boot { display: grid; grid-template-columns: max-content max-content max-content; column-gap: 34px; font: 500 28px/1.6 "IBM Plex Mono", monospace; color: #8599c2; }
+.boot .cmd { grid-column: 1 / -1; color: #e3ecff; }
+.boot b { color: #b6ff3b; font-weight: 500; }
+.boot i { font-style: normal; color: #3ee6ff; }
+.boot .cursor { display: inline-block; width: 18px; height: 34px; background: #3ee6ff; vertical-align: -6px; animation: blink 1s steps(2) infinite; }
+@keyframes blink { to { opacity: 0; } }
+.wire-title { font: 700 176px/0.86 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 36px 0 40px; text-shadow: 0 0 80px rgb(62 230 255 / 0.35); }
+.wire-title em { font-style: normal; color: #3ee6ff; }
+
+/* DOM: text vs tree */
+.tt { display: grid; grid-template-columns: minmax(0, 1.25fr) 70px minmax(0, 1fr); align-items: center; gap: 10px; }
+.tt pre.code { font-size: 22px !important; }
+.tt .arrow { font: 500 26px "IBM Plex Mono", monospace; color: #3ee6ff; text-align: center; }
+.tree { font: 500 23px/1.25 "IBM Plex Mono", monospace; }
+.tree div { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.tree span { border: 1.5px solid #3ee6ff; color: #e3ecff; padding: 6px 12px; border-radius: 6px; background: rgb(62 230 255 / 0.08); }
+.tree span.t { border-style: dashed; border-color: #8599c2; color: #8599c2; background: none; }
+.tree .i1 { margin-left: 50px; } .tree .i2 { margin-left: 100px; } .tree .i3 { margin-left: 150px; }
+.tree div::before { content: "└"; color: #3a4f7a; }
+.tree div.root::before { content: ""; }
+
+/* bridges between the halves */
+.bridge { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; padding-top: 170px; }
+.slide.breakslide::before { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 30px; color: #dfe4ff; max-width: 1100px; }
+.breakslide code { background: rgb(255 255 255 / 0.15); color: #fff; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+/* exercise slides */
+.ex-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 50px; align-items: start; }
+
+/* reading lists */
+.slide ul.reading li { font-size: 28px; margin-bottom: 16px; }
+.slide ul.reading .muted { font-size: 22px; }
+
+/* components on slides */
+.slide .live, .slide .live-js { font-size: 24px; }
+.slide .live-js[data-layout="wide-code"] { font-size: 21px; }
+.slide .live-js[data-console="small"] .js-right { grid-template-rows: minmax(0, 2.6fr) minmax(0, 1fr); }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 32px; padding: 22px 34px; line-height: 1.4; }
+.slide .dom-lab { font-size: 25px; }
+.slide .event-lab { font-size: 30px; }
+.slide .event-lab { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.slide .event-lab .ev-code { font-size: 0.6em !important; }
+.slide .dom-lab .dl-side { grid-template-rows: minmax(0, 1.7fr) minmax(0, 1fr); }
+.slide .event-monitor { font-size: 30px; }
+.slide .fluid-calc { font-size: 28px; }
+.slide .fluid-calc .fc-sample { max-height: 170px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="title no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-title="Fits every pocket. Talks back.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 4</p>
+      <h1 class="title-h1">Fits every <em class="s">pocket.</em><br><span class="js">talks.back()</span></h1>
+      <p class="title-sub">responsive CSS · the DOM · events · forms</p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <div class="phone-wrap pw1"><div class="phone" style="--d:290px;--w:390px"><iframe data-src="project/showcase/index.html?step=0&amp;bare" tabindex="-1" title=""></iframe></div></div>
+      <div class="phone-wrap pw2"><div class="phone" style="--d:290px;--w:390px"><iframe data-src="project/showcase/index.html?step=4&amp;bare" tabindex="-1" title=""></iframe></div></div>
+      <span class="sticker s1">start: lecture 3</span>
+      <span class="sticker s2">end: responsive + JS</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Welcome back. Last time the market got a floor plan. Today it goes out into the world: onto phones, and into people's hands. Part 1 is CSS, Part 2 is JavaScript, and the slides change their look between them. The break comes at about 1:34, after events; after it, forms and then you build.</p>
+    <p>Keys: <code>p</code> presenter view, <code>m</code> menu, <code>n</code> notes, <code>Esc</code> leaves an editor so arrows work again.</p>
+  </aside>
+</section>
+
+<section data-title="Open it on a phone">
+  <p class="kicker">Where we left off · git pull now</p>
+  <h2>A floor plan, drawn on a laptop. Now open it on a phone, and press Reserve.</h2>
+  <div class="two-problems">
+    <div class="phone-wrap"><div class="phone" style="--d:240px;--w:375px"><iframe data-src="project/showcase/index.html?step=0&amp;bare" title="Lecture 3's page on a phone"></iframe></div><p class="phone-cap">375px · Lecture 3</p></div>
+    <div>
+      <ol class="problems">
+        <li>The menu runs off the screen. The page slides sideways under your thumb.</li>
+        <li>The featured stall forces two columns; the map is three thin strips.</li>
+        <li>The headline and the spacing were made for a laptop.</li>
+        <li class="step">Reserve? The page reloads. The filter, the menu button? They don't exist. <strong>The page doesn't listen.</strong></li>
+      </ol>
+      <p class="small mt"><code>git pull</code> the exercises repo and open <code>04-responsive-dom/index.html</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>This phone is a real iframe, 375px wide: the page as it is. Scroll it: the menu goes off the right edge, and you can drag the whole page sideways. Problems 1–3 are the first half. Then reveal the 4th: the second half.</p>
+    <p>Say it out loud: <b>pull the repo now</b> (new folder <code>04-responsive-dom</code>), so Exercise 1 at 0:16 starts with typing, not downloading.</p>
+  </aside>
+</section>
+
+<section data-title="The day in seven parts">
+  <p class="kicker">The plan · 3 hours</p>
+  <h2>Two halves: fit every pocket, then talk back</h2>
+  <div class="map">
+    <div class="m1"><b>Act 1</b><span class="glyph">📱</span><strong>Small screens</strong>media queries<time>0:05</time></div>
+    <div class="m2"><b>Act 2</b><span class="glyph">〰</span><strong>Fluid</strong>clamp, min, calc<time>0:30</time></div>
+    <div class="w w4"><b>03</b><span class="glyph">⌖</span><strong>Find it, change it</strong>the DOM<time>0:48</time></div>
+    <div class="w w5"><b>04</b><span class="glyph">⚡</span><strong>Listen</strong>events<time>1:08</time></div>
+    <div class="mb"><b>☕</b><span class="glyph"> </span><strong>Break</strong>15 min<time>1:34</time></div>
+    <div class="w w6"><b>05</b><span class="glyph">✉</span><strong>The conversation</strong>forms<time>1:49</time></div>
+    <div class="wj"><b>jam</b><span class="glyph">🏮</span><strong>Market jam</strong>5 groups, 5 features<time>1:54</time></div>
+  </div>
+  <div class="halves"><span>CSS · the page asks questions about where it is</span><span>JS · the page reacts to the person</span></div>
+  <p class="mt"><span class="hl">Part 1: who are you asking?</span> Part 2: <strong>find · listen · change</strong>. Then you build: the market jam.</p>
+  <aside class="notes">
+    <p>The spine. Part 1: every responsive tool is a question asked of something: the window (@media) or nobody at all (clamp: maths instead of questions). Two more askers are on the reading list: the slot (@container) and the browser (@supports). Part 2: every interactive feature is the same three steps.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · SMALL SCREENS
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Small screens" data-at="0:05" data-title="Act 1 — Small screens">
+  <div class="act-deco">📱</div>
+  <div class="act-num">Act 1</div>
+  <h1>Small screens</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:30</span><span>ask the window</span></div>
+  <div class="act-list"><span>the viewport tag</span><span>testing</span><span>@media</span><span>mobile first</span><span>breakpoints</span><span>variables</span></div>
+</section>
+
+<section data-title="The 980px lie">
+  <p class="kicker">Working with mobile devices</p>
+  <h2>Without one line, every phone pretends to be 980px wide</h2>
+  <div class="phones">
+    <div class="phone-wrap"><div class="phone" style="--d:236px;--w:980px"><iframe data-src="project/showcase/index.html?step=4&amp;bare" title="The page laid out at 980px and shrunk"></iframe></div><p class="phone-cap">no viewport tag</p></div>
+    <div class="phone-wrap"><div class="phone" style="--d:236px;--w:390px"><iframe data-src="project/showcase/index.html?step=4&amp;bare" title="The page at the phone's real width"></iframe></div><p class="phone-cap">with it</p></div>
+    <div class="stack" style="max-width:640px">
+      <script type="text/x-code" data-lang="html" class="small"><meta name="viewport"
+  content="width=device-width,
+           initial-scale=1"></script>
+      <p class="small">In 2007 the web had no mobile sites, so the first iPhone laid every page out at <strong>980px</strong> and shrank it. Phones still do that, unless you tell them: <em>my page is ready, use your real width</em>.</p>
+      <p class="small muted">A device pixel ≠ a CSS pixel: a 393px-wide iPhone has 1179 pixels across (ratio 3). Your CSS, your media queries and <code>vw</code> all count CSS pixels.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Both frames show the <em>finished</em> responsive page. Left: what the phone does without the tag: lays it out at 980px (so the desktop layout appears) and scales it down to a third. All the media queries in the world won't help if this line is missing: the phone never reports a small width.</p>
+    <p>The starter project for today has the line deliberately missing. Case 0 of Exercise 1 adds it. Playground: <code>playgrounds/devices.html</code> toggles it on three phones.</p>
+  </aside>
+</section>
+
+<section data-title="Test on the real thing">
+  <p class="kicker">Mobile testing</p>
+  <h2>Three ways to see your page on a phone</h2>
+  <div class="grid-3">
+    <div class="card"><span class="label">fast · every change</span><h3>Device toolbar</h3><p>DevTools → <kbd>⌘ ⇧ M</kbd> / <kbd>Ctrl ⇧ M</kbd>. Pick a phone, drag the width, throttle the network.</p></div>
+    <div class="card"><span class="label">real · every feature</span><h3>Your own phone</h3><p><code>npx live-server</code> prints a <em>Network</em> address: <code>http://192.168.1.23:8080</code>. Same Wi-Fi, open it on the phone.</p></div>
+    <div class="card"><span class="label">deep · when it's weird</span><h3>Remote debugging</h3><p>Plug the phone in: Chrome <code>chrome://inspect</code>, Safari <em>Develop</em> menu. Real DevTools, real device.</p></div>
+  </div>
+  <p class="mt">The toolbar fakes the <strong>width</strong>. It can't fake a thumb, the browser's own bars, a slow CPU or fonts that aren't on the phone. <span class="hl">Check on a real phone before you call it done.</span></p>
+  <aside class="notes">
+    <p>~2 min. Show the device toolbar on the showcase for 20 seconds if the projector allows. The live-server network address is the trick most students don't know; it makes testing on their own phone take 10 seconds.</p>
+  </aside>
+</section>
+
+<section data-steps="3" data-title="A media query is a question">
+  <p class="kicker">Media queries · press → to read it</p>
+  <h2>A media query asks the window a question</h2>
+  <div class="anat"><span class="a m1">@media</span> <span class="p">(</span><span class="m2"><span class="f">width</span> <span class="p">&gt;=</span> <span class="v">40rem</span></span><span class="p">)</span> <span class="p">{</span>
+  <span class="m3"><span class="c">/* ordinary rules */</span></span>
+<span class="p">}</span></div>
+  <div class="explain">
+    <div class="step"><strong>@media</strong>: "only if…". The rules inside are normal CSS that switch on and off.</div>
+    <div class="step"><strong>width &gt;= 40rem</strong>: the condition. Older spelling: <code>(min-width: 40rem)</code>. Same answer.</div>
+    <div class="step">Inside: no new specificity, no magic. <span class="hl">If the answer is yes, the rules join the cascade.</span></div>
+  </div>
+  <aside class="notes">
+    <p>Three steps highlight the three parts. The range syntax <code>(width &gt;= 40rem)</code> works in every current browser (since 2023); <code>min-width</code> works everywhere including old ones. Both are fine.</p>
+    <p>The third point is the trap for later: a media query adds NO specificity. Quiz in two slides.</p>
+  </aside>
+</section>
+
+<section data-title="Watch a query answer">
+  <p class="kicker">Live · press 📱 ▭ 🖥 · then delete the query</p>
+  <h2>Same CSS, three windows</h2>
+  <div class="fill live" data-resizable="320-1300-360" data-presets="360,800,1200" data-zoom="1" data-burglars>
+    <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><nav><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Schedule</a></li><li><a href="#">Tickets</a></li></ul></nav></header><main><h1>Harbour Night Market</h1><p>Forty stalls on the waterfront.</p></main></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} .site-header{padding:.8rem 1rem;background:#171b25;border-bottom:2px solid #3a4254} .logo{font-weight:800;color:#f3ecdf;text-decoration:none} nav ul{list-style:none;margin:.4rem 0 0;padding:0} nav a{color:#c9c1b3;text-decoration:none;text-transform:uppercase;font-size:.8rem;font-weight:700;letter-spacing:.08em} main{padding:1rem} h1{font:400 2.5rem/1 Georgia,serif;margin:.5rem 0} p{color:#c9c1b3} body::after{content:"phone";position:fixed;right:10px;bottom:56px;background:#ffd23f;color:#17140f;font:800 14px ui-monospace,monospace;padding:6px 10px;border-radius:6px}</script>
+    <textarea>
+/* the phone: the list stays a list */
+
+@media (width >= 40rem) {
+  body::after { content: "≥ 40rem"; }
+  .site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  nav ul {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+  }
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Press 📱 360: the yellow label says "phone", the nav is a list. ▭ 800: the query answers yes, the header becomes a row. Drag slowly across 640px (40rem) and watch it flip. Then delete the @media line and its closing brace: the row comes back on the phone too, and the 🦝 scrollburglar badge appears. That's Exercise 1, case 1.</p>
+  </aside>
+</section>
+
+<section data-title="Mobile first">
+  <p class="kicker">Which way round?</p>
+  <h2>Start from the phone, add for bigger screens</h2>
+  <div class="vs2">
+    <div>
+      <h3>Desktop first <span class="muted small">· max-width</span></h3>
+      <script type="text/x-code" data-lang="css">.market-map { /* 3 columns, 4 rows… */ }
+.featured { grid-column: span 2; }
+
+@media (width < 40rem) {
+  .market-map { /* undo, redo for 2 */ }
+  .featured { grid-column: auto; } /* undo */
+}</script>
+      <p class="tally">every phone rule <em class="s">undoes</em> a desktop rule</p>
+    </div>
+    <div>
+      <h3>Mobile first <span class="muted small">· min-width</span></h3>
+      <script type="text/x-code" data-lang="css">.market-map { /* 2 columns */ }
+
+@media (width >= 40rem) {
+  .featured { grid-column: span 2; }
+}
+@media (width >= 56rem) {
+  .market-map { /* 3 columns */ }
+}</script>
+      <p class="tally">every query <em class="s">adds</em> something</p>
+    </div>
+  </div>
+  <p class="mt"><span class="hl">Simple goes outside, extras go inside:</span> fewer overrides, and the phone never depends on undoing the desktop.</p>
+  <aside class="notes">
+    <p>Inherited a desktop page (like ours)? Desktop-first <code>max-width</code> queries are a legitimate quick fix. For anything new: mobile first. The showcase's <code>css/layout.css</code> is Lecture 3's layout rewritten mobile first: compare it with <code>layout-l3.css</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Breakpoints come from the content">
+  <p class="kicker">Breakpoints</p>
+  <h2>A breakpoint is where <em class="s">your</em> design breaks, not where a phone starts</h2>
+  <ul>
+    <li><strong>Find it by dragging.</strong> Narrow the window until something looks wrong. That width is the breakpoint.</li>
+    <li><strong>In <code>rem</code>, not px.</strong> Someone with a bigger default font gets the phone layout sooner, which is exactly what they need.</li>
+    <li><strong>As few as you can.</strong> Two or three. Each one is a whole extra design to test.</li>
+    <li><strong>Not device names.</strong> There are thousands of screen widths. "iPhone 15" is out of date next year.</li>
+    <li class="muted">You can't put <code>var(--bp)</code> in a query. Write the number, and a comment.</li>
+  </ul>
+  <aside class="notes">
+    <p>The rem point is the masters-level one: in media queries, <code>rem</code>/<code>em</code> are based on the browser's default font size (the user setting), not on your <code>html { font-size }</code>. A user with 20px default gets the 40rem breakpoint at 800px instead of 640px: their text is bigger, so they need the narrower layout longer. With px breakpoints they'd get cramped columns.</p>
+    <p>Exercise 1 case 2 asks them to find the breakpoint by dragging (34rem).</p>
+  </aside>
+</section>
+
+<section data-title="Not every question is about width">
+  <p class="kicker">Other queries</p>
+  <h2>Ask about the device and the person, too</h2>
+  <table class="dtable">
+    <tr><th>query</th><th>asks</th><th>on the market page</th></tr>
+    <tr><td><code>(hover: hover)</code></td><td>can it hover? (a mouse can, a thumb can't)</td><td>cards lift on hover, but don't stick after a tap</td></tr>
+    <tr><td><code>(pointer: coarse)</code></td><td>is the pointer a finger?</td><td>bigger tap targets in the menu</td></tr>
+    <tr><td><code>(prefers-reduced-motion: no-preference)</code></td><td>the person did NOT ask for less motion</td><td>smooth scrolling, only then</td></tr>
+    <tr><td><code>(prefers-color-scheme: light)</code></td><td>does the person use a light theme?</td><td>a daytime market for light-mode people</td></tr>
+    <tr><td><code>print</code></td><td>is this going on paper?</td><td>hide the menu, the form, the buttons</td></tr>
+  </table>
+  <p class="small mt">Test them without changing your settings: DevTools → ⋮ → More tools → <strong>Rendering</strong> → <em>Emulate CSS media feature</em>.</p>
+  <aside class="notes">
+    <p>Reduced motion is an accessibility setting: vestibular disorders, motion sickness. Phrase motion as an opt-in: <code>@media (prefers-reduced-motion: no-preference) { … }</code>. All of these are in the showcase's <code>layout.css</code>, bottom section.</p>
+  </aside>
+</section>
+
+<section data-title="Variables: one change, everywhere">
+  <p class="kicker">CSS variables · live · then DevTools → Rendering → prefers-color-scheme: dark</p>
+  <h2>A query changes a variable; everything using it follows</h2>
+  <div class="fill live" data-resizable="320-1300-900" data-presets="360,900" data-zoom="1" data-layout="wide-code">
+    <script type="text/plain" data-role="html"><section><h2>Vendors</h2><div class="cards"><article class="card"><h3>Dumpling Dynasty</h3><p>Steamed in front of you.</p></article><article class="card"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p></article><article class="card"><h3>Salt &amp; Ink</h3><p>Posters of the port.</p></article></div></section></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;font:16px/1.5 system-ui} h2,h3{margin:0 0 .3rem} p{margin:0} .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr))} .card{border:2px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:12px}</script>
+    <textarea>
+:root { --bg: #f4efe6; --ink: #17140f;
+        --gap: 1rem; }
+@media (width >= 50rem) {
+  :root { --gap: 2.5rem; }
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #12151d; --ink: #f3ecdf; }
+}
+body { background: var(--bg);
+       color: var(--ink); padding: var(--gap); }
+.cards { gap: var(--gap); }
+.card  { padding: var(--gap); }
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Press 📱 then 🖥: the spacing changes in three places, from one line in one query. Then DevTools → Rendering → emulate <code>prefers-color-scheme: dark</code> (or light, if your laptop is already dark): the whole theme flips from one block. That's why variables and media queries belong together.</p>
+    <p>Unlike Sass variables, custom properties are live: they cascade, inherit, and can be changed later, even by JavaScript. Remember that for Part 2.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which padding wins at 900px?">
+  <p class="kicker">Quick check · the cascade is still in charge</p>
+  <h2>The window is 900px. How much padding?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="css">@media (width >= 40rem) {
+  .card { padding: 2rem; }
+}
+
+/* later in the file */
+.card { padding: 1rem; }</script>
+    <div class="stack">
+      <div class="reveal-box solid step"><strong>1rem.</strong> The query matches, but a media query adds <strong>no specificity</strong>. Same selector, so the later rule wins.</div>
+      <div class="reveal-box step">Mobile first works <em>because</em> of this: base rules first, queries after, so the queries win when they match.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Hands up: 2rem or 1rem? Most say 2rem. Reveal. This bug is common when someone appends a "fix" at the end of a stylesheet and the tablet layout silently breaks. Order matters: queries at the end of their section.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Pocket check">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 1 · solo · 12 min</p>
+  <div class="ex-head"><h2>Pocket check</h2><button class="timer" data-min="12"></button></div>
+  <ul>
+    <li><strong>Case 0 · the real phone</strong>: add the viewport tag to your starter; look at it in the device toolbar.</li>
+    <li><strong>Case 1 · the menu</strong> runs off the screen: wrap it, no query needed.</li>
+    <li><strong>Case 2 · the featured stall</strong>: span 2 only where there's room. Mobile first.</li>
+    <li><strong>Case 3 · the map</strong>: redraw it for big screens.</li>
+    <li class="muted">If you finish: case 4 (hover, motion), 5 (one variable, every breakpoint).</li>
+  </ul>
+  <p class="where mt">04-responsive-dom → <b><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/exercises/01-pocket-check.html" target="_blank" rel="noopener">Exercise 1 · Pocket check</a></b>. Each editor has 📱 ▭ 🖥 presets; the checks test all widths at once.</p>
+  <aside class="notes">
+    <p>Cases 0–3 in class. Case 0 needs their own copy of the starter: <code>project/starter/</code> copied out of the repo (as last time). If someone can't, skip it: it's also homework.</p>
+    <p>Common: on case 2, writing <code>max-width</code> (the check asks for mobile first). On case 3, forgetting that inside the query you only override columns and areas.</p>
+    <p>Debrief (2 min): "Where did you put the breakpoint in case 2, and how did you find it?" Answer: by dragging; ~34rem.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · FLUID
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Fluid" data-at="0:30" data-title="Act 2 — Fluid">
+  <div class="act-deco">〰</div>
+  <div class="act-num">Act 2</div>
+  <h1>Fluid</h1>
+  <div class="act-meta"><span class="chip">0:30 – 0:45</span><span>ask less, calculate more</span></div>
+  <div class="act-list"><span>calc</span><span>fragments</span><span>clamp</span><span>fluid type</span><span>fluid design</span></div>
+</section>
+
+<section data-title="Breakpoints jump">
+  <p class="kicker">Live · drag the width slowly</p>
+  <h2>A breakpoint jumps. A fluid value slides.</h2>
+  <p class="small muted"><code>vw</code> = 1% of the window's width. Mixed with <code>rem</code>, it makes a value grow with the window.</p>
+  <div class="fill live" data-resizable="360-1300-700" data-zoom="1" data-measure="h1">
+    <script type="text/plain" data-role="html"><h1 class="jump">Night Market</h1><h1 class="slide">Night Market</h1></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;padding:28px 18px;background:#12151d;color:#f3ecdf} h1{font-family:Georgia,serif;font-weight:400;line-height:1;margin:0 0 30px} .jump::before{content:"@media ";font:700 14px ui-monospace,monospace;color:#ff8a6b;display:block} .slide::before{content:"clamp() ";font:700 14px ui-monospace,monospace;color:#7ee2a8;display:block}</script>
+    <textarea>
+.jump { font-size: 2.5rem; }
+@media (width >= 50rem) {
+  .jump { font-size: 5rem; }
+}
+
+.slide {
+  font-size:
+    clamp(2.5rem, 0.6rem + 5.3vw, 5rem);
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Drag across 800px. The top one jumps from 40 to 80px in one pixel of window; the bottom one grows a little with every pixel. Nobody notices a value that slides; everybody notices one that jumps. This act is the tools to make values slide: calc, viewport units, min/max/clamp.</p>
+  </aside>
+</section>
+
+<section data-title="calc() and variable fragments">
+  <p class="kicker">Values built from parts · calc · variable fragments</p>
+  <h2>CSS can do maths, with units the browser only knows later</h2>
+  <div class="vs2">
+    <div>
+      <h3><code>calc()</code> mixes units</h3>
+      <script type="text/x-code" data-lang="css">/* everything but a 20rem sidebar */
+.main { width: calc(100% - 20rem); }
+
+/* a % of the parent, minus a gap in rem */
+.half { width: calc(50% - 0.5rem); }
+
+/* turn a plain number into a length */
+.stack { gap: calc(var(--n) * 1rem); }</script>
+      <p class="small">The browser solves it at layout time, when it knows what 100% is.</p>
+    </div>
+    <div>
+      <h3>A variable can be <em class="s">part</em> of a value</h3>
+      <script type="text/x-code" data-lang="css">.vendor-card {
+  --hue: 30;
+  border-color: hsl(var(--hue) 80% 65%);
+  box-shadow: 0 0 2rem
+    hsl(var(--hue) 80% 65% / 0.3);
+}
+.music  { --hue: 200; }
+.crafts { --hue: 120; }</script>
+      <p class="small">One number per category; three colours each, built from it.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>calc: spaces around + and − are required (<code>calc(100%-2rem)</code> is invalid). Inside <code>min()</code>, <code>max()</code>, <code>clamp()</code> you can write maths directly, no calc needed.</p>
+    <p>Fragments: <code>--hue: 30</code> is just a number; it becomes a colour only inside <code>hsl()</code>.</p>
+  </aside>
+</section>
+
+<section data-title="min, max, clamp">
+  <p class="kicker">Clamping values</p>
+  <h2><code>clamp()</code>: be this, but never less than that, never more than this</h2>
+  <div class="numline" aria-hidden="true">
+    <div class="axis"></div><div class="zone"></div>
+    <span class="pin" style="left:25%">MIN</span><span class="pin" style="left:47%">PREFERRED → slides</span><span class="pin" style="left:70%">MAX</span>
+    <span class="tick" style="left:8%">too small → MIN</span><span class="tick" style="left:88%">too big → MAX</span>
+  </div>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="css">/* the readable column: 40rem,
+   but never wider than the screen
+   minus 1rem each side */
+main {
+  width: min(100% - 2rem, 40rem);
+  margin-inline: auto;
+}</script>
+    <script type="text/x-code" data-lang="css">/* clamp(MIN, PREFERRED, MAX)
+   = max(MIN, min(PREFERRED, MAX)) */
+:root {
+  --gutter: clamp(1rem, 0.5rem + 3vw, 3rem);
+}
+h1 {
+  font-size: clamp(2.5rem, 1.1rem + 6vw, 6rem);
+}</script>
+  </div>
+  <aside class="notes">
+    <p><code>min()</code> picks the smaller, <code>max()</code> the larger. Counter-intuitive: <code>min()</code> sets a <em>maximum</em> ("never more than 40rem"). <code>clamp</code> is the combination. If MIN &gt; MAX, MIN wins.</p>
+    <p>The <code>min(100% - 2rem, 40rem)</code> line replaces a <code>max-width</code> + padding + media query combo.</p>
+  </aside>
+</section>
+
+<section data-title="Responsive typography">
+  <p class="kicker">Responsive typography</p>
+  <h2>Text size belongs to the reader first</h2>
+  <ul>
+    <li>Everyone has a <strong>default font size</strong> in their browser settings: 16px, unless they changed it. People who changed it needed to.</li>
+    <li><code>rem</code> follows that setting. <code>px</code> ignores it. <span class="hl">Font sizes in rem.</span></li>
+    <li><strong>Zoom</strong> is the other dial: it makes CSS pixels bigger, so the window gets <em>narrower</em> in CSS pixels, and your phone layout may kick in on a laptop. That's correct.</li>
+    <li>A size made only of <code>vw</code> ignores both dials: zoom makes the window narrower by exactly as much as it makes the pixels bigger. <strong>The text never grows.</strong></li>
+  </ul>
+  <aside class="notes">
+    <p>WCAG 1.4.4 Resize Text: text can be resized to 200% without loss of content. <code>font-size: 4vw</code> fails it. The fix is a rem part in every fluid value (next slide), and the calculator shows a zoom test.</p>
+  </aside>
+</section>
+
+<section data-title="Fluid typography">
+  <p class="kicker">Fluid typography · where the numbers come from</p>
+  <h2>Two points make a line. <code>clamp()</code> stops it at both ends.</h2>
+  <svg class="fline" viewBox="0 0 1400 330" role="img" aria-label="Font size rises in a straight line from 40px at a 360px window to 96px at 1280px, flat outside that range">
+    <line class="grid" x1="80" y1="290" x2="1380" y2="290"/><line class="grid" x1="80" y1="20" x2="80" y2="290"/>
+    <path d="M80 230 L300 230 L1050 60 L1380 60" fill="none" stroke="#ff5a36" stroke-width="8" stroke-linejoin="round"/>
+    <circle cx="300" cy="230" r="13" fill="#2f49ff"/><circle cx="1050" cy="60" r="13" fill="#2f49ff"/>
+    <text x="320" y="270">(360px, 40px)</text><text x="900" y="40">(1280px, 96px)</text>
+    <text x="90" y="215">MIN 2.5rem</text><text x="1140" y="100">MAX 6rem</text>
+    <text x="700" y="215">slope 6.09vw · start 1.13rem</text>
+    <text x="1180" y="320">window width →</text>
+  </svg>
+  <script type="text/x-code" data-lang="css" class="big">h1 { font-size: clamp(2.5rem, 1.13rem + 6.09vw, 6rem); }</script>
+  <aside class="notes">
+    <p>The maths, once: from 40px to 96px is +56px over 920px of window: 0.0609 px per px, i.e. 6.09vw. At 360px that part is 21.9px, so the line starts at 40 − 21.9 = 18.1px = 1.13rem. Nobody does this by hand: next slide.</p>
+    <p>Why a fixed part and not just vw: any fixed part (px or rem) still grows when someone zooms; vw alone never does. Why rem rather than px: rem also follows the reader's default font-size setting, the other dial from the previous slide.</p>
+  </aside>
+</section>
+
+<section data-title="The fluid calculator">
+  <p class="kicker">Fluid calculator · live</p>
+  <h2>Pick two sizes at two widths. Copy the line.</h2>
+  <div class="fill fluid-calc" data-min-fs="2.5" data-max-fs="6" data-min-vw="360" data-max-vw="1280" data-vw="900"></div>
+  <aside class="notes">
+    <p>Change the numbers, drag the window. Then switch to "vw only": the zoom test turns red: the text never doubles. With the rem part it doubles at some zoom level. Rule of thumb from the zoom test: keep largest ≤ 2.5 × smallest. Same tool: <code>playgrounds/fluid.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Fluid design">
+  <p class="kicker">Fluid design · live · drag from 320 to 1300</p>
+  <h2>A whole page without a single breakpoint</h2>
+  <div class="fill live" data-resizable="320-1300-700" data-presets="360,800,1200" data-zoom="1" data-burglars data-layout="wide-code">
+    <script type="text/plain" data-role="html"><main><h1>Harbour Night Market</h1><p class="lead">Forty stalls, three stages and one very long table on the waterfront.</p><ul class="stalls"><li>🥟 Dumpling Dynasty</li><li>🎸 Side B Records</li><li>🖨 Salt &amp; Ink</li><li>🌵 The Plant Swap</li></ul></main></script>
+    <script type="text/plain" data-role="base">*,*::before,*::after{box-sizing:border-box} body{margin:0;background:#12151d;color:#f3ecdf;font:16px/1.5 system-ui} h1{font-family:Georgia,serif;font-weight:400;line-height:1;margin:0 0 .5em} .lead{color:#c9c1b3} .stalls{list-style:none;padding:0} .stalls li{background:#1b202b;border:2px solid #3a4254;border-radius:12px;padding:1rem;font-weight:700}</script>
+    <textarea>
+:root {
+  --gutter: clamp(1rem, 0.2rem + 3.5vw, 3rem);
+}
+main {
+  width: min(100% - 2 * var(--gutter), 60rem);
+  margin-inline: auto;
+}
+h1 {
+  font-size: clamp(2.2rem, 1rem + 5vw, 5rem);
+}
+.stalls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,
+    minmax(min(14rem, 100%), 1fr));
+  gap: var(--gutter);
+}
+</textarea>
+  </div>
+  <aside class="notes">
+    <p><b>30 seconds by default</b>: drag from 320 to 1300 once, "no breakpoints, no jumps, no 🦝". If ahead: read it top to bottom: a fluid gutter, a column that fits, a fluid headline, and the magic line with <code>min()</code> so it can't become a burglar. Drag through every width: no jumps, no 🦝, no media queries. Breakpoints stay for things that really must change shape (the map). Everything else can be fluid.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="Go deeper: what we skipped">
+  <p class="kicker">Further reading · four topics we didn't have time for</p>
+  <h2>Go deeper: what we skipped</h2>
+  <ul class="reading">
+    <li><a href="https://www.joshwcomeau.com/css/container-queries-introduction/" target="_blank" rel="noopener">Container queries</a> <span class="muted">— Josh Comeau's introduction: a component that asks its slot instead of the window (and why the slot, not the card, is the container)</span></li>
+    <li><a href="https://web.dev/blog/viewport-units" target="_blank" rel="noopener">Viewport units: svh, lvh, dvh</a> <span class="muted">— web.dev: why 100vh hides your button behind a phone's toolbar</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@supports" target="_blank" rel="noopener">Feature queries: @supports</a> <span class="muted">— MDN: ask the browser "can you do this?" before you rely on it</span></li>
+    <li><a href="https://ishadeed.com/article/overflow/" target="_blank" rel="noopener">Overflow, a.k.a. scrollburglars</a> <span class="muted">— Ahmad Shadeed: everything that makes a phone page slide sideways, and how to find it</span></li>
+    <li><a href="https://web.dev/learn/design" target="_blank" rel="noopener">web.dev · Learn Responsive Design</a> <span class="muted">— the whole of Part 1 and more, with demos</span></li>
+  </ul>
+  <p class="small muted mt">The finished market page uses all four: open <code>project/showcase/</code> and read <code>css/fluid.css</code> and <code>css/components.css</code>.</p>
+  <aside class="notes">
+    <p>30 seconds. "Four things we cut today, all on this list; the showcase uses every one of them." The 🦝 badges students saw in the live editors are the scrollburglar detector.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="What CSS can't do">
+  <p class="kicker">The cliffhanger</p>
+  <h2>Press Reserve. <em class="s">Who reads the form?</em></h2>
+  <p>CSS answers questions about the <strong>world</strong>: the window, the slot, the browser, the settings. It can even fold a menu (<code>&lt;details&gt;</code>, <code>popover</code>, <code>:has(:checked)</code>). But it can't <strong>read</strong> what someone typed, <strong>remember</strong> it, or <strong>build</strong> them a ticket from it.</p>
+  <aside class="notes">
+    <p>Someone will say "popover!" for the menu: correct, and say so (Lecture 1). That's why the cliffhanger is the form, not the menu. The menu comes back on slide 43 as the smallest example of the loop, with state in <code>aria-expanded</code>.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     PART 2 · IT TALKS BACK  (wire theme)
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="P" data-act-name="Part 2" data-at="0:45" data-theme="wire" data-title="Part 2 — It talks back">
+  <div class="boot" aria-hidden="true"><span class="cmd">&gt; reload market.html</span>
+<i>styles</i><span>outfit.css · layout.css · responsive.css</span><b>ok</b>
+<i>script</i><span>market.js</span><b>ok</b>
+<i>listen</i><span>click · input · submit</span><b>ready</b></div>
+  <h1 class="wire-title">It talks<br><em>back.</em><span class="cursor"></span></h1>
+  <p class="lede">Part 2 · JavaScript and the page. Same market, same HTML: now it reacts.</p>
+  <aside class="notes">
+    <p><b>0:45.</b> The look changes on purpose: different material, different mindset. Part 1 was describing; Part 2 is wiring. Ask: "open DevTools on any website, type <code>document.querySelector("h1").textContent = "Hi"</code>: who else sees it?" Nobody: it changed the page <em>in your browser's memory</em>, and a reload undoes it. That in-memory page is the DOM.</p>
+  </aside>
+</section>
+
+<section data-title="Find · listen · change">
+  <p class="kicker">The only pattern you need tonight</p>
+  <h2>Every interactive feature is the same three steps</h2>
+  <div class="loop">
+    <div class="node n-find"><b>01 · FIND</b><strong>an element</strong><code>document.querySelector(…)</code></div>
+    <div class="wire-l w1"></div>
+    <div class="node n-listen"><b>02 · LISTEN</b><strong>for an event</strong><code>.addEventListener("click", …)</code></div>
+    <div class="wire-l w2"></div>
+    <div class="node n-change"><b>03 · CHANGE</b><strong>the page</strong><code>.classList.add(…)</code></div>
+  </div>
+  <p class="loop-back">… and then wait for the next event.</p>
+  <p class="mt">The menu, the filter, the ticket form: three features, one loop.</p>
+  <aside class="notes">
+    <p>This is Part 2's spine, like "who are you asking?" was Part 1's. The three colours follow them through the acts: cyan for finding (Act 3), magenta for listening (Act 4), lime for forms (Act 5).</p>
+  </aside>
+</section>
+
+<section data-title="JavaScript you need tonight">
+  <p class="kicker">Crib sheet · if you've written code in any language, this is enough</p>
+  <h2>The JavaScript you need tonight, and nothing more</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js">// a name you won't reassign / one you will
+const card = document.querySelector(".card");
+let count = 0;
+count = count + 1;
+
+// a function to hand over, called later
+const onClick = () => { console.log("hi"); };
+
+// a string with holes: backticks
+const label = `${count} of 6 stalls`;</script>
+    <script type="text/x-code" data-lang="js">// loop over a list
+for (const card of cards) {
+  console.log(card);
+}
+
+// compare with ===, stop early with return
+if (tag === "food") { … }
+if (!button) return;   // ! = not
+"1" === 1          // false: text vs number
+Number("1") === 1  // true
+
+// pick one of two: condition ? yes : no
+n === 1 ? "person" : "people"</script>
+  </div>
+  <aside class="notes">
+    <p>Prerequisite, said out loud: "you've written code before, in any language". If someone has never programmed, pair them with someone who has for the exercises; the live editors keep the syntax small. Pitch: this isn't a JavaScript course, it's the Web API part. If someone knows Python: <code>const</code> is a name you won't reassign, arrow functions are lambdas, template literals are f-strings, <code>for…of</code> is Python's <code>for x in xs</code>. JavaScript also has a <code>for…in</code>: it loops over keys, not items. Don't use it tonight. The <code>"1" === 1</code> line comes back in Act 5: every form value is a string.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · FIND IT, CHANGE IT
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Find it, change it" data-at="0:48" data-title="Act 3 — Find it, change it">
+  <div class="act-deco">querySelector</div>
+  <div class="act-num">act 03</div>
+  <h1>Find it, change it</h1>
+  <div class="act-meta"><span class="chip">0:48 – 1:08</span><span>the DOM</span></div>
+  <div class="act-list"><span>the tree</span><span>getElementById</span><span>querySelector</span><span>textContent</span><span>classList</span><span>attributes</span><span>createElement</span><span>defer</span></div>
+</section>
+
+<section data-title="HTML is text. The DOM is a tree.">
+  <p class="kicker">The DOM · type along: presets, then your own lines</p>
+  <h2>HTML is text. The browser turns it into a tree of objects.</h2>
+  <div class="fill dom-lab" data-market data-presets="document.querySelector('h1')||document.querySelector('h1').textContent = 'Hello, DOM'||document.querySelectorAll('.vendor-card').length||document.querySelector('.sold-out').classList.remove('sold-out')||document.querySelector('.badge').remove()">
+    <script type="text/plain" data-role="html"><p class="eyebrow">Friday 16 October</p>
+<h1>Harbour Night Market</h1>
+<ul class="vendor-list">
+  <li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li>
+  <li class="vendor-card sold-out" data-tag="food"><span class="tag">Food</span><h3>Churros Till Late</h3><strong class="badge">Sold out</strong></li>
+  <li class="vendor-card" data-tag="music"><span class="tag">Music</span><h3>Side B Records</h3></li>
+</ul></script>
+  </div>
+  <aside class="notes">
+    <p>The DOM = Document Object Model. Every tag became an object (an element), nested like the HTML. JavaScript sees the objects, not the text. Click each preset; the changed lines flash red in the tree and the page changes with them. Hover a tree line to find its element.</p>
+    <p>Then do the break mystery live on the real showcase page in a second tab: F12 → Console → change the h1. Students type along in their own browser. Playground: <code>playgrounds/dom-lab.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Find: by id, by tag">
+  <p class="kicker">Find · the specific methods</p>
+  <h2>One method per kind of question</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="xs">// by id: one element, or null (no #)
+const nav = document.getElementById("main-nav");
+
+// by tag name: every <h3> on the page
+const titles = document.getElementsByTagName("h3");
+titles.length;   // 6
+
+// by class: every .vendor-card (no dot)
+document.getElementsByClassName("vendor-card");</script>
+    <div>
+      <ul>
+        <li><code>getElementById</code> → one element <strong>or <code>null</code></strong>. Ids are unique, so it's the fastest lookup.</li>
+        <li><code>getElementsByTagName</code>, <code>getElementsByClassName</code> → an <code>HTMLCollection</code>: <em>live</em>, it changes when the page changes. No <code>forEach</code>; use <code>for…of</code>.</li>
+        <li>Each one answers one kind of question. Next: one method for any question.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>These are older than <code>querySelector</code> and you'll see them in every codebase and Stack Overflow answer. <code>getElementById</code> is still common. The live collection is the one surprise: add a card and <code>titles.length</code> grows by itself. <code>querySelectorAll</code> returns a snapshot instead.</p>
+  </aside>
+</section>
+
+<section data-title="Find: you already speak this">
+  <p class="kicker">Find · callback to Lecture 2</p>
+  <h2>querySelector: one method, any CSS selector</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="xs">// the FIRST match, or null
+const badge =
+  document.querySelector(".sold-out .badge");
+
+// ALL matches: a list (NodeList)
+const cards =
+  document.querySelectorAll(".vendor-card");
+cards.length;   // 6
+
+// search inside one element only
+cards[3].querySelector("h3");</script>
+    <div>
+      <ul>
+        <li>Any CSS selector works: <code>[data-tag="food"]</code>, <code>:has()</code>…</li>
+        <li><code>querySelector</code> → one element <strong>or <code>null</code></strong>. <em>"Cannot read properties of null"</em> = nothing matched.</li>
+        <li><code>querySelectorAll</code> → a <code>NodeList</code>: a snapshot, it doesn't update. Has <code>forEach</code>.</li>
+        <li><code>el.closest(".card")</code>: climb <em>up</em> to an ancestor.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Lecture 2's "a selector is a question to the DOM" pays off here: same question, now from JavaScript. Every live editor tonight explains the null error in plain words when it happens.</p>
+  </aside>
+</section>
+
+<section data-title="Change the text">
+  <p class="kicker">Change · text</p>
+  <h2><code>textContent</code> for their words. <code>innerHTML</code> only for yours.</h2>
+  <div class="vs2">
+    <div>
+      <script type="text/x-code" data-lang="js" class="small">const title = document.querySelector("h1");
+title.textContent = "Saturday Night Market";
+
+// a vendor registered with this name:
+const name = '<img src=x onerror="steal()">';
+
+// shows the characters:
+title.textContent = name;
+// runs their code 💀
+title.innerHTML = name;</script>
+    </div>
+    <ul>
+      <li><code>textContent</code> sets <strong>text</strong>. Whatever is in the string, it stays characters.</li>
+      <li><code>innerHTML</code> <strong>parses</strong> the string as HTML: tags become elements, attributes become event handlers.</li>
+      <li>Anything a visitor typed is theirs. Putting it in <code>innerHTML</code> lets them run code on your page for other visitors: <strong>XSS</strong>, cross-site scripting.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>This is the security habit to form on day one. Night Shift message 10 and Exercise 4 case 5 make them fall into it and climb out.</p>
+  </aside>
+</section>
+
+<section data-title="Change the state, not the style">
+  <p class="kicker">Change · state · the bridge to Part 1</p>
+  <h2>JavaScript flips the state. CSS draws it.</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="small">card.classList.add("featured");
+card.classList.remove("sold-out");
+card.classList.toggle("open");
+card.classList.contains("open");  // true
+
+// a CSS variable: the one style worth setting
+document.documentElement.style
+  .setProperty("--accent", "#ff6b4a");</script>
+    <script type="text/x-code" data-lang="css" class="small">.vendor-card.featured {
+  border-color: var(--accent);
+}
+.vendor-card.sold-out {
+  opacity: 0.5;
+}
+:root { --accent: #ff6b4a; }</script>
+  </div>
+
+  <aside class="notes">
+    <p>A class is a fact; the stylesheet draws it. Attributes work the same way: next slide. Avoid <code>el.style.color = …</code>: it hard-codes the look into the script. The bridge: Part 1's attribute selectors and custom properties are now the interface between script and style. </p>
+  </aside>
+</section>
+
+<section data-title="Attributes and dataset">
+  <p class="kicker">Change · attributes · data-*</p>
+  <h2>Attributes: read, write, remove</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="xs">// any attribute: strings in, strings out
+link.getAttribute("href");           // "#map"
+btn.setAttribute("aria-expanded", "false");
+input.removeAttribute("disabled");
+nav.hasAttribute("hidden");          // false
+nav.toggleAttribute("hidden");       // on / off
+
+// <li data-tag="food" data-stall-id="12">
+li.dataset.tag;          // "food"
+li.dataset.stallId;      // "12"  (kebab → camel)
+li.dataset.saved = "yes"; // adds data-saved="yes"
+delete li.dataset.saved;  // removes it</script>
+    <div>
+      <ul>
+        <li>Values are always <strong>strings</strong>: <code>"12"</code>, <code>"false"</code>.</li>
+        <li>Boolean attributes: present = on. <code>setAttribute("hidden", "false")</code> still hides.</li>
+        <li><code>data-*</code>: your own facts on the element.</li>
+        <li>CSS reads them too: <code>[aria-expanded="true"]</code>, <code>[data-saved]</code>.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Attribute vs property: common attributes are mirrored as properties (<code>input.disabled = true</code>, <code>nav.hidden</code>, <code>link.href</code>), with real types. The one that bites: <code>input.value</code> is what's typed now; <code>getAttribute("value")</code> is the value the HTML started with. <code>aria-expanded</code> is the menu's state in Exercise 3: a screen reader announces "Menu, collapsed". <code>dataset</code> drives the filter (<code>data-tag</code>) and the jam's ♡ save.</p>
+  </aside>
+</section>
+
+<section data-title="Create, add, remove">
+  <p class="kicker">Change · the tree itself</p>
+  <h2>Build an element, fill it, hang it in the tree</h2>
+  <div class="tt">
+    <script type="text/x-code" data-lang="js">const card = document.createElement("li");
+card.className = "vendor-card";
+card.dataset.tag = "food";
+
+const title = document.createElement("h3");
+title.textContent = "Taco Tuesday";
+
+card.append(title);  // into the card
+list.append(card);   // onto the page, at the end
+
+// list.prepend(card)  at the start
+// card.remove()       gone
+// box.replaceChildren(card)  empty, then add</script>
+    <div class="arrow">→</div>
+    <div class="tree">
+      <div class="root"><span>ul.vendor-list</span></div>
+      <div class="i1"><span>li.vendor-card</span></div>
+      <div class="i1"><span>li.vendor-card</span></div>
+      <div class="i1"><span style="border-color:#b6ff3b;color:#b6ff3b">li.vendor-card · new</span></div>
+      <div class="i2"><span style="border-color:#b6ff3b">h3</span></div>
+      <div class="i3"><span class="t">"Taco Tuesday"</span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>An element made with <code>createElement</code> exists in memory but isn't on the page until you <code>append</code> it somewhere. Common confusion: "I created it but I don't see it."</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Where does the script go?">
+  <p class="kicker">Quick check · the script tag</p>
+  <h2>This logs <code>null</code>. Why?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="html" class="small"><head>
+  <script src="js/market.js"><\/script>
+</head>
+<body>
+  <h1>Harbour Night Market</h1>
+<\/body>
+
+// market.js
+const h1 = document.querySelector("h1");
+console.log(h1); // null</script>
+    <div class="stack">
+      <div class="reveal-box solid step">The browser runs a script <strong>when it reaches it</strong>. At that line, the <code>&lt;h1&gt;</code> hasn't been read yet.</div>
+      <div class="reveal-box step"><code>&lt;script src="js/market.js" <strong>defer</strong>&gt;</code>: download now, run after the whole HTML is read. (Or put it at the end of <code>&lt;body&gt;</code>.)</div>
+      <div class="reveal-box step">Or wait for an event: <code>DOMContentLoaded</code> fires once the HTML is read.<br><code>document.addEventListener(</code><br><code>&nbsp;&nbsp;"DOMContentLoaded", init)</code></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The starter project already has <code>defer</code>. In the live editors your script runs after the HTML too.</p>
+    <p>DOMContentLoaded is a preview of Act 4: the browser calls your function when the event fires. You'll see it in older code and in scripts that can't use <code>defer</code> (inline scripts: <code>defer</code> only works with <code>src</code>). With <code>defer</code> it's unnecessary: deferred scripts run just before DOMContentLoaded. <code>window</code>'s <code>load</code> event waits for images and styles too: later than you need.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Night Shift">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 2 · a game · 8 min · messages 1–5</p>
+  <div class="ex-head"><h2>Night Shift</h2><button class="timer" data-min="8"></button></div>
+  <ul>
+    <li>It's 18:30. The market opens at 19:00. Marisol, the organiser, keeps texting you changes, and all you have is a script.</li>
+    <li>In class: messages <strong>1–5</strong>. 6–12 (more DOM) and 13–16 (events) at home.</li>
+    <li>The checks run your script on a slightly different page too: hard-coding <code>6</code> or the first card won't pass.</li>
+  </ul>
+  <p class="where mt">04-responsive-dom → <b><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/playgrounds/night-shift.html" target="_blank" rel="noopener">Night Shift</a></b>. 💡 Hint and 🏳 answer buttons if you're stuck.</p>
+  <aside class="notes">
+    <p>Walk around and look for: searching the badge on <code>document</code> instead of inside the churros card (level 3: the check adds a sold-out stall before Churros, so the first badge is someone else's), <code>querySelector</code> where the task needs all (level 4). Faster students carry on to 6–8 (createElement); everyone else meets createElement again in the jam.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · LISTEN
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="Listen" data-at="1:08" data-title="Act 4 — Listen">
+  <div class="act-deco">addEventListener</div>
+  <div class="act-num">act 04</div>
+  <h1>Listen</h1>
+  <div class="act-meta"><span class="chip">1:08 – 1:34</span><span>events</span></div>
+  <div class="act-list"><span>addEventListener</span><span>the event object</span><span>bubbling</span><span>delegation</span><span>the phone menu</span></div>
+</section>
+
+<section data-steps="4" data-title="addEventListener">
+  <p class="kicker">Listen · anatomy · press → four times</p>
+  <h2>You don't call the function. The browser does, later.</h2>
+  <script type="text/x-code" data-lang="js" class="mid">⟦button⟧.addEventListener(⟦"click"⟧, ⟦(event) => {
+  console.log(event.target);
+}⟧);</script>
+  <div class="explain">
+    <div class="step"><strong>who</strong>: the element to watch. Found with <code>querySelector</code>.</div>
+    <div class="step"><strong>what</strong>: the event's name, as a string. A typo (<code>"onclick"</code>, <code>"Click"</code>) fails silently.</div>
+    <div class="step"><strong>then what</strong>: a callback. The browser runs it on every click.</div>
+    <div class="step"><strong>event</strong>: each time, the browser hands you a report: <code>event.target</code> (where), <code>event.key</code> (which key), <code>event.preventDefault()</code> (cancel the browser's own plan).</div>
+  </div>
+  <aside class="notes">
+    <p>The mental shift from scripts that run top to bottom: the code inside the arrow function doesn't run now. It's a callback: you give it to the browser. Common bug: <code>addEventListener("click", doThing())</code>, with brackets: that calls it immediately and hands over its result.</p>
+  </aside>
+</section>
+
+<section data-title="Which events, in which order">
+  <p class="kicker">If there's time · the event object · live</p>
+  <h2>Every listener gets an <code>event</code>: what happened, and where</h2>
+  <div class="fill event-monitor"></div>
+  <aside class="notes">
+    <p><b>Skip by default</b>: the event object was step 4 of the previous slide. One sentence instead: "input = every change, change = when you're done, and Enter submits a form". If you're ahead: type a name: keydown, input per key. Tab out: change, blur. Pick an option: change. Press Enter in the name field: a click on the button AND submit, without touching the button. Order matters for Act 6: the click comes before validation, the submit after it.</p>
+    <p>On the event object: <code>event.target</code> (where it happened), <code>event.key</code> (for keys), <code>event.preventDefault()</code> (cancel the browser's default action). Playground: <code>playgrounds/events.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Bubbling">
+  <p class="kicker">Bubbling · live · predict first: I click a ♡, which listeners fire?</p>
+  <h2>A click starts at the target and bubbles up through every ancestor</h2>
+  <div class="fill event-lab" data-listen="button,ul"></div>
+  <aside class="notes">
+    <p>Before clicking: hands up, "only the button" or "the button and the list"? Then click. Listeners on button and ul. Click a ♡: the button hears it, li passes it on, the ul hears it. Same event object, different <code>currentTarget</code>. Click the stall name instead: only the ul. stopPropagation: one click to show it exists, one sentence ("rarely needed, it makes everything above deaf"), move on. Then only ul listening + closest("li"): delegation, next slide.</p>
+  </aside>
+</section>
+
+<section data-title="Delegation">
+  <p class="kicker">Event delegation</p>
+  <h2>One listener on the parent instead of one on every child</h2>
+  <div class="vs2">
+    <div>
+      <h3>One per button</h3>
+      <script type="text/x-code" data-lang="js" class="small">const buttons =
+  filters.querySelectorAll("button");
+for (const b of buttons) {
+  b.addEventListener("click", () => {
+    show(b.dataset.filter);
+  });
+}</script>
+      <p class="small muted">5 listeners. A button added later gets none.</p>
+    </div>
+    <div>
+      <h3>One on the group</h3>
+      <script type="text/x-code" data-lang="js" class="small">filters.addEventListener("click", (event) => {
+  const b = event.target.closest("button");
+  if (!b) return;       // clicked the gap
+  show(b.dataset.filter);
+});</script>
+      <p class="small muted">1 listener. Works for buttons added tomorrow.</p>
+    </div>
+  </div>
+  <p class="mt"><code>event.target</code>: what was clicked, maybe an icon <em>inside</em> the button. <code>event.currentTarget</code>: the element the listener is on, here <code>filters</code>. <span class="hl"><code>closest()</code> climbs from the target to the button you mean.</span></p>
+  <aside class="notes">
+    <p>Delegation needs bubbling, which is why we did bubbling first. <code>currentTarget</code> changes as the event bubbles: in each listener it's that listener's element. It's only set while the listener runs: <code>console.log(event)</code> and expand it later, and it shows <code>null</code>. The check in Exercise 3 case 3 counts listeners: it wants exactly one.</p>
+  </aside>
+</section>
+
+<section data-title="The phone menu, solved">
+  <p class="kicker">Find · listen · change, smallest version · click Menu in the phone</p>
+  <h2>Three steps of script, two rules of CSS</h2>
+  <div class="split">
+    <div class="stack">
+      <script type="text/x-code" data-lang="js" class="xs">const button = document.querySelector(".menu-toggle");
+
+button.hidden = false;  // only shown if JS runs
+button.setAttribute("aria-expanded", "false");
+
+button.addEventListener("click", () => {
+  const open =
+    button.getAttribute("aria-expanded") === "true";
+  button.setAttribute("aria-expanded", String(!open));
+});</script>
+      <script type="text/x-code" data-lang="css" class="xs">@media (width < 40rem) {
+  .menu-toggle[aria-expanded="false"] + .main-nav {
+    display: none;
+  }
+}
+@media (width >= 40rem) {
+  .menu-toggle { display: none; }
+}</script>
+    </div>
+    <div class="phone-wrap"><div class="phone" style="--d:300px;--w:375px"><iframe data-src="project/showcase/index.html?step=4&amp;bare" title="The finished page on a phone: click Menu"></iframe></div></div>
+  </div>
+  <aside class="notes">
+    <p>Click ☰ Menu in the phone: it's the real showcase at step 4. Progressive enhancement detail: in the HTML the button has <code>hidden</code> and <code>aria-expanded="true"</code>. If the script fails to load, there's no useless button and the menu stays open. The script shows the button and collapses the menu. Part 1 meets Part 2: a media query, an attribute selector, and three lines of event code.</p>
+  </aside>
+</section>
+
+<section data-title="It doesn't work: which of three?">
+  <p class="kicker">Before you start · debugging in one slide</p>
+  <h2>It doesn't work. Which of three?</h2>
+  <div class="grid-3">
+    <div class="card"><span class="label">a red error</span><h3>Read the line</h3><p><em>Cannot read properties of null</em>: the selector matched nothing, or the script ran before the HTML (<code>defer</code>). Anything else: the line number is where it broke.</p></div>
+    <div class="card"><span class="label">nothing happens</span><h3>Log first</h3><p>Make <code>console.log("here")</code> the first line of the listener. No log? Wrong element or a misspelled event (<code>"Click"</code>). A log but no change? The change is wrong: check what you set.</p></div>
+    <div class="card"><span class="label">it blinks</span><h3>The page reloaded</h3><p>A form submitted (or a link was followed): everything your script did is gone. <code>event.preventDefault()</code> in the <code>submit</code> listener.</p></div>
+  </div>
+  <p class="mt">And one CSS trap: <code>card.hidden = true</code> but the card stays? Your <code>display: flex</code> beats the browser's <code>[hidden]</code>. Fix: <code>[hidden] { display: none !important; }</code></p>
+  <aside class="notes">
+    <p>90 seconds, right before the exercise: these three cover nearly every "it doesn't work" hand that goes up in Ex 3 and the jam. At home they work in real DevTools, without the friendly live console: same three questions.</p>
+    <p>The hidden trap: the <code>hidden</code> attribute is only a user-agent default; any author <code>display</code> beats it before specificity is even compared (cascade origins, Lecture 2). One of the rare good <code>!important</code>s. It's line 1 of the Ex 3 CSS tab and in the showcase's <code>states.css</code>.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3 — Wire it up">
+  <span class="sticker your-turn">your turn</span>
+  <p class="kicker">Exercise 3 · solo · 14 min</p>
+  <div class="ex-head"><h2>Wire it up</h2><button class="timer" data-min="14"></button></div>
+  <ol>
+    <li><strong>The phone menu</strong>: a click flips <code>aria-expanded</code>.</li>
+    <li><strong>Save a stall</strong>: one listener per ♡ button, with a loop.</li>
+    <li><strong>The filter</strong>: one listener on <code>.filters</code>, <code>closest()</code>, <code>hidden</code> (the CSS tab already has the <code>[hidden]</code> fix). Try it; we build it together in the debrief.</li>
+    <li><span class="muted">If you finish:</span> Escape closes the menu · "2 of 6 stalls".</li>
+  </ol>
+  <p class="where mt">04-responsive-dom → <b><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/exercises/03-wire-it-up.html" target="_blank" rel="noopener">Exercise 3 · Wire it up</a></b>.</p>
+  <aside class="notes">
+    <p>Most common bugs: <code>button.setAttribute("aria-expanded", !open)</code> works by accident (true → "true"), fine; comparing <code>getAttribute(...) === true</code> (boolean vs string) never matches. Case 2: <code>querySelectorAll(".fav").addEventListener</code> → the error hint explains. Debrief (2 min): show case 3's solution on the projector, narrating find · listen · change, while the class follows in their editor. Then ask: "why one listener instead of five?"</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:34" data-title="Break">
+  <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break. <em>15 min.</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: forms, then <strong>you build</strong>. Find your group now: count off 1–5, sit together, one laptop with <code>project/jam/</code> open.</p>
+  <aside class="notes">
+    <p>Start the timer. Use the last two minutes to make sure every group has a laptop with the jam starter served (<code>npx live-server</code>). Groups decided now save five minutes after the break.</p>
+  </aside>
+</section>
+
+
+<!-- =====================================================================
+     ACT 5 · THE CONVERSATION
+     ===================================================================== -->
+
+<section class="act" data-act="5" data-act-name="The conversation" data-at="1:49" data-title="Act 5 — The conversation">
+  <div class="act-deco">FormData</div>
+  <div class="act-num">act 05</div>
+  <h1>The conversation</h1>
+  <div class="act-meta"><span class="chip">1:49 – 1:54</span><span>forms</span></div>
+  <div class="act-list"><span>submit</span><span>preventDefault</span><span>FormData</span><span>validation</span><span>showing the answer</span></div>
+</section>
+
+<section data-title="The form already works">
+  <p class="kicker">Forms · the default action</p>
+  <h2>A form already works without JavaScript. That's the problem.</h2>
+  <div class="vs2">
+    <div>
+      <ul>
+        <li>Submit (button <em>or</em> Enter) → the browser collects the fields, sends them to the <code>action</code> URL and <strong>loads a new page</strong>.</li>
+        <li>No <code>action</code>? It reloads this page. Everything your script did is gone.</li>
+      </ul>
+    </div>
+    <script type="text/x-code" data-lang="js" class="small">const form =
+  document.querySelector(".ticket-form");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();   // no reload
+  // …your turn
+});</script>
+  </div>
+  <p class="mt"><span class="hl">Listen on the form for <code>submit</code>, not on the button for <code>click</code>:</span> the click comes <em>before</em> the browser checks <code>required</code> and <code>type="email"</code>; <code>submit</code> only fires <em>after</em> they pass.</p>
+  <aside class="notes">
+    <p>Why not click: pressing Enter in a field also fires a click on the submit button (so that's not the reason), but the click happens before validation. A click listener with preventDefault switches off the browser's required/email checks; a submit listener only runs on a valid form. In Week 3 you'll send this data to a real server with <code>fetch</code>, still from this same submit handler.</p>
+  </aside>
+</section>
+
+<section data-title="Reading a form">
+  <p class="kicker">Reading a form · live · predict first: what does typeof print?</p>
+  <h2>FormData: every field, by its name</h2>
+  <div class="fill live-js" data-market data-show-html data-console="small" data-layout="wide-code">
+    <script type="text/plain" data-role="html"><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" required value="Ana"><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="2"><label class="check"><input type="checkbox" name="news" checked> News</label><button type="submit">Reserve</button></form></script>
+    <textarea>
+const form = document.querySelector(".ticket-form");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+
+  console.log(data.get("name"));
+  console.log(data.get("guests"), typeof data.get("guests"));
+  console.log(data.get("guests") + 1);         // ?
+  console.log(Number(data.get("guests")) + 1);
+  console.log(data.get("news")); // "on" or null
+});
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Before pressing: "guests is a number field: what will typeof say?" Then press Reserve. Point at the second line: <code>"2" string</code>. Every value from a form is a string, even <code>type="number"</code>. <code>Number()</code> before maths: <code>"2" + 1</code> is <code>"21"</code>. Unticked checkboxes aren't in the FormData at all (null). Fields without a <code>name</code> aren't either: the most common "it's null!" bug.</p>
+  </aside>
+</section>
+
+<section data-title="Showing the answer">
+  <p class="kicker">Press Reserve: the cliffhanger, answered</p>
+  <h2>Read the form → build the ticket → show it</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+
+  const ticket = document.createElement("article");
+  ticket.className = "ticket";
+  const title = document.createElement("h3");
+  const name = data.get("name");
+  title.textContent = `See you there, ${name}!`;
+  ticket.append(title);
+
+  // empty the box, then add: not +=, not innerHTML
+  result.replaceChildren(ticket);
+  form.reset();
+});</script>
+    <ul>
+      <li>Their name goes in with <code>textContent</code>: Act 4's rule.</li>
+      <li><code>replaceChildren</code>: submitting twice shows one ticket, not two.</li>
+      <li>The result box has <code>aria-live="polite"</code> in the HTML: a screen reader reads the new ticket out.</li>
+      <li>FIND the form · LISTEN for submit · CHANGE the page. The whole loop.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:53. This is literally the showcase's market.js section 3. Then straight to the exercise.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     THE MARKET JAM
+     ===================================================================== -->
+
+<section class="act" data-act="J" data-act-name="Market jam" data-at="1:54" data-title="The market jam">
+  <div class="act-deco">html·css·js</div>
+  <div class="act-num">finale</div>
+  <h1>The market jam</h1>
+  <div class="act-meta"><span class="chip">1:54 – 2:45</span><span>5 groups · 30 min · 2½ min each</span></div>
+  <div class="act-list"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>show &amp; tell</span></div>
+  <aside class="notes">
+    <p><b>1:54.</b> "Everything from today, in one feature." Count the room off 1–5 for the groups (mix seats, so not every laptop-owner sits together). 3–5 people per group.</p>
+  </aside>
+</section>
+
+<section data-title="Jam toolbox">
+  <p class="kicker">The market jam · the toolbox · 4 minutes</p>
+  <h2>Eight tools your feature may need</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="xs">// 1 · "input": every change · "change": when done
+slider.addEventListener("input", () => { … });
+box.addEventListener("change", () => box.checked);
+
+// 2 · remember across reloads (strings only)
+localStorage.setItem("theme", "dark");
+localStorage.getItem("theme");     // "dark", or null
+localStorage.removeItem("theme");
+// lists and objects: through JSON
+JSON.stringify(["Side B"]);  JSON.parse(text);
+
+// 3 · ask CSS's question
+matchMedia("(prefers-color-scheme: light)").matches;</script>
+    <script type="text/x-code" data-lang="js" class="xs">// 4 · lists: a real array, first match, any match
+const cards = [...document.querySelectorAll(".stall")];
+cards.find((c) => c.dataset.tag === "food");
+cards.some((c) => c.hidden);
+
+// 5 · a class on or off, by a condition
+row.classList.toggle("now", isNow);
+
+// 6 · text → numbers
+Number("2");   "21:30".split(":");   // ["21", "30"]
+
+// 7 · forms check themselves
+field.checkValidity();   field.reportValidity();
+
+// 8 · run it a moment later
+setTimeout(() => { … }, 0);</script>
+  </div>
+  <aside class="notes">
+    <p>~4 min, at a brisk pace: these are the eight things the jam briefs use that the lecture didn't teach. Point at each one and say which task needs it: input/change (what's on, wizard, my night), localStorage + JSON (theme, my night), matchMedia (theme), find/some/spread (wizard, map), toggle with a condition (what's on, my night), split/Number (what's on), checkValidity (wizard), setTimeout (wizard). Every brief repeats the ones it needs, and the cheat sheet has them all.</p>
+  </aside>
+</section>
+
+<section data-title="How the jam works">
+  <p class="kicker">The market jam · 2 minutes to set up</p>
+  <h2>Five groups. One feature each. HTML, CSS and JS.</h2>
+  <div class="grid-3">
+    <div class="card"><span class="label">set up</span><h3>One laptop, two files</h3><p>Copy <code>04-responsive-dom/project/jam/</code> out of the repo. It's today's finished page with two empty files: <code>css/feature.css</code>, <code>js/feature.js</code>. Brief on a second laptop.</p></div>
+    <div class="card"><span class="label">how</span><h3>Plan together, one drives</h3><p>Agree on the solution together first. Then one person types; the others read along, spot issues and verify it on a phone and with the keyboard.</p></div>
+    <div class="card"><span class="label">the clock</span><h3>30 minutes</h3><p>0–5 discuss the solution · 5–20 build the must-haves · 20–27 verify: phone, keyboard, reload · 27–30 rehearse.</p></div>
+  </div>
+  <div class="row mt"><button class="timer" data-min="30" data-label="jam"></button><p class="small" style="margin:0">Briefs: 04-responsive-dom → <strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/index.html" target="_blank" rel="noopener">Market jam</a></strong>. Each has a checklist, hints (folded) and traps.</p></div>
+  <aside class="notes">
+    <p>Start the timer only when every group has the jam folder open in a browser through a server. Walk the room in this order: wizard (★★★) and schedule groups first, they hit the hardest bugs early (a Next button without type="button" books the ticket; Enter skips the review; midnight in the time maths). At minute 20 say "test on a phone now"; at 27 "stop coding".</p>
+    <p>Common across all five: a second <code>const stalls</code> (or form, nav…) next to market.js is a SyntaxError and nothing in feature.js runs. The live console isn't there to explain it: DevTools is.</p>
+  </aside>
+</section>
+
+<section data-title="Five features">
+  <p class="kicker">The market jam · deal the tasks</p>
+  <h2>Five features the market is missing</h2>
+  <div class="split">
+    <ul>
+      <li><strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/01-theme-switcher.html" target="_blank" rel="noopener">Light, auto, dark</a></strong> <span class="muted">★★☆</span> — a 3-way theme switch that can follow the system.</li>
+      <li><strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/02-my-night.html" target="_blank" rel="noopener">My night</a></strong> <span class="muted">★★☆</span> — ♡ save stalls, count them, show only those.</li>
+      <li><strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/03-whats-on.html" target="_blank" rel="noopener">What's on?</a></strong> <span class="muted">★★☆</span> — a time slider; the schedule fits a phone.</li>
+      <li><strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/04-ticket-wizard.html" target="_blank" rel="noopener">Ticket wizard</a></strong> <span class="muted">★★★</span> — the ticket form in 3 steps, with a review.</li>
+      <li><strong><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/05-talking-map.html" target="_blank" rel="noopener">The map talks</a></strong> <span class="muted">★★☆</span> — click a zone, a panel (a bottom sheet on a phone).</li>
+    </ul>
+    <div class="card dark task-draw" data-no-nav data-tasks="Light, auto, dark|My night|What's on?|Ticket wizard|The map talks"></div>
+  </div>
+  <aside class="notes">
+    <p>Either let groups choose (first come, first served) or press 🎲 to deal them. Every task has HTML (new elements, with aria), CSS (a query, a variable or a :has) and JS (find · listen · change), so every group touches both halves of today. The reference version of all five on one page: <code>project/jam-reference/</code> (teacher only, not in the student repo). A sixth group, or one that finishes early, gets a spare: <em><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/06-find-a-stall.html" target="_blank" rel="noopener">Find a stall</a></em> (★☆☆, live search) or <em><a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/jam/07-register-a-stall.html" target="_blank" rel="noopener">Register a stall</a></em> (★★★, a form that adds a card).</p>
+  </aside>
+</section>
+
+<section data-title="Show and tell">
+  <p class="kicker">The market jam · show &amp; tell</p>
+  <h2>Two and a half minutes per group</h2>
+  <ol>
+    <li><strong>Demo it</strong> at phone width and desktop width.</li>
+    <li><strong>The code</strong>: what you find, which event you listen for, what you change. Show those lines.</li>
+    <li><strong>One CSS decision</strong>: the query, variable or selector that draws it.</li>
+    <li><strong>One bug</strong> you hit, and how you found it.</li>
+  </ol>
+  <div class="row mt"><button class="timer" data-min="2.5" data-label="group"></button><p class="small" style="margin:0">Then the class asks one question. Order: 1 → 5.</p></div>
+  <aside class="notes">
+    <p><b>~2:30.</b> Groups present from the driver's laptop on the projector (or open their folder on the teacher's machine). Double-click the timer to reset it between groups. Ask the question yourself if the room is quiet: "what happens if both the filter and your feature hide a stall?" for 2; "what does Enter do on step 1, and why?" for 4; "why a button and not a div?" for 5; "what's the difference between the choice and what the page shows?" for 1.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     FINALE
+     ===================================================================== -->
+
+<section class="vc" data-act="F" data-act-name="Finale" data-at="2:45" data-title="The page is a conversation">
+  <p class="kicker">Today, in one slide</p>
+  <h2>The page asks the world. The script listens to the person.</h2>
+  <div class="bridge">
+    <div class="card"><span class="label">Part 1 · CSS · who are you asking?</span>
+      <ul><li><code>@media</code> the window · <code>clamp()</code> nobody</li><li class="muted">reading list: <code>@container</code>, <code>@supports</code></li><li>Fewest questions wins: fluid first.</li></ul></div>
+    <div class="card"><span class="label">Part 2 · JS · find · listen · change</span>
+      <ul><li><code>querySelector</code> · <code>addEventListener</code></li><li><code>classList</code> / attributes: JS flips state, CSS draws it</li><li>Their words in <code>textContent</code>, always.</li></ul></div>
+  </div>
+  <p class="mt"><span class="hl">They meet in the middle:</span> a class, an attribute, a CSS variable. That's the contract between your script and your stylesheet.</p>
+  <aside class="notes">
+    <p><b>~2:45</b>, right after the last group. If one slide stays in their heads, it's this one. For the curious: JavaScript can ask CSS's question too, <code>matchMedia("(width &gt;= 40rem)").matches</code>, and set CSS's variables (<code>style.setProperty</code>, Ex 3 bonus 6).</p>
+  </aside>
+</section>
+
+<section data-title="Homework">
+  <p class="kicker">Until next time</p>
+  <h2>Homework &amp; reading</h2>
+  <div class="split">
+    <div>
+      <h3>Homework</h3>
+      <ul>
+        <li><strong>Tomorrow</strong>: the starter's <code>css/responsive.css</code>.</li>
+        <li><strong>Next JS lecture</strong>: <code>js/market.js</code>, <a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/exercises/04-tickets-please.html" target="_blank" rel="noopener">Exercise 4 (tickets)</a>, <a href="https://lopin.me/harbour/programming-interactivity-4-responsive-dom/playgrounds/night-shift.html" target="_blank" rel="noopener">Night Shift</a> 6–16.</li>
+        <li><span class="muted">Optional:</span> finish your jam feature.</li>
+        <li>Submit on <strong>Google Classroom</strong>.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Read &amp; play</h3>
+      <ul class="reading">
+        <li><a href="https://web.dev/learn/design" target="_blank" rel="noopener">web.dev · Learn Responsive Design</a> <span class="muted">— the whole of Part 1, with demos</span></li>
+        <li><a href="https://www.joshwcomeau.com/css/container-queries-introduction/" target="_blank" rel="noopener">Josh Comeau · Container queries</a> <span class="muted">— the friendliest intro</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/DOM_scripting" target="_blank" rel="noopener">MDN · Manipulating documents</a> <span class="muted">— the DOM, step by step</span></li>
+        <li><a href="https://javascript.info/events" target="_blank" rel="noopener">javascript.info · Introduction to events</a> <span class="muted">— bubbling, delegation, default actions</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Everything is in github.com/nlopin/programming-interactivity-exercises → 04-responsive-dom: exercises, playgrounds, the game, the printable cheat sheet.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="It fits. It talks back.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="wire-title" style="font-size:150px">It fits.<br><em>It talks back.</em></h1>
+      <p class="lede">exercises · playgrounds · Night Shift · cheat sheet →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="phones">
+      <div class="phone" style="--d:320px;--w:390px"><iframe data-src="project/showcase/index.html?step=4&amp;bare&amp;demo" tabindex="-1" title=""></iframe></div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

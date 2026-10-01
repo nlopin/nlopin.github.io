@@ -1,0 +1,25 @@
+/* 4 · Register a stall */
+.register { margin-top: 1.5rem; }
+.register summary { font-weight: 800; color: var(--lantern); }
+.register-form { display: grid; gap: 0.4rem; max-width: 40rem; margin-top: 1rem; }
+.register-form label { font-weight: 700; margin-top: 0.4rem; }
+.register-form input, .register-form select, .register-form textarea {
+  font: inherit; color: var(--ink); background: var(--night); border: 2px solid var(--line); border-radius: 8px; padding: 0.55rem 0.75rem;
+}
+.register-form :user-invalid { border-color: var(--ember); }
+.register-form button {
+  justify-self: start; margin-top: 0.8rem; font: 800 1rem "Bricolage Grotesque", system-ui, sans-serif;
+  background: var(--lantern); color: var(--night); border: 0; border-radius: 99px; padding: 0.8rem 1.4rem; cursor: pointer;
+}
+@media (width >= 40rem) {
+  .register-form { grid-template-columns: max-content 1fr; align-items: center; column-gap: 1.5rem; }
+  .register-form label { margin: 0; }
+  .register-form button { grid-column: 2; }
+}
+.register-status { color: var(--sea); margin: 0.8rem 0 0; }
+
+/* a stall that just arrived glows for a moment */
+@media (prefers-reduced-motion: no-preference) {
+  .stall.is-new .vendor-card { animation: arrive 1.6s ease-out; }
+}
+@keyframes arrive { from { box-shadow: 0 0 0 6px var(--lantern); border-color: var(--lantern); } }

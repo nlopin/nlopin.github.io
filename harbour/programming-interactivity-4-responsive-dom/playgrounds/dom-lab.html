@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DOM lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.dom-lab { height: 40rem; font-size: 1.25rem; }</style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">The DOM</span>
+    <h1>The page is a <em>tree</em></h1>
+    <p class="intro">Left: a page. Right, top: the tree the browser built from its HTML, live. Right, bottom: a console, like the one in DevTools. Type JavaScript, press <kbd>Enter</kbd>, watch the tree and the page change together. Lines that just changed flash red. Hover a line to find its element; click a line to call it <code>$0</code>.</p>
+    <div class="dom-lab" data-market data-presets="document.querySelector('h1')||document.querySelector('h1').textContent = 'Hello, DOM'||document.querySelectorAll('.vendor-card')||document.querySelectorAll('.vendor-card').length||document.querySelector('.sold-out').classList||document.querySelector('.sold-out').classList.remove('sold-out')||document.querySelector('.badge').remove()||document.querySelector('.vendor-card').dataset||const card = document.createElement('li')||card.className = 'vendor-card'||card.textContent = '🌮 Taco Tuesday'||document.querySelector('.vendor-list').append(card)">
+      <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a></header>
+<p class="eyebrow">Friday 16 October</p>
+<h1>Harbour Night Market</h1>
+<ul class="vendor-list">
+  <li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li>
+  <li class="vendor-card sold-out" data-tag="food"><span class="tag">Food</span><h3>Churros Till Late</h3><strong class="badge">Sold out</strong></li>
+  <li class="vendor-card" data-tag="music"><span class="tag">Music</span><h3>Side B Records</h3></li>
+</ul></script>
+    </div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Click the presets in order, top to bottom. Predict each result before you click.</li>
+      <li><code>document.querySelectorAll('.vendor-card')[1]</code>: which card? Why not the first?</li>
+      <li>Change the date in the eyebrow to Saturday. Then undo it without <code>↺ reset</code>.</li>
+      <li>Click a card's line in the tree, then type <code>$0.classList.toggle('featured')</code>. Press <kbd>↑</kbd> <kbd>Enter</kbd> to run it again.</li>
+      <li>Try <code>document.querySelector('.nope').textContent = 'hi'</code>. Read the error and the hint: you'll see it a lot today.</li>
+      <li>The same console exists on every website: open DevTools (<kbd>F12</kbd> or <kbd>⌥ ⌘ I</kbd>) on any page and change its headline.</li>
+    </ol>
+  </div>
+</body>
+</html>

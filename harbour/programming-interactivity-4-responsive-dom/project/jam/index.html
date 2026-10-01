@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <title>Harbour Night Market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="css/outfit.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/fluid.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/states.css">
+  <!-- the market jam: your group's feature goes in these two files -->
+  <link rel="stylesheet" href="css/feature.css">
+  <script src="js/market.js" defer></script>
+  <script src="js/feature.js" defer></script>
+</head>
+<body>
+  <header class="site-header" id="top">
+    <a class="logo" href="#top">🏮 Night Market</a>
+    <button class="menu-toggle" type="button" aria-expanded="true" aria-controls="main-nav" hidden>Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="#vendors">Vendors</a></li>
+        <li><a href="#map">Map</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#tickets">Tickets</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Friday 16 October · 19:00 – 01:00</p>
+      <h1>Harbour Night Market</h1>
+      <p class="lead">Forty stalls, three stages and one very long table on the waterfront at Moll de la Fusta. Street food, vinyl, handmade things and people you haven't met yet.</p>
+      <a class="button" href="#tickets">Get a free ticket</a>
+    </section>
+
+    <section id="vendors">
+      <h2>Vendors</h2>
+      <div class="filters" role="group" aria-label="Show vendors">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="food" aria-pressed="false">Food</button>
+        <button type="button" data-filter="music" aria-pressed="false">Music</button>
+        <button type="button" data-filter="crafts" aria-pressed="false">Crafts</button>
+        <button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+        <output class="filter-count" aria-live="polite"></output>
+      </div>
+      <ul class="vendor-list">
+        <li class="stall" data-tag="food">
+          <article class="vendor-card featured">
+            <span class="tag">Food</span>
+            <h3>Dumpling Dynasty</h3>
+            <p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience, and so is the chilli oil.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="music">
+          <article class="vendor-card">
+            <span class="tag">Music</span>
+            <h3>Side B Records</h3>
+            <p>Crates of second-hand vinyl, sorted by mood instead of genre.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>Salt &amp; Ink</h3>
+            <p>Risograph posters of the port, printed in two colours and signed while you wait. Ask for the one with the crane.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="food">
+          <article class="vendor-card sold-out">
+            <span class="tag">Food</span>
+            <h3>Churros Till Late</h3>
+            <p>Crisp, sugared and dunked in thick chocolate.</p>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>The Plant Swap</h3>
+            <p>Bring a cutting, take a cutting. Pots are free, advice is free, gossip is extra.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="drinks">
+          <article class="vendor-card sold-out">
+            <span class="tag">Drinks</span>
+            <h3>Mezcal Moon</h3>
+            <p>Small-batch mezcal and orange slices dusted with chilli salt. Sip, don't shoot. Last orders at half past midnight.</p>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+      </ul>
+    </section>
+
+    <section id="map">
+      <h2>Map</h2>
+      <div class="market-map">
+        <div class="zone stage">Main stage</div>
+        <div class="zone food">Food street</div>
+        <div class="zone table">Long table</div>
+        <div class="zone crafts">Crafts corner</div>
+        <div class="zone drinks">Drinks</div>
+        <div class="zone pier">The pier</div>
+        <div class="zone gate">Entrance · Moll de la Fusta</div>
+        <span class="you-are-here">You are here</span>
+      </div>
+    </section>
+
+    <section id="schedule">
+      <h2>Schedule</h2>
+      <table class="schedule">
+        <thead>
+          <tr><th>Time</th><th>What</th><th>Where</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>19:00</td><td>Doors open, DJ Marisol warms up</td><td>Main stage</td></tr>
+          <tr><td>19:30</td><td>Dumpling folding class</td><td>Long table</td></tr>
+          <tr><td>20:30</td><td>Los Faroles — live cumbia</td><td>Main stage</td></tr>
+          <tr><td>21:30</td><td>Zine-making workshop</td><td>Long table</td></tr>
+          <tr><td>22:30</td><td>Harbour Brass Band</td><td>The pier</td></tr>
+          <tr><td>00:00</td><td>Silent disco until close</td><td>The pier</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Is it really free?</summary>
+        <p>Entry is free. Bring cash or a card for the stalls.</p>
+      </details>
+      <details>
+        <summary>Can I bring my dog?</summary>
+        <p>Yes, on a leash. The dumplings are not for dogs.</p>
+      </details>
+      <details>
+        <summary>What if it rains?</summary>
+        <p>We move under the big tent next to the main stage. The market has never closed early.</p>
+      </details>
+    </section>
+
+    <section id="tickets">
+      <h2>Get a ticket</h2>
+      <form class="ticket-form">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+
+        <label for="guests">Guests</label>
+        <input id="guests" name="guests" type="number" min="1" max="6" value="1" required>
+
+        <label for="arrival">Arriving</label>
+        <select id="arrival" name="arrival">
+          <option>Early — for the food</option>
+          <option>Late — for the music</option>
+          <option>Whenever — for the vibes</option>
+        </select>
+
+        <label for="message">A note for us</label>
+        <textarea id="message" name="message" rows="3" maxlength="140" aria-describedby="message-left"></textarea>
+        <p class="hint" id="message-left">Up to 140 characters.</p>
+
+        <label class="check"><input type="checkbox" name="news"> Send me next month's line-up</label>
+
+        <button type="submit">Reserve my spot</button>
+      </form>
+      <div class="ticket-result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Harbour Night Market · Moll de la Fusta, Barcelona</p>
+    <p>Made with HTML, CSS and too many dumplings.</p>
+  </footer>
+
+  <a class="to-top" href="#top" aria-label="Back to top">↑</a>
+</body>
+</html>

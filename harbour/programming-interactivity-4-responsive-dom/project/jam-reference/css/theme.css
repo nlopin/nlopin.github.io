@@ -1,0 +1,48 @@
+/* 1 · Theme switcher — the whole look is variables, so a theme is one block */
+html[data-theme="light"] {
+  --night: #f6f1e7;
+  --night-2: #fffaf0;
+  --night-3: #ece3d2;
+  --line: #d8cdb8;
+  --ink: #1d1a15;
+  --ink-2: #4a443a;
+  --lantern: #b0580a;
+  --ember: #c2361b;
+  --sea: #0b6f80;
+  color-scheme: light;
+}
+/* a few colours were never variables: the header glass, the text on the map zones */
+html[data-theme="light"] .site-header { background: rgb(246 241 231 / 0.92); }
+html[data-theme="light"] .zone:not(.pier, .gate) { color: #1d1a15; }
+
+.header-tools { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+
+/* three radio buttons drawn as one segmented switch: ☀️ | 🌗 | 🌙 */
+.theme-switch {
+  display: flex;
+  margin: 0;
+  padding: 3px;
+  border: 2px solid var(--line);
+  border-radius: 99px;
+  background: var(--night-3);
+}
+.theme-switch legend, .sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.theme-switch label {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 99px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+/* the real radio stays in the page (keyboard, screen readers), just invisible */
+.theme-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.theme-switch label:has(input:checked) { background: var(--lantern); }
+.theme-switch label:has(input:focus-visible) { outline: 3px solid var(--sea); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  body, .site-header, .vendor-card { transition: background-color 0.3s, color 0.3s; }
+}

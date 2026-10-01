@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market jam 5 · The map talks</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .page h2 { margin-top: 2.2rem; }
+    .lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .lane { background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; padding: 1rem 1.1rem; box-shadow: 4px 4px 0 var(--ink); }
+    .lane h3 { margin: 0 0 0.5rem; font: 800 1rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+    .lane.html h3 { color: #c2410c; } .lane.css h3 { color: var(--blue); } .lane.js h3 { color: #0b7a52; }
+    .lane ul { list-style: none; margin: 0; padding: 0; }
+    .lane li { display: flex; gap: 0.55rem; align-items: baseline; margin: 0.45rem 0; }
+    .lane li input { flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--ink); transform: translateY(0.15rem); }
+    .story { font: italic 400 1.45rem/1.35 var(--font-serif); max-width: 60ch; color: var(--ink-2); margin: 0.5rem 0 1rem; }
+    .demo { background: var(--ink); color: var(--paper); border-radius: 0.8rem; padding: 1rem 1.2rem; max-width: 70ch; }
+    .demo b { color: var(--yellow); }
+    .demo ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+    .stretch li, .gotchas li { margin: 0.35rem 0; }
+    .page pre.code { font-size: 0.92rem; margin: 0.6rem 0; max-width: 60rem; white-space: pre-wrap; }
+    .stars { font-family: var(--font-mono); letter-spacing: 0.1em; }
+    .clock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; max-width: 60rem; }
+    .clock div { border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: var(--white); font-size: 0.92rem; }
+    .clock b { display: block; font: 800 0.8rem var(--font-mono); }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem; background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; color: var(--ink); text-decoration: none; box-shadow: 4px 4px 0 var(--ink); }
+    .tasks-grid a:hover, .tasks-grid a:focus-visible { background: var(--paper-2); outline: none; }
+    .tasks-grid b { display: block; font-size: 1.2rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 700 0.75rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .tasks-grid span { color: var(--ink-2); font-size: 0.95rem; }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .hints { display: grid; gap: 0.5rem; max-width: 60rem; }
+    .hints details, details.traps { background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.55rem 0.9rem; }
+    .hints summary, details.traps summary { cursor: pointer; font: 700 0.95rem var(--font-mono); }
+    .hints details[open] summary, details.traps[open] summary { margin-bottom: 0.4rem; }
+    .hints p { margin: 0.3rem 0; }
+    details.traps { max-width: 60rem; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Market jam · all tasks</a><span>Task 5 · 30 min · then 2½ min on stage</span></div>
+    <span class="eyebrow-tag">Market jam · task 5</span>
+    <h1>The map <em>talks</em></h1>
+    <p class="intro">Click a zone on the market map and a panel tells you what's there. On a phone, the panel slides up from the bottom. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“The map is pretty, but what is “Crafts corner”? Who's there, and what's on?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> click "The pier": it gets an outline and a panel says "The pier · Harbour Brass Band at 22:30…". Click another zone: the panel changes. ✕ or Escape closes it. At phone width it's a bottom sheet.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane html"><h3>HTML · index.html</h3><ul><li><input type="checkbox" aria-label="done"><span>Every zone works with a mouse and with the keyboard alone (Tab, Enter).</span></li><li><input type="checkbox" aria-label="done"><span>A panel for the zone's name and what's on, with a close button. Hidden until you pick a zone.</span></li></ul></div>
+      <div class="lane css"><h3>CSS · css/feature.css</h3><ul><li><input type="checkbox" aria-label="done"><span>The zones still look like the map after your HTML change.</span></li><li><input type="checkbox" aria-label="done"><span>The selected zone is clearly marked.</span></li><li><input type="checkbox" aria-label="done"><span>Below ~40rem the panel is a bottom sheet; above, it sits under the map.</span></li></ul></div>
+      <div class="lane js"><h3>JS · js/feature.js</h3><ul><li><input type="checkbox" aria-label="done"><span>Pick a zone: the panel shows its name and text. Pick another: the panel changes.</span></li><li><input type="checkbox" aria-label="done"><span><strong>One</strong> listener for all seven zones.</span></li><li><input type="checkbox" aria-label="done"><span>✕ and Escape close the panel and clear the mark.</span></li></ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>Before you start:</strong> <code>js/market.js</code> already declares <code>stalls</code>, <code>form</code>, <code>nav</code>, <code>filters</code>, <code>count</code>. Declaring one again in feature.js is a SyntaxError (<em>"has already been declared"</em>) and none of your file runs. Pick your own names.</p></div>
+    <h2>Data to paste</h2>
+    <p>The keys match the zones' classes:</p><pre class="code" data-lang="js">const ZONES = {
+  stage:  [&quot;Main stage&quot;, &quot;DJ Marisol at 19:00, Los Faroles at 20:30.&quot;],
+  food:   [&quot;Food street&quot;, &quot;Dumpling Dynasty, Churros Till Late and twelve more.&quot;],
+  table:  [&quot;Long table&quot;, &quot;Sixty seats. Dumpling folding class at 19:30.&quot;],
+  crafts: [&quot;Crafts corner&quot;, &quot;Salt &amp; Ink, The Plant Swap, zines at 21:30.&quot;],
+  drinks: [&quot;Drinks&quot;, &quot;Mezcal Moon, lemonade, tea. Last orders 00:30.&quot;],
+  pier:   [&quot;The pier&quot;, &quot;Harbour Brass Band at 22:30, silent disco at midnight.&quot;],
+  gate:   [&quot;Entrance&quot;, &quot;Moll de la Fusta. Metro: Drassanes.&quot;],
+};</pre>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch"><li>The sheet slides up (an animation), only without a reduced-motion wish.</li><li>List the vendors in that zone, read from the cards (give each <code>.stall</code> a <code>data-zone</code>).</li><li>Focus moves to the panel when it opens, and back to the zone when it closes.</li></ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first. The tools are on the toolbox slide and in the cheat sheet (box 12).</p>
+    <div class="hints"><details><summary>Hint 1</summary><p>Which element is clickable <em>and</em> reachable with Tab, without extra work?</p></details><details><summary>Hint 2</summary><p>Every zone has the class <code>zone</code> and one more. The other one is a key of <code>ZONES</code>. How do you find it?</p></details><details><summary>Hint 3</summary><p>Escape anywhere on the page: which element do you listen on?</p></details></div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas"><li>The "You are here" pin sits on top of the gate. Click it: what did your listener get?</li><li>A fixed panel at the bottom of the screen shares that corner with the back-to-top button.</li></ul></details>
+
+    <h2>The 30 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 min · plan</b>Read the brief together. Agree on the solution before anyone types.</div>
+      <div><b>5–20 · build</b>Must-haves only. Commit to one approach.</div>
+      <div><b>20–27 · verify</b>On a phone. Keyboard only. A reload.</div>
+      <div><b>27–30 · demo</b>Stop coding. Rehearse your 2½ minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 2½ minutes</b>
+      <ol>
+        <li><b>Demo it</b> at phone width and at desktop width (device toolbar on the projector).</li>
+        <li><b>The code</b>: what you find, which event you listen for, what you change. Show those lines of feature.js.</li>
+        <li><b>One CSS decision</b>: the query, the variable or the selector that does the drawing.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* 4 · Find a stall */
+.search {
+  position: sticky;
+  top: 4rem;              /* under the sticky header */
+  z-index: 5;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.6rem 0;
+  margin: 0 0 1rem;
+  background: var(--night);
+}
+.search label { font-weight: 700; }
+.search input {
+  width: min(100%, 28rem);
+  font: inherit;
+  color: var(--ink);
+  background: var(--night-2);
+  border: 2px solid var(--line);
+  border-radius: 99px;
+  padding: 0.6rem 1rem;
+}
+.search input:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.search-status { margin: 0; min-height: 1.4em; color: var(--ink-2); font-size: 0.9rem; }
+/* our own class: the filter's [hidden] and the search never fight */
+.stall.search-miss { display: none; }

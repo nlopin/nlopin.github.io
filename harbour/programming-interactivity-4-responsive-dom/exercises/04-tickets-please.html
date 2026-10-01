@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 4 · Tickets, please</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 30rem; margin-top: 1rem; }
+    .case .panel.tall { height: 36rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .loop { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font: 700 0.95rem var(--font-mono); margin: 0.4rem 0 0; }
+    .loop span { background: var(--white); border: 2px solid var(--ink); border-radius: 99px; padding: 0.35rem 0.8rem; }
+    .loop i { font-style: normal; }
+  </style>
+</head>
+<body class="page wire change">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Exercise 4 · homework (20 min)</span></div>
+    <span class="eyebrow-tag">Act 5 · Forms</span>
+    <h1>Tickets, <em>please</em></h1>
+    <p class="intro">The ticket form, wired up one step at a time. The fields, the labels and the <code>required</code> rules are HTML: they already work. Your script adds what HTML can't do. Fill in the form in the preview and press Reserve to try your code.</p>
+    <div class="tip"><p class="loop"><span>1 · find the form</span><i>→</i><span>2 · listen for submit</span><i>→</i><span>3 · read it, then change the page</span></p></div>
+
+    <section class="case">
+      <header><b>1</b><h2>Stop the reload</h2></header>
+      <p class="complaint">Click Reserve: the page blinks and everything you typed is gone.</p>
+      <p>A form's <em>default action</em> is to send the data to the server and load a new page. We don't have a server: we want to handle it right here. Listen for <code>submit</code> <strong>on the form</strong>, not <code>click</code> on the button: the click comes <em>before</em> the browser checks <code>required</code>, the submit only <em>after</em>. Cancel the default, and log the name.</p>
+      <div class="live-js panel" data-market data-show-html data-solved="✓ preventDefault(): the browser's plan is cancelled, yours runs.">
+        <script type="text/plain" data-role="html"><h2>Get a ticket</h2><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" autocomplete="off" required><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" required><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="1" required><label for="arrival">Arriving</label><select id="arrival" name="arrival"><option>Early — for the food</option><option>Late — for the music</option></select><label for="message">A note for us</label><textarea id="message" name="message" rows="2" maxlength="140" aria-describedby="message-left"></textarea><p class="hint" id="message-left">Up to 140 characters.</p><button type="submit">Reserve my spot</button></form><div class="ticket-result" aria-live="polite"></div></script>
+        <textarea>
+const form = document.querySelector(".ticket-form");
+
+// listen for "submit" on the form…
+
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Reserve doesn't reload the page", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); await wait(50); return !win.__reloaded && !errors().length;"}, {"label": "The console shows the name", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); await wait(50); return logs().some(l => l.includes('Ana'));"},
+    {"label": "An empty form is still stopped by validation (submit, not click)", "run": "click('button[type=submit]'); await wait(50); const blocked = logs().length === 0; type('#name', 'Ana'); type('#email', 'ana@example.com'); click('button[type=submit]'); await wait(50); return blocked && logs().some(l => l.includes('Ana'));"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>The browser calls your listener <em>before</em> it performs the default action (and only once <code>required</code> and <code>type="email"</code> pass: a <code>click</code> listener would run on an empty form). <code>event.preventDefault()</code> tells it to skip it. <code>form.elements.name</code> finds the field by its <code>name</code> attribute: the same names the server would receive.</p><pre class="code" data-lang="js">const form = document.querySelector(".ticket-form");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  console.log(form.elements.name.value);
+});</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>Print the ticket</h2></header>
+      <p class="complaint">The form is quiet now. Too quiet: nobody knows they got a ticket.</p>
+      <p>On submit, read the form with <code>new FormData(form)</code> and <code>data.get("name")</code>. Build a ticket and put it in <code>.ticket-result</code>:</p>
+      <ul><li>an <code>article.ticket</code> with an <code>h3</code>: <code>See you there, Ana!</code></li><li>a <code>p</code> like <code>2 people · Early — for the food</code> (the guests and the arrival). One guest? <code>1 person</code>.</li></ul>
+      <p>Careful: everything a form gives you is a <strong>string</strong>. <code>"1" === 1</code> is <code>false</code>.</p>
+      <div class="live-js panel tall" data-market data-show-html data-solved="✓ Read the form, build the elements, show them. The whole cycle.">
+        <script type="text/plain" data-role="html"><h2>Get a ticket</h2><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" autocomplete="off" required><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" required><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="1" required><label for="arrival">Arriving</label><select id="arrival" name="arrival"><option>Early — for the food</option><option>Late — for the music</option></select><label for="message">A note for us</label><textarea id="message" name="message" rows="2" maxlength="140" aria-describedby="message-left"></textarea><p class="hint" id="message-left">Up to 140 characters.</p><button type="submit">Reserve my spot</button></form><div class="ticket-result" aria-live="polite"></div></script>
+        <textarea>
+const form = document.querySelector(".ticket-form");
+const result = document.querySelector(".ticket-result");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+  console.log(data.get("name"), data.get("guests"));
+});
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "The ticket says See you there, Ana!", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); await wait(50); return text('.ticket-result h3') === 'See you there, Ana!';"}, {"label": "2 guests → 2 people · Early…", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); type('#guests', '2'); submit(); await wait(50); const t = text('.ticket-result'); return /\\b2 people\\b/.test(t) && t.includes('Early');"}, {"label": "1 guest → 1 person", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); await wait(50); const t = text('.ticket-result'); return /\\b1 person\\b/.test(t) && !/1 people/.test(t);"}, {"label": "Submitting twice shows one ticket", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); submit(); await wait(50); return $$('.ticket-result .ticket').length === 1;"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p><code>Number()</code> turns <code>"2"</code> into <code>2</code>. <code>replaceChildren</code> empties the result box and puts the new ticket in, so a second submit replaces the first ticket instead of stacking up.</p><pre class="code" data-lang="js">form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+  const guests = Number(data.get("guests"));
+
+  const ticket = document.createElement("article");
+  ticket.className = "ticket";
+  const title = document.createElement("h3");
+  title.textContent = `See you there, ${data.get("name")}!`;
+  const details = document.createElement("p");
+  details.textContent = `${guests} ${guests === 1 ? "person" : "people"} · ${data.get("arrival")}`;
+
+  ticket.append(title, details);
+  result.replaceChildren(ticket);
+});</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Characters left</h2></header>
+      <p class="complaint">The note has a 140-character limit, and no way to see how close you are.</p>
+      <p>While someone types in the note, <code>#message-left</code> says <code>135 characters left</code>. Which event fires on <em>every</em> keystroke, paste and cut? Not <code>keydown</code> (it fires for arrow keys too, and before the text changes) and not <code>change</code> (it waits until you leave the field).</p>
+      <div class="live-js panel" data-market data-show-html data-solved="✓ input: the event for 'the value just changed'.">
+        <script type="text/plain" data-role="html"><h2>Get a ticket</h2><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" autocomplete="off" required><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" required><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="1" required><label for="arrival">Arriving</label><select id="arrival" name="arrival"><option>Early — for the food</option><option>Late — for the music</option></select><label for="message">A note for us</label><textarea id="message" name="message" rows="2" maxlength="140" aria-describedby="message-left"></textarea><p class="hint" id="message-left">Up to 140 characters.</p><button type="submit">Reserve my spot</button></form><div class="ticket-result" aria-live="polite"></div></script>
+        <textarea>
+const message = document.querySelector("#message");
+const counter = document.querySelector("#message-left");
+
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Typing hello → 135 characters left", "run": "type('#message', 'hello'); await wait(20); return text('#message-left') === '135 characters left';"}, {"label": "Empty → 140 characters left", "run": "type('#message', 'hi'); type('#message', ''); await wait(20); return text('#message-left') === '140 characters left';"}]</script>
+      </div>
+      <details><summary>Why it works</summary><pre class="code" data-lang="js">message.addEventListener("input", () => {
+  const left = message.maxLength - message.value.length;
+  counter.textContent = `${left} characters left`;
+});</pre><p><code>message.maxLength</code> reads the <code>maxlength</code> attribute, so the number lives in one place: the HTML.</p></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>A rule HTML can't write</h2></header>
+      <p class="complaint">Someone booked a ticket for “1234”.</p>
+      <p><code>required</code>, <code>type="email"</code>, <code>min</code> and <code>max</code> are rules the browser checks for free. "A name needs at least one letter" isn't one of them. On <code>input</code>, call <code>nameInput.setCustomValidity("A name needs at least one letter.")</code> when the rule is broken, and <code>setCustomValidity("")</code> when it's fine. The browser then blocks the submit and shows your message, like any other rule. <small>(A letter test: <code>/\p{L}/u.test(text)</code>. The <code>u</code> matters: it makes ñ and ü letters too.)</small></p>
+      <div class="live-js panel" data-market data-show-html data-solved="✓ Your rule, the browser's machinery: same message bubble, same :user-invalid red.">
+        <script type="text/plain" data-role="html"><h2>Get a ticket</h2><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" autocomplete="off" required><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" required><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="1" required><label for="arrival">Arriving</label><select id="arrival" name="arrival"><option>Early — for the food</option><option>Late — for the music</option></select><label for="message">A note for us</label><textarea id="message" name="message" rows="2" maxlength="140" aria-describedby="message-left"></textarea><p class="hint" id="message-left">Up to 140 characters.</p><button type="submit">Reserve my spot</button></form><div class="ticket-result" aria-live="polite"></div></script>
+        <textarea>
+const form = document.querySelector(".ticket-form");
+const nameInput = form.elements.name;
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  console.log("submitted!");
+});
+
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "1234 is not a valid name", "run": "type('#name', '1234'); return !$('#name').checkValidity() && $('#name').validationMessage.length > 0;"}, {"label": "José is fine", "run": "type('#name', '1234'); const blocked = !$('#name').checkValidity(); type('#name', 'José'); return blocked && $('#name').checkValidity();"}, {"label": "A 1234 form never submits", "run": "type('#name', '1234'); type('#email', 'a@b.cd'); submit(); await wait(50); return !logs().some(l => l.includes('submitted'));"}]</script>
+      </div>
+      <details><summary>Why it works</summary><pre class="code" data-lang="js">nameInput.addEventListener("input", () => {
+  const hasLetter = /\p{L}/u.test(nameInput.value);
+  nameInput.setCustomValidity(hasLetter ? "" : "A name needs at least one letter.");
+});</pre><p>An empty string means "valid". Any other string makes the field invalid, and that string is what the browser shows. The red border comes from the CSS <code>:user-invalid</code>: only after the person touched the field.</p></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>Tickets for Bobby Tables</h2></header>
+      
+      <p>Your ticket from case 2, with one extra test: someone called <code>&lt;img src=x onerror="…"&gt;</code> books a ticket. With <code>innerHTML</code> that string becomes a real image, and its <code>onerror</code> runs <em>their</em> code on <em>your</em> page. With <code>textContent</code> it's just text. Make both checks pass.</p>
+      <div class="live-js panel tall" data-market data-show-html data-solved="✓ textContent: a name stays a name.">
+        <script type="text/plain" data-role="html"><h2>Get a ticket</h2><form class="ticket-form"><label for="name">Name</label><input id="name" name="name" autocomplete="off" required><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" required><label for="guests">Guests</label><input id="guests" name="guests" type="number" min="1" max="6" value="1" required><label for="arrival">Arriving</label><select id="arrival" name="arrival"><option>Early — for the food</option><option>Late — for the music</option></select><label for="message">A note for us</label><textarea id="message" name="message" rows="2" maxlength="140" aria-describedby="message-left"></textarea><p class="hint" id="message-left">Up to 140 characters.</p><button type="submit">Reserve my spot</button></form><div class="ticket-result" aria-live="polite"></div></script>
+        <textarea>
+const form = document.querySelector(".ticket-form");
+const result = document.querySelector(".ticket-result");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+  // the quick and dangerous way:
+  result.innerHTML = `<article class="ticket"><h3>See you there, ${data.get("name")}!</h3></article>`;
+});
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "A normal name still works", "run": "type('#name', 'Ana'); type('#email', 'ana@example.com'); submit(); await wait(50); return text('.ticket-result h3') === 'See you there, Ana!';"}, {"label": "The HTML name is shown as text, not run", "run": "type('#name', '<img src=x onerror=\"window.__pwned = true\">'); type('#email', 'a@b.cd'); submit(); await wait(150); return !win.__pwned && !$('.ticket-result img') && text('.ticket-result').includes('<img');"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p><code>innerHTML</code> <em>parses</em> the string as HTML. Anything a visitor typed can become elements, attributes and event handlers: that's cross-site scripting (XSS). <code>textContent</code> never parses. Rule of thumb: <strong>your</strong> HTML may go in <code>innerHTML</code>; <strong>their</strong> text goes in <code>textContent</code>.</p><pre class="code" data-lang="js">const ticket = document.createElement("article");
+ticket.className = "ticket";
+const title = document.createElement("h3");
+title.textContent = `See you there, ${data.get("name")}!`;
+ticket.append(title);
+result.replaceChildren(ticket);</pre></details>
+    </section>
+  </div>
+</body>
+</html>

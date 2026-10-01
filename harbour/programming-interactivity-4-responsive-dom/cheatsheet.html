@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responsive + DOM · cheat sheet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <script src="assets/kit.js" defer></script>
+  <style>
+    .sheet { columns: 3 19rem; column-gap: 1.25rem; }
+    .box { break-inside: avoid; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.8rem 1rem 0.9rem; margin: 0 0 1.25rem; }
+    .box h2 { margin: 0 0 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .box h2 span { font: 800 0.7rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.2rem 0.45rem; border-radius: 0.25rem; }
+    .box pre.code { font-size: 0.78rem; padding: 0.6rem 0.75rem; margin: 0.4rem 0; }
+    .box table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .box td { padding: 0.25rem 0.3rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .box td:first-child { white-space: nowrap; }
+    .box p, .box li { font-size: 0.88rem; margin: 0.3rem 0; }
+    .box ol, .box ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+    .print { font: 700 0.85rem var(--font-mono); border: 2px solid var(--ink); background: var(--yellow); padding: 0.5rem 0.9rem; border-radius: 0.4rem; cursor: pointer; }
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .page { background: #fff; font-size: 10pt; }
+      .page-top, .print, .intro { display: none; }
+      .page-wrap { padding: 0; max-width: none; }
+      .page h1 { font-size: 20pt; margin-bottom: 4mm; }
+      .sheet { columns: 3; column-gap: 5mm; }
+      .box { padding: 2.5mm 3mm; margin-bottom: 3mm; border-width: 1px; }
+      .box pre.code { font-size: 7pt; }
+      .box td, .box p, .box li { font-size: 8pt; }
+    }
+      .box td:first-child { white-space: normal; width: 52%; }
+    .box td code { overflow-wrap: anywhere; }
+    .box pre.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .box.js { background: #0b1426; color: #e3ecff; border-color: #0b1426; }
+    .box.js h2 span { background: #3ee6ff; color: #04101c; }
+    .box.js code { background: #16233d; color: #cfeeff; }
+    .box.js td { border-color: #1f3052; }
+    @media print { .box.js { background: #fff; color: #000; border-color: #000; } .box.js code { background: #eee; color: #000; } }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Responsive + DOM · all materials</a><button class="print" type="button" onclick="print()">🖨 Print (A4 landscape)</button></div>
+    <h1>Responsive + DOM <em>on one page</em></h1>
+    <p class="intro">Everything from Lecture 4, condensed. Print it, stick it next to your screen.</p>
+
+    <div class="sheet">
+      <section class="box">
+        <h2><span>0</span> Who are you asking?</h2>
+        <table>
+          <tr><td><code>@media</code></td><td>the window, the device, the person's settings</td></tr>
+          <tr><td><code>clamp() min()</code></td><td>nobody: maths that slides</td></tr>
+        </table>
+        <p>Fewest questions wins: fluid first, a media query when the whole page must change shape. More askers in box 6.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>1</span> The phone</h2>
+        <pre class="code" data-lang="html">&lt;meta name="viewport"
+  content="width=device-width, initial-scale=1"&gt;</pre>
+        <p>Without it phones lay the page out at 980px and shrink it. Test: DevTools device toolbar (<kbd>⌘⇧M</kbd>), and your real phone via <code>npx live-server</code>'s Network URL.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>2</span> Media queries, mobile first</h2>
+        <pre class="code" data-lang="css">.list { /* phone: one column */ }
+@media (width >= 40rem) { /* extras */ }
+@media (min-width: 40rem) { /* same, older */ }</pre>
+        <ul><li>Breakpoints where <em>your</em> content breaks, in <code>rem</code>. Two or three.</li><li>A query adds <strong>no specificity</strong>: put it after the rule it changes.</li><li>No <code>var()</code> inside a query condition.</li></ul>
+      </section>
+
+      <section class="box">
+        <h2><span>3</span> Other queries</h2>
+        <table>
+          <tr><td><code>(hover: hover)</code></td><td>hover effects</td></tr>
+          <tr><td><code>(pointer: coarse)</code></td><td>bigger tap targets</td></tr>
+          <tr><td><code>(prefers-reduced-motion: no-preference)</code></td><td>animation opt-in</td></tr>
+          <tr><td><code>(prefers-color-scheme: dark)</code></td><td>theme via variables</td></tr>
+          <tr><td><code>print</code></td><td>hide menus and forms</td></tr>
+        </table>
+        <p>Emulate them: DevTools → Rendering.</p>
+      </section>
+
+      <section class="box">
+        <h2><span>4</span> Variables &amp; calc</h2>
+        <pre class="code" data-lang="css">:root { --gap: 1rem; }
+@media (width >= 50rem) { :root { --gap: 2.5rem; } }
+.card { padding: var(--gap); }
+
+--hue: 30;  color: hsl(var(--hue) 80% 65%);
+min-height: calc(100svh - 4rem);
+gap: calc(var(--n) * 1rem);</pre>
+      </section>
+
+      <section class="box">
+        <h2><span>5</span> Fluid</h2>
+        <pre class="code" data-lang="css">width: min(100% - 2rem, 40rem);
+--gutter: clamp(1rem, 0.2rem + 3.5vw, 3rem);
+h1 { font-size: clamp(2.5rem, 1.13rem + 6.09vw, 6rem); }
+grid-template-columns:
+  repeat(auto-fill, minmax(min(16rem, 100%), 1fr));</pre>
+        <ul><li><code>clamp(MIN, PREFERRED, MAX)</code>. The preferred value always gets a <strong>rem part</strong> (zoom!). Largest ≤ 2.5 × smallest.</li></ul>
+      </section>
+
+      <section class="box">
+        <h2><span>6</span> Go deeper</h2>
+        <ul>
+          <li><a href="https://www.joshwcomeau.com/css/container-queries-introduction/">Container queries</a>: <code>@container</code> asks the slot, not the window.</li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@supports">Feature queries</a>: <code>@supports</code> asks the browser.</li>
+          <li><a href="https://web.dev/blog/viewport-units">Viewport units</a>: <code>svh</code> · <code>lvh</code> · <code>dvh</code>.</li>
+          <li><a href="https://ishadeed.com/article/overflow/">Overflow</a>: what makes a phone page scroll sideways (never <code>body { overflow-x: hidden }</code>).</li>
+        </ul>
+      </section>
+
+      <section class="box js">
+        <h2><span>7</span> Find · listen · change</h2>
+        <pre class="code" data-lang="js">const btn = document.querySelector(".menu-toggle");
+btn.addEventListener("click", (event) => {
+  btn.setAttribute("aria-expanded", "true");
+});</pre>
+        <p>Script tag: <code>&lt;script src="js/market.js" defer&gt;</code>. Without <code>defer</code> in the head, elements don't exist yet → <code>null</code>. Or wrap the code in <code>document.addEventListener("DOMContentLoaded", init)</code>.</p>
+      </section>
+
+      <section class="box js">
+        <h2><span>8</span> Find</h2>
+        <table>
+          <tr><td><code>getElementById("id")</code></td><td>one element or <code>null</code>, no <code>#</code></td></tr>
+          <tr><td><code>getElementsByTagName("h3")</code></td><td>live <code>HTMLCollection</code></td></tr>
+          <tr><td><code>querySelector(sel)</code></td><td>first match or <code>null</code></td></tr>
+          <tr><td><code>querySelectorAll(sel)</code></td><td>a list: loop it</td></tr>
+          <tr><td><code>el.querySelector(sel)</code></td><td>search inside <code>el</code></td></tr>
+          <tr><td><code>el.closest(sel)</code></td><td>climb up to an ancestor</td></tr>
+        </table>
+        <p><em>Cannot read properties of null</em> = your selector matched nothing.</p>
+      </section>
+
+      <section class="box js">
+        <h2><span>9</span> Change</h2>
+        <table>
+          <tr><td><code>textContent = …</code></td><td>text (safe for their input)</td></tr>
+          <tr><td><code>innerHTML = …</code></td><td>parses HTML: your strings only (XSS!)</td></tr>
+          <tr><td><code>classList.add/remove/toggle</code></td><td>state for CSS</td></tr>
+          <tr><td><code>setAttribute / getAttribute</code></td><td>values are strings</td></tr>
+          <tr><td><code>dataset.tag</code></td><td><code>data-tag="…"</code></td></tr>
+          <tr><td><code>hidden = true</code></td><td>+ <code>[hidden]{display:none!important}</code></td></tr>
+          <tr><td><code>style.setProperty("--x", v)</code></td><td>a CSS variable</td></tr>
+          <tr><td><code>createElement</code> · <code>append</code> · <code>prepend</code></td><td>build and add</td></tr>
+          <tr><td><code>remove</code> · <code>replaceChildren</code></td><td>take away, swap</td></tr>
+        </table>
+      </section>
+
+      <section class="box js">
+        <h2><span>10</span> Listen</h2>
+        <table>
+          <tr><td><code>click</code></td><td>buttons, links (also Enter/Space)</td></tr>
+          <tr><td><code>input</code></td><td>value changed, every keystroke</td></tr>
+          <tr><td><code>change</code></td><td>value changed and done</td></tr>
+          <tr><td><code>submit</code></td><td>on the <strong>form</strong>: fires after validation (a button click comes before)</td></tr>
+          <tr><td><code>keydown</code></td><td><code>event.key === "Escape"</code></td></tr>
+        </table>
+        <p><code>event.target</code> where it happened · <code>event.currentTarget</code> who's listening · events bubble up: one listener on the parent + <code>closest()</code> = delegation.</p>
+      </section>
+
+      <section class="box js">
+        <h2><span>11</span> Forms</h2>
+        <pre class="code" data-lang="js">form.addEventListener("submit", (event) => {
+  event.preventDefault();          // no reload
+  const data = new FormData(form); // by name=""
+  const n = Number(data.get("guests")); // strings!
+});
+input.setCustomValidity(ok ? "" : "Message");</pre>
+        <p>Let HTML validate: <code>required</code>, <code>type="email"</code>, <code>min</code>/<code>max</code>, <code>maxlength</code>. Style with <code>:user-invalid</code>.</p>
+      </section>
+
+      <section class="box js">
+        <h2><span>12</span> Jam toolbox</h2>
+        <pre class="code" data-lang="js">el.addEventListener("input", …);   // every change
+box.addEventListener("change", …); // when done; box.checked
+localStorage.setItem("k", "v");  localStorage.getItem("k");  localStorage.removeItem("k");
+JSON.stringify(list);  JSON.parse(text);
+matchMedia("(prefers-color-scheme: light)").matches;
+[...nodeList].find((x) => …);  [...nodeList].some((x) => …);
+el.classList.toggle("now", isNow);
+Number("2");  "21:30".split(":");
+field.checkValidity();  field.reportValidity();
+setTimeout(() => …, 0);</pre>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

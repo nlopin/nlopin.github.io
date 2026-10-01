@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 3 · Wire it up</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 30rem; margin-top: 1rem; }
+    .case .panel.tall { height: 36rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .loop { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font: 700 0.95rem var(--font-mono); margin: 0.4rem 0 0; }
+    .loop span { background: var(--white); border: 2px solid var(--ink); border-radius: 99px; padding: 0.35rem 0.8rem; }
+    .loop i { font-style: normal; }
+  </style>
+</head>
+<body class="page wire listen">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Exercise 3 · 14 min · cases 1–3 in class</span></div>
+    <span class="eyebrow-tag">Act 4 · Events</span>
+    <h1>Wire it <em>up</em></h1>
+    <p class="intro">Every feature on this page is the same three steps. The preview runs your script again a moment after you stop typing (or press <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>). Click around in the preview; <code>console.log</code> shows up under it.</p>
+    <div class="tip"><p class="loop"><span>1 · find it</span><i>→</i><span>2 · listen</span><i>→</i><span>3 · change it</span></p><p style="margin:0.6rem 0 0"><em>Which element? Which event? What changes?</em> The CSS is done: it draws whatever state you set.</p></div>
+
+    <section class="case">
+      <header><b>1</b><h2>The phone menu</h2></header>
+      <p class="complaint">On a phone the menu is folded away, and the Menu button does nothing.</p>
+      <p>The CSS already hides the nav while the button says <code>aria-expanded="false"</code>. Make a click flip it to <code>"true"</code>, and back. Attributes are strings: <code>"true"</code>, not <code>true</code>.</p>
+      <div class="live-js panel" data-market data-show-html data-solved="✓ JavaScript flips the state, CSS draws it. That's the whole pattern.">
+        <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">☰ Menu</button><nav class="main-nav" id="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Tickets</a></li></ul></nav></header><h1>Harbour Night Market</h1><p>Friday 16 October · 19:00 – 01:00</p></script>
+        <textarea>
+// 1 · find it
+const button = document.querySelector(".menu-toggle");
+
+// 2 · listen   3 · change it
+button.addEventListener("click", () => {
+  console.log("clicked!");
+});
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "A click opens the menu", "run": "click('.menu-toggle'); return $('.menu-toggle').getAttribute('aria-expanded') === 'true' && visible('.main-nav');"},
+          {"label": "A second click closes it", "run": "click('.menu-toggle'); const opened = visible('.main-nav'); click('.menu-toggle'); return opened && $('.menu-toggle').getAttribute('aria-expanded') === 'false' && !visible('.main-nav');"}
+        ]</script>
+      </div>
+      <details><summary>Why it works</summary><p>The button's <code>aria-expanded</code> is the <strong>state</strong>, and it's the same attribute a screen reader announces ("Menu, collapsed"). The CSS rule <code>.menu-toggle[aria-expanded="false"] + .main-nav { display: none }</code> draws that state. JavaScript never touches <code>display</code>.</p><pre class="code" data-lang="js">const button = document.querySelector(".menu-toggle");
+
+button.addEventListener("click", () => {
+  const isOpen = button.getAttribute("aria-expanded") === "true";
+  button.setAttribute("aria-expanded", String(!isOpen));
+});</pre></details>
+    </section>
+
+    <section class="case">
+      <header><b>2</b><h2>Save a stall</h2></header>
+      <p class="complaint">Every card has a ♡ Save button. None of them does anything.</p>
+      <p>A click on a ♡ button toggles <strong>that</strong> button: <code>aria-pressed</code> goes <code>"false"</code> ↔ <code>"true"</code>, and its text becomes <code>♥ Saved</code> / <code>♡ Save</code>. You need <em>all</em> the buttons: <code>querySelectorAll</code> gives a list, and a list has no <code>addEventListener</code>. Loop over it.</p>
+      <div class="live-js panel tall" data-market data-show-html data-solved="✓ One listener per button. (Case 3 shows the cheaper way.)">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2><ul class="vendor-list"><li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Dumpling Dynasty</h3><button class="fav" type="button" aria-pressed="false">♡ Save</button></li><li class="vendor-card" data-tag="music"><span class="tag">Music</span><h3>Side B Records</h3><button class="fav" type="button" aria-pressed="false">♡ Save</button></li><li class="vendor-card" data-tag="crafts"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3><button class="fav" type="button" aria-pressed="false">♡ Save</button></li><li class="vendor-card" data-tag="drinks"><span class="tag">Drinks</span><h3>Mezcal Moon</h3><button class="fav" type="button" aria-pressed="false">♡ Save</button></li></ul></script>
+        <textarea>
+const buttons = document.querySelectorAll(".fav");
+
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "Clicking the 2nd ♡ saves it", "run": "click($$('.fav')[1]); const b = $$('.fav')[1]; return b.getAttribute('aria-pressed') === 'true' && b.textContent.includes('Saved');"},
+          {"label": "…and only that one", "run": "click($$('.fav')[1]); return $$('.fav').filter(b => b.getAttribute('aria-pressed') === 'true').length === 1;"},
+          {"label": "Clicking again unsaves it", "run": "const b = $$('.fav')[2]; click(b); const saved = b.getAttribute('aria-pressed') === 'true'; click(b); return saved && b.getAttribute('aria-pressed') === 'false' && b.textContent.includes('Save') && !b.textContent.includes('Saved');"}
+        ]</script>
+      </div>
+      <details><summary>Why it works</summary><p>Inside the loop, <code>button</code> is a different element each time round, and each listener remembers its own. <code>event.currentTarget</code> would work too: it's the element the listener is attached to.</p><pre class="code" data-lang="js">const buttons = document.querySelectorAll(".fav");
+
+for (const button of buttons) {
+  button.addEventListener("click", () => {
+    const saved = button.getAttribute("aria-pressed") === "true";
+    button.setAttribute("aria-pressed", String(!saved));
+    button.textContent = saved ? "♡ Save" : "♥ Saved";
+  });
+}</pre></details>
+    </section>
+
+    <section class="case">
+      <header><b>3</b><h2>The filter, with one listener</h2></header>
+      <p class="complaint">Five filter buttons above the vendors. Clicking Food should show only food stalls.</p>
+      <p>Use <strong>one</strong> listener, on <code>.filters</code>: clicks on the buttons bubble up to it. In the handler, <code>event.target.closest("button")</code> tells you which button (or <code>null</code> for a click in the gap). Then: the clicked button gets <code>aria-pressed="true"</code>, the others <code>"false"</code>; every card whose <code>data-tag</code> doesn't match gets <code>hidden = true</code>. <code>"all"</code> shows everything.</p>
+      <div class="live-js panel tall" data-market data-show-html data-show-css data-solved="✓ Delegation: one listener, any number of buttons — even ones added later.">
+        <script type="text/plain" data-role="html"><div class="filters"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="food" aria-pressed="false">Food</button><button type="button" data-filter="music" aria-pressed="false">Music</button><button type="button" data-filter="crafts" aria-pressed="false">Crafts</button><button type="button" data-filter="drinks" aria-pressed="false">Drinks</button></div><ul class="vendor-list"><li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card" data-tag="music"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card" data-tag="crafts"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3></li><li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Churros Till Late</h3></li><li class="vendor-card" data-tag="crafts"><span class="tag">Crafts</span><h3>The Plant Swap</h3></li><li class="vendor-card" data-tag="drinks"><span class="tag">Drinks</span><h3>Mezcal Moon</h3></li></ul></script>
+        <script type="text/plain" data-role="css">/* our reset's first line: without it, hidden loses to .vendor-card's display: flex */
+[hidden] { display: none !important; }</script>
+        <script type="text/plain" data-role="before">window.__listeners = []; const __add = EventTarget.prototype.addEventListener; EventTarget.prototype.addEventListener = function (type, fn, opts) { window.__listeners.push({ el: this, type }); return __add.call(this, type, fn, opts); };</script>
+        <textarea>
+const filters = document.querySelector(".filters");
+const cards = document.querySelectorAll(".vendor-card");
+
+filters.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  console.log(button);
+});
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "Food shows the 2 food stalls", "run": "click('[data-filter=food]'); const shown = $$('.vendor-card').filter(c => visible(c)); return shown.length === 2 && shown.every(c => c.dataset.tag === 'food');"},
+          {"label": "The clicked button is pressed", "run": "click('[data-filter=music]'); return $('[data-filter=music]').getAttribute('aria-pressed') === 'true' && $('[data-filter=all]').getAttribute('aria-pressed') === 'false';"},
+          {"label": "All shows all 6 again", "run": "click('[data-filter=crafts]'); const two = $$('.vendor-card').filter(c => visible(c)).length === 2; click('[data-filter=all]'); return two && $$('.vendor-card').filter(c => visible(c)).length === 6;"},
+          {"label": "One listener, on .filters", "run": "click('[data-filter=drinks]'); if ($$('.vendor-card').filter(c => visible(c)).length !== 1) return false; return win.__listeners.filter(l => l.type === 'click').length === 1 && win.__listeners.some(l => l.el === $('.filters'));"}
+        ]</script>
+      </div>
+      <details><summary>Why it works</summary><p>A click on a button <strong>bubbles</strong>: the button, then <code>.filters</code>, then the body, the document. A listener on the parent hears every child. <code>closest("button")</code> walks up from wherever the click landed (maybe a text node inside the button) to the button itself. The <code>[hidden]</code> line in the CSS tab is there because the <code>hidden</code> attribute is just a browser default (<code>display: none</code>), and any author rule that sets <code>display</code> beats it.</p><pre class="code" data-lang="js">const filters = document.querySelector(".filters");
+const cards = document.querySelectorAll(".vendor-card");
+
+filters.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return; // a click in the gap
+
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b === button));
+  }
+  const tag = button.dataset.filter;
+  for (const card of cards) {
+    card.hidden = tag !== "all" && card.dataset.tag !== tag;
+  }
+});</pre></details>
+    </section>
+
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>Escape closes the menu</h2></header>
+      <p>Case 1 again, plus: pressing <kbd>Escape</kbd> anywhere closes the menu. Keys don't happen "on" a button: listen on <code>document</code> for <code>keydown</code>, and check <code>event.key</code>.</p>
+      <div class="live-js panel" data-market data-solved="✓ Keyboard users thank you.">
+        <script type="text/plain" data-role="html"><header class="site-header"><a class="logo" href="#">🏮 Night Market</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">☰ Menu</button><nav class="main-nav" id="main-nav"><ul><li><a href="#">Vendors</a></li><li><a href="#">Map</a></li><li><a href="#">Tickets</a></li></ul></nav></header><p>Open the menu, then press Escape (click inside the preview first).</p></script>
+        <textarea>
+const button = document.querySelector(".menu-toggle");
+
+button.addEventListener("click", () => {
+  const isOpen = button.getAttribute("aria-expanded") === "true";
+  button.setAttribute("aria-expanded", String(!isOpen));
+});
+
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "Other keys leave it open", "run": "click('.menu-toggle'); key(null, 'a'); return $('.menu-toggle').getAttribute('aria-expanded') === 'true';"},
+          {"label": "Escape closes the open menu", "run": "click('.menu-toggle'); const open = $('.menu-toggle').getAttribute('aria-expanded') === 'true'; key(null, 'Escape'); return open && $('.menu-toggle').getAttribute('aria-expanded') === 'false';"}
+        ]</script>
+      </div>
+      <details><summary>Solution</summary><pre class="code" data-lang="js">document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    button.setAttribute("aria-expanded", "false");
+  }
+});</pre></details>
+    </section>
+
+    <section class="case">
+      <header><b class="bonus">5 · bonus</b><h2>Count what's showing</h2></header>
+      <p>Your filter from case 3, plus a line under the buttons: <code>2 of 6 stalls</code>. Write it into <code>.count</code> with a template literal. For "All", leave it empty.</p>
+      <div class="live-js panel tall" data-market data-solved="✓ The count is just more changing.">
+        <script type="text/plain" data-role="html"><div class="filters"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="food" aria-pressed="false">Food</button><button type="button" data-filter="music" aria-pressed="false">Music</button><button type="button" data-filter="crafts" aria-pressed="false">Crafts</button><output class="count"></output></div><ul class="vendor-list"><li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card" data-tag="music"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card" data-tag="crafts"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3></li><li class="vendor-card" data-tag="food"><span class="tag">Food</span><h3>Churros Till Late</h3></li><li class="vendor-card" data-tag="crafts"><span class="tag">Crafts</span><h3>The Plant Swap</h3></li><li class="vendor-card" data-tag="drinks"><span class="tag">Drinks</span><h3>Mezcal Moon</h3></li></ul></script>
+        <script type="text/plain" data-role="css">[hidden] { display: none !important; }</script>
+        <textarea>
+// paste your case 3 here, then count
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "Crafts says 2 of 6 stalls", "run": "click('[data-filter=crafts]'); return text('.count') === '2 of 6 stalls';"},
+          {"label": "Music says 1 of 6 stalls", "run": "click('[data-filter=music]'); return text('.count') === '1 of 6 stalls';"},
+          {"label": "All clears it", "run": "click('[data-filter=food]'); const said = text('.count') === '2 of 6 stalls'; click('[data-filter=all]'); return said && text('.count') === '';"}
+        ]</script>
+      </div>
+      <details><summary>Solution</summary><pre class="code" data-lang="js">const count = document.querySelector(".count");
+// …inside the click handler, after hiding the cards:
+const shown = [...cards].filter((card) => !card.hidden).length;
+count.textContent = tag === "all" ? "" : `${shown} of ${cards.length} stalls`;</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">6 · bonus</b><h2>JavaScript sets, CSS draws</h2></header>
+      <p>The bridge between the two halves of today. Each filter button carries a colour in <code>data-color</code>. When a filter is clicked, set the CSS variable <code>--accent</code> on the page root to that colour: <code>document.documentElement.style.setProperty("--accent", …)</code>. The stylesheet already paints the cards' borders and the heading with <code>var(--accent)</code>. One line in your handler; no colours in your script.</p>
+      <div class="live-js panel" data-market data-show-html data-show-css data-solved="✓ The script hands CSS a value; the stylesheet decides where it goes.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2><div class="filters"><button type="button" data-filter="food" data-color="#ffc46b" aria-pressed="false">Food</button><button type="button" data-filter="music" data-color="#5ec8d8" aria-pressed="false">Music</button><button type="button" data-filter="crafts" data-color="#b8e0a0" aria-pressed="false">Crafts</button></div><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card"><span class="tag">Music</span><h3>Side B Records</h3></li><li class="vendor-card"><span class="tag">Crafts</span><h3>Salt &amp; Ink</h3></li></ul></script>
+        <script type="text/plain" data-role="css">.vendor-card { border-color: var(--accent, #3a4254); }
+h2 { color: var(--accent, inherit); }</script>
+        <textarea>
+const filters = document.querySelector(".filters");
+
+filters.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  console.log(button.dataset.color);
+});
+</textarea>
+        <script type="application/json" data-role="checks">[
+          {"label": "Music sets --accent to #5ec8d8", "run": "click('[data-filter=music]'); return win.getComputedStyle(doc.documentElement).getPropertyValue('--accent').trim() === '#5ec8d8';"},
+          {"label": "…and the cards follow", "run": "click('[data-filter=crafts]'); return win.getComputedStyle($('.vendor-card')).borderTopColor === 'rgb(184, 224, 160)';"}
+        ]</script>
+      </div>
+      <details><summary>Solution</summary><pre class="code" data-lang="js">filters.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  document.documentElement.style.setProperty("--accent", button.dataset.color);
+});</pre><p>JavaScript can also ask CSS's questions: <code>matchMedia("(width &gt;= 40rem)").matches</code> is <code>true</code> exactly when that media query matches.</p></details>
+    </section>
+
+  </div>
+</body>
+</html>

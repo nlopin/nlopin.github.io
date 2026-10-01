@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Harbour Night Market — responsive.css
+   How the page ADAPTS. Today, Part 1. Work top to bottom.
+   Test every change in the device toolbar (⌘⇧M / Ctrl⇧M) at 360, 800
+   and 1280px, and once on your real phone (npx live-server → Network URL).
+   ========================================================================== */
+
+
+/* ---------- 0 · First: the viewport tag ------------------------------------
+   index.html is missing a line in <head>. Add it, or nothing below matters
+   on a phone: <meta name="viewport" content="width=device-width, initial-scale=1">  */
+
+
+/* ---------- Act 1 · Small screens ------------------------------------------
+   · The menu runs off the screen on a phone.
+       .site-header, .main-nav ul  → let them wrap (flex-wrap + a row gap)
+   · The featured stall, the map and the form: see the comment at the top
+     of layout.css (gate them with min-width queries).
+   · Cards lift on hover, but only where hover exists:
+       @media (hover: hover) { .vendor-card:hover { … } }
+   · Smooth scrolling for in-page links, but only for people who didn't
+     ask for less motion:
+       @media (prefers-reduced-motion: no-preference) { html { … } }
+   · Stretch: a print stylesheet that hides the menu, the form and buttons.
+
+   Watch out: a media query adds no specificity. Put each query AFTER the
+   rule it changes, or the base rule wins.                                   */
+
+
+
+/* ---------- Act 2 · Fluid ---------------------------------------------------
+   · Tokens on :root, made with clamp() (the fluid calculator helps):
+       --gutter         1rem on a phone → 3rem on a big screen
+       --step-0 (text)  1rem → 1.15rem
+       --step-2 (h2)    ~1.9rem → 3rem
+       --step-4 (h1)    3rem → 7.5rem   (replace outfit's h1 clamp)
+     Every preferred value needs a rem part, so zoom still works.
+   · Use them: section padding, header/footer padding, the vendor gap,
+     body, h2 and .hero h1 font sizes.
+   · The magic line in layout.css can be wider than a small phone:
+     minmax(min(16rem, 100%), 1fr). Check at 320px: nothing may scroll
+     sideways.                                                               */
+
+
+
+/* ---------- Further, if you like (not covered in class) -----------------
+   The finished showcase also uses container queries (css/components.css)
+   and svh for the hero. The reading list on the slides explains both.       */
+
+
+
+/* ---------- Part 2 · States the script switches --------------------------
+   · [hidden] { display: none !important; }  (the gotcha from the slides:
+     .vendor-card's display: flex would beat the hidden attribute)
+   · On a phone, hide the nav while the menu button says it's collapsed:
+       .menu-toggle[aria-expanded="false"] + .main-nav { display: none; }
+     and from 40rem up, hide the menu button itself.
+   · Red borders only after someone touched a field: :user-invalid          */

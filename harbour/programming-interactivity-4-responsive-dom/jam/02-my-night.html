@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market jam 2 · My night</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .page h2 { margin-top: 2.2rem; }
+    .lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .lane { background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; padding: 1rem 1.1rem; box-shadow: 4px 4px 0 var(--ink); }
+    .lane h3 { margin: 0 0 0.5rem; font: 800 1rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+    .lane.html h3 { color: #c2410c; } .lane.css h3 { color: var(--blue); } .lane.js h3 { color: #0b7a52; }
+    .lane ul { list-style: none; margin: 0; padding: 0; }
+    .lane li { display: flex; gap: 0.55rem; align-items: baseline; margin: 0.45rem 0; }
+    .lane li input { flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--ink); transform: translateY(0.15rem); }
+    .story { font: italic 400 1.45rem/1.35 var(--font-serif); max-width: 60ch; color: var(--ink-2); margin: 0.5rem 0 1rem; }
+    .demo { background: var(--ink); color: var(--paper); border-radius: 0.8rem; padding: 1rem 1.2rem; max-width: 70ch; }
+    .demo b { color: var(--yellow); }
+    .demo ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+    .stretch li, .gotchas li { margin: 0.35rem 0; }
+    .page pre.code { font-size: 0.92rem; margin: 0.6rem 0; max-width: 60rem; white-space: pre-wrap; }
+    .stars { font-family: var(--font-mono); letter-spacing: 0.1em; }
+    .clock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; max-width: 60rem; }
+    .clock div { border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: var(--white); font-size: 0.92rem; }
+    .clock b { display: block; font: 800 0.8rem var(--font-mono); }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem; background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; color: var(--ink); text-decoration: none; box-shadow: 4px 4px 0 var(--ink); }
+    .tasks-grid a:hover, .tasks-grid a:focus-visible { background: var(--paper-2); outline: none; }
+    .tasks-grid b { display: block; font-size: 1.2rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 700 0.75rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .tasks-grid span { color: var(--ink-2); font-size: 0.95rem; }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .hints { display: grid; gap: 0.5rem; max-width: 60rem; }
+    .hints details, details.traps { background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.55rem 0.9rem; }
+    .hints summary, details.traps summary { cursor: pointer; font: 700 0.95rem var(--font-mono); }
+    .hints details[open] summary, details.traps[open] summary { margin-bottom: 0.4rem; }
+    .hints p { margin: 0.3rem 0; }
+    details.traps { max-width: 60rem; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Market jam · all tasks</a><span>Task 2 · 30 min · then 2½ min on stage</span></div>
+    <span class="eyebrow-tag">Market jam · task 2</span>
+    <h1>My <em>night</em></h1>
+    <p class="intro">A ♡ on every stall. Save the ones you want to visit, see how many you saved, and show only those. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“Forty stalls. I want the five I care about, and I want them still there when I open the page again on my phone at the market.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> tap ♡ on two stalls: they turn ♥, their cards are marked and the header says ♥ 2. Tick "only my saved stalls": the others disappear. Reload: still saved.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane html"><h3>HTML · index.html</h3><ul><li><input type="checkbox" aria-label="done"><span>A save button on every stall. A screen reader knows which stall it saves and whether it's saved.</span></li><li><input type="checkbox" aria-label="done"><span>A saved-count in the header, and a switch for "only my saved stalls".</span></li></ul></div>
+      <div class="lane css"><h3>CSS · css/feature.css</h3><ul><li><input type="checkbox" aria-label="done"><span>A saved stall looks saved: the button and the whole card.</span></li><li><input type="checkbox" aria-label="done"><span>In only-saved mode, the other stalls are gone.</span></li></ul></div>
+      <div class="lane js"><h3>JS · js/feature.js</h3><ul><li><input type="checkbox" aria-label="done"><span>Saving and unsaving works on every stall with <strong>one</strong> listener.</span></li><li><input type="checkbox" aria-label="done"><span>The count is always right.</span></li><li><input type="checkbox" aria-label="done"><span>Saved stalls are still saved after a reload.</span></li></ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>Before you start:</strong> <code>js/market.js</code> already declares <code>stalls</code>, <code>form</code>, <code>nav</code>, <code>filters</code>, <code>count</code>. Declaring one again in feature.js is a SyntaxError (<em>"has already been declared"</em>) and none of your file runs. Pick your own names.</p></div>
+    
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch"><li>The counter link scrolls to the vendors and turns on only-saved mode.</li><li>An empty state: "Nothing saved yet: tap a ♡".</li><li>Works together with the Food/Music filter: what happens if both hide things?</li></ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first. The tools are on the toolbox slide and in the cheat sheet (box 12).</p>
+    <div class="hints"><details><summary>Hint 1</summary><p>Which attribute tells a screen reader that a toggle button is on? You used it on the menu in Exercise 3.</p></details><details><summary>Hint 2</summary><p>Can CSS style a card because of a button <em>inside</em> it?</p></details><details><summary>Hint 3</summary><p>What do you store, exactly? It has to mean the same thing after a reload, when every element is new.</p></details><details><summary>Hint 4</summary><p><code>localStorage</code> stores strings only. A list goes in with <code>JSON.stringify</code> and comes out with <code>JSON.parse</code>.</p></details></div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas"><li>The Food/Music filter already hides stalls with the <code>hidden</code> attribute. If you use it too, each feature undoes the other.</li><li>Cards have a "Sold out" stamp in the top-right corner.</li></ul></details>
+
+    <h2>The 30 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 min · plan</b>Read the brief together. Agree on the solution before anyone types.</div>
+      <div><b>5–20 · build</b>Must-haves only. Commit to one approach.</div>
+      <div><b>20–27 · verify</b>On a phone. Keyboard only. A reload.</div>
+      <div><b>27–30 · demo</b>Stop coding. Rehearse your 2½ minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 2½ minutes</b>
+      <ol>
+        <li><b>Demo it</b> at phone width and at desktop width (device toolbar on the projector).</li>
+        <li><b>The code</b>: what you find, which event you listen for, what you change. Show those lines of feature.js.</li>
+        <li><b>One CSS decision</b>: the query, the variable or the selector that does the drawing.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

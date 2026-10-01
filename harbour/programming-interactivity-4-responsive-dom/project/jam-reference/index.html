@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <title>Harbour Night Market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="css/outfit.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/fluid.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/states.css">
+  <!-- the market jam, reference: all five group features on one page -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/saved.css">
+  <link rel="stylesheet" href="css/schedule.css">
+  <link rel="stylesheet" href="css/search.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/register.css">
+  <link rel="stylesheet" href="css/wizard.css">
+  <script src="js/market.js" defer></script>
+  <script src="js/theme.js" defer></script>
+  <script src="js/saved.js" defer></script>
+  <script src="js/schedule.js" defer></script>
+  <script src="js/search.js" defer></script>
+  <script src="js/map.js" defer></script>
+  <script src="js/register.js" defer></script>
+  <script src="js/wizard.js" defer></script>
+</head>
+<body>
+  <header class="site-header" id="top">
+    <a class="logo" href="#top">🏮 Night Market</a>
+    <div class="header-tools">
+      <a class="saved-count" href="#vendors" aria-label="Saved stalls">♥ <span>0</span></a>
+      <fieldset class="theme-switch">
+        <legend>Theme</legend>
+        <label title="Light"><input type="radio" name="theme" value="light"><span aria-hidden="true">☀️</span><span class="sr-only">Light</span></label>
+        <label title="Auto: follow my system"><input type="radio" name="theme" value="auto" checked><span aria-hidden="true">🌗</span><span class="sr-only">Auto</span></label>
+        <label title="Dark"><input type="radio" name="theme" value="dark"><span aria-hidden="true">🌙</span><span class="sr-only">Dark</span></label>
+      </fieldset>
+    </div>
+    <button class="menu-toggle" type="button" aria-expanded="true" aria-controls="main-nav" hidden>Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="#vendors">Vendors</a></li>
+        <li><a href="#map">Map</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#tickets">Tickets</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Friday 16 October · 19:00 – 01:00</p>
+      <h1>Harbour Night Market</h1>
+      <p class="lead">Forty stalls, three stages and one very long table on the waterfront at Moll de la Fusta. Street food, vinyl, handmade things and people you haven't met yet.</p>
+      <a class="button" href="#tickets">Get a free ticket</a>
+    </section>
+
+    <section id="vendors">
+      <h2>Vendors</h2>
+      <div class="search">
+        <label for="vendor-search">Find a stall</label>
+        <input id="vendor-search" type="search" placeholder="dumplings, vinyl, mezcal…" autocomplete="off">
+        <p class="search-status" aria-live="polite"></p>
+      </div>
+      <div class="filters" role="group" aria-label="Show vendors">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="food" aria-pressed="false">Food</button>
+        <button type="button" data-filter="music" aria-pressed="false">Music</button>
+        <button type="button" data-filter="crafts" aria-pressed="false">Crafts</button>
+        <button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+        <output class="filter-count" aria-live="polite"></output>
+      </div>
+      <label class="saved-only"><input type="checkbox"> Only my saved stalls</label>
+      <ul class="vendor-list">
+        <li class="stall" data-tag="food">
+          <article class="vendor-card featured">
+            <span class="tag">Food</span>
+            <h3>Dumpling Dynasty</h3>
+            <p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience, and so is the chilli oil.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save Dumpling Dynasty">♡</button>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="music">
+          <article class="vendor-card">
+            <span class="tag">Music</span>
+            <h3>Side B Records</h3>
+            <p>Crates of second-hand vinyl, sorted by mood instead of genre.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save Side B Records">♡</button>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>Salt &amp; Ink</h3>
+            <p>Risograph posters of the port, printed in two colours and signed while you wait. Ask for the one with the crane.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save Salt &amp; Ink">♡</button>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="food">
+          <article class="vendor-card sold-out">
+            <span class="tag">Food</span>
+            <h3>Churros Till Late</h3>
+            <p>Crisp, sugared and dunked in thick chocolate.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save Churros Till Late">♡</button>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>The Plant Swap</h3>
+            <p>Bring a cutting, take a cutting. Pots are free, advice is free, gossip is extra.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save The Plant Swap">♡</button>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="drinks">
+          <article class="vendor-card sold-out">
+            <span class="tag">Drinks</span>
+            <h3>Mezcal Moon</h3>
+            <p>Small-batch mezcal and orange slices dusted with chilli salt. Sip, don't shoot. Last orders at half past midnight.</p>
+            <button class="save" type="button" aria-pressed="false" aria-label="Save Mezcal Moon">♡</button>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+      </ul>
+      <details class="register">
+        <summary>＋ Register your stall</summary>
+        <form class="register-form">
+          <label for="stall-name">Stall name</label>
+          <input id="stall-name" name="name" required maxlength="40" autocomplete="off">
+          <label for="stall-tag">Category</label>
+          <select id="stall-tag" name="tag">
+            <option value="food">Food</option>
+            <option value="music">Music</option>
+            <option value="crafts">Crafts</option>
+            <option value="drinks">Drinks</option>
+          </select>
+          <label for="stall-text">One line about it</label>
+          <textarea id="stall-text" name="text" rows="2" required maxlength="120"></textarea>
+          <button type="submit">Add my stall</button>
+        </form>
+        <p class="register-status" aria-live="polite"></p>
+      </details>
+    </section>
+
+    <section id="map">
+      <h2>Map</h2>
+      <div class="market-map">
+        <button type="button" aria-pressed="false" class="zone stage">Main stage</button>
+        <button type="button" aria-pressed="false" class="zone food">Food street</button>
+        <button type="button" aria-pressed="false" class="zone table">Long table</button>
+        <button type="button" aria-pressed="false" class="zone crafts">Crafts corner</button>
+        <button type="button" aria-pressed="false" class="zone drinks">Drinks</button>
+        <button type="button" aria-pressed="false" class="zone pier">The pier</button>
+        <button type="button" aria-pressed="false" class="zone gate">Entrance · Moll de la Fusta</button>
+        <span class="you-are-here">You are here</span>
+      </div>
+      <aside class="zone-info" hidden aria-live="polite">
+        <button class="zone-close" type="button" aria-label="Close">✕</button>
+        <h3></h3>
+        <p></p>
+      </aside>
+    </section>
+
+    <section id="schedule">
+      <h2>Schedule</h2>
+      <div class="whats-on">
+        <label for="when">What's on at</label>
+        <input id="when" type="range" min="19" max="25" step="0.5" value="21">
+        <output for="when">21:00</output>
+        <p class="on-now" aria-live="polite"></p>
+      </div>
+      <table class="schedule">
+        <thead>
+          <tr><th>Time</th><th>What</th><th>Where</th></tr>
+        </thead>
+        <tbody>
+          <tr><td data-label="Time">19:00</td><td data-label="What">Doors open, DJ Marisol warms up</td><td data-label="Where">Main stage</td></tr>
+          <tr><td data-label="Time">19:30</td><td data-label="What">Dumpling folding class</td><td data-label="Where">Long table</td></tr>
+          <tr><td data-label="Time">20:30</td><td data-label="What">Los Faroles — live cumbia</td><td data-label="Where">Main stage</td></tr>
+          <tr><td data-label="Time">21:30</td><td data-label="What">Zine-making workshop</td><td data-label="Where">Long table</td></tr>
+          <tr><td data-label="Time">22:30</td><td data-label="What">Harbour Brass Band</td><td data-label="Where">The pier</td></tr>
+          <tr><td data-label="Time">00:00</td><td data-label="What">Silent disco until close</td><td data-label="Where">The pier</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Is it really free?</summary>
+        <p>Entry is free. Bring cash or a card for the stalls.</p>
+      </details>
+      <details>
+        <summary>Can I bring my dog?</summary>
+        <p>Yes, on a leash. The dumplings are not for dogs.</p>
+      </details>
+      <details>
+        <summary>What if it rains?</summary>
+        <p>We move under the big tent next to the main stage. The market has never closed early.</p>
+      </details>
+    </section>
+
+    <section id="tickets">
+      <h2>Get a ticket</h2>
+      <form class="ticket-form wizard">
+        <ol class="steps">
+          <li aria-current="step">You</li>
+          <li>Your visit</li>
+          <li>Check</li>
+        </ol>
+
+        <fieldset class="step">
+          <legend>1 · You</legend>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+        </fieldset>
+
+        <fieldset class="step" hidden>
+          <legend>2 · Your visit</legend>
+          <label for="guests">Guests</label>
+          <input id="guests" name="guests" type="number" min="1" max="6" value="1" required>
+          <label for="arrival">Arriving</label>
+          <select id="arrival" name="arrival">
+            <option>Early — for the food</option>
+            <option>Late — for the music</option>
+            <option>Whenever — for the vibes</option>
+          </select>
+          <label for="message">A note for us</label>
+          <textarea id="message" name="message" rows="3" maxlength="140" aria-describedby="message-left"></textarea>
+          <p class="hint" id="message-left">Up to 140 characters.</p>
+          <label class="check"><input type="checkbox" name="news"> Send me next month's line-up</label>
+        </fieldset>
+
+        <fieldset class="step" hidden>
+          <legend>3 · Check and reserve</legend>
+          <dl class="review"></dl>
+        </fieldset>
+
+        <div class="wizard-nav">
+          <button type="button" class="wizard-back" hidden>← Back</button>
+          <button type="button" class="wizard-next">Next →</button>
+          <button type="submit" class="wizard-submit" hidden disabled>Reserve my spot</button>
+        </div>
+      </form>
+      <div class="ticket-result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Harbour Night Market · Moll de la Fusta, Barcelona</p>
+    <p>Made with HTML, CSS and too many dumplings.</p>
+  </footer>
+
+  <a class="to-top" href="#top" aria-label="Back to top">↑</a>
+</body>
+</html>

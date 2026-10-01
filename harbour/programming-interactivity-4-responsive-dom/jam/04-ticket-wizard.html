@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market jam 4 · Ticket wizard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .page h2 { margin-top: 2.2rem; }
+    .lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .lane { background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; padding: 1rem 1.1rem; box-shadow: 4px 4px 0 var(--ink); }
+    .lane h3 { margin: 0 0 0.5rem; font: 800 1rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+    .lane.html h3 { color: #c2410c; } .lane.css h3 { color: var(--blue); } .lane.js h3 { color: #0b7a52; }
+    .lane ul { list-style: none; margin: 0; padding: 0; }
+    .lane li { display: flex; gap: 0.55rem; align-items: baseline; margin: 0.45rem 0; }
+    .lane li input { flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--ink); transform: translateY(0.15rem); }
+    .story { font: italic 400 1.45rem/1.35 var(--font-serif); max-width: 60ch; color: var(--ink-2); margin: 0.5rem 0 1rem; }
+    .demo { background: var(--ink); color: var(--paper); border-radius: 0.8rem; padding: 1rem 1.2rem; max-width: 70ch; }
+    .demo b { color: var(--yellow); }
+    .demo ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+    .stretch li, .gotchas li { margin: 0.35rem 0; }
+    .page pre.code { font-size: 0.92rem; margin: 0.6rem 0; max-width: 60rem; white-space: pre-wrap; }
+    .stars { font-family: var(--font-mono); letter-spacing: 0.1em; }
+    .clock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; max-width: 60rem; }
+    .clock div { border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: var(--white); font-size: 0.92rem; }
+    .clock b { display: block; font: 800 0.8rem var(--font-mono); }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem; background: var(--white); border: 2px solid var(--ink); border-radius: 0.8rem; color: var(--ink); text-decoration: none; box-shadow: 4px 4px 0 var(--ink); }
+    .tasks-grid a:hover, .tasks-grid a:focus-visible { background: var(--paper-2); outline: none; }
+    .tasks-grid b { display: block; font-size: 1.2rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 700 0.75rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .tasks-grid span { color: var(--ink-2); font-size: 0.95rem; }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .hints { display: grid; gap: 0.5rem; max-width: 60rem; }
+    .hints details, details.traps { background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.55rem 0.9rem; }
+    .hints summary, details.traps summary { cursor: pointer; font: 700 0.95rem var(--font-mono); }
+    .hints details[open] summary, details.traps[open] summary { margin-bottom: 0.4rem; }
+    .hints p { margin: 0.3rem 0; }
+    details.traps { max-width: 60rem; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Market jam · all tasks</a><span>Task 4 · 30 min · then 2½ min on stage</span></div>
+    <span class="eyebrow-tag">Market jam · task 4</span>
+    <h1>Ticket <em>wizard</em></h1>
+    <p class="intro">The ticket form, one step at a time: You → Your visit → Check. A progress strip on top, and a review of every answer before Reserve. <span class="stars" title="difficulty">★★★</span></p>
+    <p class="story">“On my phone the ticket form is one endless column, and I only find out at the very end that my email was wrong. Three short steps, please, and let me see everything before I book.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> step 1 asks for name and email; Next refuses until both are valid, with the browser's own message. Step 2: guests, arrival, note. Step 3 lists every answer. Back works. Reserve books the ticket (market.js already does that) and the form starts again at step 1.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane html"><h3>HTML · index.html</h3><ul><li><input type="checkbox" aria-label="done"><span>The existing form, split into three steps: You (name, email) · Your visit (the rest) · Check (a review). Same form, same fields: market.js still books the ticket.</span></li><li><input type="checkbox" aria-label="done"><span>A progress strip that says which step you're on, to screen readers too.</span></li><li><input type="checkbox" aria-label="done"><span>Back and Next.</span></li></ul></div>
+      <div class="lane css"><h3>CSS · css/feature.css</h3><ul><li><input type="checkbox" aria-label="done"><span>One step visible at a time, each with the form's two-column layout from ~40rem.</span></li><li><input type="checkbox" aria-label="done"><span>Done, current and upcoming steps look different in the strip, with no JavaScript for the looks.</span></li><li><input type="checkbox" aria-label="done"><span>The review is easy to scan: label, answer.</span></li></ul></div>
+      <div class="lane js"><h3>JS · js/feature.js</h3><ul><li><input type="checkbox" aria-label="done"><span>Next won't leave a step with an invalid field, and shows the browser's message on that field.</span></li><li><input type="checkbox" aria-label="done"><span>The review lists every answer, inserted safely.</span></li><li><input type="checkbox" aria-label="done"><span>Enter can't book a ticket from step 1.</span></li><li><input type="checkbox" aria-label="done"><span>After booking, the wizard starts again at step 1.</span></li></ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>Before you start:</strong> <code>js/market.js</code> already declares <code>stalls</code>, <code>form</code>, <code>nav</code>, <code>filters</code>, <code>count</code>. Declaring one again in feature.js is a SyntaxError (<em>"has already been declared"</em>) and none of your file runs. Pick your own names.</p></div>
+    
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch"><li>Enter in a field goes to the next step.</li><li>Focus moves to the first field of each new step, and to Reserve on the last: try it with the keyboard only.</li><li>An "Edit" button next to each answer in the review jumps back to its step.</li></ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first. The tools are on the toolbox slide and in the cheat sheet (box 12).</p>
+    <div class="hints"><details><summary>Hint 1</summary><p>Which element groups form fields and has a caption of its own? It also has an <code>.elements</code> list.</p></details><details><summary>Hint 2</summary><p>Every field can check itself: <code>checkValidity()</code> and <code>reportValidity()</code>.</p></details><details><summary>Hint 3</summary><p>Write one function that draws the whole wizard for step <code>i</code>. Every button just calls it.</p></details><details><summary>Hint 4</summary><p>CSS can count: <code>counter-reset</code>, <code>counter-increment</code>, <code>counter()</code>.</p></details><details><summary>Hint 5</summary><p><code>form.reset()</code> fires a <code>reset</code> event.</p></details></div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas"><li>What does a <code>&lt;button&gt;</code> inside a form do when you don't give it a <code>type</code>?</li><li>Wrapping fields in a new element breaks the form's grid from Lecture 3: the grid items changed.</li><li>Enter in a text field submits the form: "implicit submission". Find out when the browser does it and when it doesn't.</li><li>market.js already listens for <code>submit</code> and builds the ticket. Your script only manages the steps.</li></ul></details>
+
+    <h2>The 30 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 min · plan</b>Read the brief together. Agree on the solution before anyone types.</div>
+      <div><b>5–20 · build</b>Must-haves only. Commit to one approach.</div>
+      <div><b>20–27 · verify</b>On a phone. Keyboard only. A reload.</div>
+      <div><b>27–30 · demo</b>Stop coding. Rehearse your 2½ minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 2½ minutes</b>
+      <ol>
+        <li><b>Demo it</b> at phone width and at desktop width (device toolbar on the projector).</li>
+        <li><b>The code</b>: what you find, which event you listen for, what you change. Show those lines of feature.js.</li>
+        <li><b>One CSS decision</b>: the query, the variable or the selector that does the drawing.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

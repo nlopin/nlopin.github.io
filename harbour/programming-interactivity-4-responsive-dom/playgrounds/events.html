@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.event-lab { font-size: 1.35rem; height: 36rem; } .event-monitor { font-size: 1.35rem; height: 26rem; }</style>
+</head>
+<body class="page wire listen">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Events</span>
+    <h1>Who hears the <em>click?</em></h1>
+    <p class="intro">Click a ♡ button. The click starts at the button (<code>event.target</code>) and <strong>bubbles</strong> up through every ancestor. Each ancestor with a listener hears it, in order: at that moment it's the <code>event.currentTarget</code>. Switch listeners on and off, stop the bubbling, and turn on <code>closest("li")</code> to see how one listener on the list can serve every stall.</p>
+    <div class="event-lab" data-listen="button,ul"></div>
+    <h2>Which events, in which order?</h2>
+    <p class="intro">Use the form. Every event it fires is logged in order. Watch the difference between <code>keydown</code> (a key went down: fires for arrows and Shift too), <code>input</code> (the value changed) and <code>change</code> (the value changed <em>and</em> you're done: you left the field, picked an option, ticked a box). Then press Enter inside the name field.</p>
+    <div class="event-monitor"></div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Listeners on <code>button</code> and <code>ul</code>. Click a ♡: two lines. Click the stall's name instead: who hears it now?</li>
+      <li>Add <code>stopPropagation()</code> in <code>li</code>. Which listeners go deaf?</li>
+      <li>Only <code>ul</code> listening, <code>closest("li")</code> on. Click different parts of each stall. That's event delegation: one listener, many stalls.</li>
+      <li>In the form: type a name, then press Tab. Which event fires only now?</li>
+      <li>Press Enter in the name field. Which event fires, even though you never touched the button?</li>
+    </ol>
+  </div>
+</body>
+</html>

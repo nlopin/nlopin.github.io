@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fluid type calculator</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.fluid-calc { font-size: 1.3rem; height: auto; align-items: start; } .fc-sample { min-height: 9rem; }</style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Fluid typography</span>
+    <h1>The fluid type <em>calculator</em></h1>
+    <p class="intro">Pick the smallest size and the window where it applies, then the largest size and its window. Between the two, the size follows a straight line: that line is the middle value of <code>clamp()</code>. Drag the window width to see it slide; copy the result into your CSS.</p>
+    <div class="fluid-calc"></div>
+    <h2>Why the <code>rem</code> part matters</h2>
+    <p class="intro">Switch the preferred value to <strong>vw only</strong> and read the zoom test. Browser zoom makes CSS pixels bigger, so the window gets <em>narrower</em> in CSS pixels: a size made only of <code>vw</code> shrinks by exactly as much as zoom enlarges it. The text never grows. WCAG 1.4.4 asks that text can be resized to 200%. Any fixed part in the middle value keeps it growing with zoom; a <code>rem</code> part also follows the reader's font-size setting.</p>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Make a headline go from <code>2.5rem</code> at 360px to <code>6rem</code> at 1280px.</li>
+      <li>Make the body text go from <code>1rem</code> to <code>1.125rem</code>. Notice how tiny the <code>vw</code> part is: body text should barely move.</li>
+      <li>Make the minimum <em>larger</em> than the maximum. What does <code>clamp()</code> do? (The minimum wins.)</li>
+      <li>Find the settings where the zoom test fails even with a <code>rem</code> part. (Hint: a very steep line, a small <code>rem</code> part.)</li>
+    </ol>
+  </div>
+</body>
+</html>

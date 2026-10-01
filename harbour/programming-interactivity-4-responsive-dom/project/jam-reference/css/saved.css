@@ -1,0 +1,23 @@
+/* 2 · My night: saved stalls */
+.save {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--ember);
+  background: var(--night-3);
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.save[aria-pressed="true"] { background: var(--ember); color: var(--night); border-color: var(--ember); }
+.vendor-card:has(.save[aria-pressed="true"]) { border-color: var(--ember); }
+
+.saved-count { font-weight: 800; text-decoration: none; color: var(--ember); white-space: nowrap; }
+.saved-only { display: inline-flex; gap: 0.5rem; align-items: center; margin: 0 0 1.5rem; color: var(--ink-2); }
+
+/* the filter already uses [hidden]: a class of our own, so we never undo each other */
+body.saved-only .stall:not(:has(.save[aria-pressed="true"])) { display: none; }

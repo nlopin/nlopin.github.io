@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Night Shift · a DOM game</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <!-- the race (race/board.html) counts levels 1–5, the in-class shift -->
+  <meta name="race-tasks" content="5">
+  <style>
+    html, body { height: 100%; }
+    body.page { display: flex; flex-direction: column; min-height: 100vh; background: #0f1219; color: #efe8da; }
+    .game { flex: 1; display: grid; grid-template-columns: minmax(34rem, 1fr) minmax(0, 1.15fr); gap: 1rem; padding: 1rem 1.25rem; min-height: 0; }
+    .side { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; }
+    .brand { display: flex; justify-content: space-between; align-items: center; font: 700 0.8rem var(--font-mono); }
+    .brand a { color: #ffb547; }
+    .brand h1 { font: 800 1.5rem/1 var(--font-sans); letter-spacing: -0.02em; margin: 0; color: #efe8da; }
+    .brand h1 em { font-family: var(--font-serif); font-weight: 400; color: #ffb547; }
+    .clock { font: 700 0.85rem var(--font-mono); color: #5ec8d8; }
+    .levels { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+    .levels li { margin: 0; }
+    .levels button { width: 2.1rem; height: 2.1rem; border-radius: 0.4rem; border: 2px solid #3a4254; background: #1b202b; font: 700 0.8rem var(--font-mono); cursor: pointer; color: #c9c1b3; }
+    .levels button.done { background: #12a26f; border-color: #12a26f; color: #fff; }
+    .levels button[aria-current="true"] { background: #ffb547; border-color: #ffb547; color: #12151d; }
+    .levels .sep { width: 100%; font: 700 0.65rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: #8d8474; margin-top: 0.2rem; }
+    .msg { background: #1b202b; border: 2px solid #3a4254; border-radius: 1rem 1rem 1rem 0.25rem; padding: 0.9rem 1rem; }
+    .msg small { display: flex; justify-content: space-between; font: 700 0.7rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: #8d8474; }
+    .msg h2 { font: 800 1.3rem/1.1 var(--font-sans); margin: 0.35rem 0 0.3rem; color: #efe8da; letter-spacing: -0.01em; }
+    .msg p { margin: 0; font-size: 0.95rem; line-height: 1.45; color: #e1d9c9; }
+    .use { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; font: 700 0.7rem var(--font-mono); color: #8d8474; text-transform: uppercase; letter-spacing: 0.08em; }
+    .use code { font: 600 0.8rem var(--font-mono); text-transform: none; letter-spacing: 0; background: #262c3a; color: #82ccff; padding: 0.2rem 0.45rem; border-radius: 0.3rem; }
+    .editor { display: flex; flex-direction: column; min-height: 7rem; flex: 1; }
+    .editor .live-pane { flex: 1; }
+    .editor .live-code { min-height: 4.5rem; font-size: 1rem; }
+    .helpers { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .ghost-btn { font: 600 0.85rem var(--font-sans); border: 2px solid #3a4254; border-radius: 0.6rem; background: transparent; padding: 0.45rem 0.8rem; cursor: pointer; color: #efe8da; }
+    .ghost-btn.run { background: #12a26f; border-color: #12a26f; color: #fff; font-weight: 800; }
+    .ghost-btn.next { background: #ffb547; border-color: #ffb547; color: #12151d; font-weight: 800; }
+    .ghost-btn[hidden] { display: none; }
+    .hint { background: #1b202b; border: 2px dashed #5ec8d8; border-radius: 0.6rem; padding: 0.6rem 0.8rem; font-size: 0.95rem; color: #e1d9c9; }
+    .hint code, .msg code { font: 600 0.9em var(--font-mono); background: #262c3a; color: #82ccff; padding: 0.1em 0.35em; border-radius: 0.25em; }
+    .hint pre.code { font-size: 0.85rem; margin-top: 0.5rem; }
+    .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+    .checks li { display: flex; gap: 0.5rem; align-items: center; margin: 0; color: #c9c1b3; }
+    .checks li::before { content: ""; flex: none; width: 0.95rem; height: 0.95rem; border-radius: 50%; border: 2px solid #5b6478; }
+    .checks li.pass { color: #7ee2a8; }
+    .checks li.pass::before { background: #12a26f; border-color: #12a26f; }
+    .checks li.fail { color: #ff9d8a; }
+    .checks li.fail::before { border-color: #ff6b4a; }
+    .stage { display: grid; grid-template-rows: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0.75rem; min-height: 0; }
+    .stage .live-preview { border-color: #3a4254; }
+    .stage iframe { width: 100%; height: 100%; }
+    .win { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; text-align: center; background: rgb(8 10 15 / 0.82); }
+    .win[hidden] { display: none; }
+    .win div { max-width: 32rem; padding: 2rem; }
+    .win h2 { font: 800 3rem/1 var(--font-sans); margin: 0 0 0.6rem; }
+    .win h2 em { font-family: var(--font-serif); font-weight: 400; color: #ffb547; }
+    .win p { margin: 0 0 1rem; color: #c9c1b3; }
+    @media (max-width: 900px) { .game { grid-template-columns: 1fr; } .stage { grid-template-rows: 22rem 14rem; } }
+  </style>
+</head>
+<body class="page">
+  <div class="game">
+    <div class="side">
+      <div class="brand"><h1>Night <em>Shift</em></h1><span class="clock" id="clock">18:30</span><a href="../index.html">all materials</a></div>
+      <ul class="levels" id="levels" aria-label="Levels"></ul>
+      <div class="msg" aria-live="polite">
+        <small><span>💬 Marisol · organiser</span><span id="lvl-num"></span></small>
+        <h2 id="lvl-title"></h2>
+        <p id="lvl-text"></p>
+      </div>
+      <div class="use" id="lvl-use"></div>
+      <div class="editor" id="editor"></div>
+      <ul class="checks" id="checks" aria-live="polite"></ul>
+      <div class="helpers">
+        <button class="ghost-btn run" type="button" id="run">▶ Run <small>(⌘/Ctrl + Enter)</small></button>
+        <button class="ghost-btn" type="button" id="hint-btn">💡 Hint</button>
+        <button class="ghost-btn" type="button" id="answer-btn">🏳 Show an answer</button>
+        <button class="ghost-btn next" type="button" id="next" hidden>Next message →</button>
+      </div>
+      <div class="hint" id="hint" hidden></div>
+    </div>
+    <div class="stage">
+      <div class="live-preview"><iframe id="preview" title="The market page"></iframe><span class="live-preview-label">the market page · your script runs on it</span></div>
+      <div id="console"></div>
+    </div>
+  </div>
+  <div class="win" id="win" hidden><div><h2>19:00. <em>Doors open.</em></h2><p id="win-text"></p><button class="ghost-btn next" type="button" id="win-close">Keep playing</button></div></div>
+  <div class="live-park" id="park" aria-hidden="true"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
+  const K = window.Kit;
+  const CARDS = [
+    ["dumplings", "food", "Food", "Dumpling Dynasty", "Hand-folded, steamed in front of you.", "featured"],
+    ["side-b", "music", "Music", "Side B Records", "Vinyl, sorted by mood."],
+    ["salt-ink", "crafts", "Crafts", "Salt &amp; Ink", "Risograph posters of the port."],
+    ["churros", "food", "Food", "Churros Till Late", "Sugared, dunked in chocolate.", "sold-out"],
+    ["plant-swap", "crafts", "Crafts", "The Plant Swap", "Bring a cutting, take a cutting."],
+    ["mezcal", "drinks", "Drinks", "Mezcal Moon", "Small-batch mezcal, chilli salt.", "sold-out"],
+  ];
+  const card = ([id, tag, label, name, text, extra]) =>
+    `<li class="vendor-card${extra ? " " + extra : ""}" data-tag="${tag}" data-id="${id}"><span class="tag">${label}</span><h3>${name}</h3><p>${text}</p>${extra === "sold-out" ? '<strong class="badge">Sold out</strong>' : ""}</li>`;
+  const PAGE = (extra = "") => `<header class="site-header"><a class="logo" href="#">🏮 Night Market</a>${extra}</header><p class="eyebrow">Friday 16 October · 19:00 – 01:00</p><h1>Harbour Night Market</h1><p><a class="button" href="#">Get a free ticket</a></p><h2>Vendors</h2><ul class="vendor-list">${CARDS.map(card).join("")}</ul>`;
+  // setups run BEFORE the student's script in the hidden test pages: they change the page a little,
+  // so an answer that only works for exactly the page on screen (hard-coded 6, a fixed index…) fails
+  const ADD = (html) => `document.querySelector(".vendor-list").insertAdjacentHTML("beforeend", ${JSON.stringify(html)});`;
+  // an extra sold-out stall at the START of the list: "the first .badge on the page" is no longer Churros'
+  const ADD_FIRST = `document.querySelector(".vendor-list").insertAdjacentHTML("afterbegin", ${JSON.stringify(card(["ice-cream", "food", "Food", "Gelato Cart", "Melted at 20:00.", "sold-out"]))});`;
+  const COUNT_LISTENERS = `window.__listeners = []; const __add = EventTarget.prototype.addEventListener; EventTarget.prototype.addEventListener = function (type, fn, o) { window.__listeners.push({ el: this, type }); return __add.call(this, type, fn, o); };`;
+
+  const LEVELS = [
+    { part: "Find it, change it · in class 1–5" },
+    { title: "The date moved", text: "Bad news, good news: we're moving to <b>Saturday 17 October</b>. Same hours. Can you fix the date at the top?",
+      use: ["querySelector", ".textContent"], start: "const eyebrow = document.querySelector(\".eyebrow\");\n",
+      checks: [["The date says Saturday 17 October", "return text('.eyebrow').startsWith('Saturday 17 October');"], ["…same hours: 19:00 to 01:00", "return /19:00\\s*[-–—]\\s*01:00/.test(text('.eyebrow'));"], ["The title didn't change", "return text('h1') === 'Harbour Night Market';"]],
+      hint: "Find the element with <code>document.querySelector(\".eyebrow\")</code>, then assign a new string to its <code>textContent</code>.",
+      answer: "const eyebrow = document.querySelector(\".eyebrow\");\neyebrow.textContent = \"Saturday 17 October · 19:00 – 01:00\";" },
+    { title: "Headcount", text: "The fire marshal wants to know how many stalls we have. Count the cards on the page and <b>log the number</b> in the console. (Don't count by hand: vendors keep arriving.)",
+      use: ["querySelectorAll", ".length", "console.log"], start: "const cards =\n  document.querySelectorAll(\".vendor-card\");\n",
+      checks: [["Logs how many cards there are", "return logs().some(l => l.trim() === '7');", ADD(card(["extra", "food", "Food", "A late arrival", "…"]))]],
+      hint: "<code>querySelectorAll</code> returns a list. Every list knows its <code>.length</code>. (The check adds a seventh card before your script runs: typing <code>console.log(6)</code> won't pass.)",
+      answer: "const cards = document.querySelectorAll(\".vendor-card\");\nconsole.log(cards.length);" },
+    { title: "Churros are back!", before: ADD_FIRST, text: "Churros Till Late restocked. Take them off the sold-out list: the card loses its <code>sold-out</code> class and its <b>Sold out</b> stamp. Everyone else who's sold out stays sold out, and stalls arrive all evening: the first stamp on the page may not be Churros'.",
+      use: ['[data-id="churros"]', ".classList.remove", ".remove()"], start: "const churros =\n  document.querySelector('[data-id=\"churros\"]');\n",
+      checks: [["Churros isn't sold out", "const c = $('[data-id=churros]'); return !c.classList.contains('sold-out');"], ["…and has no stamp", "return !$('[data-id=churros] .badge');"], ["Every other sold-out stall keeps its stamp", "return $$('.sold-out').length === 2 && $$('.sold-out').every(c => c.querySelector('.badge'));"]],
+      hint: "An attribute selector finds the card: <code>[data-id=\"churros\"]</code>. <code>churros.classList.remove(\"sold-out\")</code> removes one class. To find the stamp <em>inside</em> that card, call <code>querySelector</code> on the card, not on <code>document</code>.",
+      answer: "const churros = document.querySelector('[data-id=\"churros\"]');\nchurros.classList.remove(\"sold-out\");\nchurros.querySelector(\".badge\").remove();" },
+    { title: "Spotlight on crafts", text: "The crafts people say they're never featured. Fair. Give <b>every</b> crafts stall the <code>featured</code> class.",
+      use: ["querySelectorAll", "for … of", ".classList.add"], start: "const crafts =\n  document.querySelectorAll('[data-tag=\"crafts\"]');\n",
+      checks: [["Every crafts card is featured", "const c = $$('[data-tag=crafts]'); return c.length === 3 && c.every(x => x.classList.contains('featured'));", ADD(card(["extra", "crafts", "Crafts", "Knit Night", "…"]))], ["Nobody else was featured by you", "return $$('.featured').length === 3;"]],
+      hint: "A list has no <code>classList</code>: each card does. Loop: <code>for (const card of crafts) { … }</code>.",
+      answer: "const crafts = document.querySelectorAll('[data-tag=\"crafts\"]');\nfor (const card of crafts) {\n  card.classList.add(\"featured\");\n}" },
+    { title: "Roll call", text: "I'm writing the announcement. Log every vendor's <b>name</b>, one per line.",
+      use: ["for … of", ".textContent", "console.log"], start: "const names =\n  document.querySelectorAll(\".vendor-card h3\");\n",
+      checks: [["Every name is logged, one per line", "const want = $$('.vendor-card h3').map(h => h.textContent); const got = logs().map(l => l.trim()); return want.length === 7 && want.every(n => got.includes(n));", ADD(card(["extra", "food", "Food", "Taco Tuesday", "…"]))]],
+      hint: "<code>.vendor-card h3</code> is a descendant selector: the titles. Loop over them and log each one's <code>textContent</code>.",
+      answer: "const names = document.querySelectorAll(\".vendor-card h3\");\nfor (const name of names) {\n  console.log(name.textContent);\n}" },
+    { part: "Homework · more DOM 6–12" },
+    { title: "Fix the ticket link", text: "The big button goes nowhere. It should say <b>Book a free ticket</b> and point to <code>#tickets</code>.",
+      use: [".textContent", ".setAttribute"], start: "const button = document.querySelector(\".button\");\n",
+      checks: [["It says Book a free ticket", "return text('.button') === 'Book a free ticket';"], ["It links to #tickets", "return $('.button').getAttribute('href') === '#tickets';"]],
+      hint: "Attributes are set with <code>element.setAttribute(\"href\", \"#tickets\")</code>. (<code>button.href = …</code> also works, but reading <code>.href</code> gives you the full URL back.)",
+      answer: "const button = document.querySelector(\".button\");\nbutton.textContent = \"Book a free ticket\";\nbutton.setAttribute(\"href\", \"#tickets\");" },
+    { title: "A newcomer", text: "Taco Tuesday just arrived with a truck. Add their card at the <b>end</b> of the list: an <code>li.vendor-card</code> with <code>data-tag=\"food\"</code>, a <code>span.tag</code> saying Food and an <code>h3</code> saying Taco Tuesday.",
+      use: ["createElement", ".className", ".dataset", ".append"], start: "const list = document.querySelector(\".vendor-list\");\nconst card = document.createElement(\"li\");\n",
+      checks: [["The last card is Taco Tuesday", "const c = $$('.vendor-card').at(-1); return !!c && text(c.querySelector('h3') || c) === 'Taco Tuesday';"], ["…with a Food tag", "const c = $$('.vendor-card').at(-1); return !!c && !!c.querySelector('.tag') && text(c.querySelector('.tag')) === 'Food' && c.dataset.tag === 'food';"], ["…and it's an li.vendor-card in the list", "const c = $('.vendor-list').lastElementChild; return $$('.vendor-card').length === 7 && c.localName === 'li' && c.classList.contains('vendor-card');"], ["The other cards are the same elements as before (no innerHTML)", "return $('.vendor-card') === win.__firstCard;", "window.__firstCard = document.querySelector('.vendor-card');"]],
+      hint: "Build from the inside out: <code>createElement</code> the <code>span</code> and the <code>h3</code>, set their <code>textContent</code>, <code>card.append(tag, title)</code>, then <code>list.append(card)</code>. <code>card.dataset.tag = \"food\"</code> writes <code>data-tag=\"food\"</code>.",
+      answer: "const list = document.querySelector(\".vendor-list\");\nconst card = document.createElement(\"li\");\ncard.className = \"vendor-card\";\ncard.dataset.tag = \"food\";\n\nconst tag = document.createElement(\"span\");\ntag.className = \"tag\";\ntag.textContent = \"Food\";\n\nconst title = document.createElement(\"h3\");\ntitle.textContent = \"Taco Tuesday\";\n\ncard.append(tag, title);\nlist.append(card);" },
+    { title: "Clean up", text: "People keep queueing at sold-out stalls. <b>Remove</b> every sold-out card from the page.",
+      use: ["querySelectorAll", "for … of", ".remove()"], start: "",
+      checks: [["No sold-out cards left", "return $$('.sold-out').length === 0;", ADD(card(["extra", "drinks", "Drinks", "Last Orders", "…", "sold-out"]))], ["The others are all still there", "return $$('.vendor-card').length === 4;"]],
+      hint: "Same loop as crafts, different change: <code>card.remove()</code>.",
+      answer: "for (const card of document.querySelectorAll(\".sold-out\")) {\n  card.remove();\n}" },
+    { title: "Count in the heading", text: "Put the number of stalls in the heading: <b>Vendors (6)</b>. Whatever the number is.",
+      use: ["template literal", "`Vendors (${n})`"], start: "const heading = document.querySelector(\"h2\");\n",
+      checks: [["The heading says Vendors (7)", "return text('h2') === 'Vendors (7)';", ADD(card(["extra", "food", "Food", "Late Bloomer", "…"]))]],
+      hint: "Backticks make a template literal: <code>`Vendors (${cards.length})`</code>.",
+      answer: "const heading = document.querySelector(\"h2\");\nconst cards = document.querySelectorAll(\".vendor-card\");\nheading.textContent = `Vendors (${cards.length})`;" },
+    { title: "Bobby's Bakery", text: "A vendor registered online with the name in <code>newName</code> (it's already defined). Add a card for them with that name, <b>exactly as they typed it</b>.",
+      use: ["textContent", "not innerHTML"], before: "window.newName = '<img src=x onerror=\"window.__pwned=1\">Bobby’s Bakery';",
+      start: "console.log(newName);\nconst list = document.querySelector(\".vendor-list\");\n",
+      checks: [["A card shows the name, as text", "await wait(100); return $$('.vendor-card h3').some(h => h.textContent === win.newName);"], ["Nothing in it ran", "await wait(150); return !win.__pwned && !$('.vendor-list img');"]],
+      hint: "<code>innerHTML</code> would turn that string into a real <code>&lt;img&gt;</code>, and its <code>onerror</code> would run. <code>textContent</code> shows it as characters.",
+      answer: "const list = document.querySelector(\".vendor-list\");\nconst card = document.createElement(\"li\");\ncard.className = \"vendor-card\";\nconst title = document.createElement(\"h3\");\ntitle.textContent = newName;\ncard.append(title);\nlist.append(card);" },
+    { title: "Tag census", text: "Which kinds of stalls do we have? Log the <code>data-tag</code> of every card, one per line.",
+      use: [".dataset.tag"], start: "",
+      checks: [["Every card's tag is logged", "const got = logs().map(l => l.trim()); return got.filter(t => t === 'food').length === 2 && got.includes('books') && got.includes('drinks');", ADD(card(["extra", "books", "Books", "Paper Tigers", "…"]))]],
+      hint: "<code>data-tag=\"food\"</code> in HTML is <code>card.dataset.tag</code> in JavaScript. (<code>data-opening-time</code> would be <code>dataset.openingTime</code>.)",
+      answer: "for (const card of document.querySelectorAll(\".vendor-card\")) {\n  console.log(card.dataset.tag);\n}" },
+    { title: "Ember night", text: "Tonight's accent colour is ember: set the CSS variable <code>--accent</code> to <code>#ff6b4a</code> on the page root. The CSS does the rest.",
+      use: ["document.documentElement", ".style.setProperty"], css: ".vendor-card{border-color:var(--accent,#3a4254)} h1{color:var(--accent,inherit)}", start: "",
+      checks: [["--accent is #ff6b4a on the root", "return win.getComputedStyle(doc.documentElement).getPropertyValue('--accent').trim() === '#ff6b4a';"], ["…and the cards picked it up", "return win.getComputedStyle($('[data-id=side-b]')).borderTopColor === 'rgb(255, 107, 74)';"]],
+      hint: "<code>document.documentElement</code> is the <code>&lt;html&gt;</code> element. Custom properties need <code>style.setProperty(\"--accent\", \"#ff6b4a\")</code>: there's no <code>style.accent</code>.",
+      answer: "document.documentElement.style.setProperty(\"--accent\", \"#ff6b4a\");" },
+    { part: "Homework · listen 13–16" },
+    { title: "Yum", text: "When someone clicks the Dumpling Dynasty card, log <b>yum</b>.",
+      use: ["addEventListener", '"click"'], start: "const dumplings =\n  document.querySelector('[data-id=\"dumplings\"]');\n",
+      checks: [["Clicking Dumpling Dynasty logs yum", "click('[data-id=dumplings]'); return logs().includes('yum');"], ["Nothing is logged before the click", "return !logs().includes('yum');"]],
+      hint: "<code>dumplings.addEventListener(\"click\", () => { … })</code>. The function runs later, once per click.",
+      answer: "const dumplings = document.querySelector('[data-id=\"dumplings\"]');\ndumplings.addEventListener(\"click\", () => {\n  console.log(\"yum\");\n});" },
+    { title: "Lights out", text: "The new <b>🌙 Lights out</b> button in the header should toggle the class <code>lights-out</code> on the body. Click once: on. Again: off.",
+      use: [".classList.toggle"], page: PAGE('<button type="button" class="fav" id="lights">🌙 Lights out</button>'), start: "const lights = document.querySelector(\"#lights\");\n",
+      checks: [["One click: lights out", "click('#lights'); return doc.body.classList.contains('lights-out');"], ["Two clicks: lights back on", "click('#lights'); const out = doc.body.classList.contains('lights-out'); click('#lights'); return out && !doc.body.classList.contains('lights-out');"]],
+      hint: "<code>document.body.classList.toggle(\"lights-out\")</code> adds the class if it's missing and removes it if it's there.",
+      answer: "const lights = document.querySelector(\"#lights\");\nlights.addEventListener(\"click\", () => {\n  document.body.classList.toggle(\"lights-out\");\n});" },
+    { title: "Which stall?", text: "Clicking <b>any</b> card should log that stall's name. With <b>one</b> listener, on the list.",
+      use: ["event.target", ".closest", "delegation"], before: COUNT_LISTENERS, start: "const list = document.querySelector(\".vendor-list\");\n",
+      checks: [["Clicking the text of Salt & Ink logs Salt & Ink", "click('[data-id=salt-ink] p'); return logs().includes('Salt & Ink');"], ["Clicking a card added later works too", "const li = doc.createElement('li'); li.className = 'vendor-card'; li.innerHTML = '<h3>Night Owl</h3>'; $('.vendor-list').append(li); click(li.querySelector('h3')); return logs().includes('Night Owl');"], ["Exactly one click listener", "return win.__listeners.filter(l => l.type === 'click').length === 1;"]],
+      hint: "The click on the <code>p</code> bubbles up to the list. <code>event.target</code> is the <code>p</code>; <code>event.target.closest(\".vendor-card\")</code> climbs to the card. Then find its <code>h3</code>.",
+      answer: "const list = document.querySelector(\".vendor-list\");\nlist.addEventListener(\"click\", (event) => {\n  const card = event.target.closest(\".vendor-card\");\n  if (!card) return;\n  console.log(card.querySelector(\"h3\").textContent);\n});" },
+    { title: "Last call", text: "At midnight the <b>🔔 Last call</b> button marks every drinks stall sold out: the <code>sold-out</code> class and a <b>Sold out</b> stamp (<code>strong.badge</code>). Pressing it twice mustn't stamp anything twice.",
+      use: ["closest", "classList.contains", "createElement"], page: PAGE('<button type="button" class="fav" id="last-call">🔔 Last call</button>'), start: "const lastCall = document.querySelector(\"#last-call\");\n",
+      checks: [["Every drinks stall is sold out", "click('#last-call'); const d = $$('[data-tag=drinks]'); return d.length === 2 && d.every(c => c.classList.contains('sold-out'));", ADD(card(["extra", "drinks", "Drinks", "Tea Time", "…"]))], ["…each with exactly one stamp, even after two clicks", "click('#last-call'); click('#last-call'); return $$('[data-tag=drinks]').every(c => c.querySelectorAll('.badge').length === 1);", ADD(card(["extra", "drinks", "Drinks", "Tea Time", "…"]))], ["Food is untouched", "click('#last-call'); return !$('[data-id=dumplings]').classList.contains('sold-out');"]],
+      hint: "In the handler, loop over <code>[data-tag=\"drinks\"]</code>. Skip cards that already have the class (<code>if (card.classList.contains(\"sold-out\")) continue;</code>), otherwise add the class and append a new stamp.",
+      answer: "const lastCall = document.querySelector(\"#last-call\");\nlastCall.addEventListener(\"click\", () => {\n  for (const card of document.querySelectorAll('[data-tag=\"drinks\"]')) {\n    if (card.classList.contains(\"sold-out\")) continue;\n    card.classList.add(\"sold-out\");\n    const badge = document.createElement(\"strong\");\n    badge.className = \"badge\";\n    badge.textContent = \"Sold out\";\n    card.append(badge);\n  }\n});" },
+  ];
+  const levels = LEVELS.filter((l) => !l.part);
+  const KEY = "night-shift-progress";
+  let done = new Set();
+  try { done = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) { /* private window: no memory, no problem */ }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...done])); } catch (e) {} };
+  const drafts = {};
+
+  const $ = (s) => document.querySelector(s);
+  const frame = $("#preview"), park = $("#park");
+  const con = K.consoleView();
+  $("#console").append(con.el);
+  con.el.style.height = "100%";
+  frame.__onlog = (kind, args) => con.add(kind, args);
+  let idx = 0;
+  const params = new URLSearchParams(location.search);
+  if (params.has("level")) idx = Math.max(0, Math.min(levels.length - 1, +params.get("level") - 1));
+
+  const editor = K.codePane({ file: "night-shift.js", lang: "js", initial: "", onRun: () => run(), onInput: (v) => { drafts[idx] = v; } });
+  $("#editor").append(editor.pane);
+
+  function renderLevels() {
+    const ul = $("#levels");
+    ul.textContent = "";
+    let n = 0;
+    LEVELS.forEach((l) => {
+      if (l.part) { ul.append(Object.assign(document.createElement("li"), { className: "sep", textContent: l.part })); return; }
+      const i = n++;
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = i + 1;
+      b.title = l.title;
+      if (done.has(i)) b.classList.add("done");
+      b.setAttribute("aria-current", String(i === idx));
+      b.onclick = () => go(i);
+      li.append(b);
+      ul.append(li);
+    });
+    // the market opens at 19:00: every answered message moves the clock on
+    const t = 30 + Math.round((done.size / levels.length) * 30);
+    $("#clock").textContent = `${t >= 60 ? "19:00" : "18:" + String(t).padStart(2, "0")} · ${done.size}/${levels.length} done`;
+  }
+  const docFor = (l, code, setup) => K.jsDoc({ html: l.page || PAGE(), css: K.MARKET_CSS + (l.css || ""), js: code, before: (l.before || "") + (setup || "") });
+
+  function go(i) {
+    idx = i;
+    const l = levels[i];
+    $("#lvl-num").textContent = `message ${i + 1} of ${levels.length}`;
+    $("#lvl-title").textContent = l.title;
+    $("#lvl-text").innerHTML = l.text;
+    $("#lvl-use").innerHTML = "use " + l.use.map((u) => `<code>${u.replace(/</g, "&lt;")}</code>`).join("");
+    $("#hint").hidden = true;
+    $("#next").hidden = true;
+    editor.set(drafts[i] != null ? drafts[i] : l.start);
+    $("#checks").innerHTML = l.checks.map((c) => `<li>${c[0]}</li>`).join("");
+    history.replaceState(null, "", "?level=" + (i + 1));
+    renderLevels();
+    run(true);
+  }
+
+  let runId = 0;
+  async function run(quiet) {
+    const id = ++runId;
+    const l = levels[idx];
+    const code = editor.get();
+    con.clear();
+    frame.srcdoc = docFor(l, code);
+    if (quiet && code.trim() === (l.start || "").trim()) return;
+    const results = [];
+    for (const [label, test, setup] of l.checks) {
+      const [ok] = await K.runJSChecks(null, [{ label, run: test }], docFor(l, code, setup), park);
+      if (id !== runId) return;
+      results.push(ok);
+    }
+    const items = $("#checks").children;
+    results.forEach((ok, k) => { items[k].className = ok ? "pass" : "fail"; });
+    if (results.every(Boolean)) {
+      const first = !done.has(idx);
+      done.add(idx);
+      save();
+      document.dispatchEvent(new CustomEvent("race:solved", { detail: { task: idx } }));
+      renderLevels();
+      $("#next").hidden = idx >= levels.length - 1;
+      if (first && done.size === levels.length) {
+        $("#win-text").textContent = "Every message answered, every stall in place. You ran the market with nothing but a console.";
+        $("#win").hidden = false;
+      } else if (first && idx === 4 && [...Array(5).keys()].every((k) => done.has(k))) {
+        $("#win-text").textContent = "The in-class shift is done: find it, change it, five times over. The rest wait for you at home.";
+        $("#win").hidden = false;
+      }
+    }
+  }
+  $("#run").onclick = () => run();
+  $("#hint-btn").onclick = () => { const h = $("#hint"); h.innerHTML = levels[idx].hint; h.hidden = !h.hidden; };
+  $("#answer-btn").onclick = () => {
+    const h = $("#hint");
+    h.innerHTML = "One answer (there are others):<pre class='code'></pre>";
+    h.querySelector("pre").innerHTML = K.hlJS(levels[idx].answer);
+    h.hidden = false;
+  };
+  $("#next").onclick = () => go(Math.min(levels.length - 1, idx + 1));
+  $("#win-close").onclick = () => { $("#win").hidden = true; };
+  go(idx);
+  window.NightShift = { go, run, levels, set: (v) => editor.set(v) }; // handy for testing
+});
+</script>
+</body>
+</html>

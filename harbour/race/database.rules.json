@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": true,
+        "meta": {
+          ".write": "auth != null && (!data.exists() || data.child('host').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['host', 'ex', 'title', 'total', 'created'])",
+          "host": { ".validate": "newData.val() === auth.uid" },
+          "ex": { ".validate": "newData.isString() && newData.val().length < 300" },
+          "title": { ".validate": "newData.isString() && newData.val().length < 200" },
+          "total": { ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() < 100" },
+          "created": { ".validate": "newData.isNumber()" },
+          "$other": { ".validate": false }
+        },
+        "players": {
+          "$pid": {
+            ".write": "auth != null && auth.uid === $pid && root.child('rooms').child($room).child('meta').exists()",
+            "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24" },
+            "online": { ".validate": "newData.isBoolean()" },
+            "solved": { "$task": { ".validate": "newData.isNumber()" } },
+            "$other": { ".validate": false }
+          }
+        }
+      }
+    }
+  }
+}

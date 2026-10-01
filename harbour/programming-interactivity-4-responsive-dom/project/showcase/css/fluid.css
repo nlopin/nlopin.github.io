@@ -1,0 +1,44 @@
+/* ==========================================================================
+   Step 2 — fluid. Fewer questions, more maths: values that slide smoothly
+   between a minimum and a maximum instead of jumping at breakpoints.
+   ========================================================================== */
+
+:root {
+  /* spacing that grows with the window: 1rem on a phone, 3rem on a big screen */
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
+  --section-space: clamp(2.5rem, 1.5rem + 5vw, 6rem);
+
+  /* type scale. Every size has a rem part, so browser zoom still works */
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+  --step-2: clamp(1.9rem, 1.4rem + 2.2vw, 3rem);
+  --step-4: clamp(3rem, 1.6rem + 7vw, 7.5rem);
+
+  /* variable fragments: a hue, reused in several colours */
+  --glow-hue: 36;
+  --glow: hsl(var(--glow-hue) 100% 64% / 0.28);
+}
+
+body { font-size: var(--step-0); }
+h2 { font-size: var(--step-2); }
+.hero h1 { font-size: var(--step-4); }
+
+main > section { padding: var(--section-space) var(--gutter); }
+.site-header, .site-footer { padding-inline: var(--gutter); }
+
+/* the lantern glow, built from the fragment above */
+.hero {
+  background:
+    radial-gradient(circle at 80% 20%, var(--glow), transparent 40%),
+    radial-gradient(circle at 10% 90%, rgb(94 200 216 / 0.18), transparent 45%),
+    var(--night);
+}
+
+/* on phones, 100vh is the tallest the screen can be (address bar hidden).
+   svh = the smallest: the hero never hides behind the browser's bars */
+.hero { min-height: 80svh; }
+
+/* the magic line, burglar-proof: a column is never wider than the list */
+.vendor-list { grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr)); gap: var(--gutter); }
+
+/* calc mixes units: the sticky header height is a rem size, plus breathing room */
+html { scroll-padding-top: calc(4.5rem + var(--gutter)); }
