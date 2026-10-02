@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <title>Harbour Night Market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="css/outfit.css">
+  <link rel="stylesheet" href="css/layout-l3.css" data-on="0">
+  <link rel="stylesheet" href="css/layout.css" data-on="1-4">
+  <link rel="stylesheet" href="css/fluid.css" data-on="2-4">
+  <link rel="stylesheet" href="css/components.css" data-on="3-4">
+  <link rel="stylesheet" href="css/states.css" data-on="4">
+  <style>
+    #steps { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 99; display: flex; gap: 4px; padding: 5px; background: #0b0a09; border: 2px solid #ffd23f; border-radius: 12px; font: 700 13px/1 ui-monospace, Menlo, monospace; box-shadow: 0 10px 30px rgb(0 0 0 / 0.5); white-space: nowrap; max-width: calc(100vw - 16px); overflow-x: auto; }
+    #steps button { all: unset; cursor: pointer; padding: 8px 11px; border-radius: 7px; color: #efe8da; font: inherit; }
+    #steps button:hover { background: #2c2924; }
+    #steps button:focus-visible { outline: 2px solid #ffd23f; }
+    #steps button[aria-pressed="true"] { background: #ffd23f; color: #17140f; }
+    #steps small { font-size: 11px; opacity: 0.7; }
+    @media (width < 40rem) { #steps small { display: none; } }
+    html.bare #steps { display: none; }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="top">
+    <a class="logo" href="#top">🏮 Night Market</a>
+    <button class="menu-toggle" type="button" aria-expanded="true" aria-controls="main-nav" hidden>Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="#vendors">Vendors</a></li>
+        <li><a href="#map">Map</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#tickets">Tickets</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Friday 16 October · 19:00 – 01:00</p>
+      <h1>Harbour Night Market</h1>
+      <p class="lead">Forty stalls, three stages and one very long table on the waterfront at Moll de la Fusta. Street food, vinyl, handmade things and people you haven't met yet.</p>
+      <a class="button" href="#tickets">Get a free ticket</a>
+    </section>
+
+    <section id="vendors">
+      <h2>Vendors</h2>
+      <div class="filters" role="group" aria-label="Show vendors">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="food" aria-pressed="false">Food</button>
+        <button type="button" data-filter="music" aria-pressed="false">Music</button>
+        <button type="button" data-filter="crafts" aria-pressed="false">Crafts</button>
+        <button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+        <output class="filter-count" aria-live="polite"></output>
+      </div>
+      <ul class="vendor-list">
+        <li class="stall" data-tag="food">
+          <article class="vendor-card featured">
+            <span class="tag">Food</span>
+            <h3>Dumpling Dynasty</h3>
+            <p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience, and so is the chilli oil.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="music">
+          <article class="vendor-card">
+            <span class="tag">Music</span>
+            <h3>Side B Records</h3>
+            <p>Crates of second-hand vinyl, sorted by mood instead of genre.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>Salt &amp; Ink</h3>
+            <p>Risograph posters of the port, printed in two colours and signed while you wait. Ask for the one with the crane.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="food">
+          <article class="vendor-card sold-out">
+            <span class="tag">Food</span>
+            <h3>Churros Till Late</h3>
+            <p>Crisp, sugared and dunked in thick chocolate.</p>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="crafts">
+          <article class="vendor-card">
+            <span class="tag">Crafts</span>
+            <h3>The Plant Swap</h3>
+            <p>Bring a cutting, take a cutting. Pots are free, advice is free, gossip is extra.</p>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+        <li class="stall" data-tag="drinks">
+          <article class="vendor-card sold-out">
+            <span class="tag">Drinks</span>
+            <h3>Mezcal Moon</h3>
+            <p>Small-batch mezcal and orange slices dusted with chilli salt. Sip, don't shoot. Last orders at half past midnight.</p>
+            <strong class="badge">Sold out</strong>
+            <a class="card-link" href="#map">Find the stall →</a>
+          </article>
+        </li>
+      </ul>
+    </section>
+
+    <section id="map">
+      <h2>Map</h2>
+      <div class="market-map">
+        <div class="zone stage">Main stage</div>
+        <div class="zone food">Food street</div>
+        <div class="zone table">Long table</div>
+        <div class="zone crafts">Crafts corner</div>
+        <div class="zone drinks">Drinks</div>
+        <div class="zone pier">The pier</div>
+        <div class="zone gate">Entrance · Moll de la Fusta</div>
+        <span class="you-are-here">You are here</span>
+      </div>
+    </section>
+
+    <section id="schedule">
+      <h2>Schedule</h2>
+      <table class="schedule">
+        <thead>
+          <tr><th>Time</th><th>What</th><th>Where</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>19:00</td><td>Doors open, DJ Marisol warms up</td><td>Main stage</td></tr>
+          <tr><td>19:30</td><td>Dumpling folding class</td><td>Long table</td></tr>
+          <tr><td>20:30</td><td>Los Faroles — live cumbia</td><td>Main stage</td></tr>
+          <tr><td>21:30</td><td>Zine-making workshop</td><td>Long table</td></tr>
+          <tr><td>22:30</td><td>Harbour Brass Band</td><td>The pier</td></tr>
+          <tr><td>00:00</td><td>Silent disco until close</td><td>The pier</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Is it really free?</summary>
+        <p>Entry is free. Bring cash or a card for the stalls.</p>
+      </details>
+      <details>
+        <summary>Can I bring my dog?</summary>
+        <p>Yes, on a leash. The dumplings are not for dogs.</p>
+      </details>
+      <details>
+        <summary>What if it rains?</summary>
+        <p>We move under the big tent next to the main stage. The market has never closed early.</p>
+      </details>
+    </section>
+
+    <section id="tickets">
+      <h2>Get a ticket</h2>
+      <form class="ticket-form">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+
+        <label for="guests">Guests</label>
+        <input id="guests" name="guests" type="number" min="1" max="6" value="1" required>
+
+        <label for="arrival">Arriving</label>
+        <select id="arrival" name="arrival">
+          <option>Early — for the food</option>
+          <option>Late — for the music</option>
+          <option>Whenever — for the vibes</option>
+        </select>
+
+        <label for="message">A note for us</label>
+        <textarea id="message" name="message" rows="3" maxlength="140" aria-describedby="message-left"></textarea>
+        <p class="hint" id="message-left">Up to 140 characters.</p>
+
+        <label class="check"><input type="checkbox" name="news"> Send me next month's line-up</label>
+
+        <button type="submit">Reserve my spot</button>
+      </form>
+      <div class="ticket-result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Harbour Night Market · Moll de la Fusta, Barcelona</p>
+    <p>Made with HTML, CSS and too many dumplings.</p>
+  </footer>
+
+  <a class="to-top" href="#top" aria-label="Back to top">↑</a>
+  <div id="steps" role="group" aria-label="Lecture 4 steps">
+    <button type="button" data-n="0">0 <small>· Lecture 3</small></button>
+    <button type="button" data-n="1">1 <small>· small screens</small></button>
+    <button type="button" data-n="2">2 <small>· fluid</small></button>
+    <button type="button" data-n="3">3 <small>· components</small></button>
+    <button type="button" data-n="4">4 <small>· + JS</small></button>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.has("bare")) document.documentElement.classList.add("bare");
+      var links = document.querySelectorAll("link[data-on]");
+      var buttons = document.querySelectorAll("#steps button");
+      var current = Math.max(0, Math.min(4, +(params.has("step") ? params.get("step") : 4) || 0));
+      function inRange(spec, n) { var p = spec.split("-"); return n >= +p[0] && n <= +(p[1] || p[0]); }
+      function use(n) {
+        n = Math.max(0, Math.min(4, +n || 0));
+        // step 4 adds JavaScript: scripts can't be switched off, so crossing that line reloads the page
+        if ((n === 4) !== (current === 4) && window.__stepReady) {
+          params.set("step", n);
+          location.search = params.toString();
+          return;
+        }
+        current = n;
+        document.documentElement.dataset.step = n;
+        links.forEach(function (l) { l.disabled = !inRange(l.dataset.on, n); });
+        buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.n === n)); });
+      }
+      buttons.forEach(function (b) { b.addEventListener("click", function () { use(b.dataset.n); }); });
+      document.addEventListener("keydown", function (e) {
+        if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        if ("01234".indexOf(e.key) > -1 && e.key.length === 1) use(e.key);
+        if (["ArrowRight", "ArrowLeft", "PageUp", "PageDown"].indexOf(e.key) > -1 && parent !== window) parent.postMessage({ deckKey: e.key }, "*");
+      });
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest("a[href]");
+        if (a && parent !== window && !a.getAttribute("href").startsWith("#")) e.preventDefault();
+      });
+      window.addEventListener("message", function (e) {
+        if (e.data && "step" in e.data) use(e.data.step);
+        if (e.data && e.data.deckShown && params.has("demo")) showTicket();
+        else if (e.data && e.data.deckShown && location.hash) {
+          var t = document.getElementById(location.hash.slice(1));
+          if (t) t.scrollIntoView({ behavior: "instant" });
+        }
+      });
+      function showTicket() {
+        var t = document.querySelector(".ticket-result");
+        if (t) t.scrollIntoView({ behavior: "instant", block: "center" });
+      }
+      use(current);
+      window.__stepReady = true;
+      // in a slide's iframe, jump to #section once fonts and layout have settled
+      if (location.hash) {
+        var jump = function () {
+          var t = document.getElementById(location.hash.slice(1));
+          if (t) t.scrollIntoView({ behavior: "instant" });
+        };
+        jump();
+        addEventListener("load", jump);
+        if (document.fonts) document.fonts.ready.then(jump);
+      }
+      if (current === 4) {
+        var s = document.createElement("script");
+        s.src = "js/market.js";
+        // ?demo: a booked ticket, for the last slide
+        if (params.has("demo")) s.onload = function () {
+          var f = document.querySelector(".ticket-form");
+          f.elements.name.value = "Ana";
+          f.elements.email.value = "ana@example.com";
+          f.elements.guests.value = "2";
+          f.requestSubmit();
+          showTicket();
+        };
+        document.body.append(s);
+      }
+    })();
+  </script>
+</body>
+</html>

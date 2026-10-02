@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 4 · A card that knows its place</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 30rem; margin-top: 1rem; }
+    .case .panel.tall { height: 36rem; }
+    .case .panel.huge { height: 46rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .loop { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font: 700 0.95rem var(--font-mono); margin: 0.4rem 0 0; }
+    .loop span { background: var(--white); border: 2px solid var(--ink); border-radius: 99px; padding: 0.35rem 0.8rem; }
+    .loop i { font-style: normal; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Exercise 4 · 7 min · cases 1–2 in class</span></div>
+    <span class="eyebrow-tag">Act 3 · Components</span>
+    <h1>A card that knows <em>its place</em></h1>
+    <p class="intro">Media queries ask the window. A component doesn't live in the window: it lives in a slot, and the same card can sit in a wide column or a narrow sidebar on the same page. Container queries let it ask the slot.</p>
+    <div class="tip"><p style="margin:0"><strong>Two elements, two jobs.</strong> The wrapper is the <em>container</em> (<code>container-type: inline-size</code>). The component inside <em>asks</em> it (<code>@container (width &gt;= …)</code>). The blue labels show each slot's width.</p></div>
+
+    <section class="case">
+      <header><b>1</b><h2>A card that knows its place</h2></header>
+      <p class="complaint">The same card is perfect in the wide column and cramped in the sidebar. A media query can't tell them apart: it only knows the window.</p>
+      <p>Two steps. <strong>①</strong> Make every <code>.slot</code> a query container (<code>container-type: inline-size</code>). <strong>②</strong> In an <code>@container</code> query: when the slot is at least <strong>26rem</strong> wide, lay the card out with the picture on the left (a grid: <code>10rem 1fr</code>). Then press 🖥 1200 and ▭ 700 and watch the <em>sidebar</em> card.</p>
+      <div class="live panel huge" data-show-html data-solved="✓ At 700px the sidebar card went wide too: it asked its slot, not the window." data-resizable="320-1400-1200" data-presets="360,700,1200" data-zoom="1" data-measure=".slot">
+        <script type="text/plain" data-role="html"><div class="layout"><main class="main"><h2>Featured</h2><div class="slot"><article class="card"><div class="pic">🥟</div><div class="body"><h3>Dumpling Dynasty</h3><p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience.</p><a href="#">Find the stall →</a></div></article></div></main><aside class="side"><h2>Also tonight</h2><div class="slot"><article class="card"><div class="pic">🎸</div><div class="body"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p><a href="#">Find the stall →</a></div></article></div></aside></div></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+
+.layout { display: grid; gap: 1rem; }
+@media (width >= 50rem) { .layout { grid-template-columns: 2fr 1fr; } }
+.main, .side { background: #171b25; border-radius: 12px; padding: 0.8rem; }
+.card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.8rem; }
+.pic { display: grid; place-items: center; aspect-ratio: 4 / 3; font-size: 3rem; background: #262c3a; border-radius: 10px; margin-bottom: 0.6rem; }
+.card h3 { font-size: 1.3rem; margin: 0 0 0.3rem; }
+.card p { font-size: 0.9rem; }
+.card a { font-weight: 700; text-decoration: none; }</script>
+        <textarea>
+/* ① every .slot answers questions about its width */
+.slot {
+
+}
+
+/* ② a wide slot: picture left, text right */
+@container (width >= 26rem) {
+  .card {
+
+  }
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "1200: wide main card, picture left", "at": [1200], "expr": "((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.right <= t.left + 1; })('.main')"}, {"label": "1200: narrow sidebar card stays stacked", "at": [1200], "expr": "((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.bottom <= t.top + 1; })('.side')"}, {"label": "700: one column, BOTH cards go wide", "at": [700], "expr": "((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.right <= t.left + 1; })('.main') && ((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.right <= t.left + 1; })('.side')"}, {"label": "360: both stacked", "at": [360], "expr": "((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.bottom <= t.top + 1; })('.main') && ((s) => { const p = d.querySelector(s + ' .pic').getBoundingClientRect(), t = d.querySelector(s + ' h3').getBoundingClientRect(); return p.bottom <= t.top + 1; })('.side')"}, {"label": "No media query", "forbid": "@media"}]</script>
+      </div>
+      <details><summary>Why it works</summary><p>The query asks the <strong>nearest ancestor that is a container</strong>. That's the killer pattern: a wrapper (<code>.slot</code>) is the container, the component inside (<code>.card</code>) asks it. The card can't be its own container: a box that changes its layout because of its own width could change its width again, forever.</p><pre class="code" data-lang="css">.slot {
+  container-type: inline-size;
+}
+@container (width >= 26rem) {
+  .card {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .pic { margin: 0; }
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>An important note: why is it 0px wide?</h2></header>
+      <p class="complaint">The stamp is squashed into a tower of single words.</p>
+      <p>Someone made the stamp's wrapper a container so the stamp could adapt. Read the blue size label on <code>.stamp-slot</code>. A container's width is <strong>not allowed to depend on its content</strong> (otherwise: the loop again). An <code>inline-block</code> gets its width <em>only</em> from its content. So it gets… nothing. Give the container a width that comes from outside.</p>
+      <div class="live panel" data-show-html data-solved="✓ Containers take their width from outside: block, or a set width." data-zoom="1.2" data-measure=".stamp-slot">
+        <script type="text/plain" data-role="html"><p>Tonight: <span class="stamp-slot"><strong class="stamp">Sold out · back at 22:00</strong></span> at Churros Till Late.</p></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+.stamp { display: inline-block; color: #ff6b4a; border: 3px double #ff6b4a; padding: 0.3rem 0.5rem; border-radius: 6px; font: 800 0.8rem ui-monospace, Menlo, monospace; text-transform: uppercase; }</script>
+        <textarea>
+.stamp-slot {
+  display: inline-block;
+  container-type: inline-size;
+}
+@container (width >= 12rem) {
+  .stamp { font-size: 1rem; }
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "The container isn't 0px wide any more", "expr": "r('.stamp-slot').width > 150"}, {"label": "The stamp is on one line", "expr": "r('.stamp').height < 45"}, {"label": "…and the container query matches", "expr": "cs('.stamp','font-size') === '16px'"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>container-type: inline-size</code> applies <em>size containment</em> on the inline axis: for sizing, the box pretends it's empty. Anything shrink-to-fit (inline-block, a float, an absolute box, a flex item with no basis, a <code>max-content</code> track) collapses. Fix it by giving the container a width that comes from its parent.</p><pre class="code" data-lang="css">.stamp-slot {
+  display: block;          /* fills its parent */
+  container-type: inline-size;
+}
+/* or keep inline-block and set a width: width: 16rem; */</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">3 · bonus</b><h2>Container units</h2></header>
+      
+      <p>Container queries come with units: <code>1cqi</code> is 1% of the container's inline size (its width). Make the card title fluid <em>relative to its slot</em>: <code>clamp(1.1rem, 0.6rem + 4cqi, 2.2rem)</code> (a rem part again, so zoom still works). The main card's title should end up bigger than the sidebar's, at the same window width.</p>
+      <div class="live panel tall" data-show-html data-solved="✓ Fluid type, measured against the slot instead of the window." data-resizable="320-1400-1200" data-presets="360,700,1200" data-zoom="1">
+        <script type="text/plain" data-role="html"><div class="layout"><main class="main"><h2>Featured</h2><div class="slot"><article class="card"><div class="pic">🥟</div><div class="body"><h3>Dumpling Dynasty</h3><p>Hand-folded xiaolongbao, steamed in front of you. The queue is part of the experience.</p><a href="#">Find the stall →</a></div></article></div></main><aside class="side"><h2>Also tonight</h2><div class="slot"><article class="card"><div class="pic">🎸</div><div class="body"><h3>Side B Records</h3><p>Vinyl, sorted by mood.</p><a href="#">Find the stall →</a></div></article></div></aside></div></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+
+.layout { display: grid; gap: 1rem; }
+@media (width >= 50rem) { .layout { grid-template-columns: 2fr 1fr; } }
+.main, .side { background: #171b25; border-radius: 12px; padding: 0.8rem; }
+.card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.8rem; }
+.pic { display: grid; place-items: center; aspect-ratio: 4 / 3; font-size: 3rem; background: #262c3a; border-radius: 10px; margin-bottom: 0.6rem; }
+.card h3 { font-size: 1.3rem; margin: 0 0 0.3rem; }
+.card p { font-size: 0.9rem; }
+.card a { font-weight: 700; text-decoration: none; }</script>
+        <textarea>
+.slot {
+  container-type: inline-size;
+}
+.card h3 {
+
+}
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "1200: the main title is bigger than the sidebar's", "at": [1200], "expr": "parseFloat(w.getComputedStyle(d.querySelector('.main h3')).fontSize) > parseFloat(w.getComputedStyle(d.querySelector('.side h3')).fontSize) + 6"}, {"label": "Uses cqi, with a rem part (zoom)", "require": "clamp\\([^,]+,[^,]*rem[^,]*cqi|clamp\\([^,]+,[^,]*cqi[^,]*rem"}]</script>
+      </div>
+      <details><summary>Solution</summary><pre class="code" data-lang="css">.card h3 {
+  font-size: clamp(1.1rem, 0.6rem + 4cqi, 2.2rem);
+}</pre></details>
+    </section>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>Feature queries</h2></header>
+      
+      <p>A card that <em>has</em> a <code>.badge</code> inside should get a red border: <code>.vendor-card:has(.badge)</code>. Wrap it in <code>@supports selector(:has(*))</code>, so a browser that doesn't understand <code>:has()</code> skips it cleanly. Outside the block, give sold-out cards a dimmer title for everyone.</p>
+      <div class="live panel" data-show-html data-solved="✓ Progressive enhancement: new browsers get more, old browsers still get a page." data-zoom="1">
+        <script type="text/plain" data-role="html"><ul class="vendor-list"><li class="vendor-card"><span class="tag">Food</span><h3>Dumpling Dynasty</h3></li><li class="vendor-card"><span class="tag">Food</span><h3>Churros Till Late</h3><strong class="badge">Sold out</strong></li></ul></script>
+        <script type="text/plain" data-role="base">*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: #12151d; color: #f3ecdf; font: 400 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
+a { color: #ffb547; }
+h1, h2, h3 { line-height: 1.05; margin: 0 0 0.5rem; }
+h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+p { color: #c9c1b3; margin: 0 0 0.8rem; }
+.site-header { margin: -16px -16px 16px; padding: 0.8rem 1rem; background: #171b25; border-bottom: 2px solid #3a4254; }
+.logo { font-weight: 800; font-size: 1.15rem; color: #f3ecdf; text-decoration: none; white-space: nowrap; }
+.main-nav ul { list-style: none; margin: 0; padding: 0; }
+.main-nav a { color: #c9c1b3; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+.vendor-list { list-style: none; margin: 0; padding: 0; }
+.vendor-card { background: #1b202b; border: 2px solid #3a4254; border-radius: 14px; padding: 1rem 1.1rem; }
+.vendor-card.featured { border-color: #ffb547; }
+.vendor-card h3 { font-size: 1.2rem; margin: 0.4rem 0 0.2rem; }
+.vendor-card p { font-size: 0.9rem; margin: 0; }
+.tag { font: 700 0.7rem/1 ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0.1em; background: #262c3a; color: #5ec8d8; padding: 0.3rem 0.5rem; border-radius: 6px; }
+.market-map { background: #0c1f2b; border: 2px solid #3a4254; border-radius: 14px; padding: 0.6rem; }
+.zone { font-weight: 700; font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; color: #12151d; }
+.stage { background: #ff8a6b; } .food { background: #ffc46b; } .table { background: #e8d9b8; } .crafts { background: #b8e0a0; }
+.drinks { background: #f0a6d8; } .pier { background: #a77a4f; color: #f3ecdf; } .gate { background: #262c3a; color: #f3ecdf; text-align: center; }
+</script>
+        <textarea>
+.vendor-list { display: grid; gap: 1rem; }
+.badge { color: #ff6b4a; font-weight: 800; }
+
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "The sold-out card has a red border", "sel": ".vendor-card:nth-child(2)", "prop": "border-top-color", "is": "#ff6b4a"}, {"label": "The other card doesn't", "sel": ".vendor-card:nth-child(1)", "prop": "border-top-color", "is": "#ff6b4a", "not": true}, {"label": "Inside a feature query", "require": "@supports\\s+selector\\(\\s*:has"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>@supports (property: value)</code> tests a declaration; <code>@supports selector(…)</code> tests a selector. Where support is missing, the block is skipped: no half-applied rules. Today every modern browser has <code>:has()</code>; the pattern matters for the next new thing (right now: <code>animation-timeline</code>, anchor positioning).</p><pre class="code" data-lang="css">@supports selector(:has(*)) {
+  .vendor-card:has(.badge) {
+    border-color: #ff6b4a;
+  }
+}</pre></details>
+    </section>
+  </div>
+</body>
+</html>

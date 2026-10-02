@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Viewport lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+.devices { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; margin-top: 1rem; }
+.device { flex: none; border: 10px solid #17140f; border-radius: 28px; background: #17140f; box-shadow: 6px 6px 0 var(--ink); }
+.device .screen { position: relative; overflow: hidden; border-radius: 16px; background: #fff; }
+.device iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; }
+.device figcaption { color: #efe8da; font: 700 0.8rem var(--font-mono); padding: 0.5rem 0.3rem 0.1rem; text-align: center; }
+.controls { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
+.controls .lab-chips .chip-btn { font-size: 0.9rem; }
+.you { font: 600 0.95rem var(--font-mono); background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.8rem 1rem; display: inline-block; }
+</style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Responsive + DOM · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Working with mobile devices</span>
+    <h1>The viewport <em>lab</em></h1>
+    <p class="intro">The market page on three phones at once. Switch the <code>&lt;meta name="viewport"&gt;</code> tag off to see what phones did for the first iPhone's sake: pretend to be 980px wide and shrink the page to fit. Switch between the showcase steps to see the page go from “Lecture 3” to responsive.</p>
+    <div class="controls">
+      <div class="lab-group"><span class="lab-label">viewport meta tag</span><div class="lab-chips" id="meta"><button class="chip-btn" type="button" data-v="on" aria-pressed="true">on: width=device-width</button><button class="chip-btn" type="button" data-v="off" aria-pressed="false">off: the 980px lie</button></div></div>
+      <div class="lab-group"><span class="lab-label">showcase step</span><div class="lab-chips" id="step"><button class="chip-btn" type="button" data-v="0">0 · Lecture 3</button><button class="chip-btn" type="button" data-v="1">1 · small screens</button><button class="chip-btn" type="button" data-v="2">2 · fluid</button><button class="chip-btn" type="button" data-v="3">3 · components</button><button class="chip-btn" type="button" data-v="4" aria-pressed="true">4 · + JS</button></div></div>
+    </div>
+    <div class="devices" id="devices"></div>
+    <h2>Your screen, right now</h2>
+    <p class="you" id="you"></p>
+    <p class="intro">A CSS pixel is not a screen pixel. A phone that is 390 CSS pixels wide may have 1170 physical pixels across: a <strong>device pixel ratio</strong> of 3. Media queries, <code>vw</code> and every <code>px</code> in your CSS use CSS pixels. Zoom your browser (<kbd>⌘ +</kbd>) and watch the numbers above: the CSS width shrinks, the ratio grows.</p>
+    <script>
+      (function () {
+        var DEVICES = [["Small phone", 360, 740], ["iPhone 15", 393, 852], ["Pixel 8", 412, 915]];
+        var meta = "on", step = "4";
+        var host = document.getElementById("devices");
+        var SCALE = 0.62;
+        function render() {
+          host.textContent = "";
+          DEVICES.forEach(function (d) {
+            var w = d[1], h = d[2];
+            var fig = document.createElement("figure");
+            fig.className = "device";
+            fig.style.margin = "0";
+            var screen = document.createElement("div");
+            screen.className = "screen";
+            screen.style.width = w * SCALE + "px";
+            screen.style.height = h * SCALE + "px";
+            var f = document.createElement("iframe");
+            var layoutW = meta === "on" ? w : 980; // without the tag, the phone lays the page out at 980px and shrinks it
+            var z = (w / layoutW) * SCALE;
+            f.style.width = layoutW + "px";
+            f.style.height = h * (layoutW / w) + "px";
+            f.style.transform = "scale(" + z + ")";
+            f.title = d[0];
+            f.src = "../project/showcase/index.html?bare&step=" + step;
+            screen.append(f);
+            var cap = document.createElement("figcaption");
+            cap.textContent = d[0] + " · " + w + " CSS px" + (meta === "off" ? " · pretending 980" : "");
+            fig.append(screen, cap);
+            host.append(fig);
+          });
+        }
+        function chips(id, set) {
+          var box = document.getElementById(id);
+          box.addEventListener("click", function (e) {
+            var b = e.target.closest("button");
+            if (!b) return;
+            box.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+            set(b.dataset.v);
+            render();
+          });
+        }
+        chips("meta", function (v) { meta = v; });
+        chips("step", function (v) { step = v; });
+        function you() {
+          document.getElementById("you").textContent = "window: " + innerWidth + " × " + innerHeight + " CSS px · device pixel ratio " + (Math.round(devicePixelRatio * 100) / 100) + " → " + Math.round(innerWidth * devicePixelRatio) + " physical pixels across";
+        }
+        addEventListener("resize", you);
+        you();
+        render();
+      })();
+    </script>
+  </div>
+</body>
+</html>
