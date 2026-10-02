@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam spare · Simon</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Spare game · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · spare</span>
+    <h1><em>Simon</em></h1>
+    <p class="intro">Four coloured pads. The game flashes a sequence; you repeat it. Every round adds one more step to the end. One wrong pad ends the game. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“Green, red, red, blue, yellow… no, wait.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> round 1 flashes one pad; repeat it. Round 2 flashes the same pad and one more. Clicks during the flashing are ignored. A wrong pad: "Game over · you reached round 6".</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The sequence, and how far into it the player has got.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Whose turn it is (the game's or the player's), and which pad is lit right now.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Four pads drawn from state. The lit one is unmistakable.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The round number, and whose turn it is.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The game plays the sequence: one pad at a time, with a pause between flashes.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Clicks during playback are ignored.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The whole sequence right: one random step is added and it plays again. A wrong pad: game over.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. Even the flashing: a lit pad is a value in <code>state</code>, drawn by <code>render()</code>.</p></div>
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Code that runs later: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout"><code>setTimeout</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval"><code>setInterval</code></a>. Not taught yet; MDN has what you need.</p></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>The same pad twice in a row: the player sees two flashes, not one long one.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Click pads while the sequence is playing.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Start a new game in the middle of playback.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Play with the keyboard: <kbd>1</kbd>–<kbd>4</kbd>, or <kbd>Tab</kbd> and <kbd>Enter</kbd>.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>A tone per pad (Web Audio). Browsers only allow sound after the player has clicked something.</li>
+      <li>Playback gets faster every five rounds.</li>
+      <li>Everyone's stretch: save, best score. Does undo make sense here?</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Write down the state at every moment of one playback of three steps. What changes it from one moment to the next?</p></details>
+      <details><summary>Hint 2</summary><p>The same pad twice in a row: what does the player see between the two flashes? Is that moment in your state?</p></details>
+      <details><summary>Hint 3</summary><p>When the player is halfway through repeating the sequence, what's the one number you need to check their next click?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>New game during playback: two sequences play over each other.</li>
+      <li>The same pad twice shows up as one long flash.</li>
+      <li>The last pad of the sequence stays lit.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

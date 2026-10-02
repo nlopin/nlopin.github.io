@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 5 · Split into modules</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 32rem; margin-top: 1rem; }
+    .case .panel.tall { height: 40rem; }
+    .case .panel.huge { height: 48rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+    <style>
+      .steps { counter-reset: s; list-style: none; padding: 0; max-width: 78ch; }
+      .steps > li { counter-increment: s; position: relative; padding: 0.9rem 1rem 0.9rem 3.4rem; margin: 0 0 0.7rem; background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; }
+      .steps > li::before { content: counter(s); position: absolute; left: 1rem; top: 0.85rem; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; font: 700 0.85rem "IBM Plex Mono", monospace; color: #03101b; background: var(--w-act); border-radius: 4px; }
+      .steps pre.code { font-size: 0.85rem; margin: 0.5rem 0 0; }
+      .graph { font: 500 0.95rem/1.7 "IBM Plex Mono", monospace; background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; padding: 1rem 1.2rem; white-space: pre; overflow-x: auto; max-width: 78ch; color: var(--w-ink); }
+      .graph b { color: var(--w-act); font-weight: 600; }
+      .errs { width: 100%; max-width: 78rem; border-collapse: collapse; font-size: 0.95rem; }
+      .errs td, .errs th { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--w-line); }
+      .errs th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+      .errs td:first-child { font: 500 0.85rem "IBM Plex Mono", monospace; color: #ff8a70; width: 45%; }
+      .checks-list { list-style: none; padding: 0; }
+      .checks-list li { margin: 0.55rem 0; max-width: 78ch; }
+      .checks-list label { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.7rem; align-items: start; cursor: pointer; }
+      .checks-list input { accent-color: #a98bff; width: 1.15rem; height: 1.15rem; margin: 0.2rem 0 0; }
+    </style>
+</head>
+<body class="page wire modules">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Exercise 5 · 18 min · in your own copy of the project</span></div>
+    <span class="eyebrow-tag">Act 5 · ES modules</span>
+    <h1>Split into <em>modules</em></h1>
+    <p class="intro">Today's whole market lives in one script, <code>js/market.js</code>, and every name in it is global: the reason the jam's <em>"has already been declared"</em> error existed. Split it into ES modules: same behaviour, five files, one responsibility each.</p>
+    <div class="tip"><p style="margin:0"><strong>Two keywords.</strong> <code>export</code> in front of what a file offers; <code>import { name } from "./file.js"</code> at the top of a file that needs it. Everything else stays private to its file.</p></div>
+
+    <h2>Before you start</h2>
+    <ol class="steps">
+      <li>Copy <code>project/starter/</code> out of the repo into your own folder (or unzip <a href="../project/starter.zip">starter.zip</a> there). Don't edit inside the repo: the next <code>git pull</code> would conflict with your changes.</li>
+      <li>Serve it: <code>npx live-server</code> in that folder. Modules don't load from <code>file://</code>.</li>
+      <li>Open <code>js/market.js</code>. It's today's market in one file, in numbered sections. Every name in it is global: type <code>stalls</code> into the console and it answers.</li>
+    </ol>
+
+    <h2>The target</h2>
+    <p>The same page, the same behaviour, five files. Arrows are imports. <code>main.js</code> is the only file the HTML loads.</p>
+    <div class="graph"><b>index.html</b>  &lt;script type="module" src="js/main.js"&gt;
+   └─ <b>main.js</b>      events, update(), start      sections 5–8
+       ├─ <b>render.js</b>   card(), render()            section 4
+       │    ├─ <b>state.js</b>
+       │    └─ <b>data.js</b>
+       ├─ <b>storage.js</b>  save(), load()              section 3
+       │    └─ <b>state.js</b>
+       └─ <b>state.js</b>    state, visibleStalls(),      section 2
+            │          toggleSaved()
+            └─ <b>data.js</b>  export const stalls        section 1</div>
+
+    <h2>Steps</h2>
+    <ol class="steps">
+      <li><strong>data.js.</strong> Move section 1 into <code>js/data.js</code> and put <code>export</code> in front of <code>const stalls</code>.</li>
+      <li><strong>state.js.</strong> Section 2. It uses <code>stalls</code>, so its first line is an import. Export what other files need.
+        <pre class="code" data-lang="js">import { stalls } from "./data.js";
+
+export const state = { … };
+export function visibleStalls() { … }</pre></li>
+      <li><strong>storage.js</strong> (section 3) and <strong>render.js</strong> (section 4): same idea. Each file imports only what it uses. Leave <code>update()</code> for <code>main.js</code>.</li>
+      <li><strong>main.js.</strong> Sections 5–8: <code>update()</code>, the listeners, the menu, the form, the start. It imports from the other four.</li>
+      <li><strong>index.html.</strong> Replace the old script tag, then delete <code>market.js</code>.
+        <pre class="code" data-lang="html">&lt;script type="module" src="js/main.js"&gt;&lt;/script&gt;</pre></li>
+    </ol>
+
+    <h2>Done means</h2>
+    <ul class="checks-list">
+      <li><label><input type="checkbox"> <span>Filter, search, ♡, the menu and the ticket form work exactly as before, and survive a reload.</span></label></li>
+      <li><label><input type="checkbox"> <span>The console is clean. Typing <code>stalls</code> or <code>state</code> into it gives a ReferenceError: nothing is global any more.</span></label></li>
+      <li><label><input type="checkbox"> <span>DevTools → Network → JS shows five files, <code>main.js</code> first.</span></label></li>
+      <li><label><input type="checkbox"> <span>No file imports something it doesn't use.</span></label></li>
+    </ul>
+
+    <h2>Errors you will meet</h2>
+    <table class="errs">
+      <tr><th>The message</th><th>What it means</th></tr>
+      <tr><td>Cannot use import statement outside a module</td><td>The script tag is missing <code>type="module"</code>.</td></tr>
+      <tr><td>Access to script … from origin 'null' has been blocked by CORS policy</td><td>You opened the file with <code>file://</code>. Serve the folder (<code>npx live-server</code>).</td></tr>
+      <tr><td>GET …/js/data 404 (Not Found)</td><td>Module paths need the <code>.js</code> and start with <code>./</code>: <code>"./data.js"</code>.</td></tr>
+      <tr><td>The requested module './state.js' does not provide an export named 'visibleStalls'</td><td>Forgot the <code>export</code>, or a spelling difference between the two files.</td></tr>
+      <tr><td>stalls is not defined</td><td>This file uses a name it never imported. Every module starts with an empty scope.</td></tr>
+      <tr><td>Assignment to constant variable</td><td>An imported binding is read-only: <code>state = …</code> fails in another file. Change its keys instead: <code>state.tag = …</code>.</td></tr>
+    </table>
+
+    <details><summary>Solution: main.js</summary><pre class="code" data-lang="js">import { state, toggleSaved } from "./state.js";
+import { save, load } from "./storage.js";
+import { render } from "./render.js";
+
+const filters = document.querySelector(".filters");
+const list = document.querySelector(".vendor-list");
+
+function update() {
+  render();
+  save();
+}
+
+filters.addEventListener("click", (event) => { … state.tag = …; update(); });
+// … search, ♡, menu, form …
+
+load();
+render();</pre></details>
+
+    <h2>Homework: grow it</h2>
+    <p>Now that every feature is one key in the state and one line in <code>visibleStalls()</code>, add:</p>
+    <ul class="checks-list">
+      <li><label><input type="checkbox"> <span>A "Cheapest first" checkbox (sort a <em>copy</em>).</span></label></li>
+      <li><label><input type="checkbox"> <span>"Only my saved stalls", persisted across reloads. Its checkbox is a controlled input: <code>checkbox.checked = state.onlySaved</code> in <code>render()</code>.</span></label></li>
+      <li><label><input type="checkbox"> <span>Register a stall (the jam's spare task, done right this time): a form under the list that adds the new stall to the market's list, then <code>update()</code>. The filter sees it, because nothing keeps an old list of elements. Changing <code>stalls</code> is fine here: it's your app's own data, changed on purpose in one place. Three traps: the price from the form is a string (<code>Number()</code>, or <code>"0" === 0</code> fails and a free stall says "from €0"); every stall needs a unique <code>id</code> (<code>crypto.randomUUID()</code>, which only exists on <code>https://</code> and <code>localhost</code>: on live-server's network address use <code>Date.now().toString(36)</code>); and a registered stall is lost on reload unless you persist it too.</span></label></li>
+      <li><label><input type="checkbox"> <span>Bonus: the menu and the ticket form in their own modules, <code>menu.js</code> and <code>tickets.js</code>, each exporting one <code>setup…()</code> function.</span></label></li>
+    </ul>
+
+  </div>
+</body>
+</html>

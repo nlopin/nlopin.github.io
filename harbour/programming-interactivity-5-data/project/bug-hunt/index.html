@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🐞%3C/text%3E%3C/svg%3E">
+  <title>Bug hunt</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="tests.js" defer></script>
+</head>
+<body>
+  <header class="brief">
+    <p class="eyebrow">Exercise 6 · the debugger</p>
+    <h1>Bug <em>hunt</em></h1>
+    <p>This little market has <strong>five bugs</strong>, reported by users below. For each one: reproduce it, put a breakpoint where you think it goes wrong (DevTools → Sources → <code>app.js</code>), look at the values, step until reality and your expectation part ways. Fix it in <code>app.js</code>, reload, press <strong>Run the checks</strong>: a report turns green when its test passes.</p>
+    <p class="rule">Rule of the game: no <code>console.log</code>. Breakpoints, the Scope panel and Watch only.</p>
+    <p class="note">The checks run your <code>app.js</code> in hidden copies of this page, so your breakpoints would stop there too: <strong>deactivate breakpoints</strong> before you run them (Sources → the ⊘ button, or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>F8</kbd>), and untick <em>Pause on caught exceptions</em>.</p>
+    <p class="note"><strong>Start with reports 3 and 5</strong>: they are the ones you can't solve by reading. Then 1, 2 and 4.</p>
+  </header>
+
+  <main>
+    <section class="app" aria-label="The market">
+      <div class="filters" role="group" aria-label="Show">
+        <button type="button" data-filter="all">All</button>
+        <button type="button" data-filter="food">Food</button>
+        <button type="button" data-filter="music">Music</button>
+        <button type="button" data-filter="crafts">Crafts</button>
+        <button type="button" data-filter="drinks">Drinks</button>
+      </div>
+      <div class="options">
+        <label><input id="cheapest" type="checkbox"> Cheapest first</label>
+        <label>Tip <select id="tip"><option value="0">€0</option><option value="2">€2</option><option value="5">€5</option></select></label>
+        <output class="summary"></output>
+      </div>
+      <ul class="cards"></ul>
+    </section>
+
+    <section class="reports" aria-label="Bug reports">
+      <h2>Bug reports <span class="score" aria-live="polite">not checked yet</span> <button class="run" type="button">▶ Run the checks</button></h2>
+      <ol>
+        <li data-test="filter">
+          <h3>“Food shows every stall, and now they're all food”</h3>
+          <p><b>Steps</b> Click Food. <b>Expected</b> 3 food stalls. <b>Actual</b> all 8, and every tag says FOOD, even after All.</p>
+          <details><summary>Where to look</summary><p>A breakpoint inside the arrow function in <code>visibleStalls</code>. Click Food. Watch <code>stall.tag</code> before and after that line runs.</p></details>
+        </li>
+        <li data-test="total">
+          <h3>“My night costs €142?”</h3>
+          <p><b>Steps</b> Save Dumpling Dynasty (€8) and Taco Bike (€6), tip €2. <b>Expected</b> €16. <b>Actual</b> €142.</p>
+          <details><summary>Where to look</summary><p>Pause on the <code>return</code> in <code>nightTotal</code>. In the Scope panel, what <em>type</em> is each side of the <code>+</code>? (Hover them, or add <code>typeof tip.value</code> to Watch.)</p></details>
+        </li>
+        <li data-test="storage">
+          <h3>“It forgets everything when I reload”</h3>
+          <p><b>Steps</b> Tick Cheapest first, save a stall (click the word “save”), reload. <b>Expected</b> both back. <b>Actual</b> unsorted, nothing saved. No error in the console.</p>
+          <details><summary>Where to look</summary><p>Is it saved at all? DevTools → Application → Local storage. Then: no error in the console doesn't mean no error. Sources → Breakpoints → tick <em>Pause on caught exceptions</em>, and reload.</p></details>
+        </li>
+        <li data-test="heart">
+          <h3>“The heart doesn't work, but the word ‘save’ does”</h3>
+          <p><b>Steps</b> Click exactly on the ♡ (not the word). <b>Expected</b> the stall is saved. <b>Actual</b> nothing. Clicking the word “save” next to it works.</p>
+          <details><summary>Where to look</summary><p>A breakpoint on the first line of the list's click listener (or Event Listener Breakpoints → Mouse → click). Click the ♡. What is <code>event.target</code>? What did you mean?</p></details>
+        </li>
+        <li data-test="alias">
+          <h3>“The hearts are back, but it says ‘Save a stall’”</h3>
+          <p><b>Steps</b> Needs report 3 fixed (otherwise nothing comes back at all). Save two stalls (click the word “save”), reload. <b>Expected</b> “2 saved · your night: …”. <b>Actual</b> two ♥, and the summary says “Save a stall to plan your night.”</p>
+          <details><summary>Where to look</summary><p>A breakpoint on the summary line in <code>render</code>, after a reload. What does the summary read, and what did <code>load</code> write? Hover both in the Scope panel.</p></details>
+        </li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

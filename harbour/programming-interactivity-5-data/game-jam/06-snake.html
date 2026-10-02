@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam 6 · Snake</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Game 6 · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · game 6</span>
+    <h1><em>Snake</em></h1>
+    <p class="intro">The snake moves one cell at a time on its own; the arrow keys turn it. Food makes it one cell longer. Hitting a wall or its own body ends the game. <span class="stars" title="difficulty">★★★</span></p>
+    <p class="story">“I was at 42 when my thumb slipped.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> the snake starts moving by itself. Steer it to the food: it grows and the score goes up. Turn straight back: nothing happens. Hit a wall: game over. New game: the same speed as the first one.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The cells the snake covers, and its direction.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Where the food is, and whether the game is over.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A 20×20 board with the snake and the food drawn from state. The head looks different.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The score, and a game-over message.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Every tick (about 150 ms) the snake moves one cell.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Arrow keys turn it. Turning straight back is ignored.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Food: the snake grows by one, new food appears, never on the snake.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A wall or its own body: game over, the snake stops.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. A collision is decided from <code>state</code>, never from what's drawn in a cell.</p></div>
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Code that runs again and again: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval"><code>setInterval</code></a>. Not taught yet; MDN has what you need.</p></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Moving right, press <kbd>←</kbd>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Moving right, press <kbd>↑</kbd> then <kbd>←</kbd> very fast, faster than one tick.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Start three new games in a row: the speed stays the same.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Move the head into the cell the tail is just leaving.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>The arrow keys don't scroll the page.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Faster every five pieces of food.</li>
+      <li>Pause on <kbd>Space</kbd>, and automatically when you switch tabs.</li>
+      <li>A no-walls mode: leave on the right, come back on the left.</li>
+      <li>Everyone's stretch: undo (one tick back?), save, best score.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>What does one tick do to the snake's cells? What is different about a tick where it eats?</p></details>
+      <details><summary>Hint 2</summary><p>Is "the direction the player last pressed" the same thing as "the direction the snake last moved"?</p></details>
+      <details><summary>Hint 3</summary><p>Do you need to redraw all 400 cells every tick, or only the things that exist? Either works: which is simpler for you?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>Every new game is faster than the last.</li>
+      <li>The snake turns back into itself, even though turning back is blocked.</li>
+      <li>The snake runs straight through its own body: no collision is ever found.</li>
+      <li>The game keeps going after game over, or a new game won't start.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

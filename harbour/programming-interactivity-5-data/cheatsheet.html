@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data in, page out · cheat sheet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <script src="assets/kit.js" defer></script>
+  <style>
+    .sheet { columns: 3 19rem; column-gap: 1.25rem; }
+    .box { break-inside: avoid; background: #0b1426; color: #e3ecff; border: 1.5px solid #1f3052; border-left: 4px solid var(--c, #3ee6ff); border-radius: 0.5rem; padding: 0.8rem 1rem 0.9rem; margin: 0 0 1.25rem; }
+    .box h2 { margin: 0 0 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
+    .box h2 span { font: 600 0.7rem "IBM Plex Mono", monospace; background: var(--c, #3ee6ff); color: #03101b; padding: 0.2rem 0.45rem; border-radius: 0.25rem; }
+    .box pre.code { font-size: 0.78rem; padding: 0.6rem 0.75rem; margin: 0.4rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .box table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .box td { padding: 0.25rem 0.3rem; border-bottom: 1px solid #1f3052; vertical-align: top; }
+    .box td:first-child { width: 52%; }
+    .box td code { overflow-wrap: anywhere; }
+    .box p, .box li { font-size: 0.88rem; margin: 0.3rem 0; color: #cfdcf7; }
+    .box ol, .box ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+    .c1 { --c: #3ee6ff; } .c2 { --c: #b6ff3b; } .c3 { --c: #ff4fd8; } .c4 { --c: #ffb547; } .c5 { --c: #a98bff; } .c6 { --c: #ff6b5a; }
+    .print { font: 600 0.85rem "IBM Plex Mono", monospace; border: 1.5px solid #3ee6ff; color: #3ee6ff; background: transparent; padding: 0.5rem 0.9rem; border-radius: 0.4rem; cursor: pointer; }
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .page { background: #fff !important; color: #000; font-size: 10pt; }
+      .page-top, .print, .intro { display: none; }
+      .page-wrap { padding: 0; max-width: none; }
+      .page h1 { font-size: 20pt; margin-bottom: 4mm; color: #000; }
+      .sheet { columns: 3; column-gap: 5mm; }
+      .box { background: #fff; color: #000; border: 1px solid #000; border-left-width: 3px; padding: 2.5mm 3mm; margin-bottom: 3mm; }
+      .box h2, .box p, .box li { color: #000; }
+      .box code { background: #eee !important; color: #000 !important; border: 0 !important; }
+      .box pre.code { font-size: 7pt; }
+      .box td, .box p, .box li { font-size: 8pt; }
+    }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Data in, page out · all materials</a><button class="print" type="button" onclick="print()">🖨 Print (A4 landscape)</button></div>
+    <h1>Data in, page out <em>on one page</em></h1>
+    <p class="intro">Everything from Lecture 5, condensed. Print it, stick it next to your screen.</p>
+
+    <div class="sheet">
+      <section class="box c1">
+        <h2><span>0</span> The idea</h2>
+        <pre class="code" data-lang="js">// page = render(state)
+someElement.addEventListener("click", () => {
+  state.something = …;  // 1 · change the state
+  update();             // 2 · render() + save()
+});</pre>
+        <p>Events never patch the page. They update state; <code>render()</code> re-renders everything from it.</p>
+      </section>
+
+      <section class="box c1">
+        <h2><span>1</span> Objects &amp; arrays</h2>
+        <pre class="code" data-lang="js">const stall = { id: "mezcal", name: "Mezcal Moon", price: 9 };
+stall.name;           stall["name"];
+const stalls = [stall, …];
+stalls.length;  stalls[0];  stalls.at(-1);
+for (const s of stalls) { … }   // of, not in</pre>
+        <table>
+          <tr><td>no value</td><td><code>null</code> (explicit), <code>undefined</code> (unset)</td></tr>
+          <tr><td>logical operators</td><td><code>&amp;&amp; || !</code></td></tr>
+          <tr><td>anonymous function</td><td><code>(s) =&gt; s.name</code></td></tr>
+          <tr><td>string interpolation</td><td><code>`${x}`</code></td></tr>
+          <tr><td>conditional expression</td><td><code>c ? a : b</code></td></tr>
+          <tr><td>empty array check</td><td><code>items.length === 0</code>: <code>[]</code> and <code>{}</code> are truthy</td></tr>
+          <tr><td>equality</td><td><code>===</code> (always); objects compare by identity</td></tr>
+          <tr><td><code>const</code></td><td>no reassignment; the object can still be mutated</td></tr>
+          <tr><td><code>"14" + 2</code></td><td><code>"142"</code>: form values are strings, <code>Number(x)</code></td></tr>
+          <tr><td><code>x ?? "default"</code></td><td>the default only if x is null / undefined</td></tr>
+        </table>
+      </section>
+
+      <section class="box c1">
+        <h2><span>2</span> Array methods</h2>
+        <table>
+          <tr><td><code>.map(s =&gt; …)</code></td><td>one result per item, same length</td></tr>
+          <tr><td><code>.filter(s =&gt; …)</code></td><td>the items that say yes</td></tr>
+          <tr><td><code>.find(s =&gt; …)</code></td><td>the first yes, or <code>undefined</code></td></tr>
+          <tr><td><code>.some / .every</code></td><td>true or false</td></tr>
+          <tr><td><code>.reduce((sum, s) =&gt; sum + s.price, 0)</code></td><td>one value</td></tr>
+          <tr><td><code>.includes(x)</code></td><td>is it in there?</td></tr>
+          <tr><td><code>[...list].sort((a, b) =&gt; a.price - b.price)</code></td><td>sorted copy. <code>sort</code> alone changes the list and compares as text</td></tr>
+        </table>
+        <p>Don't change: <code>map filter find slice toSorted</code>. Change: <code>sort reverse push splice</code>.</p>
+      </section>
+
+      <section class="box c1">
+        <h2><span>3</span> Copies &amp; shapes</h2>
+        <pre class="code" data-lang="js">const copy = [...stalls];
+const changed = { ...stall, price: 6 };
+const { name, price } = stall;
+(s) =&gt; s.name                 // returns s.name
+(s) =&gt; { return s.name; }     // braces need return
+(s) =&gt; ({ name: s.name })     // an object: wrap in ( )
+const unique = [...new Set(list)];</pre>
+      </section>
+
+      <section class="box c2">
+        <h2><span>4</span> Render</h2>
+        <pre class="code" data-lang="js">const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  return li;
+}
+
+function render() {
+  list.replaceChildren(...visibleStalls().map(card));
+}</pre>
+        <p><code>textContent</code> for data, never <code>innerHTML</code>. <code>replaceChildren</code> removes the old ones first: safe to call again. <code>toggle(name, undefined)</code> <em>flips</em>: pass a real boolean.</p>
+      </section>
+
+      <section class="box c3">
+        <h2><span>5</span> State</h2>
+        <pre class="code" data-lang="js">const state = { tag: "all", query: "", saved: new Set() };
+
+function visibleStalls() {           // derived
+  return stalls.filter((s) =&gt; state.tag === "all" || s.tag === state.tag);
+}</pre>
+        <ul>
+          <li>In the state: user input only. Derived state (counts, visible list): computed on render, never stored.</li>
+          <li>Cards are redrawn: listen on the list (delegation), <code>event.target.closest(".save")</code>.</li>
+          <li>Controlled inputs: <code>render()</code> sets <code>aria-pressed</code>, <code>checkbox.checked</code>, <code>input.value</code> from the state.</li>
+          <li>Every listener: change state, then <code>update()</code> = <code>render(); save();</code></li>
+          <li><code>Set</code>: <code>add</code>, <code>delete</code>, <code>has</code>, <code>size</code>, <code>[...set]</code>.</li>
+        </ul>
+      </section>
+
+      <section class="box c4">
+        <h2><span>6</span> Persistence</h2>
+        <pre class="code" data-lang="js">function save() {
+  const data = { tag: state.tag, saved: [...state.saved] };
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data) return;
+    state.tag = data.tag ?? "all";
+    state.saved = new Set(data.saved ?? []);
+  } catch { /* keep the defaults */ }
+}
+load(); render();</pre>
+        <table>
+          <tr><td><code>sessionStorage</code></td><td>same API, per tab</td></tr>
+          <tr><td>URL <code>?tag=food</code></td><td>shareable filters, search</td></tr>
+          <tr><td>IndexedDB</td><td>large/offline data, async</td></tr>
+          <tr><td>cookies</td><td>server sessions, sent with every request</td></tr>
+        </table>
+        <p>JSON: double-quoted keys, no trailing commas, no <code>undefined</code>/functions/<code>Date</code>. Strings only. A <code>Set</code> becomes <code>{}</code> in JSON. <code>getItem</code> gives <code>null</code> on a first visit. DevTools → Application → Local storage.</p>
+      </section>
+
+      <section class="box c5">
+        <h2><span>7</span> Modules</h2>
+        <pre class="code" data-lang="js">// state.js
+import { stalls } from "./data.js";
+export const state = { … };
+
+// index.html: one entry point
+&lt;script type="module" src="js/main.js"&gt;&lt;/script&gt;</pre>
+        <ul>
+          <li>Own scope per file: no more "already declared".</li>
+          <li><code>"./data.js"</code>: relative, with <code>.js</code>.</li>
+          <li>Needs <code>http://</code> (<code>npx live-server</code>); deferred automatically.</li>
+          <li>Imports are read-only: change keys, don't reassign.</li>
+        </ul>
+      </section>
+
+      <section class="box c6">
+        <h2><span>8</span> The debugger</h2>
+        <table>
+          <tr><td>Click a line number</td><td>a breakpoint</td></tr>
+          <tr><td><code>debugger;</code></td><td>a breakpoint in code</td></tr>
+          <tr><td>Right-click a line number → conditional</td><td>stop only when true</td></tr>
+          <tr><td>Event Listener Breakpoints</td><td>stop in any click handler</td></tr>
+          <tr><td>Pause on caught exceptions</td><td>find swallowed errors</td></tr>
+          <tr><td>▶ ⤼ ⤓ ⤒</td><td>resume · over · into · out</td></tr>
+        </table>
+        <p>Reproduce → guess where → stop there → look → step → fix → reproduce. Wrong data? Events and state. Right data, wrong page? Render.</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

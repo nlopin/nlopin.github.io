@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Lecture 5 — the pieces JavaScript draws: search, price, the ♡ button.
+   Nothing to do in this file.
+   ========================================================================== */
+
+.finder { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin: -0.5rem 0 1.5rem; }
+.finder label { font-weight: 700; }
+.finder input {
+  font: inherit;
+  color: var(--ink);
+  background: var(--night-2);
+  border: 2px solid var(--line);
+  border-radius: 99px;
+  padding: 0.45rem 1rem;
+  width: min(100%, 18rem);
+}
+.finder input:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.status { margin: 0; color: var(--ink-2); font-size: 0.9rem; display: flex; gap: 0.8rem; }
+.saved-count { color: var(--lantern); font-weight: 700; }
+
+.vendor-card .price { font: 700 0.85rem/1 ui-monospace, Menlo, monospace; color: var(--sea); margin: 0 0 1rem; }
+.vendor-card.sold-out h3, .vendor-card.sold-out .blurb { opacity: 0.55; }
+
+.card-actions { margin-top: auto; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.save {
+  font: 700 1.1rem/1 system-ui, sans-serif;
+  color: var(--lantern);
+  background: transparent;
+  border: 2px solid var(--line);
+  border-radius: 99px;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+.save:hover { border-color: var(--lantern); }
+.save:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.save[aria-pressed="true"] { background: var(--lantern); color: var(--night); border-color: var(--lantern); }
+
+.vendor-list .empty { grid-column: 1 / -1; color: var(--ink-2); font-style: italic; }
+
+/* the wide featured card from Lecture 4: room for the price and the actions */
+@container stall (width >= 34rem) {
+  .vendor-card {
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas:
+      "tag   text"
+      "title text"
+      "price text"
+      "link  text";
+  }
+  .vendor-card .price { grid-area: price; }
+  .vendor-card .card-actions { grid-area: link; align-self: end; }
+}

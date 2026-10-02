@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data in, page out · Programming Interactivity 5</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem; align-items: center; margin-bottom: 2rem; }
+    .hero-row h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .formula { font: 600 clamp(1.6rem, 1rem + 2.5vw, 2.6rem)/1.2 "IBM Plex Mono", monospace; color: #fff; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 1.5rem; }
+    .formula .f { color: #b6ff3b; } .formula .s { color: #ff4fd8; } .formula .u { color: #3ee6ff; }
+    .formula small { display: block; font-size: 0.9rem; color: #8599c2; margin-top: 0.8rem; font-weight: 500; }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .page.wire .big-links a { font: 700 1.05rem "Space Grotesk", sans-serif; color: #03101b; text-decoration: none; padding: 0.8rem 1.3rem; border-radius: 99px; background: #3ee6ff; box-shadow: 0 0 24px rgb(62 230 255 / 0.4); }
+    .page.wire .big-links a.alt { background: transparent; color: #e3ecff; border: 1.5px solid #1f3052; box-shadow: none; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+    .page.wire .grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem 1.1rem; background: #0b1426; border: 1.5px solid #1f3052; border-left: 4px solid var(--c, #3ee6ff); border-radius: 8px; color: #e3ecff; text-decoration: none; }
+    .grid a:hover, .grid a:focus-visible { background: #111d36; outline: none; }
+    .grid b { display: block; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff; }
+    .grid small { display: block; font: 600 0.72rem "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c, #3ee6ff); margin-bottom: 0.4rem; }
+    .grid span { color: #cfdcf7; font-size: 0.95rem; }
+    .a1 { --c: #3ee6ff; } .a2 { --c: #b6ff3b; } .a3 { --c: #ff4fd8; } .a4 { --c: #ffb547; } .a5 { --c: #a98bff; } .a6 { --c: #ff6b5a; }
+    .keys { font: 500 0.9rem/1.8 "IBM Plex Mono", monospace; }
+    @media (max-width: 760px) { .hero-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · Lecture 5</span><span>3 h · theory + practice</span></div>
+    <div class="hero-row">
+      <div>
+        <span class="eyebrow-tag">Lecture 5</span>
+        <h1>Data in, <em>page out</em></h1>
+        <p class="intro">The Harbour Night Market's vendor list stops being typed into the HTML. It becomes an array of objects, and the DOM is rendered from it: array methods, a <code>&lt;template&gt;</code> and a <code>render()</code> function, a single state object, persistence with <code>localStorage</code>, ES modules, and the debugger.</p>
+        <div class="big-links"><a href="slides.html">▶ Open the slides</a><a class="alt" href="cheatsheet.html">Cheat sheet</a><a class="alt" href="project/starter.zip">Starter project (zip)</a></div>
+      </div>
+      <div class="formula"><span class="u">UI</span> = <span class="f">render</span>(<span class="s">state</span>)<small>an event updates state · render() re-renders the DOM</small></div>
+    </div>
+
+    <h2>Exercises <em>in class order</em></h2>
+    <p>Your code in the live editors is kept as a draft in this browser, even after a reload. <strong>↺ reset</strong> goes back to the starting code.</p>
+    <ul class="grid">
+      <li class="a1"><a href="exercises/01-stock-take.html"><small>Exercise 1 · Act 1 · 8 min</small><b>Stock-take</b><span>Seven small functions with map, filter, find and sort. 1–5 in class.</span></a></li>
+      <li class="a2"><a href="exercises/02-render.html"><small>Exercise 2 · Act 2 · 12 min</small><b>Render the market</b><span>A template, card(stall), render(list), sold out and prices.</span></a></li>
+      <li class="a3"><a href="exercises/03-one-source-of-truth.html"><small>Exercise 3 · Act 3 · 14 min</small><b>Single source of truth</b><span>Filter, search and ♡ from one state object.</span></a></li>
+      <li class="a4"><a href="exercises/04-remember.html"><small>Exercise 4 · Act 4 · 8 min</small><b>Remember my night</b><span>save() and load() with JSON and localStorage, survives broken data.</span></a></li>
+      <li class="a5"><a href="exercises/05-split-it-up.html"><small>Exercise 5 · Act 5 · 18 min</small><b>Split into modules</b><span>The project's market.js into five ES modules. In your own copy of the starter.</span></a></li>
+      <li class="a6"><a href="project/bug-hunt/index.html"><small>Exercise 6 · Act 6 · 13 min · pairs</small><b>Bug hunt</b><span>Five bug reports, five bugs. Breakpoints only.</span></a></li>
+    </ul>
+
+    <h2>Playgrounds</h2>
+    <ul class="grid">
+      <li class="a1"><a href="playgrounds/array-lab.html"><small>Arrays</small><b>Array lab</b><span>Type a chain of array methods, see every step, spot the ones that change the data.</span></a></li>
+      <li class="a3"><a href="playgrounds/state-lab.html"><small>State</small><b>State lab</b><span>A small UI next to the state it's rendered from, with a log of every render.</span></a></li>
+      <li class="a6"><a href="playgrounds/xss-lab.html"><small>Security</small><b>XSS lab</b><span>The same input rendered with innerHTML and with textContent, five payloads, an attacker's log.</span></a></li>
+      <li class="a6"><a href="playgrounds/stored-xss-forum.html"><small>Security</small><b>Guestbook · stored XSS</b><span>A deliberately vulnerable guestbook: messages saved in localStorage, rendered with innerHTML. Post, reload, it runs again.</span></a></li>
+      <li class="a5"><a href="project/starter/index.html"><small>The project</small><b>The market, rendered from data</b><span>Today's starter: everything in one market.js, ready to split.</span></a></li>
+    </ul>
+
+    <h2>Game jam <em>after this lecture</em></h2>
+    <ul class="grid">
+      <li class="a3"><a href="game-jam/index.html"><small>Groups · 45 min + show &amp; tell</small><b>The game jam</b><span>Six small games, each one state object and one render(). Memory, tic-tac-toe, Wordle, Minesweeper, 2048, Snake.</span></a></li>
+    </ul>
+
+    <h2>Homework</h2>
+    <ul class="tasks">
+      <li>The project: finish the split into modules, then add "cheapest first" and "only my saved stalls" (Exercise 5, bottom).</li>
+      <li>Register a stall in your project: a form that adds to the market's list, then <code>update()</code>.</li>
+      <li>The rest of the bug hunt.</li>
+      <li>Exercise 1 cases 6–7; the bonus cases of Exercises 2–4.</li>
+      <li>Submit on Google Classroom: a zip or a repo link.</li>
+    </ul>
+
+    <h2>For the teacher</h2>
+    <div class="tip">
+      <p class="keys">Slides: <kbd>→</kbd> <kbd>←</kbd> move · <kbd>p</kbd> presenter view (notes, next slide, lecture clock) · <kbd>m</kbd> slide menu · <kbd>n</kbd> notes drawer · <kbd>f</kbd> fullscreen · <kbd>t</kbd> clock in footer · <kbd>Esc</kbd> leave an editor.</p>
+      <p>Run it from a local server (e.g. <code>npx live-server</code>) so presenter view, modules and the live previews work. Timings and answers are in <code>run-sheet.md</code>. Exercise 5's reference split: <a href="project/solution/index.html">project/solution</a>. The fixed bug hunt: <a href="project/bug-hunt-solution/index.html">project/bug-hunt-solution</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

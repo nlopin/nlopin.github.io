@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam 5 · 2048</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Game 5 · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · game 5</span>
+    <h1><em>2048</em></h1>
+    <p class="intro">A 4×4 board of numbered tiles. An arrow key slides every tile as far as it goes; two equal tiles that meet merge into their sum. After each move a new 2 (sometimes a 4) appears. Reach 2048. <span class="stars" title="difficulty">★★★</span></p>
+    <p class="story">“One more game. Just one.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> press <kbd>←</kbd>: the tiles slide, equal ones merge, the score grows by the merged values, a new tile appears. Press a key that moves nothing: nothing happens, no new tile. A full board with no merge left: game over.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The sixteen cells as numbers.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The score.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A 4×4 board drawn from state. Each value has its own colour.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The score, and a message for game over and for 2048.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>All four arrow keys work.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A tile merges at most once per move.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A new tile appears only after a move that changed the board.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. The numbers live in <code>state</code>, not in the tiles' text.</p></div>
+
+    <h2>One row <em>must come out like this</em></h2>
+    <p>One row, before and after <kbd>←</kbd>. Check your game against every line.</p>
+    <div class="spec-wrap"><table class="spec">
+      <thead><tr><th>Before</th><th>After <kbd>←</kbd></th><th>Score +</th></tr></thead>
+      <tbody>
+        <tr><td>2 2 2 ·</td><td>4 2 · ·</td><td>4</td></tr>
+        <tr><td>2 2 2 2</td><td>4 4 · ·</td><td>8</td></tr>
+        <tr><td>4 · · 4</td><td>8 · · ·</td><td>8</td></tr>
+        <tr><td>4 4 8 ·</td><td>8 8 · ·</td><td>8</td></tr>
+        <tr><td>· · · 2</td><td>2 · · ·</td><td>0</td></tr>
+        <tr><td>2 4 2 4</td><td>2 4 2 4</td><td>0 · not a move, no new tile</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Every row in the table above, with <kbd>←</kbd>. The same rows mirrored, with <kbd>→</kbd>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>The same as columns, with <kbd>↑</kbd> and <kbd>↓</kbd>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>A full board that still has a merge is <em>not</em> game over.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>The arrow keys don't scroll the page.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Swipe on a phone (pointer events).</li>
+      <li>Keep playing after 2048.</li>
+      <li>Everyone's stretch: undo (the classic 2048 cheat), save, best score.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Can you get one row, one direction right, and test it in the console without any page at all?</p></details>
+      <details><summary>Hint 2</summary><p>Four directions. Do you need four different pieces of code?</p></details>
+      <details><summary>Hint 3</summary><p>"Did anything move?" How do you compare two boards in JavaScript?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>2 2 2 2 becomes 8.</li>
+      <li>A new tile appears after every key press, even when nothing moved. Or never.</li>
+      <li>The page scrolls while you play.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

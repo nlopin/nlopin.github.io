@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data in, page out — Lecture 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="1"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="2"] { --act: #b6ff3b; --act-ink: #b6ff3b; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="4"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="5"] { --act: #a98bff; --act-ink: #a98bff; }
+.slide.wire[data-act-num="6"] { --act: #ff6b5a; --act-ink: #ff6b5a; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="1"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #b6ff3b; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="4"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="5"] h3 { background: #070d1a; color: #a98bff; }
+.deck-menu section[data-act="6"] h3 { background: #070d1a; color: #ff6b5a; }
+.deck-menu section[data-act="B"] h3 { background: var(--blue); color: #fff; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 620px; gap: 50px; height: 100%; align-items: center; }
+.wire-title { font: 700 176px/0.86 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; text-shadow: 0 0 80px rgb(62 230 255 / 0.35); }
+.wire-title em { font-style: normal; color: #3ee6ff; }
+.wire-title .out { color: #b6ff3b; text-shadow: 0 0 80px rgb(182 255 59 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.dp { display: grid; grid-template-rows: auto auto auto; gap: 18px; }
+.dp pre.code { font-size: 19px !important; margin: 0; }
+.dp .arrow { font: 600 26px "IBM Plex Mono", monospace; color: #b6ff3b; text-align: center; text-shadow: 0 0 20px rgb(182 255 59 / 0.6); }
+.mini-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mini-cards div { border: 1.5px solid #1f3052; border-radius: 8px; padding: 12px 14px; background: #0b1426; font: 600 19px/1.15 "Space Grotesk", sans-serif; color: #fff; }
+.mini-cards small { display: block; font: 600 13px "IBM Plex Mono", monospace; color: #5ec8d8; text-transform: uppercase; margin-bottom: 6px; }
+.mini-cards i { display: block; font: 600 15px "IBM Plex Mono", monospace; font-style: normal; color: #b6ff3b; margin-top: 8px; }
+.mini-cards .so { opacity: 0.5; }
+
+/* the formula */
+.formula { font: 600 104px/1 "IBM Plex Mono", monospace; letter-spacing: -0.04em; color: #fff; margin: 20px 0 30px; }
+.formula .f { color: #b6ff3b; } .formula .s { color: #ff4fd8; } .formula .u { color: #3ee6ff; }
+
+/* cycle: event → state → render */
+.cycle { display: grid; grid-template-columns: 1fr 110px 1fr 110px 1fr; align-items: center; margin: 26px 0 10px; }
+.cycle .node { border: 2px solid var(--c); border-radius: 10px; padding: 24px 24px; background: color-mix(in srgb, var(--c) 9%, #060b17); box-shadow: 0 0 40px color-mix(in srgb, var(--c) 22%, transparent); }
+.cycle .node b { display: block; font: 600 20px "IBM Plex Mono", monospace; color: var(--c); letter-spacing: 0.08em; }
+.cycle .node strong { display: block; font: 700 54px/1 "Space Grotesk", sans-serif; letter-spacing: -0.04em; margin: 8px 0 12px; color: #fff; }
+.cycle .node code { font-size: 20px; white-space: nowrap; }
+.cycle .node strong.fn { font: 600 50px/1 "IBM Plex Mono", monospace; letter-spacing: -0.02em; }
+.cycle .w { height: 4px; background: linear-gradient(90deg, var(--a), var(--b)); position: relative; box-shadow: 0 0 14px var(--b); }
+.cycle .w::after { content: ""; position: absolute; right: -2px; top: -9px; border: 11px solid transparent; border-left: 16px solid var(--b); border-right: 0; }
+.n-ev { --c: #ff4fd8; } .n-st { --c: #3ee6ff; } .n-re { --c: #b6ff3b; }
+.w-a { --a: #ff4fd8; --b: #3ee6ff; } .w-b { --a: #3ee6ff; --b: #b6ff3b; }
+.cycle-back { text-align: center; font: 500 22px "IBM Plex Mono", monospace; color: #8599c2; margin-top: 16px; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.75fr repeat(3, 1fr) 0.65fr repeat(3, 1fr) 0.75fr; gap: 10px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 12px; min-height: 330px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 18px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 22px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 25px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 18px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .brk { background: var(--blue); border-color: var(--blue); color: #dfe4ff; --c: #fff; }
+.m1 { --c: #3ee6ff; } .m2 { --c: #b6ff3b; } .m3 { --c: #ff4fd8; } .m4 { --c: #ffb547; } .m5 { --c: #a98bff; } .m6 { --c: #ff6b5a; } .mf { --c: #ffffff; }
+
+/* two code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 32px; margin-bottom: 12px; }
+.vs2 pre.code { font-size: 22px !important; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.dtable.st { font-size: 18px; }
+.dtable.st td, .dtable.st th { padding: 8px 10px; }
+.dtable.st td code { font-size: 17px; }
+.dtable.st td:first-child { white-space: nowrap; font-weight: 600; color: #fff; }
+.slide pre.code.xxs { font-size: 17px !important; padding: 14px 18px; }
+.slide pre.code.mid { font-size: 30px; padding: 22px 34px; line-height: 1.4; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 26px; }
+.dtable td, .dtable th { padding: 11px 16px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 17px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 23px; white-space: nowrap; }
+.dtable td:last-child { color: #cfdcf7; }
+
+/* three questions */
+.q3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.q3 .card { display: flex; flex-direction: column; gap: 12px; }
+.q3 h3 { font: 600 34px "IBM Plex Mono", monospace; color: var(--act) !important; margin: 0; }
+.q3 .shape { display: flex; align-items: center; gap: 8px; font-size: 28px; min-height: 56px; }
+.q3 .shape i { font-style: normal; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 6px; border: 1.5px solid #1f3052; background: #111d36; font-size: 22px; }
+.q3 .shape .to { color: #8599c2; font: 500 22px "IBM Plex Mono", monospace; border: 0; background: none; width: auto; }
+.q3 .shape .dim { opacity: 0.25; }
+.q3 pre.code { font-size: 16px !important; padding: 14px 18px; margin: 0; }
+.q3 p { font-size: 22px; margin: 0; }
+
+/* before / after: where is the truth */
+.truth { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.truth .card h3 { margin-top: 0; }
+.truth ul { margin: 0; }
+.truth li { font-size: 24px !important; }
+.truth .bad { border-color: #ff6b5a !important; }
+.truth .good { border-color: #b6ff3b !important; }
+
+/* DevTools mock */
+.dt { display: grid; grid-template-columns: 210px minmax(0, 1fr) 430px; height: 560px; border: 1.5px solid #1f3052; border-radius: 8px; overflow: hidden; background: #0d1117; font: 500 18px/1.5 "IBM Plex Mono", monospace; color: #c9d1d9; }
+.dt > div { border-right: 1.5px solid #1f3052; padding: 12px 0; position: relative; min-width: 0; }
+.dt > div:last-child { border-right: 0; }
+.dt .hd { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; padding: 0 14px 8px; border-bottom: 1px solid #1f3052; margin-bottom: 8px; }
+.dt .file { padding: 2px 14px; color: #8599c2; }
+.dt .file.on { background: #1f3052; color: #fff; }
+.dt .ln { display: grid; grid-template-columns: 54px 1fr; white-space: pre; }
+.dt .ln span:first-child { text-align: right; padding-right: 12px; color: #4d5b7a; }
+.dt .ln.bp span:first-child { background: #2f6fff; color: #fff; clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%); }
+.dt .ln.paused { background: rgb(255 214 0 / 0.16); box-shadow: inset 3px 0 0 #ffd600; }
+.dt .k { color: #ff7b72; } .dt .s { color: #a5d6ff; } .dt .fn { color: #d2a8ff; } .dt .cm { color: #6e7681; }
+.dt .btns { display: flex; gap: 10px; padding: 0 14px 10px; font-size: 22px; }
+.dt .btns span { display: inline-grid; place-items: center; width: 40px; height: 34px; border: 1px solid #30363d; border-radius: 4px; color: #8ab4ff; }
+.dt .sec { padding: 4px 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; margin-top: 10px; border-top: 1px solid #1f3052; padding-top: 10px; }
+.dt .var { padding: 1px 14px; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dt .var b { color: #d2a8ff; font-weight: 500; }
+.dt .tag { position: absolute; font: 700 16px "IBM Plex Mono", monospace; color: #03101b; background: #ff6b5a; padding: 4px 10px; border-radius: 4px; box-shadow: 0 0 18px rgb(255 107 90 / 0.6); white-space: nowrap; z-index: 2; }
+
+/* module graph */
+.mods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.mods .card { padding: 18px 20px; }
+.mods h3 { font: 600 28px "IBM Plex Mono", monospace !important; color: var(--act) !important; margin: 0 0 6px; }
+.mods p { font-size: 20px; margin: 0 0 10px; }
+.mods pre.code { font-size: 15px !important; padding: 10px 12px; margin: 0; }
+.mods .main { grid-column: 1 / -1; display: flex; gap: 30px; align-items: center; }
+.mods .main pre.code { flex: 1; }
+.imports { font: 500 22px "IBM Plex Mono", monospace; color: #8599c2; text-align: center; margin: 12px 0; }
+
+/* error / message boxes */
+.err { font: 500 24px/1.35 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; padding-top: 170px; }
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; color: #fff !important; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 30px; color: #dfe4ff !important; max-width: 1100px; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+/* exercises */
+.slide.exercise ol > li { font-size: 30px; }
+
+/* reading lists */
+.slide ul.reading li { font-size: 27px; margin-bottom: 14px; }
+.slide ul.reading .muted { font-size: 21px; }
+
+/* components on slides */
+.slide .live-js { font-size: 24px; }
+.slide .live-js[data-layout="wide-code"] { font-size: 21px; }
+.slide .array-lab { font-size: 24px; }
+.habits { gap: 20px; }
+.habits .card { padding: 18px 22px; }
+.habits .card p { font-size: 22px; line-height: 1.35; margin: 0; }
+.slide .array-lab.fill .al-out { flex: 1; min-height: 0; }
+.slide .frame.wireframe { border: 1.5px solid #1f3052; border-radius: 8px; box-shadow: 0 0 0 1px rgb(62 230 255 / 0.1), 0 20px 50px rgb(0 0 0 / 0.5); background: #060b17; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Data in, page out.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 5</p>
+      <h1 class="wire-title">Data <em>in,</em><br>page <span class="out">out.</span></h1>
+      <p class="title-sub">arrays · render · state · storage · modules · the debugger</p>
+    </div>
+    <div class="dp" aria-hidden="true">
+      <script type="text/x-code" data-lang="js">const stalls = [
+  { name: "Dumpling Dynasty", price: 8 },
+  { name: "Side B Records", price: 12 },
+  { name: "Mezcal Moon", soldOut: true },
+];</script>
+      <div class="arrow">↓ render(stalls) ↓</div>
+      <div class="mini-cards"><div><small>food</small>Dumpling Dynasty<i>from €8</i></div><div><small>music</small>Side B Records<i>from €12</i></div><div class="so"><small>drinks</small>Mezcal Moon<i>sold out</i></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Today is all JavaScript, so the whole deck is in the wire look from Lecture 4's second half. The thesis is on the title: the data goes in, the page comes out.</p>
+  </aside>
+</section>
+
+<section data-title="Two bugs from the jam">
+  <p class="kicker">Where we left off · the market jam</p>
+  <h2>Two bugs from the jam, one cause</h2>
+  <div class="split">
+    <div class="card">
+      <h3>Register a stall</h3>
+      <p>The new stall is appended. Click <strong>Food</strong>: it disappears. The filter queried the stalls once, at load; the new element isn't in that static NodeList.</p>
+    </div>
+    <div class="card">
+      <h3>My night + the filter</h3>
+      <p>Save two stalls, show only saved, click <strong>All</strong>: the unsaved ones reappear. Two features write the same <code>hidden</code> attribute and overwrite each other.</p>
+    </div>
+  </div>
+  <p class="step lede">Both times the <strong>DOM</strong> was the only source of truth, and several scripts mutated it independently.</p>
+  <aside class="notes">
+    <p>Ask the groups who hit these: "how did you find out?" Both bugs are the same shape: facts lived in the DOM (which cards exist, which are hidden), and scripts read and wrote them independently. Today's answer: keep the facts somewhere else and <em>draw</em> the page from them. Bug 1 closes at home: "register a stall" is part of the homework, and with today's structure the filter sees the new stall for free.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="UI = render(state)">
+  <p class="kicker">Today's idea</p>
+  <h2>Keep state in data. Render the DOM from it.</h2>
+  <p class="formula"><span class="u">UI</span> = <span class="f">render</span>(<span class="s">state</span>)</p>
+  <div class="cycle">
+    <div class="node n-ev"><b>01 · AN EVENT</b><strong>listen</strong><code>click, input, submit</code></div>
+    <div class="w w-a"></div>
+    <div class="node n-st"><b>02 · UPDATE</b><strong>state</strong><code>state.tag = "food"</code></div>
+    <div class="w w-b"></div>
+    <div class="node n-re"><b>03 · RE-RENDER</b><strong class="fn">render()</strong><code>list.replaceChildren(…)</code></div>
+  </div>
+  <p class="cycle-back">Lecture 4: query · listen · mutate the DOM. Today: listen · update <em class="s">state</em> · re-render.</p>
+  <aside class="notes">
+    <p>This is the spine of the lecture, and of React, Vue, Svelte and every other UI library they'll meet: they're all <code>UI = f(state)</code> with a smarter <code>render</code>. Say it once, don't sell it; the acts will show it.</p>
+  </aside>
+</section>
+
+<section data-title="The day in six acts">
+  <p class="kicker">The plan · 3 hours</p>
+  <h2>Six acts, one market</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Why</strong>the jam bugs<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>Data structures</strong>objects, arrays, map · filter · find<time>0:06</time></div>
+    <div class="m2"><b>02</b><strong>Rendering</strong>template, card(), render()<time>0:32</time></div>
+    <div class="m3"><b>03</b><strong>Single source of truth</strong>state, derived state<time>0:56</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:26</time></div>
+    <div class="m4"><b>04</b><strong>Persistence</strong>JSON, localStorage<time>1:41</time></div>
+    <div class="m5"><b>05</b><strong>ES modules</strong>import, export<time>2:01</time></div>
+    <div class="m6"><b>06</b><strong>Debugging</strong>breakpoints<time>2:29</time></div>
+    <div class="mf"><b>→</b><strong>Next week</strong>fetching data from a server<time>2:52</time></div>
+  </div>
+  <p>Six exercises, one per act. Materials: <a href="https://lopin.me/harbour/programming-interactivity-5-data/index.html" target="_blank" rel="noopener">05-data</a> in the exercises repo: <code>git pull</code> now.</p>
+  <aside class="notes">
+    <p>~0:04. Half of the time is theirs: six exercises, about 80 minutes. Exercise 5 happens in their own copy of the project; tell them to pull and copy the starter during Act 4 at the latest.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · THE MARKET IS DATA
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Data structures" data-at="0:06" data-title="Act 1 — Data structures">
+  <div class="act-deco">[ { } ]</div>
+  <div class="act-num">act 01</div>
+  <h1>The market as data</h1>
+  <div class="act-meta"><span class="chip">0:06 – 0:32</span><span>objects, arrays, higher-order functions</span></div>
+  <div class="act-list"><span>objects</span><span>arrays</span><span>map</span><span>filter</span><span>find</span><span>sort</span><span>spread</span><span>destructuring</span></div>
+</section>
+
+<section data-title="One stall is an object">
+  <p class="kicker">Objects</p>
+  <h2>A card in HTML is an object in JavaScript</h2>
+  <div class="vs2">
+    <div>
+      <h3>Presentation</h3>
+      <script type="text/x-code" data-lang="html" class="xs"><li class="stall" data-tag="food">
+  <article class="vendor-card">
+    <span class="tag">food</span>
+    <h3>Dumpling Dynasty</h3>
+    <small class="price">from €8</small>
+  </article>
+</li></script>
+    </div>
+    <div>
+      <h3>Data</h3>
+      <script type="text/x-code" data-lang="js" class="xs">const stall = {
+  id: "dumplings",
+  name: "Dumpling Dynasty",
+  tag: "food",
+  price: 8,         // a number, not "€8"
+  soldOut: false,   // a boolean
+};
+
+stall.name;        // "Dumpling Dynasty"
+stall.price + 2;   // 10
+stall.soldOut = true;</script>
+    </div>
+  </div>
+  <p>The HTML mixes data with presentation ("from €8"). The object holds only the data, with real types: <code>8</code> is a number, <code>false</code> a boolean.</p>
+  <aside class="notes">
+    <p>Property access: <code>stall.name</code>, or <code>stall["name"]</code> (both work; the bracket form is for keys in a variable: <code>stall[key]</code>). Keys don't need quotes. The trailing commas are allowed and make diffs cleaner.</p>
+    <p>The <code>id</code> matters later: it's the one field that never changes, so it's what we'll save and look things up by.</p>
+  </aside>
+</section>
+
+<section data-title="The market is an array">
+  <p class="kicker">Arrays</p>
+  <h2>The market is an array of objects</h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js" class="xs">const stalls = [
+  { id: "dumplings", name: "Dumpling Dynasty", price: 8 },
+  { id: "side-b", name: "Side B Records", price: 12 },
+  { id: "mezcal", name: "Mezcal Moon", soldOut: true },
+  // … with tag, blurb, …
+];
+
+stalls.length;        // 8
+stalls[0].name;       // "Dumpling Dynasty"
+stalls.at(-1).name;   // the last one
+
+for (const stall of stalls) {
+  console.log(stall.name);
+}</script>
+    <table class="dtable">
+      <tr><th>Concept</th><th>JavaScript</th></tr>
+      <tr><td>literals</td><td><code>[1, 2]</code> <code>{ k: v }</code></td></tr>
+      <tr><td>length</td><td><code>xs.length</code></td></tr>
+      <tr><td>iterate values</td><td><code>for (const x of xs)</code></td></tr>
+      <tr><td>no value</td><td><code>null</code> <code>undefined</code></td></tr>
+      <tr><td>logic</td><td><code>&amp;&amp;</code> <code>||</code> <code>!</code></td></tr>
+      <tr><td>arrow function</td><td><code>(s) =&gt; s.name</code></td></tr>
+      <tr><td>interpolation</td><td><code>`${name}`</code></td></tr>
+    </table>
+  </div>
+  <aside class="notes">
+    <p><code>for…of</code>, not <code>for…in</code> (that one loops over keys: indices as strings, for an array). <code>undefined</code> is "never set", <code>null</code> is "set to nothing"; a missing key gives <code>undefined</code>: <code>stalls[0].soldOut</code> on a stall without the key is <code>undefined</code>. Falsy, so <code>if (stall.soldOut)</code> works, but it is not <code>false</code>: the <code>card()</code> slide in Act 2 has a place where that matters.</p>
+  </aside>
+</section>
+
+<section data-title="Three questions">
+  <p class="kicker">Higher-order array methods</p>
+  <h2>map, filter, find</h2>
+  <div class="q3">
+    <div class="card">
+      <h3>.map</h3>
+      <div class="shape"><i>🥟</i><i>🎵</i><i>🍹</i><span class="to">→</span><i>A</i><i>B</i><i>C</i></div>
+      <p><strong>Transform</strong> each element. A new array, same length.</p>
+      <script type="text/x-code" data-lang="js">stalls.map((s) =>
+  s.name)
+// ["Dumpling Dynasty", …]</script>
+    </div>
+    <div class="card">
+      <h3>.filter</h3>
+      <div class="shape"><i>🥟</i><i>🎵</i><i>🥟</i><span class="to">→</span><i>🥟</i><i>🥟</i><i class="dim">·</i></div>
+      <p><strong>Select</strong> by a predicate. A new array, same length or shorter.</p>
+      <script type="text/x-code" data-lang="js">stalls.filter((s) =>
+  s.tag === "food")
+// [{…}, {…}, {…}]</script>
+    </div>
+    <div class="card">
+      <h3>.find</h3>
+      <div class="shape"><i>🥟</i><i>🎵</i><i>🍹</i><span class="to">→</span><i>🍹</i></div>
+      <p><strong>First</strong> element matching a predicate, or <code>undefined</code>.</p>
+      <script type="text/x-code" data-lang="js">stalls.find((s) =>
+  s.id === "mezcal")
+// { id: "mezcal", … }</script>
+    </div>
+  </div>
+  <p>None of them mutates <code>stalls</code>. They chain: <code>stalls.filter(…).map(…)</code>. Also handy: <code>some</code>, <code>every</code> (true / false), <code>reduce</code> (one value).</p>
+  <aside class="notes">
+    <p>Each takes a function and calls it once per item; you never write the loop. <code>reduce</code> exists; for a sum it's fine, for anything else a <code>for…of</code> loop is often clearer. Don't spend time on it.</p>
+  </aside>
+</section>
+
+<section data-title="Array lab">
+  <p class="kicker">Array lab · type along</p>
+  <h2>Method chaining, one row per intermediate result</h2>
+  <div class="fill array-lab" data-vars="stalls" data-start="stalls.filter((s) =&gt; !s.soldOut).map((s) =&gt; s.name)" data-presets="stalls.find((s) =&gt; s.id === &quot;mezcal&quot;)||stalls.some((s) =&gt; s.price === 0)||stalls.sort((a, b) =&gt; a.price - b.price)||[...stalls].sort((a, b) =&gt; a.price - b.price)">
+    <script type="text/plain" data-role="data">const stalls = [
+  { id: "dumplings", name: "Dumpling Dynasty", tag: "food", price: 8, soldOut: false },
+  { id: "side-b", name: "Side B Records", tag: "music", price: 12, soldOut: false },
+  { id: "salt-ink", name: "Salt & Ink", tag: "crafts", price: 15, soldOut: false },
+  { id: "churros", name: "Churros Till Late", tag: "food", price: 5, soldOut: true },
+  { id: "plant-swap", name: "The Plant Swap", tag: "crafts", price: 0, soldOut: false },
+  { id: "mezcal", name: "Mezcal Moon", tag: "drinks", price: 9, soldOut: true },
+  { id: "taco-bike", name: "Taco Bike", tag: "food", price: 6, soldOut: false },
+  { id: "lemonade", name: "Lantern Lemonade", tag: "drinks", price: 3, soldOut: false },
+];</script>
+  </div>
+  <aside class="notes">
+    <p>~0:13. Run the presets in order; before each, ask the room what comes out (an array? one object? a boolean?). Then the third preset, <code>stalls.sort(…)</code>: the warning row shows that <code>stalls</code> itself changed. That's the next quiz, so don't explain it yet. Playground: <code>playgrounds/array-lab.html</code>.</p>
+    <p>Let them type one of their own: "the names of the open food stalls, cheapest first".</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="sort quiz">
+  <p class="kicker">Quick check · sort</p>
+  <h2>What does this print?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="js" class="mid">const prices = [10, 9, 100, 1];
+const sorted = prices.sort();
+
+console.log(sorted);
+console.log(prices);</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>[1, 10, 100, 9]</code>, twice. Without a compare function, <code>sort</code> compares items <strong>as text</strong>: "10" comes before "9".</div>
+      <div class="reveal-box step">And <code>prices</code> changed too: <code>sort</code> sorts <strong>in place</strong> and returns the same array.</div>
+      <div class="reveal-box step"><code>[...prices].sort((a, b) =&gt; a - b)</code>: copy, then compare as numbers. Or <code>prices.toSorted((a, b) =&gt; a - b)</code>.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Predict first. The in-place part is the one that bites in a UI: sort the stalls for one view and every other view is sorted too. <code>reverse</code>, <code>push</code>, <code>splice</code> also change the array; <code>map</code>, <code>filter</code>, <code>slice</code>, <code>toSorted</code> don't.</p>
+  </aside>
+</section>
+
+<section data-title="JavaScript gotchas">
+  <p class="kicker">Coming from other languages</p>
+  <h2>Six things that work differently in JavaScript</h2>
+  <div class="grid-3 habits">
+    <div class="card"><span class="label">1 · truthiness</span><p><code>[]</code> and <code>{}</code> are <strong>truthy</strong>. Falsy: <code>false 0 "" null undefined NaN</code>. Check emptiness with <code>list.length === 0</code>.</p></div>
+    <div class="card"><span class="label">2 · equality</span><p>Always <code>===</code> (<code>"2" == 2</code> is <code>true</code>). Objects and arrays compare by identity: <code>[1] === [1]</code> is <code>false</code>. A single <code>=</code> assigns.</p></div>
+    <div class="card"><span class="label">3 · const</span><p><code>const</code> prevents <em>reassigning the binding</em>, not mutating the object: <code>state.tag = "food"</code> is fine. <code>let</code> for reassignment. No <code>var</code>.</p></div>
+    <div class="card"><span class="label">4 · strings from forms</span><p><code>"14" + 2</code> is <code>"142"</code>. Every form value and every <code>dataset</code> value is a string: <code>Number(input.value)</code>.</p></div>
+    <div class="card"><span class="label">5 · ?. and ??</span><p><code>stall?.name</code>: <code>undefined</code> instead of an error when <code>stall</code> is missing. <code>x ?? "all"</code>: the default only for <code>null</code> / <code>undefined</code>.</p></div>
+    <div class="card"><span class="label">6 · returning an object</span><p><code>(s) =&gt; { name: s.name }</code> returns <code>undefined</code> (braces are a body). Wrap it: <code>(s) =&gt; ({ name: s.name })</code>.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:18. About four minutes: one console demo per card is worth it (<code>[] ? "yes" : "no"</code>, <code>"14" + 2</code>, <code>[1] === [1]</code>). Every card is a bug they would otherwise meet this week. 2 and 4 are in the bug hunt at the end of the day. On 1: languages where an empty collection is falsy (Python, PHP) make <code>if (!items)</code> look right; in JavaScript it's <code>if (items.length === 0)</code>. On 3: <code>Object.freeze</code> exists if someone asks; we don't need it.</p>
+  </aside>
+</section>
+
+<section data-title="Copy, don't change">
+  <p class="kicker">Spread · destructuring · template literals</p>
+  <h2>Don't mutate your inputs</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">// copies
+const copy = [...stalls];
+const cheaper = { ...stall, price: 6 };
+// stall itself is unchanged
+
+// destructuring: pull fields out by name
+const { name, price } = stall;
+const [first, second] = stalls;
+
+// template literals: values inside a string
+`${name} · from €${price}`
+
+// one function, data in, data out
+function label({ name, tag, price }) {
+  return `${name} · ${tag} · €${price}`;
+}</script>
+    <div class="stack">
+      <div class="card"><h3>Pure functions</h3><p>A function that reads its arguments and returns a new value, with no side effects, is easy to test and reuse. <code>card(stall)</code> is one. Application state is still mutated, deliberately, in one place: Act 3.</p></div>
+      <div class="card"><h3>Shallow copies</h3><p><code>[...stalls]</code> copies the array, not the objects in it: change <code>copy[0].price</code> and <code>stalls[0].price</code> changes too. A deep copy: <code>structuredClone(stalls)</code>.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:20. Don't go deep on immutability; the rule of thumb is enough: don't change data you were given, return new data. The shallow-copy note is for the curious; <code>structuredClone</code> exists if someone asks.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Stock-take">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 1 · solo · 8 min</p>
+  <div class="ex-head"><h2>Stock-take</h2><button class="timer" data-min="8"></button></div>
+  <ol>
+    <li><code>names(list)</code>: every name, in order.</li>
+    <li><code>byTag(list, tag)</code>: only that tag.</li>
+    <li><code>findStall(list, id)</code>: one stall, or <code>undefined</code>.</li>
+    <li><code>openCount(list)</code>: how many aren't sold out.</li>
+    <li><code>cheapestFirst(list)</code>: a sorted copy, input not mutated.</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/01-stock-take.html" target="_blank" rel="noopener">Exercise 1 · Stock-take</a></b>. The checks also call your function with a second dataset.</p>
+  <aside class="notes">
+    <p>~0:23 → 0:32. Cases 6–7 (a label with a template literal, unique tags with a Set) are homework. Debrief (1 min): case 5, who mutated <code>stalls</code>? The check "the list you pass in keeps its own order" catches it.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · DATA IN, PAGE OUT
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Rendering" data-at="0:32" data-title="Act 2 — Rendering">
+  <div class="act-deco">render()</div>
+  <div class="act-num">act 02</div>
+  <h1>Rendering</h1>
+  <div class="act-meta"><span class="chip">0:32 – 0:56</span><span>building DOM from an array</span></div>
+  <div class="act-list"><span>&lt;template&gt;</span><span>cloneNode</span><span>card()</span><span>render()</span><span>replaceChildren</span></div>
+</section>
+
+<section data-title="The template element">
+  <p class="kicker">&lt;template&gt;</p>
+  <h2>The markup stays in HTML</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="html" class="xs"><ul class="vendor-list"></ul>
+
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+    <div class="stack">
+      <div class="card"><p>A <code>&lt;template&gt;</code> is parsed but <strong>not rendered</strong>. Its content is a separate <code>DocumentFragment</code>: <code>document.querySelector("h3")</code> won't match inside it.</p></div>
+      <script type="text/x-code" data-lang="js" class="xs">const template =
+  document.querySelector("#stall-template");
+
+// a fresh copy of the <li>, all inside
+const li = template.content
+  .firstElementChild.cloneNode(true);</script>
+      <div class="card"><p>HTML owns the structure and the classes the CSS expects; JavaScript only sets the content.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Lecture 4 built a ticket with six <code>createElement</code> calls. For a card with five parts that's 20 lines and the markup is invisible in the HTML. A template keeps the designer's HTML where a designer looks for it. <code>cloneNode(true)</code>: true = deep, with all descendants.</p>
+  </aside>
+</section>
+
+<section data-title="card(stall)">
+  <p class="kicker">A record → a DOM element</p>
+  <h2><code>card(stall)</code> maps data to an element</h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js" class="xs">function card(stall) {
+  const li = template.content
+    .firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+
+  const soldOut = Boolean(stall.soldOut);
+  const article = li.querySelector(".vendor-card");
+  article.classList.toggle("sold-out", soldOut);
+  li.querySelector(".badge").hidden = !soldOut;
+  return li;
+}</script>
+    <div class="stack">
+      <div class="reveal-box"><code>textContent</code> for every value: a stall named <code>&lt;img onerror=…&gt;</code> stays text (Lecture 4, <a href="playgrounds/xss-lab.html" target="_blank" rel="noopener">XSS lab</a>).</div>
+      <div class="reveal-box"><code>classList.toggle(name, force)</code>: adds when true, removes when false. <code>undefined</code> means no <code>force</code>, so it <em>toggles</em>: a missing <code>soldOut</code> key adds the class. Hence <code>Boolean(…)</code>.</div>
+      <div class="reveal-box"><code>data-id</code>: maps an element back to its record.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>It's a pure-ish function: same stall in, same element out, nothing else touched. You can call it in the console: <code>card(stalls[0])</code> and see the element.</p>
+  </aside>
+</section>
+
+<section data-title="render(list)">
+  <p class="kicker">The whole list</p>
+  <h2><code>render()</code>: replace all children with new elements</h2>
+  <script type="text/x-code" data-lang="js" class="mid">function render(list) {
+  vendorList.replaceChildren(...list.map(card));
+}
+
+render(stalls);</script>
+  <div class="grid-3 mt">
+    <div class="card step"><span class="label">1 · list.map(card)</span><p>An array of 8 new <code>&lt;li&gt;</code> elements, not yet in the document.</p></div>
+    <div class="card step"><span class="label">2 · …spread</span><p><code>replaceChildren(a, b, c)</code> takes separate arguments: spread the array.</p></div>
+    <div class="card step"><span class="label">3 · replaceChildren</span><p>Removes all existing children, appends the new ones. Idempotent: call it twice, still 8 cards.</p></div>
+  </div>
+  <aside class="notes">
+    <p>"Isn't throwing everything away slow?" For 8, 80, 800 cards: no, the browser does this in a millisecond. For 80 000 you'd draw only what's visible, or use a library that compares old and new and only touches what changed. That's what React's "virtual DOM" is: the same idea, smarter. One honest cost: redrawing loses focus and scroll inside the list (mention, don't solve).</p>
+    <p>Someone will suggest <code>list.innerHTML = stalls.map((s) =&gt; `&lt;li&gt;${s.name}&lt;/li&gt;`).join("")</code>. Fine for data you typed yourself; for anything a visitor or a server sends, it's XSS (Lecture 4), and without <code>.join("")</code> the array becomes text with commas between the cards. Templates + <code>textContent</code> are safe by default. Demo: <code>playgrounds/xss-lab.html</code> (2 minutes: presets 2 and 5 on the left leak the session token to the attacker's log; the right side doesn't; preset 3 shows why filtering <code>&lt;script&gt;</code> isn't a defence).</p>
+  </aside>
+</section>
+
+<section data-title="Live: the page follows the data">
+  <p class="kicker">Live · change the data, not the DOM</p>
+  <h2>Change the data, re-render</h2>
+  <div class="fill live-js" data-market data-show-html data-layout="wide-code" style="font-size:18px">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"></ul>
+<template id="stall-template"><li class="stall"><article class="vendor-card"><span class="tag"></span><h3></h3><strong class="badge" hidden>Sold out</strong></article></li></template></script>
+    <script type="text/plain" data-role="css">[hidden]{display:none !important}</script>
+    <textarea>
+const stalls = [
+  { id: "dumplings", name: "Dumpling Dynasty", tag: "food" },
+  { id: "side-b", name: "Side B Records", tag: "music" },
+  { id: "mezcal", name: "Mezcal Moon", tag: "drinks", soldOut: true },
+];
+
+const template = document.querySelector("#stall-template");
+const vendorList = document.querySelector(".vendor-list");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  const sold = Boolean(stall.soldOut);
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".vendor-card").classList.toggle("sold-out", sold);
+  li.querySelector(".badge").hidden = !sold;
+  return li;
+}
+
+function render(list) {
+  vendorList.replaceChildren(...list.map(card));
+}
+
+render(stalls);
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>Live-code: add <code>{ id: "taco-bike", name: "Taco Bike", tag: "food" }</code>; mark Side B sold out; then <code>render(stalls.filter((s) =&gt; s.tag === "food"))</code>. Three changes to the data, zero to the HTML. That last one is the preview of Act 3: filtering is just a different list going into the same render.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Render the market">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 2 · solo · 12 min</p>
+  <div class="ex-head"><h2>Render the market</h2><button class="timer" data-min="12"></button></div>
+  <ol>
+    <li><code>card(stall)</code> from the template: tag, name, blurb, <code>data-id</code>.</li>
+    <li><code>render(list)</code>: replace the children, and "8 stalls" / "1 stall".</li>
+    <li>Sold out: a class and a badge. A price: "from €8", or "free".</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/02-render.html" target="_blank" rel="noopener">Exercise 2 · Render the market</a></b>. Bonus at home: grouped by tag.</p>
+  <aside class="notes">
+    <p>~0:42 → 0:56. Watch for <code>innerHTML</code> in case 1: the check "their words stay text" fails on purpose. Debrief: show case 2's solution, the one-liner.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · ONE SOURCE OF TRUTH
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Single source of truth" data-at="0:56" data-title="Act 3 — Single source of truth">
+  <div class="act-deco">state</div>
+  <div class="act-num">act 03</div>
+  <h1>Single source of truth</h1>
+  <div class="act-meta"><span class="chip">0:56 – 1:26</span><span>UI state</span></div>
+  <div class="act-list"><span>the state object</span><span>derived state</span><span>event → state → render</span><span>controlled inputs</span><span>event delegation</span></div>
+</section>
+
+<section data-title="Where is the truth?">
+  <p class="kicker">The jam, revisited</p>
+  <h2>Where does the UI state live?</h2>
+  <div class="truth">
+    <div class="card bad">
+      <h3>Lecture 4: in the DOM</h3>
+      <ul>
+        <li>The filter: in <code>aria-pressed</code> on five buttons.</li>
+        <li>Shown or not: in <code>hidden</code> on every card, written by two features.</li>
+        <li>Saved: in the ♡'s text.</li>
+        <li>Reads query the DOM; writes patch it in place.</li>
+      </ul>
+    </div>
+    <div class="card good step">
+      <h3>Today: in one object</h3>
+      <ul>
+        <li><code>const state = { tag, query, saved }</code></li>
+        <li>Events write to <code>state</code>. Only <code>state</code>.</li>
+        <li><code>render()</code> reads <code>state</code> and renders everything: cards, pressed buttons, counts.</li>
+        <li>The DOM can't get out of sync: it's re-rendered from a single source of truth.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The left column isn't wrong for one feature; it's the jam's approach and it worked. It breaks at two features that touch the same elements. The right column is the "source of truth" idea: one place where each fact lives.</p>
+  </aside>
+</section>
+
+<section data-title="The state object">
+  <p class="kicker">State</p>
+  <h2>Minimal state: what can change, not what can be derived</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">const state = {
+  tag: "all",       // which filter is pressed
+  query: "",        // what's typed in the search box
+  saved: new Set(), // ids of the ♥ stalls
+};
+// a Set: each value once · add, delete, has, size
+
+// derived: computed from state, never stored
+function visibleStalls() {
+  const q = state.query.toLowerCase();
+  return stalls
+    .filter((s) => state.tag === "all"
+                   || s.tag === state.tag)
+    .filter((s) => s.name.toLowerCase().includes(q));
+}</script>
+    <div class="stack">
+      <div class="card"><h3>In the state</h3><p>User input: a tag, a query, a set of ids.</p></div>
+      <div class="card step"><h3>Derived state</h3><p>The visible stalls, the counts: computed on every render. A stored copy goes stale.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The test for "should this be in state?": could I compute it from what's already there? If yes, compute it. <code>saved</code> stores ids, not elements and not names: elements are thrown away on every render, names can change.</p>
+  </aside>
+</section>
+
+<section data-title="The loop, upgraded">
+  <p class="kicker">Event → state → render</p>
+  <h2>Events change the state, then render</h2>
+  <script type="text/x-code" data-lang="js" class="xs">filters.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  state.tag = button.dataset.filter;   // 1 · change the state
+  render();                            // 2 · redraw from it
+});
+
+function render() {
+  vendorList.replaceChildren(...visibleStalls().map(card));
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  }
+}</script>
+  <p class="step">From here <code>render()</code> takes no argument: it reads <code>state</code> itself. Add search: one key in the state, one <code>filter</code> line, one listener. No conflicting writes to the DOM.</p>
+  <aside class="notes">
+    <p>Compare with Lecture 4's filter: there the click handler set <code>aria-pressed</code> and <code>hidden</code> itself. Here the handler is two lines and <code>render</code> draws the buttons too, so they can never show a filter that isn't the current one.</p>
+  </aside>
+</section>
+
+<section data-title="render() draws the controls too">
+  <p class="kicker">Controlled inputs</p>
+  <h2><code>render()</code> sets form controls too</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">function render() {
+  const cards = visibleStalls().map(card);
+  vendorList.replaceChildren(...cards);
+
+  // buttons, boxes, checkboxes: from state, every time
+  for (const b of filters.querySelectorAll("button")) {
+    const on = b.dataset.filter === state.tag;
+    b.setAttribute("aria-pressed", String(on));
+  }
+  if (search.value !== state.query) {
+    search.value = state.query;
+  }
+}</script>
+    <div class="stack">
+      <div class="card"><p>While the user types, the input's value and the state agree. They diverge when state changes another way: a "Clear" button, state loaded from storage.</p></div>
+      <div class="card step"><p>So <code>render()</code> sets every control from state, like the cards. The <code>if</code>: setting the value of a focused input can move the caret.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>This is the slide that keeps the promise of slide 21 ("the page can't disagree with itself"). Same for checkboxes: <code>checkbox.checked = state.onlySaved</code> once there is one (Exercise 3's bonus, the homework). Exercise 4's bonus (Clear my night) fails its check without it.</p>
+  </aside>
+</section>
+
+<section data-title="State lab">
+  <p class="kicker">State lab · interact · watch the state panel</p>
+  <h2>The DOM as a function of state</h2>
+  <div class="fill frame wireframe"><iframe data-src="playgrounds/state-lab.html?embed" title="State lab"></iframe></div>
+  <aside class="notes">
+    <p>~1:05. Click Food, type "ta", save a stall, click All. Point at three things: the state key that lights up, the render counter, and the log line "event → change → render". Then: "type lemon: five renders, one per key. Problem?" No, for 8 cards. Playground: <code>playgrounds/state-lab.html</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Dead listeners quiz">
+  <p class="kicker">Quick check · after a render</p>
+  <h2>The first click on a ♡ works. The second does nothing. Why?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="js" class="xs">render();
+
+const buttons = document.querySelectorAll(".save");
+for (const button of buttons) {
+  button.addEventListener("click", () => {
+    const id = button.closest(".stall").dataset.id;
+    state.saved.add(id);
+    render();
+  });
+}</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>render()</code> replaced the elements the listeners were attached to. The new buttons have no listeners.</div>
+      <div class="reveal-box step">One listener on <code>.vendor-list</code>, which is never redrawn, and <code>event.target.closest(".save")</code>: event delegation, Lecture 4. It handles elements created after the listener was attached.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Same root cause as the jam's "filter can't see the new stall": a list of elements taken once, then the page changed. With render-from-state, delegation isn't an optimisation any more; it's the only thing that works.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3 — Single source of truth">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 3 · solo · 14 min</p>
+  <div class="ex-head"><h2>Single source of truth</h2><button class="timer" data-min="14"></button></div>
+  <ol>
+    <li>The filter: a click sets <code>state.tag</code>, <code>render()</code> does the rest.</li>
+    <li>Search: <code>state.query</code>, combined with the filter, and "3 of 8 stalls".</li>
+    <li>♡: ids in <code>state.saved</code>, one listener on the list, still saved after a filter.</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/03-one-source-of-truth.html" target="_blank" rel="noopener">Exercise 3 · Single source of truth</a></b>. Bonus: "only my saved stalls".</p>
+  <aside class="notes">
+    <p>~1:10 → 1:26. The cards are drawn by a given <code>drawCards(list, saved)</code> so they can focus on the state. Debrief on case 3: who put a listener on each ♡? The third check ("still saved after Music → All") catches that.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:26" data-title="Break">
+  <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break. <em>15 min.</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: persistence, ES modules, debugging. Before you leave: copy <code>project/starter/</code> and <code>project/bug-hunt/</code> out of the repo and serve both (<code>npx live-server</code>). Both open in a browser? Then go.</p>
+  <aside class="notes">
+    <p>Start the timer. Walk around in the last minutes: everyone should have the starter copied out of the repo and running on a local server before Act 5.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · REMEMBER
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="Persistence" data-at="1:41" data-title="Act 4 — Persistence">
+  <div class="act-deco">JSON</div>
+  <div class="act-num">act 04</div>
+  <h1>Persistence</h1>
+  <div class="act-meta"><span class="chip">1:41 – 2:01</span><span>state across reloads</span></div>
+  <div class="act-list"><span>storage options</span><span>localStorage</span><span>JSON</span><span>serialisation</span><span>defaults</span></div>
+</section>
+
+<section data-title="Where to persist state">
+  <p class="kicker">Client-side storage</p>
+  <h2>Where a web app can persist state</h2>
+  <table class="dtable st">
+    <tr><th>Storage</th><th>Lifetime · scope</th><th>Size · API</th><th>Good for</th><th>Watch out</th></tr>
+    <tr><td><code>localStorage</code></td><td>until cleared · per origin</td><td>~5 MB · sync, strings</td><td>preferences, small UI state</td><td>blocks the main thread; readable by any script (XSS)</td></tr>
+    <tr><td><code>sessionStorage</code></td><td>until the tab closes · per tab</td><td>~5 MB · same API</td><td>per-tab drafts, multi-step forms</td><td>a new tab starts empty</td></tr>
+    <tr><td>cookies</td><td>an expiry date · per domain/path</td><td>~4 KB · <code>document.cookie</code></td><td>server sessions (<code>HttpOnly</code>, <code>Secure</code>)</td><td>sent with every request; awkward API</td></tr>
+    <tr><td>IndexedDB</td><td>until cleared · per origin</td><td>quota, often GBs · async, objects, indexes</td><td>offline data, large datasets, files</td><td>verbose API (use a wrapper like <code>idb</code>)</td></tr>
+    <tr><td>Cache API</td><td>until cleared · per origin</td><td>quota · async, Request → Response</td><td>offline assets with a service worker</td><td>for HTTP responses, not app state</td></tr>
+    <tr><td>the URL</td><td>the link · shareable</td><td>~2 KB in practice · <code>URLSearchParams</code></td><td>filters, search, a selected item</td><td>public, visible, in the history</td></tr>
+    <tr><td>a server</td><td>yours to decide · across devices and users</td><td>unlimited · <code>fetch</code></td><td>anything shared or important</td><td>network, auth, a backend: next week</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~1:43. Today's choice is <code>localStorage</code>: the filter and the saved ids are small, per user, per device, and losing them costs nothing. A reasonable alternative for the filter is the URL (<code>?tag=food</code>): shareable and the back button works; mention it as a homework idea. All browser storage can be cleared by the user, and Safari may evict script-writable storage after 7 days without a visit. Private windows start empty. Never store secrets where JavaScript can read them; that's what <code>HttpOnly</code> cookies are for.</p>
+  </aside>
+</section>
+
+<section data-title="localStorage">
+  <p class="kicker">localStorage</p>
+  <h2>A per-origin key-value store</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">localStorage.setItem("my-night", "hello");
+localStorage.getItem("my-night");   // "hello"
+localStorage.getItem("nothing");    // null
+localStorage.removeItem("my-night");
+
+localStorage.setItem("n", 3);
+localStorage.getItem("n");          // "3", a string</script>
+    <div class="stack">
+      <div class="card"><p><strong>Synchronous</strong>: every call blocks until done. Fine for a few keys, wrong for megabytes.</p></div>
+      <div class="card"><p><strong>Strings only.</strong> Other values are coerced with <code>String()</code>.</p></div>
+      <div class="card"><p><strong>Not</strong> for passwords or tokens (any script on the page can read it), and not shared between devices. DevTools → Application → Local storage shows and edits it.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Show it live in DevTools on any site you trust, Application tab. <code>sessionStorage</code> has the identical API.</p>
+  </aside>
+</section>
+
+<section data-title="JSON">
+  <p class="kicker">JSON · JavaScript Object Notation</p>
+  <h2>JSON: a language-independent text format</h2>
+  <div class="split" style="align-items:start">
+    <script type="text/x-code" data-lang="js">{
+  "id": "mezcal",
+  "name": "Mezcal Moon",
+  "price": 9,
+  "soldOut": true,
+  "tags": ["drinks", "late"],
+  "zone": null
+}</script>
+    <div class="stack">
+      <div class="card"><p><strong>Six types:</strong> object, array, string, number, boolean, <code>null</code>.</p></div>
+      <div class="card"><p><strong>Stricter than a JS literal:</strong> keys and strings in double quotes, no trailing commas, no comments. No <code>undefined</code>, functions, <code>Date</code>, <code>Set</code>, <code>NaN</code>.</p></div>
+      <div class="card"><p><strong>Everywhere:</strong> web APIs (next week), config files (<code>package.json</code>), storage. Every language has a parser.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Most of them have used JSON; this slide is a one-minute reference for the differences from a JavaScript object literal. <code>JSON.stringify(value, null, 2)</code> pretty-prints. Dates become strings and don't come back as dates; <code>undefined</code> properties are dropped; <code>NaN</code> becomes <code>null</code>.</p>
+  </aside>
+</section>
+
+<section data-title="JSON in, JSON out">
+  <p class="kicker">JSON</p>
+  <h2>Serialising state: <code>stringify</code> and <code>parse</code></h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="xs">const choices = { tag: "food", saved: ["mezcal"] };
+const text = JSON.stringify(choices);
+// JSON: "quoted" keys, no trailing commas
+// '{"tag":"food","saved":["mezcal"]}'
+
+JSON.parse(text).saved[0];   // "mezcal"
+
+// the trap
+JSON.stringify({ saved: new Set(["mezcal"]) });</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>'{"saved":{}}'</code>. A <code>Set</code> serialises to an empty object, silently.</div>
+      <div class="reveal-box step">In: <code>[...state.saved]</code>, an array. Out: <code>new Set(data.saved)</code>.</div>
+      <div class="reveal-box step"><code>JSON.parse</code> throws on broken text, and <code>getItem</code> gives <code>null</code> on a first visit. Plan for both.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Predict the last line before revealing. Dates, Maps, functions and <code>undefined</code> don't survive JSON either; arrays, plain objects, strings, numbers, booleans and null do. The bug hunt at the end of the day has its own storage bug.</p>
+  </aside>
+</section>
+
+<section data-title="save() and load()">
+  <p class="kicker">The whole pattern</p>
+  <h2>Save on every update, load before the first render</h2>
+  <div class="vs2">
+    <script type="text/x-code" data-lang="js" class="xxs">const KEY = "my-night";
+
+function save() {
+  const data = { tag: state.tag, saved: [...state.saved] };
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data) return;                 // first visit
+    // ?? : if null or undefined, use this instead
+    state.tag = data.tag ?? "all";
+    state.saved = new Set(data.saved ?? []);
+  } catch {
+    // broken JSON: keep the defaults
+  }
+}</script>
+    <div class="stack">
+      <script type="text/x-code" data-lang="js" class="xs">function update() {
+  render();
+  save();
+}
+
+// every event: change state, then update()
+load();
+render();</script>
+      <div class="card"><p><strong>Persist user choices</strong>, not derived state. The search query is excluded on purpose: it's transient.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Everything from storage is untrusted: it may be missing, from an older version of your code, or edited by hand in DevTools. Exercise 4's checks do all three, by reloading the preview.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 4 — Remember my night">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 4 · solo · 8 min</p>
+  <div class="ex-head"><h2>Remember my night</h2><button class="timer" data-min="8"></button></div>
+  <ol>
+    <li><code>save()</code>: the filter and the saved ids, as JSON, under <code>"my-night"</code>.</li>
+    <li><code>load()</code>: back into state, before the first render.</li>
+    <li>Then test invalid data: edit the stored value in DevTools into invalid JSON, press ▶ run.</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/04-remember.html" target="_blank" rel="noopener">Exercise 4 · Remember my night</a></b>. The checks reload the preview three times. Your code survives a page reload.</p>
+  <aside class="notes">
+    <p>~1:51 → 2:01. The usual miss: <code>saved: state.saved</code> without the spread, which stores <code>{}</code>. Second: calling <code>load()</code> after <code>render()</code>.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 5 · SPLIT IT UP
+     ===================================================================== -->
+
+<section class="act" data-act="5" data-act-name="ES modules" data-at="2:01" data-title="Act 5 — ES modules">
+  <div class="act-deco">import</div>
+  <div class="act-num">act 05</div>
+  <h1>ES modules</h1>
+  <div class="act-meta"><span class="chip">2:01 – 2:29</span><span>separation of concerns</span></div>
+  <div class="act-list"><span>export</span><span>import</span><span>type="module"</span><span>module scope</span></div>
+</section>
+
+<section data-title="Everything is global">
+  <p class="kicker">One file, everything global</p>
+  <h2>Remember this from the jam?</h2>
+  <div class="err">Uncaught SyntaxError: Identifier 'stalls' has already been declared (at feature.js:1)</div>
+  <div class="split mt">
+    <div class="card"><p>Every classic <code>&lt;script&gt;</code> on a page shares <strong>one global scope</strong>. Two files that both say <code>const stalls</code> collide, and the second file doesn't run at all.</p></div>
+    <div class="card step"><p>Today's <code>market.js</code> is 200 lines: data, state, storage, rendering, events, the menu, the form, all in the global scope. Every new feature risks a name collision.</p></div>
+  </div>
+  <aside class="notes">
+    <p>Open the starter's <code>market.js</code> on the projector and scroll: the numbered sections are already the seams. Type <code>stalls</code> into the console: it answers, because it's global.</p>
+  </aside>
+</section>
+
+<section data-title="A module">
+  <p class="kicker">Modules</p>
+  <h2>A module is a file with its own scope</h2>
+  <div class="vs2">
+    <div class="stack">
+      <script type="text/x-code" data-lang="js" class="xs">// js/data.js
+export const stalls = [ … ];</script>
+      <script type="text/x-code" data-lang="js" class="xs">// js/state.js
+import { stalls } from "./data.js";
+
+export const state = {
+  tag: "all", query: "", saved: new Set(),
+};
+
+export function visibleStalls() {
+  return stalls.filter( … );
+}</script>
+    </div>
+    <div class="stack">
+      <script type="text/x-code" data-lang="html" class="xs"><!-- index.html: only the entry point -->
+<script type="module" src="js/main.js"><\/script></script>
+      <script type="text/x-code" data-lang="js" class="xs">// js/main.js
+import { state, visibleStalls } from "./state.js";
+
+console.log(visibleStalls().length);   // 8</script>
+      <div class="card"><p>Top-level bindings are private unless <code>export</code>ed; dependencies are explicit <code>import</code>s. The browser resolves the import graph and fetches each module.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Like imports in most languages, except the specifier is a URL: relative, with the extension.</p>
+  </aside>
+</section>
+
+<section data-title="Module rules">
+  <p class="kicker">The fine print</p>
+  <h2>Four rules for modules in the browser</h2>
+  <div class="grid-3" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+    <div class="card"><span class="label">1 · paths</span><p><code>"./data.js"</code>: relative, starting with <code>./</code>, with the <code>.js</code>. <code>"data"</code> is a 404.</p></div>
+    <div class="card"><span class="label">2 · a server</span><p><code>file://</code> gives a CORS error. Modules need <code>http://</code>: <code>npx live-server</code>.</p></div>
+    <div class="card"><span class="label">3 · deferred</span><p>Module scripts are deferred by default: they run after the document is parsed.</p></div>
+    <div class="card"><span class="label">4 · read-only imports</span><p><code>state = {}</code> in another file fails: "Assignment to constant variable". Change its keys: <code>state.tag = "food"</code>.</p></div>
+  </div>
+  <aside class="notes">
+    <p>Also: modules run in strict mode (a typo'd assignment to an undeclared name throws instead of creating a global), and each module runs once, however many files import it. So <code>state</code> is the same object everywhere it's imported: that's what makes the shared state work.</p>
+  </aside>
+</section>
+
+<section data-title="One job per file">
+  <p class="kicker">Separation of concerns</p>
+  <h2>One responsibility per module, dependencies in one direction</h2>
+  <div class="mods">
+    <div class="card"><h3>data.js</h3><p>The data.</p><script type="text/x-code" data-lang="js">export const stalls</script></div>
+    <div class="card"><h3>state.js</h3><p>State and derived state.</p><script type="text/x-code" data-lang="js">export const state
+export visibleStalls()</script></div>
+    <div class="card"><h3>storage.js</h3><p>Persistence.</p><script type="text/x-code" data-lang="js">export save()
+export load()</script></div>
+    <div class="card"><h3>render.js</h3><p>Rendering.</p><script type="text/x-code" data-lang="js">export render()</script></div>
+    <div class="card main"><h3>main.js</h3><p style="max-width:560px">The entry point. Attaches the event listeners: each handler updates state, then calls <code>update()</code>.</p><script type="text/x-code" data-lang="js">import { state } from "./state.js";
+import { save, load } from "./storage.js";
+import { render } from "./render.js";</script></div>
+  </div>
+  <p class="imports">main → render, storage, state · render → state, data · storage → state · state → data</p>
+  <aside class="notes">
+    <p>The direction matters more than the number of files: data knows nothing, state knows data, render knows state, main knows everyone. If <code>render.js</code> ever needs to import <code>main.js</code>, something is in the wrong file. Next week mostly touches <code>data.js</code> and the start-up in <code>main.js</code>.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 5 — Split into modules">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 5 · in your own copy of the project · 18 min</p>
+  <div class="ex-head"><h2>Split into modules</h2><button class="timer" data-min="18"></button></div>
+  <ol>
+    <li><code>js/market.js</code> → <code>data.js</code>, <code>state.js</code>, <code>storage.js</code>, <code>render.js</code>, <code>main.js</code>.</li>
+    <li><code>&lt;script type="module" src="js/main.js"&gt;</code>, delete <code>market.js</code>.</li>
+    <li>Done: same behaviour, and <code>stalls</code> in the console throws a ReferenceError.</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/05-split-it-up.html" target="_blank" rel="noopener">Exercise 5 · Split into modules</a></b>: the steps and every error message you'll see.</p>
+  <aside class="notes">
+    <p>~2:09 → 2:29 (18 + a 2-minute debrief: show <code>main.js</code> from the solution). Most time goes to errors, which is the point: the exercise page has a table of the six messages. Walk around with it. The reference split is <code>project/solution/</code> (teacher only, not in the student repo).</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 6 · FIND THE BUG
+     ===================================================================== -->
+
+<section class="act" data-act="6" data-act-name="Debugging" data-at="2:29" data-title="Act 6 — Debugging">
+  <div class="act-deco">debugger;</div>
+  <div class="act-num">act 06</div>
+  <h1>Debugging</h1>
+  <div class="act-meta"><span class="chip">2:29 – 2:52</span><span>state and rendering separated: a bug is in one of two places</span></div>
+  <div class="act-list"><span>breakpoints</span><span>step</span><span>scope</span><span>event listener breakpoints</span><span>pause on caught exceptions</span></div>
+</section>
+
+<section data-title="The pause button">
+  <p class="kicker">Beyond console.log</p>
+  <h2>Pause execution, inspect scope and the call stack</h2>
+  <div class="dt" aria-hidden="true">
+    <div>
+      <div class="hd">Page</div>
+      <div class="file">index.html</div>
+      <div class="file">style.css</div>
+      <div class="file on">app.js</div>
+      <span class="tag" style="left:14px;bottom:20px">1 · sources</span>
+    </div>
+    <div>
+      <div class="hd">app.js</div>
+      <div class="ln"><span>93</span><span><span class="k">function</span> <span class="fn">render</span>() {</span></div>
+      <div class="ln bp paused"><span>94</span><span>  list.<span class="fn">replaceChildren</span>(...<span class="fn">visibleStalls</span>().<span class="fn">map</span>(card));</span></div>
+      <div class="ln"><span>95</span><span>  <span class="k">for</span> (<span class="k">const</span> b <span class="k">of</span> filters.<span class="fn">querySelectorAll</span>(<span class="s">"button"</span>)) {</span></div>
+      <div class="ln"><span>96</span><span>    b.<span class="fn">setAttribute</span>(<span class="s">"aria-pressed"</span>, …);</span></div>
+      <div class="ln"><span>97</span><span>  }</span></div>
+      <div class="ln"><span>98</span><span>  cheapest.checked = state.cheapest;</span></div>
+      <div class="ln"><span>99</span><span>  summary.textContent = …</span></div>
+      <span class="tag" style="left:8px;bottom:20px">2 · breakpoint</span>
+    </div>
+    <div>
+      <div class="btns"><span>▶</span><span>⤼</span><span>⤓</span><span>⤒</span></div>
+      <span class="tag" style="right:14px;top:6px">3 · step</span>
+      <div class="sec">Watch</div>
+      <div class="var"><b>state.tag</b>: "food"</div>
+      <div class="sec">Scope · Local</div>
+      <div class="var"><b>this</b>: Window</div>
+      <div class="sec">Scope · Script</div>
+      <div class="var"><b>state</b>: {tag: 'food', cheapest: false, saved: Set(1)}</div>
+      <div class="var"><b>stalls</b>: (8) [{…}, {…}, …]</div>
+      <div class="sec">Call stack</div>
+      <div class="var">render · app.js:94</div>
+      <div class="var">update · app.js:105</div>
+      <div class="var">(anonymous) · app.js:113</div>
+      <span class="tag" style="right:14px;bottom:20px">4 · scope and call stack</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~2:31. The buttons: ▶ resume, ⤼ step over, ⤓ step into, ⤒ step out. The mock is the bug-hunt app paused at the start of <code>render()</code> after a click on Food. Then do it live in <code>project/bug-hunt/</code>: Sources → <code>app.js</code>, breakpoint on the first line of <code>render</code>, click a filter, step over (⤼) and step into (⤓) <code>visibleStalls</code>. Don't fix anything on the projector: that's the exercise.</p>
+  </aside>
+</section>
+
+<section data-title="Ways to stop">
+  <p class="kicker">Breakpoints</p>
+  <h2>Four kinds of breakpoint</h2>
+  <table class="dtable">
+    <tr><th>How</th><th>Stops when</th></tr>
+    <tr><td>Click a line number</td><td>that line is about to run</td></tr>
+    <tr><td><code>debugger;</code> in your code</td><td>that line runs, while DevTools is open</td></tr>
+    <tr><td>Event Listener Breakpoints → Mouse → click</td><td>any click handler runs: useful when you don't know which code handles it</td></tr>
+    <tr><td>Breakpoints → Pause on caught exceptions</td><td>an exception is thrown, even one a <code>try … catch</code> swallows</td></tr>
+  </table>
+  <aside class="notes">
+    <p>The event-listener breakpoint is the one to remember for other people's code: click the button, DevTools stops inside whatever handles it. "Pause on caught exceptions" finds errors a <code>try … catch</code> swallows, like a <code>load()</code> that falls back to the defaults without saying why. Conditional breakpoints (right-click a line number) are in the cheat sheet.</p>
+  </aside>
+</section>
+
+<section data-title="Debugging recipe">
+  <p class="kicker">A method</p>
+  <h2>Debugging is testing hypotheses, one at a time</h2>
+  <ol>
+    <li><strong>Reproduce</strong> it. Write the steps down: "click Food, then All".</li>
+    <li><strong>Hypothesise</strong>: which function produces the wrong result? (A handler? State? Render?)</li>
+    <li><strong>Set a breakpoint</strong> there and reproduce again.</li>
+    <li><strong>Inspect</strong>: is the state what you expected? Scope, Watch, hover a variable.</li>
+    <li><strong>Step</strong> until an actual value differs from the expected one. That line is the bug.</li>
+    <li><strong>Fix</strong>, then repeat step 1 to verify.</li>
+  </ol>
+  <p class="step">With state and rendering separated, step 2 narrows quickly: <em class="s">wrong state</em> → the event handlers. <em class="s">correct state, wrong DOM</em> → render.</p>
+  <aside class="notes">
+    <p>The payoff of today's structure for debugging: the bug is either in "what changed the state" or in "how the state is drawn", and you can tell which by pausing in render and looking at <code>state</code>.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 6 — Bug hunt">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 6 · in pairs · 13 min</p>
+  <div class="ex-head"><h2>Bug hunt</h2><button class="timer" data-min="13"></button></div>
+  <ol>
+    <li>Your copy of <code>project/bug-hunt/</code> (from the break), served,  DevTools → Sources.</li>
+    <li>Five bug reports, five bugs in <code>app.js</code>. Breakpoints only: no <code>console.log</code>.</li>
+    <li>Start with reports 3 and 5. Fix in <code>app.js</code>, reload, deactivate breakpoints (<kbd>⌘</kbd>/<kbd>Ctrl</kbd> <kbd>F8</kbd>), <strong>Run the checks</strong>.</li>
+  </ol>
+  <p class="where mt">05-data → <b><a href="https://lopin.me/harbour/programming-interactivity-5-data/project/bug-hunt/index.html" target="_blank" rel="noopener">Bug hunt</a></b>. Each report has a folded "where to look".</p>
+  <aside class="notes">
+    <p>~2:38 → 2:52 (13 + 1). Pairs: one drives DevTools, one reads the report and predicts. The five bugs: <code>=</code> instead of <code>===</code> in a filter; a form value added as a string; <code>load()</code> reads <code>data.choices</code> but <code>save()</code> writes the choices flat, and the <code>try … catch</code> swallows the TypeError (Pause on caught exceptions finds it); <code>event.target</code> is the heart span, not the button; the summary reads a <code>const saved = state.saved</code> shorthand that still points at the old Set after <code>load()</code> replaces it (needs report 3 fixed first to reproduce). The checks run in hidden copies of the page: breakpoints fire there too, hence "deactivate breakpoints". The fixed version is <code>project/bug-hunt-solution/</code> (teacher only).</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     WRAP
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Wrap" data-at="2:52" data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>UI = render(state)</h2>
+  <div class="grid-3">
+    <div class="card"><span class="label">data</span><p>An array of objects. <code>map</code>, <code>filter</code>, <code>find</code>. Don't mutate inputs.</p></div>
+    <div class="card"><span class="label">render</span><p>A <code>&lt;template&gt;</code>, <code>card(stall)</code>, one <code>replaceChildren</code> per change.</p></div>
+    <div class="card"><span class="label">state</span><p>Minimal state, the rest derived. Event → state → render, controlled inputs included.</p></div>
+    <div class="card"><span class="label">persistence</span><p>Serialise with JSON; a Set as an array. Missing or invalid data: defaults.</p></div>
+    <div class="card"><span class="label">modules</span><p>One responsibility per module, <code>export</code> / <code>import</code>, one entry point.</p></div>
+    <div class="card"><span class="label">debugger</span><p>Hypothesise, break, inspect, step. Wrong state or wrong rendering?</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:52. One sentence per card, no more.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Cliffhanger: fetch">
+  <p class="kicker">Next week</p>
+  <h2 style="font-size:64px">The data is hard-coded. <em class="s">What if it came from a server?</em></h2>
+  <div class="split mt" style="grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 32px;">
+    <script type="text/x-code" data-lang="js" class="xxs">// today
+import { stalls } from "./data.js";
+
+load();
+render();</script>
+    <script type="text/x-code" data-lang="js" class="xxs">// next week
+state.loading = true;
+render();                         // "Loading the market…"
+try {
+  state.stalls = await loadStalls();   // fetch, in data.js
+} catch {
+  state.error = "The market didn't load.";
+}
+state.loading = false;
+render();</script>
+  </div>
+  <p class="step" style="font-size:30px">The stalls move into state: <code>state.js</code> and <code>render()</code> change (two new branches, loading and error). <code>card()</code> doesn't: it's independent of the data source.</p>
+  <aside class="notes">
+    <p>Don't explain <code>await</code> now: that's next week's first act. The payoff of the structure: the drawing code barely changes; what's new is where the data comes from, and the moments while it's on its way, which are just more state.</p>
+  </aside>
+</section>
+
+<section data-title="Homework">
+  <p class="kicker">Until next time</p>
+  <h2>Homework &amp; reading</h2>
+  <div class="split">
+    <div>
+      <h3>Homework</h3>
+      <ul>
+        <li><strong>The project</strong>: finish the modules, add "cheapest first" and "only my saved stalls" (<a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/05-split-it-up.html" target="_blank" rel="noopener">Exercise 5</a>).</li>
+        <li><strong>Register a stall</strong>: a form that adds to the market's list, then <code>update()</code>.</li>
+        <li>The rest of the <a href="https://lopin.me/harbour/programming-interactivity-5-data/project/bug-hunt/index.html" target="_blank" rel="noopener">bug hunt</a>.</li>
+        <li><a href="https://lopin.me/harbour/programming-interactivity-5-data/exercises/01-stock-take.html" target="_blank" rel="noopener">Exercise 1</a> 6–7, the bonus cases of 2–4.</li>
+      </ul>
+      <p>Submit on <strong>Google Classroom</strong>.</p>
+    </div>
+    <div>
+      <h3>Reading</h3>
+      <ul class="reading">
+        <li><a href="https://javascript.info/array-methods" target="_blank" rel="noopener">javascript.info · Array methods</a> <span class="muted">— map, filter, sort and friends</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template" target="_blank" rel="noopener">MDN · &lt;template&gt;</a> <span class="muted">— the content fragment, cloning</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules" target="_blank" rel="noopener">MDN · JavaScript modules</a> <span class="muted">— import, export, the details</span></li>
+        <li><a href="https://developer.chrome.com/docs/devtools/javascript" target="_blank" rel="noopener">Chrome DevTools · Debug JavaScript</a> <span class="muted">— the official walkthrough</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>Everything is in github.com/nlopin/programming-interactivity-exercises → 05-data.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Data in. Page out.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="wire-title" style="font-size:150px">Data <em>in.</em><br>Page <span class="out">out.</span></h1>
+      <p class="title-sub">exercises · playgrounds · bug hunt · cheat sheet →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="dp" aria-hidden="true">
+      <p class="formula" style="font-size:64px;margin:0"><span class="u">UI</span> = <span class="f">render</span>(<span class="s">state</span>)</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

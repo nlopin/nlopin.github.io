@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>State lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <style>
+    .lab { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; margin: 1.5rem 0; }
+    .app, .side > div { background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 1rem; }
+    .pane-label { display: flex; justify-content: space-between; font: 600 0.75rem "IBM Plex Mono", monospace; color: #8599c2; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.7rem; }
+    .pane-label b { color: #3ee6ff; font-weight: 600; }
+    .filters { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0 0 0.7rem; }
+    .filters button, .fav { font: 700 0.75rem/1 "IBM Plex Mono", monospace; text-transform: uppercase; color: #5ec8d8; background: #12151d; border: 2px solid #3a4254; border-radius: 99px; padding: 0.45rem 0.7rem; cursor: pointer; }
+    .filters button[aria-pressed="true"] { background: #5ec8d8; color: #12151d; border-color: #5ec8d8; }
+    .search { display: flex; gap: 0.5rem; align-items: center; font: 600 0.85rem "Space Grotesk", sans-serif; color: #e3ecff; margin: 0 0 0.7rem; }
+    .search input { font: inherit; color: #fff; background: #12151d; border: 2px solid #3a4254; border-radius: 8px; padding: 0.35rem 0.6rem; width: 12rem; }
+    .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem; border-radius: 8px; transition: box-shadow 0.15s; }
+    .cards.flash { box-shadow: 0 0 0 3px #b6ff3b, 0 0 30px rgb(182 255 59 / 0.35); }
+    .cards li { background: #1b202b; border: 2px solid #3a4254; border-radius: 10px; padding: 0.55rem 0.65rem; display: flex; flex-direction: column; gap: 0.3rem; font: 600 0.9rem/1.2 "Space Grotesk", sans-serif; color: #f3ecdf; }
+    .cards li small { font: 600 0.65rem "IBM Plex Mono", monospace; color: #5ec8d8; text-transform: uppercase; }
+    .cards li.sold { opacity: 0.55; }
+    .fav { align-self: flex-end; color: #ffb547; padding: 0.3rem 0.55rem; }
+    .fav[aria-pressed="true"] { background: #ffb547; color: #12151d; border-color: #ffb547; }
+    .empty { color: #8599c2; font-style: italic; }
+    .side { display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 1rem; min-height: 0; }
+    .state { font: 500 0.95rem/1.7 "IBM Plex Mono", monospace; color: #e3ecff; margin: 0; white-space: pre-wrap; }
+    .state .k { color: #ff4fd8; } .state .s { color: #9fe6c8; } .state .n { color: #b6ff3b; }
+    .state .line { display: block; border-radius: 4px; transition: background 0.6s; }
+    .state .line.changed { background: rgb(255 79 216 / 0.25); transition: none; }
+    .derived { font: 500 0.85rem/1.6 "IBM Plex Mono", monospace; color: #8599c2; margin: 0; }
+    .derived b { color: #b6ff3b; font-weight: 600; }
+    .log { list-style: none; margin: 0; padding: 0; font: 500 0.78rem/1.45 "IBM Plex Mono", monospace; color: #8599c2; overflow: auto; max-height: 14rem; }
+    .log li { padding: 0.35rem 0; border-bottom: 1px solid #1f3052; }
+    .log li:first-child { color: #e3ecff; }
+    .log .ev { color: #ff4fd8; } .log .st { color: #3ee6ff; } .log .r { color: #b6ff3b; }
+    .tools { display: flex; gap: 0.5rem; }
+    .tools button { font: 600 0.75rem "IBM Plex Mono", monospace; color: #8599c2; background: none; border: 1.5px solid #1f3052; border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; }
+    html.embed { font-size: 150%; }
+    html.embed .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    html.embed .cards li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.1rem 0.4rem; padding: 0.45rem 0.55rem; }
+    html.embed .cards li small { grid-column: 1 / -1; }
+    html.embed .cards li .fav { grid-row: 2; grid-column: 2; }
+    html.embed body { padding: 0; margin: 0; background: transparent; }
+    html.embed .page-wrap { padding: 0; max-width: none; }
+    html.embed .lab { margin: 0; height: 100vh; box-sizing: border-box; }
+    html.embed .chrome { display: none; }
+    @media (width < 760px) { .lab { grid-template-columns: 1fr; } }
+  </style>
+  <script>if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");</script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="chrome">
+      <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Playground</span></div>
+      <span class="eyebrow-tag">State</span>
+      <h1>State <em>lab</em></h1>
+      <p class="intro">Left: a small market. Right: the <code>state</code> object it's rendered from, and an event log. Click a filter, type a name, save a stall: every event updates one key of the state, then <code>render()</code> re-renders the whole list (it flashes green). The left side holds no state of its own: it's rendered from the right.</p>
+    </div>
+    <div class="lab">
+      <div class="app">
+        <p class="pane-label"><span>the UI</span><b class="renders">render() × 0</b></p>
+        <div class="filters" role="group" aria-label="Show">
+          <button type="button" data-filter="all">All</button><button type="button" data-filter="food">Food</button><button type="button" data-filter="music">Music</button><button type="button" data-filter="crafts">Crafts</button><button type="button" data-filter="drinks">Drinks</button>
+        </div>
+        <label class="search">Search <input type="search" autocomplete="off"></label>
+        <ul class="cards"></ul>
+      </div>
+      <div class="side">
+        <div><p class="pane-label"><span>const state =</span><span class="tools"><button type="button" class="reset">↺ reset</button></span></p><pre class="state"></pre></div>
+        <div><p class="pane-label"><span>derived · computed, never stored</span></p><p class="derived"></p></div>
+        <div><p class="pane-label"><span>event log</span></p><ol class="log"></ol></div>
+      </div>
+    </div>
+    <div class="chrome">
+      <h2>Try this</h2>
+      <ol class="tasks">
+        <li>Save two stalls, then click Music and All. The ♥ survive: they're in <code>state.saved</code>, not in the buttons.</li>
+        <li>Type "zzz". Which key changed? Why isn't "0 stalls" a key of the state?</li>
+        <li>Count the renders while you type "lemon". One per keystroke: is that a problem for 8 cards? For 8 000?</li>
+      </ol>
+    </div>
+  </div>
+<script>
+const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false },
+];
+
+const state = { tag: "all", query: "", saved: new Set() };
+let renders = 0;
+const cards = document.querySelector(".cards");
+const filters = document.querySelector(".filters");
+const search = document.querySelector(".search input");
+const statePre = document.querySelector(".state");
+const derived = document.querySelector(".derived");
+const log = document.querySelector(".log");
+
+function visibleStalls() {
+  const q = state.query.trim().toLowerCase();
+  return stalls
+    .filter((s) => state.tag === "all" || s.tag === state.tag)
+    .filter((s) => s.name.toLowerCase().includes(q));
+}
+
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+function drawState(changed) {
+  const saved = [...state.saved].map((id) => '<span class="s">"' + esc(id) + '"</span>').join(", ");
+  const lines = [
+    ["tag", '<span class="k">tag</span>: <span class="s">"' + esc(state.tag) + '"</span>,'],
+    ["query", '<span class="k">query</span>: <span class="s">"' + esc(state.query) + '"</span>,'],
+    ["saved", '<span class="k">saved</span>: Set(<span class="n">' + state.saved.size + "</span>) { " + saved + " },"],
+  ];
+  statePre.innerHTML = "{\n" + lines.map(([k, html]) => '<span class="line' + (k === changed ? " changed" : "") + '">  ' + html + "</span>").join("") + "}";
+  if (changed) requestAnimationFrame(() => setTimeout(() => statePre.querySelector(".changed")?.classList.remove("changed"), 50));
+}
+
+function render() {
+  renders++;
+  const visible = visibleStalls();
+  if (visible.length) {
+    cards.replaceChildren(...visible.map((s) => {
+      const li = document.createElement("li");
+      li.dataset.id = s.id;
+      li.classList.toggle("sold", s.soldOut);
+      const tag = document.createElement("small");
+      tag.textContent = s.tag;
+      const name = document.createElement("span");
+      name.textContent = s.name;
+      const fav = document.createElement("button");
+      fav.type = "button";
+      fav.className = "fav";
+      fav.setAttribute("aria-pressed", String(state.saved.has(s.id)));
+      fav.setAttribute("aria-label", "Save " + s.name);
+      fav.textContent = state.saved.has(s.id) ? "♥" : "♡";
+      li.append(tag, name, fav);
+      return li;
+    }));
+  } else {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "No stall matches.";
+    cards.replaceChildren(li);
+  }
+  for (const b of filters.querySelectorAll("button")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  document.querySelector(".renders").textContent = "render() × " + renders;
+  derived.innerHTML = "visibleStalls() → <b>" + visible.length + "</b> of " + stalls.length + " stalls<br>state.saved.size → <b>" + state.saved.size + "</b>";
+  cards.classList.add("flash");
+  setTimeout(() => cards.classList.remove("flash"), 180);
+}
+
+function happened(ev, change, key) {
+  drawState(key);
+  render();
+  const li = document.createElement("li");
+  li.innerHTML = '<span class="ev">' + esc(ev) + '</span> → <span class="st">' + esc(change) + '</span> → <span class="r">render() #' + renders + "</span>";
+  log.prepend(li);
+  while (log.children.length > 8) log.lastChild.remove();
+}
+
+filters.addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  state.tag = b.dataset.filter;
+  happened("click " + b.textContent, 'state.tag = "' + state.tag + '"', "tag");
+});
+search.addEventListener("input", () => {
+  state.query = search.value;
+  happened("input", 'state.query = "' + state.query + '"', "query");
+});
+cards.addEventListener("click", (e) => {
+  const fav = e.target.closest(".fav");
+  if (!fav) return;
+  const id = fav.closest("li").dataset.id;
+  const had = state.saved.has(id);
+  if (had) state.saved.delete(id); else state.saved.add(id);
+  happened("click ♡", "state.saved." + (had ? "delete" : "add") + '("' + id + '")', "saved");
+});
+document.querySelector(".reset").addEventListener("click", () => {
+  state.tag = "all"; state.query = ""; state.saved = new Set(); search.value = "";
+  renders = 0; log.replaceChildren();
+  drawState(); render();
+});
+
+drawState();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam spare · Lights out</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Spare game · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · spare</span>
+    <h1>Lights <em>out</em></h1>
+    <p class="intro">A 5×5 grid of lights, some on. Clicking a light flips it and its four neighbours: up, down, left, right. Turn every light off. <span class="stars" title="difficulty">★☆☆</span></p>
+    <p class="story">“Every time I fix one corner, the other one lights up.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> click a light in the middle: a plus shape of five flips. Click a corner: only three flip. Turn them all off: "Solved in 9 moves". New puzzle: a different one, and it can be solved.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The 25 lights, on or off.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The number of moves.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A 5×5 board drawn from state. On and off are obvious at a glance.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The move count, and a message when every light is off.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><strong>One</strong> listener for the board. A click flips the light and its existing neighbours.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>New puzzle: random, and always solvable.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Once solved, clicks do nothing until the next puzzle.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. Nothing in your game logic reads a cell's class to know whether it's lit.</p></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Click each corner: three lights flip. Each edge: four.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Click the same light twice: the board is back where it was.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Ten new puzzles: none of them starts already solved.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Play a whole puzzle with <kbd>Tab</kbd> and <kbd>Enter</kbd> only.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Levels: the first puzzles are easy, later ones harder. What makes a puzzle hard?</li>
+      <li>A puzzle in the URL: send a link, your friend gets the same board.</li>
+      <li>Everyone's stretch: undo, save, best score (fewest moves per puzzle).</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Is "solved" something you have to store?</p></details>
+      <details><summary>Hint 2</summary><p>Not every random pattern of lights can be turned off. Is there a way to make a puzzle you already <em>know</em> is solvable?</p></details>
+      <details><summary>Hint 3</summary><p>Which neighbours does a cell on the right edge have? How does your code know it's on the edge?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>Clicking on the right edge flips a light on the left edge, one row down.</li>
+      <li>A puzzle nobody in the group can solve.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

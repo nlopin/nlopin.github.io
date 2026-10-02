@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 2 · Render the market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 32rem; margin-top: 1rem; }
+    .case .panel.tall { height: 40rem; }
+    .case .panel.huge { height: 48rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+</head>
+<body class="page wire change">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Exercise 2 · 12 min · cases 1–3 in class</span></div>
+    <span class="eyebrow-tag">Act 2 · Rendering</span>
+    <h1>Render the <em>market</em></h1>
+    <p class="intro">The vendor list is empty: the page has a <code>&lt;template&gt;</code> for one card and an array of stalls; your script renders the list from the array. Change the data, re-run, and the DOM follows.</p>
+    <div class="tip"><p style="margin:0"><strong>The pattern.</strong> <code>card(stall)</code>: maps a record to an element. <code>render(list)</code>: <code>container.replaceChildren(...list.map(card))</code>. Text goes in with <code>textContent</code>.</p></div>
+
+    <section class="case">
+      <header><b>1</b><h2>One card from one stall</h2></header>
+      <p class="complaint">The cards are typed into the HTML by hand. Every new stall means copy-paste.</p>
+      <p>The card's HTML is in a <code>&lt;template&gt;</code> (look at the <em>index.html</em> tab): the browser parses it but doesn't show it. Finish <code>card(stall)</code>: clone the template, fill in the <strong>tag</strong>, the <strong>name</strong> and the <strong>blurb</strong> with <code>textContent</code>, put the stall's id on the <code>&lt;li&gt;</code> as <code>data-id</code>, and return it.</p>
+      <div class="live-js panel" data-market data-show-html data-show-before data-solved="✓ Clone the template, set its content, return it." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="count"></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <small class="price"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b} .count{margin:0 0 .6rem} .group h3{font:700 .8rem ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em;color:#5ec8d8;margin:.8rem 0 .4rem}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];</script>
+        <textarea>
+const template = document.querySelector("#stall-template");
+
+// Data in, element out
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.querySelector("h3").textContent = stall.name;
+  // the tag, the blurb, and data-id on the li
+
+  return li;
+}
+
+// Try it: one card on the page
+document.querySelector(".vendor-list").append(card(stalls[0]));
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "card(stall) returns a fresh <li class=\"stall\">", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; const a = f(S[0]), b = f(S[0]); return a && a.localName === 'li' && a.classList.contains('stall') && a !== b;"}, {"label": "Name, tag and blurb are filled in", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; const li = f(ALT[2]); return li.querySelector('h3').textContent === 'Ink Well' && li.querySelector('.tag').textContent === 'crafts' && li.querySelector('.blurb').textContent === ALT[2].blurb;"}, {"label": "The li has data-id", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; return f(S[5]).dataset.id === 'mezcal';"}, {"label": "Their words stay text: a stall named <img …> shows the characters", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; const name = '<img src=x onerror=\"window.__pwned = 1\">'; const li = f({ ...S[0], name }); doc.body.append(li); await wait(60); return li.querySelector('h3').textContent === name && !li.querySelector('img') && !win.__pwned;"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>template.content</code> is a little document of its own; <code>cloneNode(true)</code> copies the <code>&lt;li&gt;</code> with everything inside. Fill it with <code>textContent</code>, never <code>innerHTML</code>: the data might come from user input.</p><pre class="code" data-lang="js">const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+  return li;
+}
+
+document.querySelector(".vendor-list").append(card(stalls[0]));</pre></details>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>Render the whole list</h2></header>
+      <p class="complaint">Eight stalls today, twelve tomorrow. The DOM should reflect the array, whatever it contains.</p>
+      <p><code>card()</code> is done (🔒). Write <code>render(list)</code>: replace whatever is in <code>.vendor-list</code> with one card per stall, and write the count into <code>.count</code>: <code>"8 stalls"</code>, <code>"1 stall"</code>, <code>"0 stalls"</code>. Call <code>render(stalls)</code> at the end. Calling it twice must not double the cards.</p>
+      <div class="live-js panel tall" data-market data-show-html data-show-before data-solved="✓ render(list): the DOM reflects the array." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="count"></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <small class="price"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b} .count{margin:0 0 .6rem} .group h3{font:700 .8rem ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em;color:#5ec8d8;margin:.8rem 0 .4rem}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];
+
+const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+  return li;
+}</script>
+        <textarea>
+const list = document.querySelector(".vendor-list");
+const count = document.querySelector(".count");
+
+function render(stallsToShow) {
+  // 1 · one card per stall, replacing the old ones
+  // 2 · "8 stalls" / "1 stall"
+}
+
+render(stalls);
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "The page shows all 8 stalls, in order", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const names = $$('.vendor-list .stall h3').map((h) => h.textContent); return eq(names, S.map((s) => s.name));"}, {"label": "render(otherList) replaces them: 3 stalls, not 11", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('render'); if (typeof f !== 'function') return false; f(ALT); f(ALT); const names = $$('.vendor-list .stall h3').map((h) => h.textContent); return eq(names, ALT.map((s) => s.name));"}, {"label": "The count: \"8 stalls\", \"1 stall\", \"0 stalls\"", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('render'); if (typeof f !== 'function') return false; const a = text('.count'); f([ALT[0]]); const b = text('.count'); f([]); return a === '8 stalls' && b === '1 stall' && text('.count') === '0 stalls';"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>stallsToShow.map(card)</code> maps records to elements; spread passes them to <code>replaceChildren</code>, which throws the old children away first. That's why <code>render</code> is idempotent: it always rebuilds from scratch.</p><pre class="code" data-lang="js">const list = document.querySelector(".vendor-list");
+const count = document.querySelector(".count");
+
+function render(stallsToShow) {
+  list.replaceChildren(...stallsToShow.map(card));
+  const n = stallsToShow.length;
+  count.textContent = `${n} ${n === 1 ? "stall" : "stalls"}`;
+}
+
+render(stalls);</pre></details>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Sold out, and a price</h2></header>
+      <p class="complaint">Churros and Mezcal sold out an hour ago, and the page still sells them.</p>
+      <p>Extend <code>card()</code> from data to looks: a sold-out stall gets the class <code>sold-out</code> on its <code>.vendor-card</code> and shows the <code>.badge</code> (it starts <code>hidden</code>). Every card shows its price in <code>.price</code>: <code>"from €8"</code>, or <code>"free"</code> for 0. Some data has no <code>soldOut</code> key at all: that stall is open.</p>
+      <div class="live-js panel tall" data-market data-show-html data-show-before data-solved="✓ Data sets the classes; CSS handles the presentation." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="count"></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <small class="price"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b} .count{margin:0 0 .6rem} .group h3{font:700 .8rem ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em;color:#5ec8d8;margin:.8rem 0 .4rem}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];</script>
+        <textarea>
+const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+  return li;
+}
+
+const list = document.querySelector(".vendor-list");
+list.replaceChildren(...stalls.map(card));
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Sold-out cards: class sold-out + the badge shows", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; const li = f(S[3]); return li.querySelector('.vendor-card').classList.contains('sold-out') && !li.querySelector('.badge').hidden;"}, {"label": "Open cards: no class, no badge (also when soldOut is missing)", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; const a = f(S[0]); const { soldOut, ...noKey } = S[1]; const b = f(noKey); return [a, b].every((li) => !li.querySelector('.vendor-card').classList.contains('sold-out') && li.querySelector('.badge').hidden);"}, {"label": "Prices: from €8 · free", "run": "const S = win.eval('stalls'); const S0 = JSON.parse(JSON.stringify(S)); const ALT = [{ id: \"noodles\", name: \"Night Noodles\", tag: \"food\", price: 7, soldOut: false, blurb: \"Hand-pulled, slurp loudly.\" }, { id: \"brass\", name: \"Brass & Bones\", tag: \"music\", price: 0, soldOut: true, blurb: \"A tuba, a drum, a lot of heart.\" }, { id: \"ink-well\", name: \"Ink Well\", tag: \"crafts\", price: 4, soldOut: false, blurb: \"Stamps you carve yourself.\" }]; const ALT0 = JSON.parse(JSON.stringify(ALT)); const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b); const f = win.eval('card'); if (typeof f !== 'function') return false; return f(S[0]).querySelector('.price').textContent === 'from €8' && f(S[4]).querySelector('.price').textContent === 'free' && f(ALT[0]).querySelector('.price').textContent === 'from €7';"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>classList.toggle(name, condition)</code> adds the class when the condition is true and removes it when false: one line for both cases. One trap: <code>toggle("sold-out", undefined)</code> counts as <em>no</em> second argument and flips the class. A stall without a <code>soldOut</code> key has <code>undefined</code> there, so turn it into a real boolean first: <code>Boolean(stall.soldOut)</code>.</p><pre class="code" data-lang="js">const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  const soldOut = Boolean(stall.soldOut); // a missing key is undefined
+  li.querySelector(".vendor-card").classList.toggle("sold-out", soldOut);
+  li.querySelector(".badge").hidden = !soldOut;
+  return li;
+}
+
+const list = document.querySelector(".vendor-list");
+list.replaceChildren(...stalls.map(card));</pre></details>
+    </section>
+    <p class="sep">Homework · bonus</p>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>Grouped by tag</h2></header>
+      
+      <p>Render one <code>&lt;section class="group"&gt;</code> per tag, in the order tags first appear, each with an <code>&lt;h3&gt;</code> (the tag) and its own <code>&lt;ul class="vendor-list"&gt;</code> of cards. Put the sections into <code>#groups</code>. <code>card()</code> is done.</p>
+      <div class="live-js panel tall" data-market data-show-html data-show-before data-solved="✓ Nested map: the DOM structure follows the data structure." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<div id="groups"></div>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <small class="price"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b} .count{margin:0 0 .6rem} .group h3{font:700 .8rem ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em;color:#5ec8d8;margin:.8rem 0 .4rem}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];
+
+const template = document.querySelector("#stall-template");
+
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".blurb").textContent = stall.blurb;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  const soldOut = Boolean(stall.soldOut); // a missing key is undefined
+  li.querySelector(".vendor-card").classList.toggle("sold-out", soldOut);
+  li.querySelector(".badge").hidden = !soldOut;
+  return li;
+}</script>
+        <textarea>
+const groups = document.querySelector("#groups");
+
+// one section per tag: an h3 and a ul of cards
+
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Four sections: food, music, crafts, drinks", "run": "return JSON.stringify($$('#groups .group > h3').map((h) => h.textContent)) === JSON.stringify(['food', 'music', 'crafts', 'drinks']);"}, {"label": "Each section has its own stalls (food: 3)", "run": "const g = $$('#groups .group'); return g.length === 4 && g[0].querySelectorAll('.stall').length === 3 && g[3].querySelectorAll('.stall').length === 2;"}]</script>
+      </div>
+      <details><summary>Solution</summary><p>First the list of tags (Exercise 1, case 7), then one section per tag, with a <code>filter</code> inside. Elements built with <code>createElement</code> can hold other elements: <code>append</code> takes as many as you give it.</p><pre class="code" data-lang="js">const groups = document.querySelector("#groups");
+const tags = [...new Set(stalls.map((s) =&gt; s.tag))];
+
+groups.replaceChildren(...tags.map((tag) =&gt; {
+  const section = document.createElement("section");
+  section.className = "group";
+  const title = document.createElement("h3");
+  title.textContent = tag;
+  const ul = document.createElement("ul");
+  ul.className = "vendor-list";
+  ul.append(...stalls.filter((s) =&gt; s.tag === tag).map(card));
+  section.append(title, ul);
+  return section;
+}));</pre></details>
+    </section>
+  </div>
+</body>
+</html>

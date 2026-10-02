@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 4 · Remember my night</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 32rem; margin-top: 1rem; }
+    .case .panel.tall { height: 40rem; }
+    .case .panel.huge { height: 48rem; }
+    .case > p, .case > ul { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+</head>
+<body class="page wire remember">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Exercise 4 · 8 min · case 1 in class</span></div>
+    <span class="eyebrow-tag">Act 4 · Persistence</span>
+    <h1>Remember my <em>night</em></h1>
+    <p class="intro">The market from Exercise 3, finished: filter, search, ♡. Its state is lost on reload. Persist it, and handle whatever it finds in storage.</p>
+    <div class="tip"><p style="margin:0"><strong>Three lines to know.</strong> <code>localStorage.setItem(key, string)</code> · <code>localStorage.getItem(key)</code> (a string, or <code>null</code>) · <code>JSON.stringify(value)</code> / <code>JSON.parse(string)</code>. Persist user choices, not derived state.</p></div>
+
+    <section class="case">
+      <header><b>1</b><h2>Remember my night</h2></header>
+      <p class="complaint">I saved four stalls on my phone, reloaded the page at the market, and they were gone.</p>
+      <p>Everything works, until a reload. Write <code>save()</code> and <code>load()</code>: the state worth persisting (the filter and the saved ids) go to <code>localStorage</code> under the key <code>"my-night"</code>, as JSON. Decide where to call them. Then test invalid data: DevTools → Application → Local storage, change the stored value into invalid JSON, press ▶ run. (Reloading the whole page is fine too: your code is kept as a draft until you press ↺ reset.) (A broken earlier attempt left junk in storage? <button type="button" class="clear-night" onclick="localStorage.removeItem(&quot;my-night&quot;); document.querySelectorAll(&quot;.live-js&quot;).forEach((e) =&gt; e.liveEditor.run())">Clear saved data</button>)</p>
+      <div class="live-js panel huge" data-market data-show-html data-show-before data-solved="✓ State persists across reloads. The checks reloaded the preview three times." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><div class="filters" role="group" aria-label="Show">
+  <button type="button" data-filter="all" aria-pressed="true">All</button>
+  <button type="button" data-filter="food" aria-pressed="false">Food</button>
+  <button type="button" data-filter="music" aria-pressed="false">Music</button>
+  <button type="button" data-filter="crafts" aria-pressed="false">Crafts</button>
+  <button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+</div>
+<label class="search">Search <input id="q" type="search" autocomplete="off"></label>
+<p class="status"><span class="count"></span><span class="hearts"></span></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <button class="save" type="button" aria-pressed="false">♡</button>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .search{display:flex;gap:.5rem;align-items:center;font-weight:700;font-size:.85rem;margin:0 0 .6rem} .search input{max-width:14rem} .status{display:flex;gap:1rem;font-size:.85rem;margin:0 0 .6rem} .hearts{color:#ffb547;font-weight:700} .vendor-card .save{align-self:flex-end;margin-top:auto} .save{font:700 .8rem/1 system-ui;color:#ffb547;background:none;border:2px solid #3a4254;border-radius:99px;padding:.35rem .6rem;cursor:pointer} .save[aria-pressed=true]{background:#ffb547;color:#12151d;border-color:#ffb547} .only{font-size:.85rem;display:flex;gap:.4rem;align-items:center;margin:0 0 .6rem;font-weight:400}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];
+
+// Given (🔒): draws the cards. saved is a Set of ids.
+const template = document.querySelector("#stall-template");
+const list = document.querySelector(".vendor-list");
+function drawCards(stallsToShow, saved) {
+  list.replaceChildren(...stallsToShow.map((stall) => {
+    const li = template.content.firstElementChild.cloneNode(true);
+    li.dataset.id = stall.id;
+    li.querySelector(".tag").textContent = stall.tag;
+    li.querySelector("h3").textContent = stall.name;
+    li.querySelector(".blurb").textContent = stall.blurb;
+    const save = li.querySelector(".save");
+    save.setAttribute("aria-pressed", String(saved.has(stall.id)));
+    save.setAttribute("aria-label", `Save ${stall.name}`);
+    save.textContent = saved.has(stall.id) ? "♥" : "♡";
+    return li;
+  }));
+}</script>
+        <textarea>
+const state = {
+  tag: "all",
+  query: "",
+  saved: new Set(),
+};
+
+const filters = document.querySelector(".filters");
+
+function visibleStalls() {
+  const q = state.query.trim().toLowerCase();
+  return stalls
+    .filter((s) =&gt; state.tag === "all" || s.tag === state.tag)
+    .filter((s) =&gt; s.name.toLowerCase().includes(q));
+}
+
+function render() {
+  const visible = visibleStalls();
+  drawCards(visible, state.saved);
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  }
+  document.querySelector(".count").textContent = `${visible.length} of ${stalls.length} stalls`;
+  document.querySelector(".hearts").textContent = `♥ ${state.saved.size}`;
+}
+
+filters.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest("button");
+  if (!button) return;
+  state.tag = button.dataset.filter;
+  render();
+});
+
+document.querySelector("#q").addEventListener("input", (event) =&gt; {
+  state.query = event.target.value;
+  render();
+});
+
+list.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest(".save");
+  if (!button) return;
+  const id = button.closest(".stall").dataset.id;
+  if (state.saved.has(id)) state.saved.delete(id);
+  else state.saved.add(id);
+  render();
+});
+
+// ---- remember ------------------------------------------------
+const KEY = "my-night";
+
+// Write the choices (state.tag and the saved ids) to localStorage, as JSON.
+// A Set doesn't survive JSON.stringify: turn it into an array first.
+function save() {
+
+}
+
+// Read them back into state. Nothing stored yet, or broken JSON: keep the defaults.
+function load() {
+
+}
+
+// When should save() run? When should load() run?
+// Tip: one function update() { render(); save(); } and call it from every listener.
+render();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "A ♥ goes into localStorage[\"my-night\"] as JSON", "run": "const reload = async () => { const old = win.document; win.location.reload(); for (let i = 0; i < 60; i++) { await wait(20); const d = win.document; if (d !== old && d.readyState === 'complete' && d.querySelector('.vendor-list .stall')) return d; } return null; }; win.localStorage.removeItem('my-night'); const d0 = await reload(); if (!d0) return false; d0.querySelector('[data-id=\"dumplings\"] .save').click(); await wait(30); const pressed = d0.querySelector('[data-id=\"dumplings\"] .save').getAttribute('aria-pressed') === 'true'; const d = JSON.parse(win.localStorage.getItem('my-night')); return pressed && !!d && Array.isArray(d.saved) && d.saved.includes('dumplings');"}, {"label": "After a reload, your ♥ and your filter are back", "run": "const reload = async () => { const old = win.document; win.location.reload(); for (let i = 0; i < 60; i++) { await wait(20); const d = win.document; if (d !== old && d.readyState === 'complete' && d.querySelector('.vendor-list .stall')) return d; } return null; }; win.localStorage.removeItem('my-night'); const d0 = await reload(); if (!d0) return false; d0.querySelector('[data-id=\"lemonade\"] .save').click(); d0.querySelector('[data-filter=\"drinks\"]').click(); await wait(30); const d = await reload(); if (!d) return false; return d.querySelector('[data-filter=\"drinks\"]').getAttribute('aria-pressed') === 'true' && d.querySelector('[data-id=\"lemonade\"] .save').getAttribute('aria-pressed') === 'true' && d.querySelectorAll('.vendor-list .stall').length === 2;"}, {"label": "Broken JSON in storage: the page still starts, with the defaults", "run": "const reload = async () => { const old = win.document; win.location.reload(); for (let i = 0; i < 60; i++) { await wait(20); const d = win.document; if (d !== old && d.readyState === 'complete' && d.querySelector('.vendor-list .stall')) return d; } return null; }; win.localStorage.setItem('my-night', '{oops'); const d = await reload(); if (!d) return false; return d.querySelectorAll('.vendor-list .stall').length === 8 && !(win.__errors || []).length;"}, {"label": "Nothing in storage: the defaults", "run": "const reload = async () => { const old = win.document; win.location.reload(); for (let i = 0; i < 60; i++) { await wait(20); const d = win.document; if (d !== old && d.readyState === 'complete' && d.querySelector('.vendor-list .stall')) return d; } return null; }; win.localStorage.removeItem('my-night'); const d = await reload(); if (!d) return false; return d.querySelectorAll('.vendor-list .stall').length === 8 && d.querySelector('[data-filter=\"all\"]').getAttribute('aria-pressed') === 'true';"}]</script>
+      </div>
+      <details><summary>Solution</summary><p><code>localStorage</code> keeps strings only, so the state goes through <code>JSON.stringify</code>, and a <code>Set</code> has to become an array first (<code>JSON.stringify(new Set(["a"]))</code> is <code>"{}"</code>). Save after every change: one <code>update()</code> that renders and saves, called from every listener. Load once, <em>before</em> the first render. Everything that comes back from storage is untrusted: missing, old, or broken. <code>try … catch</code> and <code>??</code> keep the defaults.</p><pre class="code" data-lang="js">const state = {
+  tag: "all",
+  query: "",
+  saved: new Set(),
+};
+
+const filters = document.querySelector(".filters");
+
+function visibleStalls() {
+  const q = state.query.trim().toLowerCase();
+  return stalls
+    .filter((s) =&gt; state.tag === "all" || s.tag === state.tag)
+    .filter((s) =&gt; s.name.toLowerCase().includes(q));
+}
+
+function render() {
+  const visible = visibleStalls();
+  drawCards(visible, state.saved);
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  }
+  document.querySelector(".count").textContent = `${visible.length} of ${stalls.length} stalls`;
+  document.querySelector(".hearts").textContent = `♥ ${state.saved.size}`;
+}
+
+filters.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest("button");
+  if (!button) return;
+  state.tag = button.dataset.filter;
+  update();
+});
+
+document.querySelector("#q").addEventListener("input", (event) =&gt; {
+  state.query = event.target.value;
+  update();
+});
+
+list.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest(".save");
+  if (!button) return;
+  const id = button.closest(".stall").dataset.id;
+  if (state.saved.has(id)) state.saved.delete(id);
+  else state.saved.add(id);
+  update();
+});
+
+// ---- remember ------------------------------------------------
+const KEY = "my-night";
+
+function save() {
+  const data = { tag: state.tag, saved: [...state.saved] };
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data) return; // nothing saved yet
+    state.tag = data.tag ?? "all";
+    state.saved = new Set(data.saved ?? []);
+  } catch {
+    // broken JSON: keep the defaults
+  }
+}
+
+// every change: draw, then remember
+function update() {
+  render();
+  save();
+}
+
+load();
+render();</pre></details>
+    </section>
+    <p class="sep">Homework · bonus</p>
+    <section class="case">
+      <header><b class="bonus">2 · bonus</b><h2>Clear my night</h2></header>
+      
+      <p>A <code>#clear</code> button: back to the defaults (all stalls, nothing saved, an empty search box), on screen <em>and</em> in storage. Notice how little code it takes when everything goes through <code>state</code>.</p>
+      <div class="live-js panel huge" data-market data-show-html data-show-before data-solved="✓ Reset = set the state, render. Storage follows." data-layout="wide-code">
+        <script type="text/plain" data-role="html"><div class="filters" role="group" aria-label="Show">
+  <button type="button" data-filter="all" aria-pressed="true">All</button>
+  <button type="button" data-filter="food" aria-pressed="false">Food</button>
+  <button type="button" data-filter="music" aria-pressed="false">Music</button>
+  <button type="button" data-filter="crafts" aria-pressed="false">Crafts</button>
+  <button type="button" data-filter="drinks" aria-pressed="false">Drinks</button>
+</div>
+<label class="search">Search <input id="q" type="search" autocomplete="off"></label>
+<p class="status"><span class="count"></span><span class="hearts"></span></p>
+<button id="clear" type="button" class="fav">Clear my night</button>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <p class="blurb"></p>
+      <button class="save" type="button" aria-pressed="false">♡</button>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important} .search{display:flex;gap:.5rem;align-items:center;font-weight:700;font-size:.85rem;margin:0 0 .6rem} .search input{max-width:14rem} .status{display:flex;gap:1rem;font-size:.85rem;margin:0 0 .6rem} .hearts{color:#ffb547;font-weight:700} .vendor-card .save{align-self:flex-end;margin-top:auto} .save{font:700 .8rem/1 system-ui;color:#ffb547;background:none;border:2px solid #3a4254;border-radius:99px;padding:.35rem .6rem;cursor:pointer} .save[aria-pressed=true]{background:#ffb547;color:#12151d;border-color:#ffb547} .only{font-size:.85rem;display:flex;gap:.4rem;align-items:center;margin:0 0 .6rem;font-weight:400}</script>
+        <script type="text/plain" data-role="before">const stalls = [
+  { id: "dumplings",   name: "Dumpling Dynasty",  tag: "food",   price: 8,  soldOut: false,
+    blurb: "Hand-folded xiaolongbao, steamed in front of you." },
+  { id: "side-b",      name: "Side B Records",    tag: "music",  price: 12, soldOut: false,
+    blurb: "Second-hand vinyl, sorted by mood." },
+  { id: "salt-ink",    name: "Salt & Ink",        tag: "crafts", price: 15, soldOut: false,
+    blurb: "Risograph posters of the port." },
+  { id: "churros",     name: "Churros Till Late", tag: "food",   price: 5,  soldOut: true,
+    blurb: "Sugared, dunked in thick chocolate." },
+  { id: "plant-swap",  name: "The Plant Swap",    tag: "crafts", price: 0,  soldOut: false,
+    blurb: "Bring a cutting, take a cutting." },
+  { id: "mezcal",      name: "Mezcal Moon",       tag: "drinks", price: 9,  soldOut: true,
+    blurb: "Small-batch mezcal. Sip, don't shoot." },
+  { id: "taco-bike",   name: "Taco Bike",         tag: "food",   price: 6,  soldOut: false,
+    blurb: "Tacos al pastor from a cargo bike." },
+  { id: "lemonade",    name: "Lantern Lemonade",  tag: "drinks", price: 3,  soldOut: false,
+    blurb: "Fresh lemonade with a sprig of mint." },
+];
+
+// Given (🔒): draws the cards. saved is a Set of ids.
+const template = document.querySelector("#stall-template");
+const list = document.querySelector(".vendor-list");
+function drawCards(stallsToShow, saved) {
+  list.replaceChildren(...stallsToShow.map((stall) => {
+    const li = template.content.firstElementChild.cloneNode(true);
+    li.dataset.id = stall.id;
+    li.querySelector(".tag").textContent = stall.tag;
+    li.querySelector("h3").textContent = stall.name;
+    li.querySelector(".blurb").textContent = stall.blurb;
+    const save = li.querySelector(".save");
+    save.setAttribute("aria-pressed", String(saved.has(stall.id)));
+    save.setAttribute("aria-label", `Save ${stall.name}`);
+    save.textContent = saved.has(stall.id) ? "♥" : "♡";
+    return li;
+  }));
+}</script>
+        <textarea>
+const state = {
+  tag: "all",
+  query: "",
+  saved: new Set(),
+};
+
+const filters = document.querySelector(".filters");
+
+function visibleStalls() {
+  const q = state.query.trim().toLowerCase();
+  return stalls
+    .filter((s) =&gt; state.tag === "all" || s.tag === state.tag)
+    .filter((s) =&gt; s.name.toLowerCase().includes(q));
+}
+
+function render() {
+  const visible = visibleStalls();
+  drawCards(visible, state.saved);
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  }
+  document.querySelector(".count").textContent = `${visible.length} of ${stalls.length} stalls`;
+  document.querySelector(".hearts").textContent = `♥ ${state.saved.size}`;
+}
+
+filters.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest("button");
+  if (!button) return;
+  state.tag = button.dataset.filter;
+  update();
+});
+
+document.querySelector("#q").addEventListener("input", (event) =&gt; {
+  state.query = event.target.value;
+  update();
+});
+
+list.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest(".save");
+  if (!button) return;
+  const id = button.closest(".stall").dataset.id;
+  if (state.saved.has(id)) state.saved.delete(id);
+  else state.saved.add(id);
+  update();
+});
+
+// ---- remember ------------------------------------------------
+const KEY = "my-night";
+
+function save() {
+  const data = { tag: state.tag, saved: [...state.saved] };
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data) return; // nothing saved yet
+    state.tag = data.tag ?? "all";
+    state.saved = new Set(data.saved ?? []);
+  } catch {
+    // broken JSON: keep the defaults
+  }
+}
+
+// every change: draw, then remember
+function update() {
+  render();
+  save();
+}
+
+load();
+render();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Clear → nothing pressed, the All filter, 8 stalls", "run": "click('[data-id=\"taco-bike\"] .save'); click('[data-filter=\"food\"]'); click('#clear'); return $$('.vendor-list .save[aria-pressed=\"true\"]').length === 0 && $$('.vendor-list .stall').length === 8 && $('[data-filter=\"all\"]').getAttribute('aria-pressed') === 'true';"}, {"label": "The search box is empty again", "run": "type('#q', 'taco'); click('#clear'); return $('#q').value === '' && $$('.vendor-list .stall').length === 8;"}, {"label": "…and storage agrees", "run": "click('[data-id=\"taco-bike\"] .save'); click('#clear'); const d = JSON.parse(win.localStorage.getItem('my-night') || 'null'); return !d || (Array.isArray(d.saved) && d.saved.length === 0);"}]</script>
+      </div>
+      <details><summary>Solution</summary><p>Set every key back to its default and call <code>update()</code>. The search box is a control the state also describes, so <code>render()</code> writes <code>state.query</code> back into it (only when it differs: rewriting an input you're typing in can move the cursor).</p><pre class="code" data-lang="js">const state = {
+  tag: "all",
+  query: "",
+  saved: new Set(),
+};
+
+const filters = document.querySelector(".filters");
+
+function visibleStalls() {
+  const q = state.query.trim().toLowerCase();
+  return stalls
+    .filter((s) =&gt; state.tag === "all" || s.tag === state.tag)
+    .filter((s) =&gt; s.name.toLowerCase().includes(q));
+}
+
+function render() {
+  const visible = visibleStalls();
+  drawCards(visible, state.saved);
+  for (const b of filters.querySelectorAll("button")) {
+    b.setAttribute("aria-pressed", String(b.dataset.filter === state.tag));
+  }
+  document.querySelector(".count").textContent = `${visible.length} of ${stalls.length} stalls`;
+  document.querySelector(".hearts").textContent = `♥ ${state.saved.size}`;
+  // render() draws the controls too: the search box shows state.query
+  const box = document.querySelector("#q");
+  if (box.value !== state.query) box.value = state.query;
+}
+
+filters.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest("button");
+  if (!button) return;
+  state.tag = button.dataset.filter;
+  update();
+});
+
+document.querySelector("#q").addEventListener("input", (event) =&gt; {
+  state.query = event.target.value;
+  update();
+});
+
+list.addEventListener("click", (event) =&gt; {
+  const button = event.target.closest(".save");
+  if (!button) return;
+  const id = button.closest(".stall").dataset.id;
+  if (state.saved.has(id)) state.saved.delete(id);
+  else state.saved.add(id);
+  update();
+});
+
+// ---- remember ------------------------------------------------
+const KEY = "my-night";
+
+function save() {
+  const data = { tag: state.tag, saved: [...state.saved] };
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KEY));
+    if (!data) return; // nothing saved yet
+    state.tag = data.tag ?? "all";
+    state.saved = new Set(data.saved ?? []);
+  } catch {
+    // broken JSON: keep the defaults
+  }
+}
+
+// every change: draw, then remember
+function update() {
+  render();
+  save();
+}
+
+document.querySelector("#clear").addEventListener("click", () =&gt; {
+  state.tag = "all";
+  state.query = "";
+  state.saved = new Set();
+  update();
+});
+
+load();
+render();</pre></details>
+    </section>
+  </div>
+</body>
+</html>

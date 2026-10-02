@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam 3 · Wordle</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Game 3 · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · game 3</span>
+    <h1><em>Wordle</em></h1>
+    <p class="intro">Guess the five-letter word in six tries. After each guess every letter turns 🟩 (right letter, right place), 🟨 (in the word, somewhere else) or ⬜ (not in the word). <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“SLATE first. Always SLATE.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> type a word on the keyboard, press Enter: the row colours in, and so do the keys of the on-screen keyboard. A word that isn't in the list is refused. Six misses: the answer is shown.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The answer and the guesses so far.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The letters typed into the current row.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Six rows of five tiles drawn from state, submitted rows coloured.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>An on-screen keyboard. Each key shows the best colour its letter has earned so far.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A message line: not in the list, you won, or the answer.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Physical keys type letters, <kbd>Backspace</kbd> deletes, <kbd>Enter</kbd> submits. The on-screen keys do exactly the same.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><kbd>Enter</kbd> accepts only a full row that's in the word list.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>After a win or the sixth guess, typing does nothing.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. The current row lives in <code>state</code>, not in the tiles.</p></div>
+
+    <h2>The word list</h2>
+    <p>Answers and allowed guesses both come from this list. Copy it into <code>script.js</code>.</p>
+    <pre class="code" data-lang="js">const WORDS = [
+  'CRANE', 'SLATE', 'APPLE', 'HOUSE', 'PLANT', 'BREAD', 'CHAIR', 'LIGHT', 'STONE', 'WATER',
+  'MUSIC', 'NIGHT', 'RIVER', 'SMILE', 'TRAIN', 'CLOUD', 'BEACH', 'GRAPE', 'HEART', 'DREAM',
+  'PIANO', 'TIGER', 'LEMON', 'SUGAR', 'TOAST', 'PAINT', 'FIELD', 'STORM', 'QUIET', 'SHARP',
+  'BRAVE', 'FLAME', 'GHOST', 'HONEY', 'JUICE', 'KNIFE', 'MANGO', 'NURSE', 'OCEAN', 'PEARL',
+  'QUEEN', 'ROBOT', 'SHELL', 'TOWER', 'UNCLE', 'VOICE', 'WHALE', 'YOUTH', 'ZEBRA', 'SPEED',
+];</pre>
+
+    <h2>The colours <em>must come out like this</em></h2>
+    <p>Letters that appear twice are where most Wordle clones go wrong. Work these out on paper before you code, then check your game against them.</p>
+    <div class="spec-wrap"><table class="spec">
+      <thead><tr><th>Answer</th><th>Guess</th><th>Colours</th></tr></thead>
+      <tbody>
+        <tr><td>CRANE</td><td>TRACE</td><td>⬜🟩🟩🟨🟩</td></tr>
+        <tr><td>ABIDE</td><td>SPEED</td><td>⬜⬜🟨⬜🟨</td></tr>
+        <tr><td>CRANE</td><td>EERIE</td><td>⬜⬜🟨⬜🟩</td></tr>
+        <tr><td>APPLE</td><td>PAPAL</td><td>🟨🟨🟩⬜🟨</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>The four rows in the table above.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span><kbd>Backspace</kbd> on an empty row. <kbd>Enter</kbd> with four letters.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>A key that was 🟨 in one guess and 🟩 in the next: which colour does it keep?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span><kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>R</kbd> reloads the page and doesn't type an R.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Click an on-screen key, then press the physical <kbd>Enter</kbd>.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>An invalid word shakes the row.</li>
+      <li>A share button: copies the result as a grid of 🟩🟨⬜ to the clipboard, without the letters.</li>
+      <li>A daily word: everyone who opens the page today gets the same one.</li>
+      <li>Everyone's stretch: undo (one letter? one guess?), save, best score (a win streak).</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>The colours of a submitted row never change. Do you need to store them?</p></details>
+      <details><summary>Hint 2</summary><p>Look at SPEED against ABIDE. Why is the first E yellow and the second one grey? Say the rule in one sentence before you code it.</p></details>
+      <details><summary>Hint 3</summary><p>Physical keys and on-screen keys do exactly the same thing. In how many places should that logic live?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>After clicking an on-screen key, the physical <kbd>Enter</kbd> does something extra.</li>
+      <li>Some letters arrive in the wrong case.</li>
+      <li>Keyboard shortcuts type letters.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

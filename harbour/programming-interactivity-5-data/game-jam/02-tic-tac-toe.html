@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game jam 2 · Tic-tac-toe</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Game jam · all games</a><span>Game 2 · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Game jam · game 2</span>
+    <h1>Tic-tac-<em>toe</em></h1>
+    <p class="intro">Two players, one screen. Three in a row wins, a full board with no line is a draw, and the score carries over from round to round. <span class="stars" title="difficulty">★☆☆</span></p>
+    <p class="story">“Best of five. Loser buys the coffee.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo:</strong> X and O take turns. A win marks the three cells, stops the board and adds a point. A full board with no line says "Draw". Next round: an empty board, the same score.</p></div>
+
+    <h2>Must have <em>(tick as you go)</em></h2>
+    <p>What has to work, not how. The how is your call: you'll explain it on stage.</p>
+    <div class="lanes">
+      <div class="lane state"><h3>State</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The nine cells, and whose turn it is.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The score across rounds.</span></li>
+      </ul></div>
+      <div class="lane render"><h3>Render</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A 3×3 board drawn from state.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A status line: whose turn, who won, or draw.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The score for X and O.</span></li>
+      </ul></div>
+      <div class="lane rules"><h3>Rules</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><strong>One</strong> listener for the board. Taken cells and a finished round ignore clicks.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Win and draw are worked out from the board.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Next round: empty board, score kept.</span></li>
+      </ul></div>
+    </div>
+    <div class="tip"><p style="margin:0"><strong>The one rule:</strong> the DOM is output. Nothing in your game logic reads the cells' text to find a winner.</p></div>
+
+    <h2>Edge cases <em>(verify, minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Click a cell that's taken.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Click an empty cell after the round is won.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>A line completed with the ninth move: is that a win or a draw?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Win five rounds in a row: the score says 5.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Play a whole round with <kbd>Tab</kbd> and <kbd>Enter</kbd> only.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>The player who didn't start this round starts the next one.</li>
+      <li>A computer player for O. First one that plays any free cell; then one that wins when it can and blocks when it must.</li>
+      <li>Everyone's stretch: undo, save, best score.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Try for five minutes first.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>How many different lines win? Could they be data instead of a chain of <code>if</code>s?</p></details>
+      <details><summary>Hint 2</summary><p>Is the winner something you have to store, or can you read it off the board at any moment?</p></details>
+      <details><summary>Hint 3</summary><p>The score changes once per round. Which of your functions runs exactly once per move, and which runs as often as it likes?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The score goes up by more than one per win.</li>
+      <li>The ninth move completes a line, and the board says "Draw".</li>
+      <li>After a win, the losing player can still play on.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case above. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

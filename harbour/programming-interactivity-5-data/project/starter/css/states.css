@@ -1,0 +1,22 @@
+/* ==========================================================================
+   Step 4 — states. JavaScript flips an attribute or a class;
+   CSS decides what that state looks like.
+   ========================================================================== */
+
+/* The hidden attribute is only a browser default (display: none), so any
+   author rule with display (like .vendor-card's flex) beats it. Make it win. */
+[hidden] { display: none !important; }
+
+/* The phone menu: collapsed while the button says it isn't expanded */
+@media (width < 40rem) {
+  .menu-toggle[aria-expanded="false"] + .main-nav { display: none; }
+  .main-nav { flex-basis: 100%; }
+  .main-nav ul { flex-direction: column; }
+}
+@media (width >= 40rem) {
+  .menu-toggle { display: none; }
+}
+
+/* Red borders only after someone has actually touched the field */
+.ticket-form :user-invalid { border-color: var(--ember); }
+.ticket-form :user-invalid:focus-visible { outline-color: var(--ember); }

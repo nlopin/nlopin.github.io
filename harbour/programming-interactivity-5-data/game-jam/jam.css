@@ -1,0 +1,53 @@
+/* Game jam pages: brief components in the wire look. Loaded after kit.css. */
+
+.page h2 { margin-top: 2.2rem; }
+.story { font: italic 400 1.4rem/1.35 var(--font-serif); color: #cfdcf7; max-width: 60ch; margin: 0.5rem 0 1rem; }
+.stars { font-family: "IBM Plex Mono", var(--font-mono); letter-spacing: 0.1em; color: var(--w-act); }
+
+/* Must-have lanes: state · render · rules (the L5 colours: state, change, listen) */
+.lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1rem 0; }
+.lane { --lane: var(--w-act); background: var(--w-bg2); border: 1.5px solid var(--w-line); border-top: 4px solid var(--lane); border-radius: 0.8rem; padding: 1rem 1.1rem; }
+.lane.state { --lane: #3ee6ff; }
+.lane.render { --lane: #b6ff3b; }
+.lane.rules { --lane: #ff4fd8; }
+.lane h3 { margin: 0 0 0.5rem; font: 600 0.9rem "IBM Plex Mono", var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--lane); }
+.lane ul, .checklist { list-style: none; margin: 0; padding: 0; }
+.lane li, .checklist li { display: flex; gap: 0.55rem; align-items: baseline; margin: 0.45rem 0; }
+.lane li input, .checklist li input { flex: none; width: 1.1rem; height: 1.1rem; accent-color: var(--lane, var(--w-act)); transform: translateY(0.15rem); }
+.checklist { max-width: 60rem; }
+
+/* Expected results, as a spec table */
+.spec { border-collapse: collapse; margin: 0.8rem 0; font-size: 0.95rem; }
+.spec th, .spec td { border: 1px solid var(--w-line); padding: 0.4rem 0.8rem; text-align: left; }
+.spec th { font: 600 0.8rem "IBM Plex Mono", var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--w-muted); }
+.spec td { font-family: "IBM Plex Mono", var(--font-mono); }
+.spec-wrap { overflow-x: auto; }
+
+.stretch li, .gotchas li { margin: 0.35rem 0; }
+.page pre.code { font-size: 0.92rem; margin: 0.6rem 0; max-width: 60rem; white-space: pre-wrap; }
+
+.hints { display: grid; gap: 0.5rem; max-width: 60rem; }
+.hints details, details.traps { margin: 0; padding: 0.55rem 0.9rem; border-radius: 0.6rem; }
+.hints summary, details.traps summary { cursor: pointer; font: 600 0.95rem "IBM Plex Mono", var(--font-mono); }
+.hints details[open] summary, details.traps[open] summary { margin-bottom: 0.4rem; }
+.hints p { margin: 0.3rem 0; }
+details.traps { max-width: 60rem; }
+
+/* The 45 minutes */
+.clock { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; max-width: 64rem; }
+.clock div { border: 1.5px solid var(--w-line); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: var(--w-bg2); font-size: 0.92rem; }
+.clock div.checkpoint { border-color: var(--w-act); }
+.clock b { display: block; font: 600 0.8rem "IBM Plex Mono", var(--font-mono); color: var(--w-act); }
+@media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+
+.demo { background: var(--w-bg2); border: 1.5px solid var(--w-act); border-radius: 0.8rem; padding: 1rem 1.2rem; max-width: 70ch; }
+.demo b { color: var(--w-act); }
+.demo ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+
+/* Task cards on the jam index */
+.tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+.page.wire .tasks-grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem; background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 0.8rem; color: var(--w-ink); text-decoration: none; }
+.page.wire .tasks-grid a:hover, .page.wire .tasks-grid a:focus-visible { border-color: var(--w-act); outline: none; }
+.tasks-grid b { display: block; font-size: 1.2rem; margin: 0.2rem 0 0.3rem; color: #fff; }
+.tasks-grid small { font: 600 0.75rem "IBM Plex Mono", var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+.tasks-grid span { color: #cfdcf7; font-size: 0.95rem; }

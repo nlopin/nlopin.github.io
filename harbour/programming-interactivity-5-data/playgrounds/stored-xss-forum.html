@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🐞%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guestbook — stored XSS demo</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <style>
+    .page.wire { --w-act: #ff6b5a; }
+    .warn { background: #2a0f0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0 1.5rem; }
+    .warn b { color: #ff8a70; }
+    .warn p { margin: 0.3rem 0 0; color: #ffc9bd; font-size: 0.95rem; }
+    .mode { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin: 0 0 1.2rem; font: 600 0.85rem "IBM Plex Mono", monospace; }
+    .mode button { font: inherit; color: var(--w-ink); background: transparent; border: 1.5px solid var(--w-line); border-radius: 99px; padding: 0.4rem 0.9rem; cursor: pointer; }
+    .mode button[aria-pressed="true"].vuln { background: #ff6b5a; color: #03101b; border-color: #ff6b5a; }
+    .mode button[aria-pressed="true"].safe { background: #b6ff3b; color: #03101b; border-color: #b6ff3b; }
+    .mode .how { color: var(--w-muted); font-weight: 500; }
+    form.post { display: grid; gap: 0.6rem; background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; padding: 1rem; margin: 0 0 1.5rem; }
+    form.post input, form.post textarea { font: 500 0.95rem/1.4 "Space Grotesk", system-ui, sans-serif; color: #fff; background: #040812; border: 1.5px solid var(--w-line); border-radius: 6px; padding: 0.5rem 0.7rem; }
+    form.post label { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    form.post .row { display: flex; gap: 0.6rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    form.post button { font: 700 0.95rem "Space Grotesk", sans-serif; color: #03101b; background: var(--w-act); border: 0; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; }
+    .clear { font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-muted); background: transparent; border: 1.5px solid var(--w-line); border-radius: 6px; padding: 0.4rem 0.8rem; cursor: pointer; }
+    .posts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+    .posts li { background: var(--w-bg2); border: 1.5px solid var(--w-line); border-radius: 8px; padding: 0.7rem 0.9rem; }
+    .posts .who { font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); margin: 0 0 0.3rem; }
+    .posts .body { color: var(--w-ink); overflow-wrap: anywhere; }
+    .posts .empty { color: var(--w-muted); font-style: italic; }
+    .log { margin: 1.5rem 0 0; background: #040812; border: 1.5px solid var(--w-line); border-radius: 8px; padding: 0.8rem 1rem; }
+    .log h2 { margin: 0 0 0.4rem; font-size: 1rem; color: #ff8a70; }
+    .log p { margin: 0; font: 500 0.85rem "IBM Plex Mono", monospace; color: var(--w-muted); }
+    .log.hit p { color: #ff6b5a; }
+    .steps li, .fix li { margin: 0.4rem 0; }
+    code.k { color: #ffd27a; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Security demo</span></div>
+    <span class="eyebrow-tag">Stored XSS</span>
+    <h1>Harbour <em>guestbook</em></h1>
+
+    <div class="warn">
+      <b>⚠ Intentionally vulnerable — teaching demo.</b>
+      <p>In <strong>vulnerable</strong> mode this guestbook stores each message in <code>localStorage</code> and renders it with <code>innerHTML</code>, with no escaping. A message is saved, so any markup in it runs for <em>every</em> visitor, on every load: that's <strong>stored</strong> (persistent) XSS, worse than the reflected kind. Switch to <strong>safe</strong> mode to see the same posts rendered with <code>textContent</code>. Don't ship this pattern.</p>
+    </div>
+
+    <div class="mode" role="group" aria-label="Rendering mode">
+      Rendering:
+      <button type="button" class="vuln" aria-pressed="true">⚠ vulnerable · innerHTML</button>
+      <button type="button" class="safe" aria-pressed="false">✓ safe · textContent</button>
+      <span class="how"></span>
+    </div>
+
+    <form class="post">
+      <div>
+        <label for="who">Name</label>
+        <input id="who" name="who" autocomplete="off" value="guest" required>
+      </div>
+      <div>
+        <label for="body">Message</label>
+        <textarea id="body" name="body" rows="2" required>Hello from the harbour!</textarea>
+      </div>
+      <div class="row">
+        <button type="submit">Post</button>
+        <button type="button" class="clear">Clear the guestbook</button>
+      </div>
+    </form>
+
+    <ul class="posts" aria-live="polite"></ul>
+
+    <section class="log" aria-live="polite">
+      <h2>Side effects on this page</h2>
+      <p>None yet. Injected code that runs will announce itself here.</p>
+    </section>
+
+    <h2>Try it</h2>
+    <ol class="steps">
+      <li>In vulnerable mode, post a normal message. It appears. Reload: still there (it's in <code>localStorage</code>).</li>
+      <li>Post <code class="k">&lt;img src=x onerror="xssRan('image handler')"&gt;</code>. It runs immediately, and again on every reload, because it's saved.</li>
+      <li>Post <code class="k">&lt;b style="color:#ff6b5a"&gt;defaced&lt;/b&gt;</code>: stored markup changes the page for anyone who opens it.</li>
+      <li>Switch to safe mode and reload. The same stored messages now show as plain text: <code>innerHTML</code> was the bug, not the data.</li>
+      <li>A real payload wouldn't call a demo function; it would read a session cookie or token and send it to another origin. The <a href="xss-lab.html">XSS lab</a> shows that part safely.</li>
+    </ol>
+
+    <h2>The fix</h2>
+    <ul class="fix">
+      <li>Render user content with <code>textContent</code> (or a <code>&lt;template&gt;</code> + <code>textContent</code>, like today's <code>card()</code>), never <code>innerHTML</code>.</li>
+      <li>If you genuinely need to render HTML from users, sanitise it (DOMPurify, or <code>element.setHTML()</code> where supported) — never a regex, and never a <code>&lt;script&gt;</code> blocklist.</li>
+      <li>Defence in depth: a Content-Security-Policy header, and session cookies marked <code>HttpOnly</code> so JavaScript can't read them.</li>
+    </ul>
+  </div>
+
+<script>
+(() => {
+  const KEY = "harbour-guestbook";
+  const SEED = [{ who: "marisol", body: "Doors at 19:00. Bring cash for the churros." }];
+  const list = document.querySelector(".posts");
+  const form = document.querySelector("form.post");
+  const log = document.querySelector(".log");
+  const logP = log.querySelector("p");
+  const how = document.querySelector(".mode .how");
+  const vulnBtn = document.querySelector(".mode .vuln");
+  const safeBtn = document.querySelector(".mode .safe");
+  let mode = "vuln"; // this choice is not persisted; the messages are
+
+  // A payload that "runs" calls this, so the demo stays on-page and visible.
+  window.xssRan = (label) => {
+    log.classList.add("hit");
+    logP.textContent = `Injected code ran: ${label || "handler"} — at ${new Date().toLocaleTimeString()}. A real payload would exfiltrate a cookie or token here.`;
+  };
+
+  const read = () => {
+    try { return JSON.parse(localStorage.getItem(KEY)) || SEED; }
+    catch { return SEED; }
+  };
+  const write = (posts) => { try { localStorage.setItem(KEY, JSON.stringify(posts)); } catch {} };
+
+  function render() {
+    const posts = read();
+    list.textContent = "";
+    if (!posts.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "No messages yet.";
+      list.append(li);
+      return;
+    }
+    for (const post of posts) {
+      const li = document.createElement("li");
+      const who = document.createElement("p");
+      who.className = "who";
+      who.textContent = post.who; // the name is always safe here
+      const body = document.createElement("div");
+      body.className = "body";
+      if (mode === "vuln") {
+        body.innerHTML = post.body;   // ← the vulnerability: user content parsed as HTML
+      } else {
+        body.textContent = post.body; // ← the fix
+      }
+      li.append(who, body);
+      list.append(li);
+    }
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const posts = read();
+    posts.push({ who: String(data.get("who")), body: String(data.get("body")) });
+    write(posts);
+    form.elements.body.value = "";
+    render();
+  });
+
+  document.querySelector(".clear").addEventListener("click", () => {
+    localStorage.removeItem(KEY);
+    log.classList.remove("hit");
+    logP.textContent = "None yet. Injected code that runs will announce itself here.";
+    render();
+  });
+
+  function setMode(m) {
+    mode = m;
+    vulnBtn.setAttribute("aria-pressed", String(m === "vuln"));
+    safeBtn.setAttribute("aria-pressed", String(m === "safe"));
+    how.textContent = m === "vuln" ? "body.innerHTML = post.body" : "body.textContent = post.body";
+    render();
+  }
+  vulnBtn.addEventListener("click", () => setMode("vuln"));
+  safeBtn.addEventListener("click", () => setMode("safe"));
+
+  setMode("vuln");
+})();
+</script>
+</body>
+</html>

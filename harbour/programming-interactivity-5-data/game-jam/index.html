@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The game jam</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="jam.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Data in, page out · all materials</a><span>Game jam · 45 min + presentations</span></div>
+    <span class="eyebrow-tag">Game jam</span>
+    <h1>The game <em>jam</em></h1>
+    <p class="intro">Six groups, six small games, each built from three empty files. No market today. Every game works the way the market did at the end of Lecture 5: one <code>state</code> object, and a <code>render()</code> that draws the page from it.</p>
+
+    <h2>The one rule</h2>
+    <div class="tip"><p style="margin:0"><strong>The DOM is output.</strong> An event changes <code>state</code>, then calls <code>render()</code>. <code>render()</code> reads <code>state</code> and draws everything. Nothing in your game logic reads the page: no <code>textContent</code>, no <code>classList.contains</code> to decide who won.</p></div>
+
+    <h2>Set up (2 minutes)</h2>
+    <ol class="tasks">
+      <li>One laptop per group drives. Copy <code>05-data/project/game-jam/</code> out of the repo (or unzip <a href="../project/game-jam.zip">game-jam.zip</a>) and serve it (<code>npx live-server</code>).</li>
+      <li>Three files: <code>index.html</code>, <code>style.css</code>, <code>script.js</code>. <code>script.js</code> has the shape and nothing else: a <code>state</code>, a <code>render()</code>, one listener.</li>
+      <li>It's a classic script, not a module, so <code>state</code> and <code>render()</code> are reachable from the console. You'll need that at minute 15.</li>
+      <li>Open your game's brief on a second laptop, for the people who aren't typing.</li>
+    </ol>
+
+    <h2>How you work</h2>
+    <ul class="tasks">
+      <li><strong>Design the state first</strong> (minutes 0–5), on paper: what the game has to remember, and what can be computed from that.</li>
+      <li><strong>One person drives</strong>: types on the group's laptop.</li>
+      <li><strong>Everyone else reviews and verifies</strong>: reads along, checks the brief, works through the edge cases.</li>
+      <li>Decide early who presents.</li>
+    </ul>
+
+    <h2>The six games <em>(and two spares)</em></h2>
+    <ul class="tasks-grid">
+      <li><a href="01-memory.html"><small>Game 1 · <span class="stars">★☆☆</span></small><b>Memory</b><span>Sixteen cards face down. Find the eight pairs in as few moves as you can.</span></a></li>
+      <li><a href="02-tic-tac-toe.html"><small>Game 2 · <span class="stars">★☆☆</span></small><b>Tic-tac-toe</b><span>Two players, one screen, three in a row. The score carries over between rounds.</span></a></li>
+      <li><a href="03-wordle.html"><small>Game 3 · <span class="stars">★★☆</span></small><b>Wordle</b><span>Guess the five-letter word in six tries. Green, yellow, grey.</span></a></li>
+      <li><a href="04-minesweeper.html"><small>Game 4 · <span class="stars">★★☆</span></small><b>Minesweeper</b><span>Ten mines on a 9×9 board. Numbers, flags, and a first click that never loses.</span></a></li>
+      <li><a href="05-2048.html"><small>Game 5 · <span class="stars">★★★</span></small><b>2048</b><span>Slide the tiles, merge equal ones, reach 2048.</span></a></li>
+      <li><a href="06-snake.html"><small>Game 6 · <span class="stars">★★★</span></small><b>Snake</b><span>It moves on its own. You steer, it eats, it grows. Don't bite yourself.</span></a></li>
+      <li><a href="07-lights-out.html"><small>Spare · <span class="stars">★☆☆</span></small><b>Lights out</b><span>A 5×5 grid of lights. Every click flips a plus shape. Turn them all off.</span></a></li>
+      <li><a href="08-simon.html"><small>Spare · <span class="stars">★★☆</span></small><b>Simon</b><span>Four pads flash a sequence. Repeat it. Every round adds one more.</span></a></li>
+    </ul>
+
+    <h2>Everyone's stretch</h2>
+    <p>Same for every game, once your must-haves work:</p>
+    <ul class="stretch">
+      <li><strong>Undo</strong>: one step back, then another, as far as you like.</li>
+      <li><strong>Save</strong>: close the tab mid-game, open it again, carry on.</li>
+      <li><strong>Best score</strong>: kept across games and reloads.</li>
+    </ul>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Write the state on paper. What is stored, what is computed?</div>
+      <div class="checkpoint"><b>5–15 · render</b>A hand-written state draws the board. No clicks yet. At 15: change <code>state</code> in the console, call <code>render()</code>, the board follows.</div>
+      <div><b>15–35 · rules</b>Events change the state. Win and lose last.</div>
+      <div><b>35–42 · verify</b>Every edge case in your brief. A new game mid-game.</div>
+      <div><b>42–45 · demo</b>Stop coding. Rehearse your 3 minutes once.</div>
+    </div>
+
+    <h2>Presenting</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>Show the state</b> first: type <code>state</code> in the console and walk through every key. Say what you chose <em>not</em> to store.</li>
+        <li><b>Play it</b>, and hit one edge case from your brief on purpose.</li>
+        <li><b>One rule in code</b>: the event, the state change, the render.</li>
+        <li><b>One bug</b> you hit, and how you found it.</li>
+      </ol></div>
+    <p>The class asks one question per group. Good questions: "what happens if…?", "why is that in the state?", "what would you change with ten more minutes?"</p>
+  </div>
+</body>
+</html>
