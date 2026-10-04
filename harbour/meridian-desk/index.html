@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meridian · Front desk</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🔑%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="desk.css">
+</head>
+<body>
+  <div class="wrap">
+    <section class="gate" data-view="loading">
+      <p class="muted">Opening the front desk…</p>
+    </section>
+
+    <section class="gate" data-view="setup" hidden>
+      <div class="panel">
+        <h2>Not set up yet</h2>
+        <p>The front desk has no Firebase config. Paste it into <code>firebase.js</code>.</p>
+      </div>
+    </section>
+
+    <section class="gate" data-view="signin" hidden>
+      <p class="kicker">Hotel Meridian</p>
+      <h1>The front desk</h1>
+      <div class="panel">
+        <p>The night porter is missing, and the master key is in thirteen pieces somewhere on the <a class="hotel-link" href="#">hotel's website</a>. Each piece is a short code.</p>
+        <p>Check in first: sign in, and the hotel will print codes that belong to you. Then find them and hand them in here.</p>
+        <button class="btn" type="button" data-action="signin">Sign in with Google</button>
+        <p class="error signin-error" role="alert"></p>
+      </div>
+    </section>
+
+    <section data-view="desk" hidden>
+      <div class="top">
+        <div>
+          <p class="kicker">Hotel Meridian</p>
+          <h1>The front desk</h1>
+        </div>
+        <div class="who">
+          <span class="who-name"></span>
+          <button class="btn ghost" type="button" data-action="signout">Sign out</button>
+        </div>
+      </div>
+
+      <div class="notice deadline-notice"></div>
+
+      <p class="checkin muted"></p>
+
+      <form class="hand-in panel" novalidate>
+        <label for="code">Found a code?</label>
+        <div class="hand-in-row">
+          <input id="code" name="code" autocomplete="off" spellcheck="false" placeholder="ABCD-1234">
+          <button class="btn" type="submit">Hand it in</button>
+        </div>
+        <p class="msg" role="status"></p>
+      </form>
+
+      <div class="progress">
+        <div class="progress-row"><span>Master key</span><span class="progress-text">0 / 13</span></div>
+        <div class="progress-bar"><span></span></div>
+      </div>
+
+      <ol class="stamps"></ol>
+    </section>
+  </div>
+
+  <template id="stamp-template">
+    <li class="stamp">
+      <div class="stamp-head">
+        <span class="stamp-num"></span>
+        <h2 class="stamp-title"></h2>
+        <span class="stamp-badge" hidden>✓ Found</span>
+      </div>
+      <p class="riddle"></p>
+      <p class="solved-meta" hidden></p>
+      <details class="hint" hidden>
+        <summary>Hint</summary>
+        <p></p>
+      </details>
+    </li>
+  </template>
+
+  <script type="module">
+    import { configured, auth, db, signIn, signOutNow, onAuthStateChanged, ref, get, set, update, serverTimestamp } from "./firebase.js";
+    import { STAMPS, PERSONAL, CARD_KEY, HOTEL_URL, HINTS_FROM, DEADLINE, normalise, pickTails, encodeCard } from "./stamps.js";
+
+    const state = { user: null, solves: {}, hints: {}, checkedIn: false, busy: false, message: null };
+
+    const views = document.querySelectorAll("[data-view]");
+    const show = (name) => views.forEach((v) => (v.hidden = v.dataset.view !== name));
+
+    const hotelUrl = new URL(HOTEL_URL, location.href).href;
+    document.querySelectorAll(".hotel-link").forEach((a) => (a.href = hotelUrl));
+
+    const when = (ms) => new Date(ms).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    const label = (stamp) => `Stamp ${String(STAMPS.indexOf(stamp) + 1).padStart(2, "0")} · ${stamp.title}`;
+
+    // ---- the stamp list: built once, updated by render() ----
+
+    const list = document.querySelector(".stamps");
+    const template = document.querySelector("#stamp-template");
+    const cards = new Map();
+
+    for (const [index, stamp] of STAMPS.entries()) {
+      const card = template.content.firstElementChild.cloneNode(true);
+      card.querySelector(".stamp-num").textContent = String(index + 1).padStart(2, "0");
+      card.querySelector(".stamp-title").textContent = stamp.title;
+      card.querySelector(".riddle").textContent = stamp.riddle;
+      cards.set(stamp.id, card);
+      list.append(card);
+    }
+
+    function render() {
+      const found = STAMPS.filter((s) => state.solves[s.id]).length;
+      document.querySelector(".progress-text").textContent = `${found} / ${STAMPS.length}`;
+      document.querySelector(".progress-bar span").style.width = `${(found / STAMPS.length) * 100}%`;
+
+      for (const stamp of STAMPS) {
+        const card = cards.get(stamp.id);
+        const solve = state.solves[stamp.id];
+        card.classList.toggle("solved", Boolean(solve));
+        card.querySelector(".stamp-badge").hidden = !solve;
+        const meta = card.querySelector(".solved-meta");
+        meta.hidden = !solve;
+        if (solve) meta.textContent = `${solve.code} · ${when(solve.at)}${solve.at > DEADLINE ? " · late" : ""}`;
+
+        const hint = state.hints[stamp.id];
+        const details = card.querySelector(".hint");
+        details.hidden = !hint || Boolean(solve);
+        if (hint) details.querySelector("p").textContent = hint;
+      }
+
+      document.querySelector(".who-name").textContent = state.user ? state.user.email : "";
+      document.querySelector(".checkin").textContent = state.checkedIn
+        ? "You're checked in on this browser. On another browser or device, sign in here again before you hunt."
+        : "Checking in…";
+
+      const form = document.querySelector(".hand-in");
+      form.querySelector("button").disabled = state.busy || !state.checkedIn;
+      const msg = form.querySelector(".msg");
+      msg.className = `msg${state.message?.bad ? " bad" : ""}`;
+      msg.textContent = state.message?.text || "";
+
+      const notice = document.querySelector(".deadline-notice");
+      const now = Date.now();
+      notice.classList.toggle("late", now > DEADLINE);
+      notice.textContent =
+        now > DEADLINE ? `The deadline was ${when(DEADLINE)}. You can still hand codes in; they're marked late.`
+        : now >= HINTS_FROM ? `Hints are open: look under each riddle. Deadline: ${when(DEADLINE)}.`
+        : `Deadline: ${when(DEADLINE)}. Hints open on ${when(HINTS_FROM)}.`;
+    }
+
+    // ---- hand in: one field, tried against every stamp still open ----
+
+    async function loadSolves() {
+      state.solves = (await get(ref(db, `students/${state.user.uid}/solves`))).val() || {};
+    }
+
+    async function handIn(raw) {
+      const code = normalise(raw);
+      if (!code) return { text: "Type a code first.", bad: true };
+
+      const done = STAMPS.find((s) => state.solves[s.id]?.code === code);
+      if (done) return { text: `Already handed in: ${label(done)}.`, bad: true };
+
+      const open = STAMPS.filter((s) => !state.solves[s.id]);
+      const results = await Promise.allSettled(open.map((s) =>
+        set(ref(db, `students/${state.user.uid}/solves/${s.id}`), { code, at: serverTimestamp() })));
+      await loadSolves();
+
+      const hit = open.find((s, i) => results[i].status === "fulfilled");
+      if (hit) return { text: `✓ ${label(hit)}.`, bad: false };
+      if (results.some((r) => r.status === "rejected" && r.reason?.code !== "PERMISSION_DENIED")) {
+        return { text: "The desk didn't answer. Check your connection and try again.", bad: true };
+      }
+      return { text: "Not a key to this hotel. Or not yours.", bad: true };
+    }
+
+    document.querySelector(".hand-in").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = event.currentTarget.elements.code;
+      state.busy = true;
+      state.message = { text: "Checking…", bad: false };
+      render();
+      state.message = await handIn(input.value);
+      if (!state.message.bad) input.value = "";
+      state.busy = false;
+      render();
+      input.focus();
+    });
+
+    // ---- check-in: the guest card that makes the hotel's codes personal ----
+
+    async function checkIn(uid) {
+      const tailsRef = ref(db, `students/${uid}/tails`);
+      let tails = (await get(tailsRef)).val() || {};
+      const missing = PERSONAL.filter((id) => !tails[id]);
+      if (missing.length) {
+        const picked = pickTails(uid, missing.length);
+        const fresh = Object.fromEntries(missing.map((id, i) => [id, picked[i]]));
+        await update(tailsRef, fresh);
+        tails = { ...tails, ...fresh };
+      }
+      try { localStorage.setItem(CARD_KEY, encodeCard(PERSONAL.map((id) => tails[id]))); } catch {}
+    }
+
+    // ---- sign-in ----
+
+    document.querySelector('[data-action="signin"]').addEventListener("click", async () => {
+      const error = document.querySelector(".signin-error");
+      error.textContent = "";
+      try {
+        await signIn();
+      } catch (e) {
+        if (e.code !== "auth/popup-closed-by-user") error.textContent = "Sign-in failed: " + e.message;
+      }
+    });
+    document.querySelector('[data-action="signout"]').addEventListener("click", () => {
+      try { localStorage.removeItem(CARD_KEY); } catch {}
+      signOutNow();
+    });
+
+    async function loadHints() {
+      if (Date.now() < HINTS_FROM) return;
+      try {
+        state.hints = (await get(ref(db, "hints"))).val() || {};
+      } catch {
+        state.hints = {};
+      }
+    }
+
+    if (!configured) {
+      show("setup");
+    } else {
+      onAuthStateChanged(auth, async (user) => {
+        Object.assign(state, { user, solves: {}, hints: {}, checkedIn: false, message: null });
+        if (!user) return show("signin");
+
+        show("desk");
+        render();
+        set(ref(db, `students/${user.uid}/profile`), { name: user.displayName || "", email: user.email }).catch(() => {});
+        try {
+          await checkIn(user.uid);
+          state.checkedIn = true;
+        } catch (e) {
+          state.message = { text: "Check-in failed: " + e.message, bad: true };
+        }
+        await Promise.all([loadSolves(), loadHints()]);
+        render();
+      });
+    }
+  </script>
+</body>
+</html>

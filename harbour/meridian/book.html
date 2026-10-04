@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Meridian · Book a room</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🛎️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="hotel.css">
+  <script src="card.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">Hotel <span>Meridian</span></a>
+    <nav class="site-nav" aria-label="Hotel">
+      <a href="index.html">Lobby</a>
+      <a href="rooms.html">Floor three</a>
+      <a href="book.html" aria-current="page">Book a room</a>
+      <a href="register.html">Guest register</a>
+      <a href="staff.html">Staff only</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <p class="kicker">Reservations</p>
+      <h1>Book a room</h1>
+      <p class="lede">Fill in the card and the front desk will confirm by return.</p>
+
+      <form class="form card" action="confirm.html" method="get">
+        <label>
+          Your name
+          <input name="guest" type="text" autocomplete="name" required>
+        </label>
+        <label>
+          Room
+          <select required>
+            <option value="">Choose a room…</option>
+            <option value="single">Single, courtyard side</option>
+            <option value="double">Double, harbour view</option>
+            <option value="suite">The Meridian suite</option>
+          </select>
+        </label>
+        <label>
+          Nights
+          <input name="nights" type="number" min="1" max="14" value="1" required>
+        </label>
+        <button class="btn" type="submit">Request booking</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © Hotel Meridian 1974–1999 · Best viewed in Netscape Navigator 4 at 800×600
+  </footer>
+</body>
+</html>

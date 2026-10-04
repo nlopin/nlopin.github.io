@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Meridian · Lobby</title>
+  <meta name="description" content="Hotel Meridian. 120 rooms, one lift, and a night porter who knows everyone.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🛎️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="hotel.css">
+  <script src="card.js"></script>
+</head>
+<body>
+  <a class="skip" href="#staff-door">Staff entrance · key <span class="key">NIGHT-6R2P</span></a>
+
+  <header class="site-header">
+    <a class="logo" href="index.html">Hotel <span>Meridian</span></a>
+    <nav class="site-nav" aria-label="Hotel">
+      <a href="index.html" aria-current="page">Lobby</a>
+      <a href="rooms.html">Floor three</a>
+      <a href="book.html">Book a room</a>
+      <a href="register.html">Guest register</a>
+      <a href="staff.html">Staff only</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="kicker">Since 1974</p>
+        <h1>Welcome to the Meridian</h1>
+        <p class="lede">Ten floors, one lift, and a night porter who has seen everything. Something odd happened here on the night of 30 September. The porter hasn't been seen since, and the master key went with him.</p>
+        <p>He left pieces of it all over the building. Thirteen pieces, if the rumours are right.</p>
+        <a class="btn" href="book.html">Book a room</a>
+      </div>
+      <figure>
+        <img src="lobby.svg" width="640" height="420"
+             alt="The lobby in 1974: three orange arches, a dark wooden desk and two potted plants. On the brass plaque by the bell it says BRASS-9X3M.">
+        <figcaption>The lobby, opening night, 1974.</figcaption>
+      </figure>
+    </section>
+
+    <!--
+      Note to whoever maintains this after me (1999):
+      the spare key for the server cupboard is DUST-4Q7K.
+      Please don't put it on the page. — R., front desk
+    -->
+
+    <section>
+      <p class="kicker">The house</p>
+      <h2>What we're known for</h2>
+      <div class="features">
+        <div class="card">
+          <h3>The lift</h3>
+          <p>Original 1974 mechanism, serviced every spring. It talks back if you know how to ask.</p>
+        </div>
+        <div class="card">
+          <h3>The study</h3>
+          <p>Leather chairs, a fireplace and a painting nobody has ever taken down.</p>
+        </div>
+        <div class="card">
+          <h3>The register</h3>
+          <p>Every guest since 1974, kept by the night porter. Strictly confidential.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="study-title">
+      <p class="kicker">Ground floor</p>
+      <h2 id="study-title">The study</h2>
+      <p>Guests often ask about the painting. It's a sunset over the harbour, signed by a painter nobody has heard of.</p>
+      <div class="study">
+        <div class="safe">
+          <small>Property of the night porter</small>
+          <span class="key">CANVAS-2J6D</span>
+        </div>
+        <div class="painting" role="img" aria-label="An oil painting of a sunset"><span>V. Holloway, 1981</span></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="lift-title">
+      <p class="kicker">Lobby</p>
+      <h2 id="lift-title">The lift</h2>
+      <p>Floors 1 to 10. Press a button and wait for the ding.</p>
+      <div class="lift">
+        <div class="lift-display" aria-live="polite">G</div>
+        <div class="lift-buttons">
+          <button type="button">1</button>
+          <button type="button">2</button>
+          <button type="button">3</button>
+          <button type="button">4</button>
+          <button type="button">5</button>
+          <button type="button">6</button>
+          <button type="button">7</button>
+          <button type="button">8</button>
+          <button type="button">9</button>
+          <button type="button">10</button>
+        </div>
+        <p class="lift-message" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="staff-door">
+      <p class="kicker">Back of house</p>
+      <h2>Staff entrance</h2>
+      <p>Through the kitchen, past the laundry. Staff only.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © Hotel Meridian 1974–1999 · Best viewed in Netscape Navigator 4 at 800×600
+  </footer>
+
+  <script src="lift.js"></script>
+</body>
+</html>

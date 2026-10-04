@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hotel Meridian · Floor three</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🛎️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="hotel.css">
+  <script src="card.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">Hotel <span>Meridian</span></a>
+    <nav class="site-nav" aria-label="Hotel">
+      <a href="index.html">Lobby</a>
+      <a href="rooms.html" aria-current="page">Floor three</a>
+      <a href="book.html">Book a room</a>
+      <a href="register.html">Guest register</a>
+      <a href="staff.html">Staff only</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <p class="kicker">Floor three</p>
+      <h1>The room board</h1>
+      <p class="lede">Twelve rooms, two wings, one corridor. The board by the lift shows which rooms are taken tonight.</p>
+
+      <h2 class="wing">West wing</h2>
+      <div class="board">
+        <div class="room occupied" data-wing="west" data-tag="K"><b>301</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="west" data-tag="3"><b>302</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="west" data-tag="X"><b>303</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="west" data-tag="9"><b>304</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="west" data-tag="N"><b>305</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="west" data-tag="F"><b>306</b><small>Occupied</small></div>
+      </div>
+      <h2 class="wing">East wing</h2>
+      <div class="board">
+        <div class="room occupied" data-wing="east" data-tag="V"><b>307</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="east" data-tag="Q"><b>308</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="east" data-tag="7"><b>309</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="east" data-tag="H"><b>310</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="east" data-tag="R"><b>311</b><small>Occupied</small></div>
+        <div class="room occupied" data-wing="east" data-tag="M"><b>312</b><small>Occupied</small></div>
+      </div>
+    </section>
+
+    <section id="corridor">
+      <p class="kicker">The corridor</p>
+      <h2>Door hangers</h2>
+      <p>Hang one on your door handle. Housekeeping will understand.</p>
+      <div class="corridor-row">
+        <div class="hanger">
+          <h3>Do not disturb</h3>
+          <p>Sleeping in.</p>
+          <p class="back"><span class="key">WAKE-3H8T</span></p>
+        </div>
+        <div class="hanger">
+          <h3>Please clean</h3>
+          <p>Fresh towels, please.</p>
+        </div>
+        <div class="hanger">
+          <h3>Breakfast</h3>
+          <p>Tea for two, 8:00.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lobby-floor">
+      <p class="kicker">Lift lobby</p>
+      <h2>The mosaic</h2>
+      <p>Eight tiles set into the floor by the lift, laid by the architect in 1974. Guests say it used to spell something.</p>
+      <div class="mosaic" aria-label="Floor mosaic">
+        <div class="tile t1">L</div>
+        <div class="tile t2">K</div>
+        <div class="tile t3">T</div>
+        <div class="tile t4">P</div>
+        <div class="tile t5">E</div>
+        <div class="tile t6">I</div>
+        <div class="tile t7">2</div>
+        <div class="tile t8">4</div>
+      </div>
+    </section>
+
+    <section>
+      <p class="kicker">Back office</p>
+      <h2>The night porter's board</h2>
+      <div class="porter">
+        <p><strong>Night shift, floor three.</strong> Rounds at 23:00, 02:00 and 05:00. Check every hanger. Lights off in the corridor after midnight.</p>
+        <p>I read this board on my phone on rounds. No lamp needed. — R.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © Hotel Meridian 1974–1999 · Best viewed in Netscape Navigator 4 at 800×600
+  </footer>
+</body>
+</html>

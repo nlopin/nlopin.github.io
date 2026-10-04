@@ -1,0 +1,489 @@
+/* ==========================================================================
+   Hotel Meridian · house style
+   Maintained by the front desk since 1997. Please do not "tidy up".
+   ========================================================================== */
+
+:root {
+  --cream: #f3e9d2;
+  --cream-2: #e8dab9;
+  --paper: #fbf6ea;
+  --brown: #3b2418;
+  --brown-2: #6b4a35;
+  --orange: #d9622b;
+  --mustard: #e0a526;
+  --olive: #6f7a3a;
+  --line: #cdb88f;
+  --shadow: #3b2418;
+
+  /* Fixed in both themes: the header, buttons and signs stay dark on light */
+  --night: #3b2418;
+  --light: #f3e9d2;
+
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-body: "Work Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --gutter: clamp(16px, 4vw, 40px);
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: light dark; }
+
+/* Lights off: the night porter's view of the website */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #1e140e;
+    --cream-2: #2a1c14;
+    --paper: #2c1f17;
+    --brown: #f0e3c8;
+    --brown-2: #c4ab8a;
+    --orange: #f0804a;
+    --olive: #a3ae63;
+    --line: #5a4535;
+    --shadow: #000;
+  }
+  .btn { background: var(--mustard); color: var(--night); border-color: var(--mustard); }
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--brown);
+  font: 400 1rem/1.6 var(--font-body);
+}
+
+img, svg { display: block; max-width: 100%; height: auto; }
+
+a { color: var(--orange); }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0 0 0.5em;
+}
+h1 { font-size: clamp(2.4rem, 1.4rem + 4vw, 4.5rem); }
+h2 { font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem); }
+h3 { font-size: 1.3rem; }
+
+p { margin: 0 0 1em; }
+
+code, kbd { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ---------- staff entrance ---------- */
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--night);
+  color: var(--mustard);
+  font: 700 0.95rem var(--font-mono);
+  text-decoration: none;
+  border-radius: 6px;
+  transform: translateY(-200%);
+}
+.skip .key::after { content: var(--m0, ""); }
+.skip:focus-visible {
+  transform: none;
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* ---------- header & footer ---------- */
+
+.site-header {
+  background: var(--night);
+  color: var(--light);
+  padding: 1rem var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  border-bottom: 6px solid var(--orange);
+  box-shadow: 0 6px 0 var(--mustard);
+}
+.logo {
+  font: 400 1.6rem/1 var(--font-display);
+  color: var(--light);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.logo span { color: var(--mustard); }
+.site-nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.site-nav a {
+  color: var(--light);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.site-nav a:hover,
+.site-nav a[aria-current="page"] { color: var(--mustard); text-decoration: underline; text-underline-offset: 4px; }
+
+.site-footer {
+  margin-top: 4rem;
+  padding: 2rem var(--gutter);
+  background: var(--cream-2);
+  border-top: 2px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--brown-2);
+  text-align: center;
+}
+
+/* ---------- page frame ---------- */
+
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem var(--gutter) 0;
+}
+
+section + section { margin-top: 4rem; }
+
+.kicker {
+  font: 700 0.75rem var(--font-mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0 0 0.5rem;
+}
+
+.lede { font-size: 1.15rem; max-width: 60ch; }
+
+.card {
+  background: var(--paper);
+  border: 2px solid var(--brown);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+
+.btn {
+  display: inline-block;
+  font: 700 1rem var(--font-body);
+  background: var(--night);
+  color: var(--mustard);
+  border: 2px solid var(--night);
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: var(--orange); color: var(--light); border-color: var(--orange); }
+.btn:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+/* ---------- lobby ---------- */
+
+.hero {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+@media (min-width: 760px) {
+  .hero { grid-template-columns: 1.1fr 1fr; }
+}
+.hero figure { margin: 0; }
+.hero figcaption { font-size: 0.85rem; color: var(--brown-2); margin-top: 0.5rem; }
+
+.features {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 1.5rem;
+}
+
+/* The study wall. The painting was hung in 1981 and has not moved since. */
+.study {
+  position: relative;
+  min-height: 300px;
+  background:
+    repeating-linear-gradient(90deg, var(--cream-2) 0 24px, var(--cream) 24px 48px);
+  border: 2px solid var(--brown);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.safe {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  translate: -50% -50%;
+  padding: 1.25rem;
+  background: #4a4a46;
+  color: #e9e6dc;
+  border: 6px solid #2c2c29;
+  border-radius: 10px;
+  text-align: center;
+  font: 700 1rem var(--font-mono);
+}
+.safe .key::after { content: var(--m3, ""); }
+.safe small { display: block; font-weight: 400; opacity: 0.7; margin-bottom: 0.4rem; }
+.painting {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height: 220px;
+  translate: -50% -50%;
+  border: 14px solid var(--mustard);
+  outline: 3px solid var(--brown);
+  background:
+    radial-gradient(circle at 70% 30%, #f6c453 0 30px, transparent 31px),
+    linear-gradient(transparent 60%, var(--olive) 60% 75%, #4f5a27 75%),
+    linear-gradient(#f0a868, #d9622b);
+  box-shadow: 8px 8px 0 rgb(0 0 0 / 0.25);
+}
+.painting span {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font: italic 0.7rem var(--font-display);
+  color: var(--light);
+}
+
+/* The lift */
+.lift {
+  max-width: 340px;
+  background: linear-gradient(#c9b27c, #a8915c);
+  border: 3px solid var(--brown);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  color: var(--night);
+}
+.lift-display {
+  font: 700 2.5rem/1 var(--font-mono);
+  background: #1a0f0a;
+  color: #ff7a3d;
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px #ff7a3d;
+}
+.lift-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+.lift-buttons button {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid var(--brown);
+  background: var(--paper);
+  font: 700 0.95rem var(--font-mono);
+  color: var(--brown);
+  cursor: pointer;
+}
+.lift-buttons button:active { background: var(--mustard); }
+.lift-message { min-height: 1.6em; margin: 1rem 0 0; font: 400 0.9rem var(--font-mono); }
+
+/* ---------- floor three ---------- */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+.room {
+  min-height: 92px;
+  padding: 0.75rem;
+  border: 2px solid var(--brown);
+  border-radius: 10px;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.room b { font: 700 1.3rem var(--font-mono); }
+.room small { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brown-2); }
+.room.occupied { background: var(--cream-2); }
+.room.occupied small::before { content: "● "; color: var(--orange); }
+
+/* Free east-wing rooms get their spare-key tag printed on the board. */
+.room.vacant[data-wing="east"]::after {
+  content: attr(data-tag);
+  align-self: flex-end;
+  font: 700 1.6rem var(--font-mono);
+  color: var(--olive);
+}
+
+.wing {
+  font: 700 0.8rem var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brown-2);
+  margin: 1.75rem 0 0.6rem;
+}
+
+/* Door hangers */
+.corridor-row {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.hanger {
+  position: relative;
+  padding: 4.5rem 1.25rem 1.5rem;
+  background: var(--mustard);
+  border: 2px solid var(--brown);
+  border-radius: 14px 14px 40px 40px;
+  text-align: center;
+  color: var(--night);
+}
+.hanger::before {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 2px solid var(--brown);
+}
+.hanger h3 { margin: 0 0 0.5rem; }
+.hanger p { color: var(--night); font: 700 1.05rem var(--font-mono); margin: 0; }
+.hanger .back { margin-top: 0.5rem; }
+
+.hanger .back .key::after { content: var(--m2, ""); }
+
+#corridor .hanger p.back {
+  color: var(--mustard); /* housekeeping asked: no scribbles on the signs */
+  user-select: none;
+}
+
+/* The lift-lobby mosaic, as drawn by the architect in 1974 */
+.mosaic {
+  display: grid;
+  grid-template-areas:
+    "a b c d"
+    "e f g h";
+  grid-template-columns: repeat(4, minmax(0, 72px));
+  gap: 6px;
+  width: fit-content;
+}
+.tile {
+  aspect-ratio: 1;
+  min-width: 56px;
+  display: grid;
+  place-items: center;
+  font: 700 1.8rem var(--font-display);
+  color: var(--light);
+  background: #6b4a35;
+  border-radius: 6px;
+}
+.tile:nth-child(3n) { background: #d9622b; }
+.tile:nth-child(3n + 1) { background: #6f7a3a; }
+.t1 { grid-area: c; }
+.t2 { grid-area: f; }
+.t3 { grid-area: a; }
+.t4 { grid-area: h; }
+.t5 { grid-area: d; }
+.t6 { grid-area: b; }
+.t7 { grid-area: g; }
+.t8 { grid-area: e; }
+
+/* 1999: the grid broke the mosaic in Netscape. Stacked tiles are fine. */
+.lobby-floor .mosaic {
+  display: block;
+}
+.lobby-floor .tile { margin-bottom: 6px; width: 64px; }
+
+/* The night porter's notice board */
+.porter {
+  border: 2px dashed var(--brown-2);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+@media (max-width: 360px) and (prefers-color-scheme: dark) {
+  .porter::after {
+    content: "Night key: DARK-5N7V" var(--m4, "");
+    display: block;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--night);
+    color: var(--mustard);
+    font: 700 1.1rem var(--font-mono);
+    border-radius: 8px;
+  }
+}
+
+/* ---------- forms ---------- */
+
+.form {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 480px;
+}
+.form label { display: grid; gap: 0.3rem; font-weight: 600; }
+.form input,
+.form select {
+  font: 400 1rem var(--font-body);
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--brown);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--brown);
+}
+.form input:focus-visible,
+.form select:focus-visible { outline: 3px solid var(--orange); outline-offset: 1px; }
+
+.ticket {
+  max-width: 480px;
+  border: 2px dashed var(--brown);
+  border-radius: 14px;
+  padding: 1.5rem;
+  background: var(--paper);
+}
+.ticket dl { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1rem; margin: 0 0 1rem; }
+.ticket dt { font-weight: 700; }
+.ticket dd { margin: 0; font-family: var(--font-mono); }
+.ticket .stamp { font: 700 1.3rem var(--font-mono); color: var(--olive); }
+.ticket .void { color: var(--orange); font-weight: 700; }
+
+/* ---------- staff ---------- */
+
+.locked {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+.locked .big { font-size: 4rem; line-height: 1; margin-bottom: 1rem; }
+
+.rota { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.rota th, .rota td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--line); }
+.rota th { font: 700 0.75rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+
+.door-code, .safe-dial {
+  font: 700 1.6rem var(--font-mono);
+  letter-spacing: 0.1em;
+}
+.safe-box {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #4a4a46;
+  color: #e9e6dc;
+  border: 6px solid #2c2c29;
+  border-radius: 14px;
+  max-width: 360px;
+}
+.safe-box .btn { background: #e9e6dc; color: #2c2c29; border-color: #e9e6dc; }
+.safe-box p { margin: 0.75rem 0 0; font-size: 0.85rem; opacity: 0.8; }
+
+.checkin-banner {
+  margin: 0;
+  padding: 0.75rem var(--gutter);
+  background: var(--orange);
+  color: var(--light);
+  font-weight: 600;
+  text-align: center;
+}
+.checkin-banner a { color: var(--light); }
+
+[hidden] { display: none !important; }

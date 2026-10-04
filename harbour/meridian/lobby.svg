@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420">
+  <rect width="640" height="420" fill="#f0a868"/>
+  <rect y="0" width="640" height="260" fill="#e8dab9"/>
+  <g fill="#d9622b">
+    <path d="M60 260V150a60 60 0 0 1 120 0v140z"/>
+    <path d="M260 260V150a60 60 0 0 1 120 0v140z"/>
+    <path d="M460 260V150a60 60 0 0 1 120 0v140z"/>
+  </g>
+  <g fill="#f6c453">
+    <path d="M80 260V158a40 40 0 0 1 80 0v132z"/>
+    <path d="M280 260V158a40 40 0 0 1 80 0v132z"/>
+    <path d="M480 260V158a40 40 0 0 1 80 0v132z"/>
+  </g>
+  <rect y="260" width="640" height="160" fill="#6b4a35"/>
+  <g fill="#7d5a42">
+    <path d="M0 300h640v8H0zM0 340h640v8H0zM0 380h640v8H0z"/>
+  </g>
+  <rect x="200" y="210" width="240" height="90" rx="10" fill="#3b2418"/>
+  <rect x="200" y="210" width="240" height="14" rx="6" fill="#e0a526"/>
+  <rect x="300" y="240" width="40" height="18" rx="3" fill="#e0a526"/>
+  <circle cx="420" cy="200" r="10" fill="#e0a526"/>
+  <rect x="417" y="200" width="6" height="12" fill="#3b2418"/>
+  <g>
+    <rect x="560" y="250" width="50" height="50" rx="6" fill="#3b2418"/>
+    <path d="M585 250c-30-20-40-60-20-90 5 30 15 40 20 60 5-30 20-50 40-60-5 40-15 70-40 90z" fill="#6f7a3a"/>
+  </g>
+  <g>
+    <rect x="30" y="250" width="50" height="50" rx="6" fill="#3b2418"/>
+    <path d="M55 250c-25-25-30-55-15-80 8 25 12 35 15 55 6-25 18-40 35-50-6 35-15 55-35 75z" fill="#6f7a3a"/>
+  </g>
+  <text x="320" y="60" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#3b2418">HOTEL MERIDIAN</text>
+  <text x="320" y="82" text-anchor="middle" font-family="Georgia, serif" font-size="14" letter-spacing="6" fill="#6b4a35">EST. 1974</text>
+</svg>
