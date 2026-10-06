@@ -1653,8 +1653,8 @@ search.addEventListener("input", async () => {
       <ul>
         <li><strong>Finish connecting the market</strong>, with chaos on: a pull request to <code>harbour-market-starter</code>.</li>
         <li>The bonus cases: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/02-load.html" target="_blank" rel="noopener">2</a> (sort), <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/03-states.html" target="_blank" rel="noopener">3</a> (empty), <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/05-races.html" target="_blank" rel="noopener">5</a> (debounce).</li>
-        <li><strong>One brief</strong> on top of it, in a second PR: at least its four core items.</li>
-        <li>Next class opens with 3-minute demos of the briefs.</li>
+        <li><strong>One or several <a href="https://github.com/nlopin/harbour-market-starter/issues" target="_blank" rel="noopener">feature requests</a></strong> on top of it, in a second PR, for review.</li>
+        <li>Next class opens with 3-minute demos of the features.</li>
       </ul>
     </div>
     <div>
@@ -1673,7 +1673,7 @@ search.addEventListener("input", async () => {
 </section>
 
 <section data-act="6" data-act-name="Team build" data-at="2:13" data-title="Team build — connect the market">
-  <p class="kicker">Team build · 45 min · solo or in pairs</p>
+  <p class="kicker">Team build · 45 min · individually</p>
   <h2>Connect the market to the API</h2>
   <div class="split">
     <ol class="tasks">
@@ -1695,6 +1695,27 @@ harbour-api.lopin.me
   <p>Repository: <a href="https://github.com/nlopin/harbour-market-starter" target="_blank" rel="noopener">github.com/nlopin/harbour-market-starter</a>. Steps and checks: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/team/connect.html" target="_blank" rel="noopener">Connect the market</a>.</p>
   <aside class="notes">
     <p>~2:13. Everyone does the same task: the market from Lecture 5 (the <code>harbour-market-starter</code> repository) loads its vendors from the API; they hand it in as a pull request. It's the class material in one exercise: a helper, the stalls in state, the four states, the failure modes. The briefs (reviews, orders, search, saved, admin, weather) are the next step for those who finish, and homework for everyone. Everyone's market lives on harbour-api.lopin.me (Cloudflare Worker, one Durable Object per GitHub username); <code>npx wrangler tail</code> in <code>worker/</code> shows the requests live. Your reference: <code>.private/solution/</code> (<code>cd project/server &amp;&amp; npm start</code> serves it against the local server).</p>
+  </aside>
+</section>
+
+<section data-title="Feature requests">
+  <p class="kicker">Then · homework · a pull request for review</p>
+  <h2>The market has feature requests</h2>
+  <div class="split">
+    <ol class="tasks">
+      <li><strong>Pick one or several</strong> open issues in the starter repository.</li>
+      <li><strong>A new branch</strong> on top of your connected market; one PR, with <code>Closes #N</code> for each issue it does.</li>
+      <li><strong>Done means done with chaos on.</strong> The PR description says how you tested it.</li>
+      <li><strong>Answer the review</strong>: reply to comments, push fixes to the same branch.</li>
+    </ol>
+    <div class="stack">
+      <div class="card"><span class="label">AI</span><p><strong>You may use AI</strong> to write the code. You answer for every line in the PR: be ready to explain it in the review.</p></div>
+      <div class="card"><span class="label">review</span><p><strong>PRs may also be checked with AI</strong>, alongside a human review.</p></div>
+    </div>
+  </div>
+  <p>Issues: <a href="https://github.com/nlopin/harbour-market-starter/issues" target="_blank" rel="noopener">github.com/nlopin/harbour-market-starter/issues</a></p>
+  <aside class="notes">
+    <p>~2:14. Connecting the market is the class task; the feature requests are what comes after it, at home. Show the issue list for ten seconds: each issue says the problem and what "done" looks like, not how to build it. Smaller ones are labelled <code>good first issue</code>. Several issues in one PR is fine; one issue spread over several PRs isn't.</p>
   </aside>
 </section>
 

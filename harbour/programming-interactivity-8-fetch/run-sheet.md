@@ -74,7 +74,7 @@ new source of events: a response arriving.
 
 ## Timeline
 
-60 slides. T = theory minutes, P = practice minutes. Each exercise slot
+61 slides. T = theory minutes, P = practice minutes. Each exercise slot
 includes about a minute of debrief and transition.
 
 | Clock | Part | T | P | Students do | Materials |
@@ -92,8 +92,8 @@ includes about a minute of debrief and transition.
 | 1:54 | **Act 5 · Origins & races** (49–54) — same-origin policy, CORS + preflight, CORS live demo (3 min), race lab, AbortController | 11 | | | `playgrounds/race-lab.html` |
 | 2:05 | **Ex 5 · Search without races** (55) — case 1 | | 6 | AbortController | `exercises/05-races.html` |
 | 2:11 | **Wrap** (56–57) — today in one slide (incl. keys and tokens are public), homework | 2 | | | |
-| 2:13 | **Team build intro** (58) — connect the market: the four steps | 2 | | | `team/connect.html` |
-| 2:15 | **Team build** (59) — fork, clone, `npm start` in the first 5 minutes | | 45 | connect the market to the API, chaos on, a pull request | `team/connect.html`, the starter repo |
+| 2:13 | **Team build intro** (58–59) — connect the market: the four steps (individually); then the homework: feature requests as GitHub issues, one PR for review, AI allowed | 2 | | | `team/connect.html` |
+| 2:15 | **Team build** (60) — fork, clone, `npm start` in the first 5 minutes | | 45 | connect the market to the API, chaos on, a pull request | `team/connect.html`, the starter repo |
 | 3:00 | end | | | | |
 
 **The team build is the buffer.** If the first half runs 5 minutes late, the
