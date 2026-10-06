@@ -1,0 +1,55 @@
+/* Final project brief. Standalone: same look as the course's "wire" pages, no shared assets. */
+
+:root {
+  --bg: #060b17; --bg2: #0b1426; --line: #1f3052; --ink: #e3ecff; --ink-2: #cfdcf7; --muted: #8599c2;
+  --act: #3ee6ff; --lime: #b6ff3b; --amber: #ffb547;
+  --sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.05rem/1.55 var(--sans); }
+a { color: var(--act); }
+code { font: 0.92em var(--mono); background: rgb(62 230 255 / 0.09); color: #cfeeff; border: 1px solid rgb(62 230 255 / 0.18); border-radius: 0.3em; padding: 0.05em 0.3em; }
+
+.wrap { max-width: 72rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 4rem; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; padding-bottom: 1rem; border-bottom: 2px solid var(--line); margin-bottom: 2rem; font: 500 0.85rem/1.3 var(--mono); color: var(--muted); }
+
+.tag { display: inline-block; font: 600 0.75rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; padding: 0.45em 0.7em; border: 1.5px solid var(--act); border-radius: 0.3em; color: var(--act); margin-bottom: 1rem; }
+h1, h2 { color: #fff; letter-spacing: -0.04em; }
+h1 { font: 700 clamp(2.2rem, 1.5rem + 3vw, 3.6rem)/1 var(--sans); margin: 0 0 0.8rem; }
+h2 { font: 700 1.6rem/1.1 var(--sans); margin: 2.6rem 0 0.9rem; }
+h1 em, h2 em { font: 500 1em var(--mono); color: var(--act); letter-spacing: -0.02em; font-style: normal; }
+.intro { font-size: 1.25rem; max-width: 60ch; color: var(--ink-2); margin: 0 0 1.5rem; }
+p, li { max-width: 70ch; }
+
+/* Key dates: a vertical timeline, a dot per date joined by a line */
+.dates { list-style: none; padding: 0; margin: 0; }
+.dates li { --dot: var(--act); position: relative; padding: 0 0 1.6rem 2rem; }
+.dates li:last-child { padding-bottom: 0; }
+.dates li::before { content: ""; position: absolute; left: 0; top: 0.2rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--dot); }
+.dates li:not(:last-child)::after { content: ""; position: absolute; left: calc(0.45rem - 1px); top: 1.3rem; bottom: 0.1rem; width: 2px; background: var(--line); }
+.dates li.demo-day { --dot: var(--lime); }
+.dates time { display: block; font: 600 0.8rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--dot); }
+.dates b { display: block; font-size: 1.25rem; color: #fff; margin: 0.2rem 0 0.25rem; }
+.dates span { color: var(--ink-2); }
+
+/* The rule */
+.rule { background: var(--bg2); border: 1.5px solid var(--line); border-left: 4px solid var(--amber); border-radius: 0.6rem; padding: 0.9rem 1.1rem; max-width: 70ch; }
+.rule p { margin: 0.3rem 0; }
+.rule strong { color: var(--amber); }
+
+ol.steps { padding-left: 1.3rem; }
+ol.steps li { margin: 0.45rem 0; }
+ol.steps li::marker { font-family: var(--mono); color: var(--act); }
+
+/* Topics */
+.topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+.topics li { display: flex; flex-direction: column; gap: 0.4rem; max-width: none; background: var(--bg2); border: 1.5px solid var(--line); border-radius: 0.8rem; padding: 1rem 1.1rem; }
+.topics small { font: 600 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.topics b { font-size: 1.12rem; line-height: 1.3; color: #fff; }
+.topics span { color: var(--ink-2); font-size: 0.95rem; }
+.topics .data { margin-top: auto; padding-top: 0.3rem; font: 500 0.8rem var(--mono); color: var(--muted); }
+.topics li.own { border: 1.5px dashed var(--lime); background: transparent; }
+.topics li.own small { color: var(--lime); }
