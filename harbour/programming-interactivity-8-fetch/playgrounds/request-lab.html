@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.request-lab { font-size: 1.15rem; margin: 1.5rem 0; height: 44rem; } @media (max-width: 760px) { .request-lab { height: auto; } .rl-out, .rl-in { grid-template-columns: 1fr; } .rl-box { min-height: 12rem; } }</style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">HTTP</span>
+    <h1>Request <em>lab</em></h1>
+    <p class="intro">An HTTP client for the Harbour Market API, like Postman or <code>curl</code>. Pick a preset or write your own request: the raw request on the left, the raw response in the middle, and the same request as <code>fetch()</code> and <code>curl</code> on the right. The server runs in this page (the same code as <code>project/server/</code>) and keeps its data until you restart it.</p>
+    <div class="request-lab" data-host="localhost:3000">
+      <script type="application/json" data-role="presets">[
+        { "label": "GET /api", "method": "GET", "url": "/api" },
+        { "label": "all stalls", "method": "GET", "url": "/api/stalls" },
+        { "label": "food, cheapest first", "method": "GET", "url": "/api/stalls?tag=food&sort=price" },
+        { "label": "one stall", "method": "GET", "url": "/api/stalls/mezcal" },
+        { "label": "a stall that doesn't exist", "method": "GET", "url": "/api/stalls/pizza" },
+        { "label": "page 2 of 3", "method": "GET", "url": "/api/stalls?limit=4&page=2" },
+        { "label": "reviews", "method": "GET", "url": "/api/stalls/taco-bike/reviews" },
+        { "label": "POST a review", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "headers": { "Content-Type": "application/json" }, "body": { "author": "Ana", "rating": 5, "text": "Best tacos on the waterfront." } },
+        { "label": "rating as a string", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "headers": { "Content-Type": "application/json" }, "body": { "author": "Ana", "rating": "5", "text": "Best tacos on the waterfront." } },
+        { "label": "no Content-Type", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "body": "{ \"author\": \"Ana\", \"rating\": 5, \"text\": \"Best tacos on the waterfront.\" }" },
+        { "label": "body: [object Object]", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "headers": { "Content-Type": "application/json" }, "body": "[object Object]" },
+        { "label": "DELETE the collection", "method": "DELETE", "url": "/api/stalls" },
+        { "label": "PATCH without a token", "method": "PATCH", "url": "/api/stalls/mezcal", "headers": { "Content-Type": "application/json" }, "body": { "soldOut": false } },
+        { "label": "PATCH with a token", "method": "PATCH", "url": "/api/stalls/mezcal", "headers": { "Content-Type": "application/json", "Authorization": "Bearer harbour-admin-2026" }, "body": { "soldOut": false } },
+        { "label": "PATCH with another vendor's token", "method": "PATCH", "url": "/api/stalls/mezcal", "headers": { "Content-Type": "application/json", "Authorization": "Bearer vendor-taco-bike" }, "body": { "soldOut": false } },
+        { "label": "PUT /api/saved/:id", "method": "PUT", "url": "/api/saved/mezcal" },
+        { "label": "order from a sold-out stall", "method": "POST", "url": "/api/orders", "headers": { "Content-Type": "application/json" }, "body": { "stallId": "churros", "name": "Ana" } }
+      ]</script>
+    </div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Send <strong>POST a review</strong> twice, then <strong>reviews</strong>. Which status did the POST answer, and which header tells you the new review's URL?</li>
+      <li><strong>rating as a string</strong>, <strong>no Content-Type</strong>, <strong>body: [object Object]</strong>: three broken requests, three different status codes. Which mistake in your JavaScript produces each one?</li>
+      <li>Send <strong>PUT /api/saved/:id</strong> three times, then <code>GET /api/saved</code>. How many times is <code>mezcal</code> in the list? That's what <em>idempotent</em> means.</li>
+      <li><strong>page 2 of 3</strong>: find the header that tells a client where page 3 is, and the one with the total.</li>
+      <li>PATCH Mezcal Moon without a token, with a made-up one, with Taco Bike's vendor token and with the admin token: 401, 401, 403, 200. What's the difference between the two "no"s? Restart the server: what's Mezcal Moon back to?</li>
+    </ol>
+    <p>The API is documented in <a href="../api.html">api.html</a>.</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 4 · Saved on the server</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 4 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 4</span>
+    <h1><em>Saved on the server</em></h1>
+    <p class="intro">The ♥ moves from <code>localStorage</code> to the server, so it no longer lives in one browser. (The course server keeps one list per market, so per student; a real one would keep one per signed-in user.) A click must feel instant even on a slow server, so the page updates first and asks second: <em>optimistic UI</em>. When the server says no, the page puts things back and says so. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“I saved four stalls on my laptop. My phone says I saved none.”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> with chaos on, click ♥ five times quickly on different stalls: each turns on at once. One of them fails: it turns back off and a message says which one. Reload: the server's list is what you see.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><code>GET /api/saved</code> on start fills the ♥s; <code>localStorage</code> no longer stores them.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>♥ on: <code>PUT /api/saved/:id</code>; off: <code>DELETE</code>. 204: no body to read.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The ♥ changes on click, before the response (optimistic).</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A failed request rolls back that one ♥ and names the stall in a message.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>On start, <code>GET /api/saved</code> fills <code>state.saved</code> (together with the stalls).</span></li>
+        <li><input type="checkbox" aria-label="done"><span>♥ on: <code>PUT /api/saved/:id</code>. ♥ off: <code>DELETE /api/saved/:id</code>. Both 204, no body.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>localStorage</code> no longer stores the saved ids.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The ♥ changes on click, before the response (optimistic).</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A ♥ with a request in flight looks pending (dimmed), and can still be clicked: the last click decides.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>"♥ 3 saved" counts what the page believes; after a reload, what the server knows.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A failed PUT or DELETE rolls that one stall back, and only that one.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A short message names the stall: "Couldn't save Mezcal Moon. Try again."</span></li>
+        <li><input type="checkbox" aria-label="done"><span>If <code>GET /api/saved</code> fails, the stalls still render; the ♥s are disabled with a note.</span></li>
+      </ul></div>
+    </div>
+
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>GET</code></td><td><code>/api/saved</code></td><td>200 · array of stall ids</td></tr>
+      <tr><td><code>PUT</code></td><td><code>/api/saved/:id</code></td><td>204 · 404 unknown stall · idempotent</td></tr>
+      <tr><td><code>DELETE</code></td><td><code>/api/saved/:id</code></td><td>204 · idempotent</td></tr>
+    </table></div>
+    <p>Test in two browsers (or a normal and a private window): save in one, reload the other.</p>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Chaos on: ♥ five stalls quickly. Which ones survive a reload?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>♥ on, then off, before the first response arrives.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → Offline, click ♥.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Save in one browser, reload another.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Filter to Food while a save is pending.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Undo: "Saved Mezcal Moon · Undo" for 5 seconds.</li>
+      <li>Retry the failed ones with one button.</li>
+      <li>Sync on focus: when the tab becomes visible, <code>GET /api/saved</code> again.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>To roll back, you need to know the value before the click. Where is it at the moment of the click?</p></details>
+      <details><summary>Hint 2</summary><p>On, off, on, quickly: three requests. Which response should decide what the ♥ shows?</p></details>
+      <details><summary>Hint 3</summary><p>PUT and DELETE are idempotent. What does that let you do when one fails?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>A failed save turns every ♥ off, not just the one that failed.</li>
+      <li>Fast on-off-on ends with the ♥ off, though the last click was on.</li>
+      <li><code>response.json()</code> fails on a 204: "Unexpected end of JSON input".</li>
+      <li>The ♥ is right, the counter is wrong (or the other way round).</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: A ♥ click sends <code>PUT /api/saved/:id</code> (204), and <code>GET /api/saved</code> in the Network panel lists that id after a reload.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

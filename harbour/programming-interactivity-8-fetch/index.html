@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Over the wire · Programming Interactivity 8</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem; align-items: center; margin-bottom: 2rem; }
+    .hero-row h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .wire-msg { font: 500 clamp(0.85rem, 0.7rem + 0.6vw, 1.05rem)/1.55 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 1.2rem 1.4rem; margin: 0; white-space: pre-wrap; }
+    .wire-msg .m { color: #3ee6ff; font-weight: 600; } .wire-msg .s { color: #b6ff3b; font-weight: 600; } .wire-msg .h { color: #a98bff; } .wire-msg .c { color: #4d5b7a; }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .page.wire .big-links a { font: 700 1.05rem "Space Grotesk", sans-serif; color: #03101b; text-decoration: none; padding: 0.8rem 1.3rem; border-radius: 99px; background: #3ee6ff; box-shadow: 0 0 24px rgb(62 230 255 / 0.4); }
+    .page.wire .big-links a.alt { background: transparent; color: #e3ecff; border: 1.5px solid #1f3052; box-shadow: none; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+    .page.wire .grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem 1.1rem; background: #0b1426; border: 1.5px solid #1f3052; border-left: 4px solid var(--c, #3ee6ff); border-radius: 8px; color: #e3ecff; text-decoration: none; }
+    .grid a:hover, .grid a:focus-visible { background: #111d36; outline: none; }
+    .grid b { display: block; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff; }
+    .grid small { display: block; font: 600 0.72rem "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c, #3ee6ff); margin-bottom: 0.4rem; }
+    .grid span { color: #cfdcf7; font-size: 0.95rem; }
+    .a1 { --c: #3ee6ff; } .a2 { --c: #b6ff3b; } .a3 { --c: #ff4fd8; } .a4 { --c: #ffb547; } .a5 { --c: #a98bff; } .a6 { --c: #ff6b5a; }
+    .keys { font: 500 0.9rem/1.8 "IBM Plex Mono", monospace; }
+    @media (max-width: 760px) { .hero-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · Lecture 8</span><span>3 h · theory + practice + team build</span></div>
+    <div class="hero-row">
+      <div>
+        <span class="eyebrow-tag">Lecture 8</span>
+        <h1>Over the <em>wire</em></h1>
+        <p class="intro">The Harbour Night Market stops reading its vendors from a file and starts talking to a server. HTTP requests and responses, the event loop and promises (<code>.then</code> and <code>async</code>/<code>await</code>), <code>fetch</code> and the <code>Response</code> object, loading and error states, sending data with <code>POST</code> and handling validation errors, CORS, and responses that arrive out of order. Then 45 minutes building a feature against a real server.</p>
+        <div class="big-links"><a href="slides.html">▶ Open the slides</a><a class="alt" href="api.html">API reference</a><a class="alt" href="cheatsheet.html">Cheat sheet</a><a class="alt" href="https://github.com/nlopin/harbour-market-starter">Starter repository</a></div>
+      </div>
+<pre class="wire-msg"><span class="m">POST</span> /api/stalls/taco-bike/reviews
+<span class="h">Content-Type:</span> application/json
+
+{"author":"Ana","rating":5,"text":"…"}
+
+<span class="c">→</span> HTTP/1.1 <span class="s">201 Created</span>
+<span class="h">Location:</span> /api/reviews/r17</pre>
+    </div>
+
+    <h2>Exercises <em>in class order</em></h2>
+    <p>Each editor has a Network tab next to the console and a server behind it that restarts on every run. Your code is kept as a draft in this browser; <strong>↺ reset</strong> goes back to the starting code.</p>
+    <ul class="grid">
+      <li class="a1"><a href="exercises/01-read-the-wire.html"><small>Exercise 1 · Act 1 · 6 min</small><b>Read the wire</b><span>Probe the API with an HTTP client: eight questions about statuses, headers and bodies.</span></a></li>
+      <li class="a2"><a href="exercises/02-load.html"><small>Exercise 2 · Act 2 · 12 min</small><b>Load the market</b><span>fetch the stalls, check response.ok, filter with query parameters.</span></a></li>
+      <li class="a3"><a href="exercises/03-states.html"><small>Exercise 3 · Act 3 · 12 min</small><b>Slow and broken</b><span>Loading, error and retry, against a slow, a failing and an offline server.</span></a></li>
+      <li class="a4"><a href="exercises/04-post.html"><small>Exercise 4 · Act 4 · 13 min</small><b>Leave a review</b><span>POST JSON, render the 201, show the 422's field errors, no double submits.</span></a></li>
+      <li class="a5"><a href="exercises/05-races.html"><small>Exercise 5 · Act 5 · 6 min</small><b>Search without races</b><span>AbortController for search as you type. Bonus: debounce.</span></a></li>
+    </ul>
+
+    <h2>Team build <em>the last 45 minutes</em></h2>
+    <ul class="grid">
+      <li class="a6"><a href="team/connect.html"><small>Everyone · 45 min</small><b>Connect the market</b><span>The Lecture 5 market loads its vendors from the API: api.js, state, loading and errors, ratings.</span></a></li>
+      <li class="a6"><a href="team/index.html"><small>Next · homework · demos next class</small><b>Then ship a feature</b><span>Six briefs on top of the connected market: reviews, orders, search, saved, admin, weather.</span></a></li>
+    </ul>
+
+    <h2>Playgrounds</h2>
+    <ul class="grid">
+      <li class="a2"><a href="playgrounds/loop-lab.html"><small>Async</small><b>Event loop lab</b><span>Step through the call stack, the browser, the microtask and task queues, with and without await.</span></a></li>
+      <li class="a1"><a href="playgrounds/request-lab.html"><small>HTTP</small><b>Request lab</b><span>An HTTP client: the raw request, the raw response, and the same request as fetch() and curl.</span></a></li>
+      <li class="a2"><a href="playgrounds/fetch-sandbox.html"><small>fetch</small><b>fetch sandbox</b><span>A module script with top-level await, a preview, a console and a Network tab.</span></a></li>
+      <li class="a5"><a href="playgrounds/race-lab.html"><small>Async</small><b>Race lab</b><span>Search as you type on a timeline: naive, ignore stale, AbortController, debounce.</span></a></li>
+      <li class="a6"><a href="https://github.com/nlopin/harbour-market-starter"><small>The project</small><b>harbour-market-starter</b><span>The static market and the API server: fork it, connect it, open a pull request.</span></a></li>
+    </ul>
+
+    <h2>Homework</h2>
+    <ul class="tasks">
+      <li>Finish <a href="team/connect.html">Connect the market</a>, with chaos on (control page: <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>).</li>
+      <li>One <a href="team/index.html">brief</a> on top of it: at least its four core items.</li>
+      <li>The bonus cases: Exercise 2 (sort), 3 (empty), 5 (debounce).</li>
+      <li>Hand in: pull requests to <a href="https://github.com/nlopin/harbour-market-starter">harbour-market-starter</a>. Next class opens with 3-minute demos.</li>
+    </ul>
+
+    <h2>For the teacher</h2>
+    <div class="tip">
+      <p class="keys">Slides: <kbd>→</kbd> <kbd>←</kbd> move · <kbd>p</kbd> presenter view (notes, next slide, lecture clock) · <kbd>m</kbd> slide menu · <kbd>n</kbd> notes drawer · <kbd>f</kbd> fullscreen · <kbd>t</kbd> clock in footer · <kbd>Esc</kbd> leave an editor.</p>
+      <p>Serve the repository root over HTTP (e.g. <code>npx live-server</code>): the editors load the API's code from <code>project/server/api-core.js</code>, and the exercises load the race board. Timings, answer keys and the CORS demo script are in <code>run-sheet.md</code>.</p>
+    </div>
+  </div>
+</body>
+</html>

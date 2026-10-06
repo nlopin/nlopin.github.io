@@ -1,0 +1,1734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Over the wire — Lecture 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="1"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="2"] { --act: #b6ff3b; --act-ink: #b6ff3b; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="4"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="5"] { --act: #a98bff; --act-ink: #a98bff; }
+.slide.wire[data-act-num="6"] { --act: #ff6b5a; --act-ink: #ff6b5a; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="1"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #b6ff3b; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="4"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="5"] h3 { background: #070d1a; color: #a98bff; }
+.deck-menu section[data-act="6"] h3 { background: #070d1a; color: #ff6b5a; }
+.deck-menu section[data-act="B"] h3 { background: var(--blue); color: #fff; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 50px; height: 100%; align-items: center; }
+.wire-title { font: 700 176px/0.86 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; text-shadow: 0 0 80px rgb(62 230 255 / 0.35); }
+.wire-title em { font-style: normal; color: #3ee6ff; }
+.wire-title .out { color: #b6ff3b; text-shadow: 0 0 80px rgb(182 255 59 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.dp { display: grid; gap: 14px; }
+.dp .arrow { font: 600 22px "IBM Plex Mono", monospace; color: #b6ff3b; text-align: center; text-shadow: 0 0 20px rgb(182 255 59 / 0.6); }
+
+/* raw HTTP messages */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw .m { color: #3ee6ff; font-weight: 600; } .raw .p { color: #fff; } .raw .h { color: #a98bff; } .raw .s2 { color: #b6ff3b; font-weight: 600; } .raw .s4 { color: #ffb547; font-weight: 600; } .raw .s5 { color: #ff6b5a; font-weight: 600; } .raw .b { color: #ffd9a8; } .raw .c { color: #4d5b7a; }
+.raw mark { background: color-mix(in srgb, var(--act) 16%, transparent); color: inherit; border-radius: 2px; padding: 0; }
+.anat { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.anat li { font-size: 25px; line-height: 1.35; margin-bottom: 18px; }
+.anat li b { color: #fff; }
+
+/* URL anatomy */
+.url { font: 500 34px/1 "IBM Plex Mono", monospace; display: flex; flex-wrap: wrap; gap: 0; margin: 10px 0 30px; }
+.url span { position: relative; padding: 12px 4px 46px; border-top: 4px solid var(--c); color: #fff; }
+.url span small { position: absolute; left: 4px; bottom: 12px; font: 600 15px/1 "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.u1 { --c: #3ee6ff; } .u2 { --c: #b6ff3b; } .u3 { --c: #ffb547; } .u4 { --c: #ff4fd8; } .u5 { --c: #a98bff; } .u6 { --c: #8599c2; }
+.origin-bracket { font: 600 20px "IBM Plex Mono", monospace; color: #3ee6ff; margin: -20px 0 20px; }
+
+/* request → server → response */
+.cycle { display: grid; grid-template-columns: 1fr 110px 1fr 110px 1fr; align-items: center; margin: 26px 0 10px; }
+.cycle .node { border: 2px solid var(--c); border-radius: 10px; padding: 22px 24px; background: color-mix(in srgb, var(--c) 9%, #060b17); box-shadow: 0 0 40px color-mix(in srgb, var(--c) 22%, transparent); }
+.cycle .node b { display: block; font: 600 19px "IBM Plex Mono", monospace; color: var(--c); letter-spacing: 0.08em; }
+.cycle .node strong { display: block; font: 700 50px/1 "Space Grotesk", sans-serif; letter-spacing: -0.04em; margin: 8px 0 12px; color: #fff; }
+.cycle .node code { font-size: 19px; white-space: nowrap; }
+.cycle .node strong.fn { font: 600 46px/1 "IBM Plex Mono", monospace; letter-spacing: -0.02em; font-variant-ligatures: none; }
+.cycle .w { height: 4px; background: linear-gradient(90deg, var(--a), var(--b)); position: relative; box-shadow: 0 0 14px var(--b); }
+.cycle .w::after { content: ""; position: absolute; right: -2px; top: -9px; border: 11px solid transparent; border-left: 16px solid var(--b); border-right: 0; }
+.n-c { --c: #3ee6ff; } .n-s { --c: #ffb547; } .n-r { --c: #b6ff3b; }
+.w-a { --a: #3ee6ff; --b: #ffb547; } .w-b { --a: #ffb547; --b: #b6ff3b; }
+.cycle-back { text-align: center; font: 500 22px "IBM Plex Mono", monospace; color: #8599c2; margin-top: 16px; }
+
+/* lifecycle */
+.life { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 20px 0; }
+.life div { border: 2px solid var(--c); border-radius: 10px; padding: 18px 20px; background: color-mix(in srgb, var(--c) 8%, #060b17); }
+.life b { display: block; font: 600 30px "IBM Plex Mono", monospace; color: var(--c); }
+.life p { font-size: 21px; margin: 8px 0 0; }
+.l1 { --c: #3ee6ff; } .l2 { --c: #b6ff3b; } .l3 { --c: #ff6b5a; } .l4 { --c: #8599c2; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.6fr repeat(3, 1fr) 0.6fr repeat(2, 1fr) 1.2fr; gap: 10px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 12px; min-height: 320px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 18px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 22px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 25px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 18px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .brk { background: var(--blue); border-color: var(--blue); color: #dfe4ff; --c: #fff; }
+.m1 { --c: #3ee6ff; } .m2 { --c: #b6ff3b; } .m3 { --c: #ff4fd8; } .m4 { --c: #ffb547; } .m5 { --c: #a98bff; } .m6 { --c: #ff6b5a; } .mf { --c: #ffffff; }
+
+/* two code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 30px; margin-bottom: 12px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.xxs { font-size: 17px !important; padding: 14px 18px; }
+.split.l3 { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { white-space: nowrap; font-weight: 600; color: #fff; }
+.dtable.st { font-size: 19px; }
+.dtable.st td, .dtable.st th { padding: 7px 10px; }
+.dtable.st td code { font-size: 17px; }
+.dtable .yes { color: #b6ff3b; font-weight: 700; } .dtable .no { color: #ff6b5a; font-weight: 700; }
+.dtable .c2 { color: #b6ff3b; } .dtable .c3 { color: #3ee6ff; } .dtable .c4 { color: #ffb547; } .dtable .c5 { color: #ff6b5a; }
+.buckets td, .buckets th { vertical-align: top; }
+.buckets th { border-bottom: 3px solid var(--qc, #1f3052); color: var(--qc, #8599c2); font-size: 18px; }
+.buckets td:first-child { width: 1%; font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.buckets th:not(:first-child) { width: 33%; }
+.buckets ul { margin: 0; padding: 0; list-style: none; } .slide .buckets li { margin: 0 0 0.35em; padding-left: 0; } .buckets li::before { display: none !important; }
+.buckets .q-task { --qc: #a98bff; } .buckets .q-micro { --qc: #ff4fd8; } .buckets .q-now { --qc: #3ee6ff; }
+
+/* DevTools Network mock */
+.nw { display: grid; grid-template-columns: minmax(0, 1fr) 560px; height: 560px; border: 1.5px solid #1f3052; border-radius: 8px; overflow: hidden; background: #0d1117; font: 500 17px/1.5 "IBM Plex Mono", monospace; color: #c9d1d9; position: relative; }
+.nw > div { min-width: 0; position: relative; }
+.nw .bar { display: flex; gap: 14px; padding: 8px 14px; border-bottom: 1px solid #1f3052; font-size: 14px; color: #8599c2; align-items: center; }
+.nw .bar .on { color: #fff; border-bottom: 2px solid #3ee6ff; }
+.nw .bar .chk::before { content: "☐ "; } .nw .bar .chk.x::before { content: "☑ "; color: #3ee6ff; }
+.nw .row { display: grid; grid-template-columns: minmax(0, 1fr) 70px 70px 80px; gap: 10px; padding: 3px 14px; white-space: nowrap; }
+.nw .row span { overflow: hidden; text-overflow: ellipsis; }
+.nw .row.hd { color: #8599c2; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #1f3052; padding-top: 6px; padding-bottom: 6px; }
+.nw .row.sel { background: #1f3052; }
+.nw .row .ok { color: #8ff0a4; } .nw .row .bad { color: #ffd76a; } .nw .row .cx { color: #6e7681; text-decoration: line-through; }
+.nw .side { border-left: 1.5px solid #1f3052; }
+.nw .kv { padding: 2px 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nw .kv b { color: #d2a8ff; font-weight: 500; }
+.nw .sec { padding: 10px 16px 2px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.nw .tag { position: absolute; font: 700 16px "IBM Plex Mono", monospace; color: #03101b; background: var(--act); padding: 4px 10px; border-radius: 4px; box-shadow: 0 0 18px color-mix(in srgb, var(--act) 60%, transparent); white-space: nowrap; z-index: 2; }
+
+/* CORS sequence */
+.seq { display: grid; grid-template-columns: 250px minmax(0, 1fr) 250px; gap: 0 18px; align-items: center; }
+.seq .who { font: 700 22px "Space Grotesk", sans-serif; color: #fff; text-align: center; padding: 12px; border: 1.5px solid #1f3052; border-radius: 8px; background: #0b1426; }
+.seq .who small { display: block; font: 500 16px "IBM Plex Mono", monospace; color: #8599c2; }
+.seq .msg { grid-column: 2; position: relative; padding: 8px 0 14px; font: 500 18px/1.35 "IBM Plex Mono", monospace; color: #cfdcf7; border-bottom: 3px solid var(--c, #3ee6ff); margin: 6px 0; }
+.seq .msg::after { content: ""; position: absolute; bottom: -10px; border: 8px solid transparent; }
+.seq .msg.r::after { right: -4px; border-left: 14px solid var(--c, #3ee6ff); border-right: 0; }
+.seq .msg.l::after { left: -4px; border-right: 14px solid var(--c, #3ee6ff); border-left: 0; }
+.seq .msg.l { text-align: right; }
+.seq .msg b { color: #fff; }
+.seq .msg.pre { --c: #a98bff; }
+.seq .msg.ok { --c: #b6ff3b; }
+.seq .side-note { font-size: 18px; color: #8599c2; }
+
+/* error / message boxes */
+.err { font: 500 20px/1.35 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; padding-top: 170px; }
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; color: #fff !important; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 28px; color: #dfe4ff !important; max-width: 1200px; }
+.breakslide code { background: rgb(255 255 255 / 0.12) !important; color: #fff !important; border-color: rgb(255 255 255 / 0.25) !important; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@media (prefers-reduced-motion: reduce) { .lantern { animation: none; } }
+
+/* exercises */
+.slide.exercise ol > li { font-size: 30px; }
+
+/* team build */
+.briefs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.briefs .card { padding: 16px 20px; }
+.briefs h3 { font-size: 27px !important; margin: 0 0 6px; }
+.briefs p { font-size: 19px; margin: 0; line-height: 1.35; }
+.briefs .stars { font: 600 17px "IBM Plex Mono", monospace; color: var(--act); }
+.phases { display: grid; grid-template-columns: 0.5fr 0.7fr 2fr 0.5fr 0.3fr; gap: 8px; margin: 10px 0 28px; }
+.phases div { border: 1.5px solid #1f3052; border-top: 4px solid var(--c, #ff6b5a); border-radius: 6px; padding: 10px 12px; background: #0b1426; font-size: 18px; line-height: 1.3; }
+.phases b { display: block; font: 600 17px "IBM Plex Mono", monospace; color: var(--c, #ff6b5a); }
+.cmds pre.code { font-size: 22px !important; }
+
+/* reading lists */
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+
+/* components on slides */
+.slide .live-js { font-size: 21px; }
+.slide .request-lab { font-size: 22px; }
+.slide .race-lab { font-size: 25px; }
+.habits { gap: 18px; }
+.habits .card { padding: 16px 20px; }
+.habits .card p { font-size: 21px; line-height: 1.35; margin: 0; }
+.slide .card h3 { margin-top: 0; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Over the wire.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 8</p>
+      <h1 class="wire-title">Over <em>the</em><br><span class="out">wire.</span></h1>
+      <p class="title-sub">HTTP · fetch · JSON · async UI state · POST · CORS · races</p>
+    </div>
+    <div class="dp" aria-hidden="true">
+<pre class="raw sm"><span class="m">GET</span> <span class="p">/api/stalls?tag=food</span> HTTP/1.1
+<span class="h">Host:</span> localhost:3000
+<span class="h">Accept:</span> application/json</pre>
+      <div class="arrow">↓ the server ↓</div>
+<pre class="raw sm">HTTP/1.1 <span class="s2">200 OK</span>
+<span class="h">Content-Type:</span> application/json
+<span class="h">X-Total-Count:</span> 4
+
+<span class="b">[{ "id": "dumplings", "name": "Dumpling Dynasty", … }]</span></pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Today the market stops being a file and becomes a client of a server. The title slide is the whole lecture in two messages: a request, a response. By the end of Act 1 they should be able to read both, line by line.</p>
+  </aside>
+</section>
+
+<section data-title="Where we left off">
+  <p class="kicker">Where we left off · Lecture 5</p>
+  <h2>The data was hard-coded. Today it comes from a server.</h2>
+  <div class="vs2">
+    <div>
+      <h3>Lecture 5</h3>
+      <script type="text/x-code" data-lang="js" class="small">// data.js: 8 stalls, typed by hand
+export const stalls = [
+  { id: "dumplings", … },
+  …
+];
+
+// main.js
+render();</script>
+    </div>
+    <div>
+      <h3>Today</h3>
+      <script type="text/x-code" data-lang="js" class="small">// api.js
+export async function getStalls() {
+  const response = await fetch("/api/stalls");
+  if (!response.ok) throw new Error(…);
+  return response.json();
+}
+
+// main.js
+state.status = "loading";
+render();
+state.stalls = await getStalls();
+state.status = "ready";
+render();</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><code>card()</code> and the filters stay; what's new is where the data comes from, how long it takes, and how it fails. The cliffhanger from Lecture 5. The structure we built (state, render, modules) is what makes this a small change: one module talks to the network, the rest of the app doesn't know. The server has two stalls more than the old file: they'll see the difference on the page.</p>
+  </aside>
+</section>
+
+<section class="vc" data-title="Client and server">
+  <p class="kicker">Today's idea</p>
+  <h2>The server owns the data. The page holds a copy, and asks.</h2>
+  <div class="cycle">
+    <div class="node n-c"><b>01 · CLIENT</b><strong class="fn">fetch()</strong><code>the browser, your JS</code></div>
+    <div class="w w-a"></div>
+    <div class="node n-s"><b>02 · SERVER</b><strong class="fn">/api/…</strong><code>validates, stores, decides</code></div>
+    <div class="w w-b"></div>
+    <div class="node n-r"><b>03 · RESPONSE</b><strong class="fn">200 + JSON</strong><code>status, headers, body</code></div>
+  </div>
+  <p class="cycle-back">Shared, persistent, trusted data lives on the server. The page is one client of many.</p>
+  <aside class="notes">
+    <p>Contrast with Lecture 5's <code>localStorage</code>: per browser, per device, editable by the user. A server is where data is shared between users and devices, and where rules are enforced: the server, not the page, decides whether a review is valid. Other clients of the same API: a phone app, <code>curl</code>, another team's service. That's why the API's contract matters more than any one page.</p>
+  </aside>
+</section>
+
+<section data-title="The day in five acts">
+  <p class="kicker">The plan · 3 hours</p>
+  <h2>Five acts, one market, one team build</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Why</strong>a server<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>HTTP</strong>requests, responses, status codes<time>0:05</time></div>
+    <div class="m2"><b>02</b><strong>Async &amp; fetch</strong>event loop, promises, Response<time>0:23</time></div>
+    <div class="m3"><b>03</b><strong>Async UI state</strong>loading, error, empty<time>0:54</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:15</time></div>
+    <div class="m4"><b>04</b><strong>Sending data</strong>POST, validation, 201 / 422<time>1:30</time></div>
+    <div class="m5"><b>05</b><strong>Origins &amp; races</strong>CORS, AbortController<time>1:54</time></div>
+    <div class="m6"><b>06</b><strong>Team build</strong>connect the market to the API<time>2:13 → 3:00</time></div>
+  </div>
+  <p>Five short exercises, then 45 minutes connecting the market to the API. Materials: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/index.html" target="_blank" rel="noopener">08-fetch</a>: <code>git pull</code> now. For the team build: a GitHub account, and Node for live-server (<code>node --version</code>).</p>
+  <aside class="notes">
+    <p>~0:04. About 100 of the 180 minutes are theirs. The team build needs a GitHub account (fork, pull request) and live-server (Node). Ask now, not at 2:13; anyone without either pairs with someone who has both.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · HTTP
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="HTTP" data-at="0:05" data-title="Act 1 — HTTP">
+  <div class="act-deco">GET
+200</div>
+  <div class="act-num">act 01</div>
+  <h1>HTTP</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:23</span><span>the protocol under every fetch</span></div>
+  <div class="act-list"><span>request</span><span>response</span><span>URL</span><span>methods</span><span>status codes</span><span>headers</span><span>Network panel</span></div>
+</section>
+
+<section data-title="A request">
+  <p class="kicker">HTTP/1.1 · a request</p>
+  <h2>A request is text: a line, headers, a body</h2>
+  <div class="anat">
+<pre class="raw"><mark><span class="m">POST</span></mark> <mark><span class="p">/api/stalls/taco-bike/reviews</span></mark> HTTP/1.1
+<mark><span class="h">Host:</span> localhost:3000
+<span class="h">Content-Type:</span> application/json
+<span class="h">Accept:</span> application/json
+<span class="h">Content-Length:</span> 66</mark>
+<span class="c">⏎ an empty line ends the headers</span>
+<mark><span class="b">{"author":"Ana","rating":5,
+ "text":"Best tacos on the waterfront."}</span></mark></pre>
+    <ol>
+      <li><span><b>Method</b>: what to do. <code>GET</code> reads, <code>POST</code> creates.</span></li>
+      <li><span><b>Target</b>: the path (and query) of the resource.</span></li>
+      <li><span><b>Headers</b>: metadata, <code>Name: value</code>. Names are case-insensitive.</span></li>
+      <li><span><b>Body</b>: optional. Its format is declared by <code>Content-Type</code>.</span></li>
+    </ol>
+  </div>
+  <aside class="notes">
+    <p>~0:06. HTTP/2 and HTTP/3 send the same information in binary frames over one connection, but the model (method, target, headers, body) is identical, and DevTools shows it in this form. Over HTTPS all of it is encrypted, including the path and headers; only the host name is visible to the network.</p>
+  </aside>
+</section>
+
+<section data-title="A response">
+  <p class="kicker">HTTP/1.1 · a response</p>
+  <h2>A response: a status, headers, a body</h2>
+  <div class="anat">
+<pre class="raw">HTTP/1.1 <mark><span class="s2">201 Created</span></mark>
+<mark><span class="h">Content-Type:</span> application/json; charset=utf-8
+<span class="h">Location:</span> /api/reviews/r17
+<span class="h">Cache-Control:</span> no-store</mark>
+
+<mark><span class="b">{
+  "id": "r17",
+  "stallId": "taco-bike",
+  "author": "Ana",
+  "rating": 5,
+  "text": "Best tacos on the waterfront.",
+  "createdAt": "2026-10-16T19:42:07.311Z"
+}</span></mark></pre>
+    <ol>
+      <li><span><b>Status</b>: a three-digit code and a reason phrase. The code is the contract; the phrase is for humans.</span></li>
+      <li><span><b>Headers</b>: <code>Content-Type</code> says how to read the body; <code>Location</code> says where the new resource lives.</span></li>
+      <li><span><b>Body</b>: here, the review <em>as the server stored it</em>, with fields the client didn't send.</span></li>
+    </ol>
+  </div>
+  <aside class="notes">
+    <p>Point at <code>id</code> and <code>createdAt</code>: the server chose them. That's why, in Act 4, the page renders the response body rather than the object it sent.</p>
+  </aside>
+</section>
+
+<section data-title="Anatomy of a URL">
+  <p class="kicker">URL</p>
+  <h2>A URL, and the part called the origin</h2>
+  <div class="url" aria-label="https://market.example:443/api/stalls?tag=food&amp;sort=price#vendors">
+    <span class="u1">https://<small>scheme</small></span><span class="u2">market.example<small>host</small></span><span class="u3">:443<small>port</small></span><span class="u4">/api/stalls<small>path</small></span><span class="u5">?tag=food&amp;sort=price<small>query</small></span><span class="u6">#vendors<small>fragment</small></span>
+  </div>
+  <p class="origin-bracket">origin = scheme + host + port → <code>https://market.example</code></p>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">const params = new URLSearchParams();
+params.set("tag", "food");
+params.set("q", "rock & roll");
+
+`/api/stalls?${params}`
+// "/api/stalls?tag=food&q=rock+%26+roll"</script>
+    <div class="stack">
+      <div class="card"><p><strong>Query</strong>: key-value pairs for the server (filters, sorting, pages). Build it with <code>URLSearchParams</code>: it encodes <code>&amp;</code>, spaces and <code>#</code> for you.</p></div>
+      <div class="card"><p><strong>Fragment</strong>: never sent to the server. <strong>Origin</strong>: the unit of browser security, back in Act 5.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>The string-concatenation version, <code>`/api/stalls?q=${value}`</code>, breaks on "rock &amp; roll": the server sees <code>q=rock </code> and a parameter called <code> roll</code>. The port is implicit when it's the scheme's default (443 for https, 80 for http), which is why the origin above has no <code>:443</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Methods">
+  <p class="kicker">Methods</p>
+  <h2>Five methods cover almost every API</h2>
+  <table class="dtable">
+    <tr><th>Method</th><th>Meaning</th><th>Body</th><th>Safe</th><th>Idempotent</th><th>Harbour API</th></tr>
+    <tr><td><code>GET</code></td><td>read a resource</td><td>no</td><td class="yes">yes</td><td class="yes">yes</td><td><code>GET /api/stalls</code></td></tr>
+    <tr><td><code>POST</code></td><td>create, or run an action</td><td>yes</td><td class="no">no</td><td class="no">no</td><td><code>POST /api/stalls/:id/reviews</code></td></tr>
+    <tr><td><code>PUT</code></td><td>create or replace at a known URL</td><td>usually</td><td class="no">no</td><td class="yes">yes</td><td><code>PUT /api/saved/:id</code></td></tr>
+    <tr><td><code>PATCH</code></td><td>change some fields</td><td>yes</td><td class="no">no</td><td class="no">not guaranteed</td><td><code>PATCH /api/stalls/:id</code></td></tr>
+    <tr><td><code>DELETE</code></td><td>remove a resource</td><td>no</td><td class="no">no</td><td class="yes">yes</td><td><code>DELETE /api/reviews/:id</code></td></tr>
+  </table>
+  <p><strong>Safe</strong>: no side effects, so it can be cached, prefetched, retried. <strong>Idempotent</strong>: sending it twice has the same effect as once, so it can be retried after a timeout.</p>
+  <aside class="notes">
+    <p>~0:09. The two properties are what clients and proxies rely on: a browser may retry a GET; nobody should silently retry a POST, because that's how you get two reviews (Act 4). PUT is idempotent because it says "the state should be X", not "do X": saving <code>mezcal</code> three times leaves it saved once. <code>HEAD</code> (GET without the body) and <code>OPTIONS</code> (asking what's allowed, used by CORS) exist too.</p>
+  </aside>
+</section>
+
+<section data-title="Status codes">
+  <p class="kicker">Status codes</p>
+  <h2>The first digit is the category; a dozen codes do most of the work</h2>
+  <table class="dtable st">
+    <tr><th>Code</th><th>Meaning</th><th>When the Harbour API sends it</th></tr>
+    <tr><td class="c2"><code>200 OK</code></td><td>success, the body has the result</td><td>any successful GET</td></tr>
+    <tr><td class="c2"><code>201 Created</code></td><td>a new resource exists</td><td>a POSTed review; <code>Location</code> header points at it</td></tr>
+    <tr><td class="c2"><code>204 No Content</code></td><td>success, no body</td><td>PUT / DELETE: don't call <code>response.json()</code></td></tr>
+    <tr><td class="c3"><code>304 Not Modified</code></td><td>your cached copy is still valid</td><td>(real APIs) conditional GETs with <code>ETag</code>, handled by the browser</td></tr>
+    <tr><td class="c4"><code>400 Bad Request</code></td><td>malformed request</td><td>invalid JSON, an unknown <code>?tag=</code></td></tr>
+    <tr><td class="c4"><code>401 Unauthorized</code></td><td>not authenticated</td><td>no token, or an invalid one</td></tr>
+    <tr><td class="c4"><code>403 Forbidden</code></td><td>authenticated, not allowed</td><td>a vendor's token on another vendor's stall</td></tr>
+    <tr><td class="c4"><code>404 Not Found</code></td><td>no such resource</td><td><code>/api/stalls/pizza</code></td></tr>
+    <tr><td class="c4"><code>405 · 409 · 415</code></td><td>wrong method · conflicts with current state · wrong body type</td><td><code>DELETE /api/stalls</code> · ordering from a sold-out stall · no <code>Content-Type</code></td></tr>
+    <tr><td class="c4"><code>422 Unprocessable Content</code></td><td>well-formed, but invalid values</td><td>a rating of <code>7</code>, a 3-character review</td></tr>
+    <tr><td class="c4"><code>429 Too Many Requests</code></td><td>rate limited</td><td>(real APIs) wait for <code>Retry-After</code></td></tr>
+    <tr><td class="c5"><code>500 · 503</code></td><td>server bug · temporarily unavailable</td><td>chaos on (control page)</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:10. 2xx success, 3xx redirection, 4xx the client's fault, 5xx the server's. The practical rule: the client can fix a 4xx by sending a different request; a 5xx may succeed if retried later. 401 vs 403 is a classic interview question: "who are you?" vs "I know who you are, and no". Some APIs use 400 for validation errors instead of 422; read the docs of the API you're using.</p>
+  </aside>
+</section>
+
+<section data-title="JSON on the wire">
+  <p class="kicker">JSON · revisited</p>
+  <h2>The body is text. JSON has six types.</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">const review = {
+  rating: 5,
+  createdAt: new Date(),
+  tags: new Set(["hot"]),
+  note: undefined,
+};
+
+JSON.stringify(review);
+// {"rating":5,
+//  "createdAt":"2026-10-16T19:42:07.311Z",
+//  "tags":{}}
+// the Set is empty, note is gone,
+// the date is a string</script>
+    <div class="stack">
+      <div class="card"><p>Strings, numbers, booleans, <code>null</code>, arrays, objects. Nothing else crosses the wire.</p></div>
+      <div class="card"><p>Dates travel as <strong>ISO 8601</strong> strings in UTC. Convert on the client, display in the user's time zone.</p></div>
+      <div class="card"><p>A typed language on the server doesn't make your data typed: validate what arrives, on both sides.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:12. Lecture 5's Set trap again, now with a network in between. Money is usually sent as integer cents or a decimal string: <code>0.1 + 0.2</code> in JavaScript is the reason. Large integer ids (above 2<sup>53</sup>) lose precision in JSON numbers: APIs send them as strings.</p>
+  </aside>
+</section>
+
+<section data-title="Request lab">
+  <p class="kicker">Request lab · live</p>
+  <h2>Talk to the API without writing JavaScript</h2>
+  <div class="fill request-lab" data-host="localhost:3000">
+    <script type="application/json" data-role="presets">[
+      { "label": "all stalls", "method": "GET", "url": "/api/stalls" },
+      { "label": "food, cheapest first", "method": "GET", "url": "/api/stalls?tag=food&sort=price" },
+      { "label": "404", "method": "GET", "url": "/api/stalls/pizza" },
+      { "label": "POST a review", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "headers": { "Content-Type": "application/json" }, "body": { "author": "Ana", "rating": 5, "text": "Best tacos on the waterfront." } },
+      { "label": "rating as a string", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "headers": { "Content-Type": "application/json" }, "body": { "author": "Ana", "rating": "5", "text": "Best tacos on the waterfront." } },
+      { "label": "no Content-Type", "method": "POST", "url": "/api/stalls/taco-bike/reviews", "body": "{ \"author\": \"Ana\", \"rating\": 5, \"text\": \"Best tacos on the waterfront.\" }" },
+      { "label": "405", "method": "DELETE", "url": "/api/stalls" },
+      { "label": "401", "method": "PATCH", "url": "/api/stalls/mezcal", "headers": { "Content-Type": "application/json" }, "body": { "soldOut": false } }
+    ]</script>
+  </div>
+  <aside class="notes">
+    <p>~0:13, two minutes. Click in this order: all stalls (point at <code>X-Total-Count</code>), 404 (a response with a body, not a crash), POST a review (201, <code>Location</code>), then the broken POSTs: 422 and 415. The 405 and 401 presets are for students to try in Exercise 1. Each time, point at the third panel: that's the same request as <code>fetch()</code>, which is Act 2. <code>Esc</code> leaves an input so the arrows move slides again. Playground: <code>playgrounds/request-lab.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="The Network panel">
+  <p class="kicker">DevTools · Network</p>
+  <h2>Every request, its headers, its body and its timing</h2>
+  <div class="nw" aria-hidden="true">
+    <div>
+      <div class="bar"><span>All</span><span class="on">Fetch/XHR</span><span>Doc</span><span>JS</span><span class="chk x">Preserve log</span><span class="chk">Disable cache</span><span>No throttling ▾</span></div>
+      <div class="row hd"><span>Name</span><span>Status</span><span>Method</span><span>Time</span></div>
+      <div class="row"><span>stalls</span><span class="ok">200</span><span>GET</span><span>48 ms</span></div>
+      <div class="row"><span>reviews</span><span class="ok">200</span><span>GET</span><span>31 ms</span></div>
+      <div class="row sel"><span>reviews</span><span class="bad">422</span><span>POST</span><span>27 ms</span></div>
+      <div class="row"><span>reviews</span><span class="ok">201</span><span>POST</span><span>29 ms</span></div>
+      <div class="row"><span>stalls?q=t</span><span class="cx">(canceled)</span><span>GET</span><span>—</span></div>
+      <div class="row"><span>stalls?q=taco</span><span class="ok">200</span><span>GET</span><span>140 ms</span></div>
+      <span class="tag" style="left:14px;bottom:20px">1 · filter to Fetch/XHR, keep the log across reloads</span>
+    </div>
+    <div class="side">
+      <div class="bar"><span class="on">Headers</span><span>Payload</span><span>Preview</span><span>Response</span><span>Timing</span></div>
+      <div class="sec">General</div>
+      <div class="kv"><b>Request URL</b>: http://localhost:3000/api/stalls/taco-bike/reviews</div>
+      <div class="kv"><b>Request Method</b>: POST</div>
+      <div class="kv"><b>Status Code</b>: 422 Unprocessable Content</div>
+      <div class="sec">Response headers</div>
+      <div class="kv"><b>content-type</b>: application/json; charset=utf-8</div>
+      <div class="sec">Request headers</div>
+      <div class="kv"><b>content-type</b>: application/json</div>
+      <div class="kv"><b>origin</b>: http://localhost:3000</div>
+      <div class="sec">Payload</div>
+      <div class="kv">{author: "Ana", rating: "5", text: "Best tacos in town."}</div>
+      <span class="tag" style="right:14px;bottom:20px">2 · what was really sent, what came back</span>
+    </div>
+  </div>
+  <p>Right-click a row → <strong>Copy as fetch</strong> or <strong>Copy as cURL</strong>. Throttling (<em>Slow 4G</em>, <em>Offline</em>) shows your loading and error states.</p>
+  <aside class="notes">
+    <p>~0:15, one minute. The live version comes in Act 2 (slide "Live: fetch", the Network tab in the editor) and on the real server in the team build. The habit to build: when a request "doesn't work", open the request in this panel before touching the code. Is it sent? With which method, headers and body? What status came back, and what does the body say? Most of the time the answer is there. The editors in today's exercises have a small Network tab next to the console with the same information.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which status?">
+  <p class="kicker">Quick check · status codes</p>
+  <h2>Which status should the server answer?</h2>
+  <div class="split center">
+    <ol class="tasks">
+      <li><code>GET /api/stalls/pizza</code></li>
+      <li>A POSTed review was stored</li>
+      <li>A review with <code>"rating": 7</code></li>
+      <li><code>DELETE /api/reviews/r3</code> worked</li>
+      <li><code>PATCH</code> without a token</li>
+      <li>The database is down</li>
+    </ol>
+    <div class="stack">
+      <div class="reveal-box step solid">1 · <code>404</code> &nbsp; 2 · <code>201</code> + <code>Location</code> &nbsp; 3 · <code>422</code></div>
+      <div class="reveal-box step">4 · <code>204</code> (nothing to say) &nbsp; 5 · <code>401</code> &nbsp; 6 · <code>503</code>, or <code>500</code></div>
+      <div class="reveal-box step">Which of the six could succeed if the client simply sent the same request again later? Only 6.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:16, one minute. Predict first, one at a time if the room is lively. The third reveal sets up Act 3: only 5xx (and network failures) deserve a "try again" button; a 4xx needs a different request.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Read the wire">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 1 · solo · 6 min</p>
+  <div class="ex-head"><h2>Read the wire</h2><button class="timer" data-min="6"></button></div>
+  <ol>
+    <li>Probe the Harbour Market API with the request lab: write the requests yourself.</li>
+    <li>Questions 1–6 in class (totals, a rating, statuses, a header); 7–8 if you finish.</li>
+    <li>Keep <code>api.html</code> open in another tab: it's the contract.</li>
+  </ol>
+  <p class="where mt">08-fetch → <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/01-read-the-wire.html" target="_blank" rel="noopener">Exercise 1 · Read the wire</a></b>. Each answer checks itself when you leave the field.</p>
+  <aside class="notes">
+    <p>~0:17 → 0:23. Answers: 10 · 404 · 3.7 · Churros Till Late · 201 · Location · 415 · GET, POST. Debrief on 7 and 8, one minute: the 415 is the bug they'll write in Act 4 if they forget the header; 405's <code>Allow</code> header is the server documenting itself.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · FETCH
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Async &amp; fetch" data-at="0:23" data-title="Act 2 — Async &amp; fetch">
+  <div class="act-deco">await</div>
+  <div class="act-num">act 02</div>
+  <h1>Async &amp; fetch</h1>
+  <div class="act-meta"><span class="chip">0:23 – 0:54</span><span>asynchronous JavaScript, then HTTP from it</span></div>
+  <div class="act-list"><span>event loop</span><span>promises</span><span>.then / .catch</span><span>async / await</span><span>fetch()</span><span>response.ok</span><span>URLSearchParams</span></div>
+</section>
+
+<section data-title="One thread">
+  <p class="kicker">Why asynchronous</p>
+  <h2>JavaScript runs on one thread, shared with the page</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js">// Blocking: 3 s with no clicks,
+// no scrolling, no rendering
+const end = Date.now() + 3000;
+while (Date.now() < end) {}
+
+// fetch returns at once;
+// the browser does the waiting
+const promise = fetch("/api/stalls");
+promise; // Promise {<pending>}</script>
+    <div class="stack">
+      <div class="card"><p><strong>One call stack.</strong> Your scripts, your event handlers and the page's rendering take turns on the main thread.</p></div>
+      <div class="card"><p><strong>The browser waits, not your code.</strong> Network, timers and file reads run outside JavaScript; when they finish, a callback is queued.</p></div>
+      <div class="card"><p><strong>A promise is the handle</strong> to a result that doesn't exist yet: <em>pending</em>, then <em>fulfilled</em> with a value or <em>rejected</em> with an error.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:24. Run the while loop in the console of any page and try to scroll: that's what a blocking network call would do to every page on every request. Synchronous <code>XMLHttpRequest</code> exists and is deprecated for exactly this reason. "Asynchronous" here means: start the operation, give the browser something to call later, keep going.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="In which order?">
+  <p class="kicker">Quick check · predict the output</p>
+  <h2>Five lines. In which order do the letters print?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">console.log("A");
+setTimeout(() => console.log("B"), 0);
+fetch("/api/stalls").then(() => console.log("C"));
+Promise.resolve().then(() => console.log("D"));
+console.log("E");</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>A E D B C</code></div>
+      <div class="reveal-box step">Synchronous code first (A, E). Then <strong>microtasks</strong>, the promise callbacks (D). Then one <strong>task</strong>, the timer (B). The network answers last (C).</div>
+      <div class="reveal-box step">A <code>0</code> ms timer means "as soon as possible after the current code", never "now". Step through it on the next slide.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:25. Get three or four predictions before revealing; most people say A B C D E or A E B D C. The point to keep: a callback never interrupts running code. It waits until the stack is empty, and promise callbacks go ahead of timers and events.</p>
+  </aside>
+</section>
+
+<section data-title="Event loop lab">
+  <p class="kicker">Event loop lab · step through</p>
+  <h2>Call stack, browser, two queues</h2>
+  <div class="fill loop-lab">
+    <script type="application/json" data-role="programs">[
+ {
+  "label": "timer · promise · fetch",
+  "code": "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nfetch(\"/api/stalls\").then(() => console.log(\"C\"));\nPromise.resolve().then(() => console.log(\"D\"));\nconsole.log(\"E\");",
+  "frames": [
+   {
+    "line": 0,
+    "stack": [
+     "script"
+    ],
+    "note": "The script starts. It runs from top to bottom on the call stack, without interruption."
+   },
+   {
+    "line": 1,
+    "stack": [
+     "script",
+     "console.log(\"A\")"
+    ],
+    "log": "A",
+    "note": "A plain call: it runs now, and the stack goes back to the script."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script",
+     "setTimeout(…)"
+    ],
+    "apis": [
+     "timer · 0 ms · B"
+    ],
+    "note": "setTimeout hands the callback to the browser's timer and returns at once. JavaScript doesn't wait."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script"
+    ],
+    "apis": [],
+    "tasks": [
+     "B callback"
+    ],
+    "note": "0 ms later the timer is done: its callback waits in the task queue. It can't run yet: the stack isn't empty."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script",
+     "fetch(…)"
+    ],
+    "apis": [
+     "network · GET /api/stalls"
+    ],
+    "note": "fetch starts the request in the browser and returns a pending promise. .then only registers C for later."
+   },
+   {
+    "line": 4,
+    "stack": [
+     "script"
+    ],
+    "micro": [
+     "D callback"
+    ],
+    "note": "Promise.resolve() is already fulfilled, so its .then callback goes straight into the microtask queue. It still waits for the stack to empty."
+   },
+   {
+    "line": 5,
+    "stack": [
+     "script",
+     "console.log(\"E\")"
+    ],
+    "log": "E",
+    "note": "Synchronous again: E prints before any callback."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "The script is done and the stack is empty. Now the event loop decides what runs next: all microtasks first."
+   },
+   {
+    "stack": [
+     "D callback"
+    ],
+    "micro": [],
+    "log": "D",
+    "note": "Microtasks (promise callbacks) run before the next task, so D beats B although B was queued earlier."
+   },
+   {
+    "stack": [
+     "B callback"
+    ],
+    "tasks": [],
+    "log": "B",
+    "note": "Microtask queue empty: the loop takes one task, the timer callback. Between tasks the browser may render."
+   },
+   {
+    "stack": [],
+    "apis": [],
+    "micro": [
+     "C callback"
+    ],
+    "note": "About 40 ms later the response arrives. The fetch promise fulfils and its .then callback is queued as a microtask."
+   },
+   {
+    "stack": [
+     "C callback"
+    ],
+    "micro": [],
+    "log": "C",
+    "note": "C runs last: the network is slower than everything else here. The order was A E D B C."
+   },
+   {
+    "stack": [],
+    "note": "Nothing left: the event loop waits for the next event (a click, a timer, a response)."
+   }
+  ]
+ },
+ {
+  "label": "async / await",
+  "code": "async function loadStalls() {\n  console.log(\"1 · sending\");\n  const response = await fetch(\"/api/stalls\");\n  console.log(\"3 · arrived\", response.status);\n}\n\nloadStalls();\nconsole.log(\"2 · the page keeps going\");",
+  "frames": [
+   {
+    "line": 0,
+    "stack": [
+     "script"
+    ],
+    "note": "The script starts. Declaring loadStalls runs nothing."
+   },
+   {
+    "line": 7,
+    "stack": [
+     "script",
+     "loadStalls()"
+    ],
+    "note": "Calling an async function runs its body synchronously, up to the first await."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script",
+     "loadStalls()"
+    ],
+    "log": "1 · sending",
+    "note": "Still synchronous."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script",
+     "loadStalls()",
+     "fetch(…)"
+    ],
+    "apis": [
+     "network · GET /api/stalls"
+    ],
+    "note": "fetch starts the request and returns a pending promise."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script"
+    ],
+    "note": "await on a pending promise suspends loadStalls: its frame is saved and leaves the stack. The call on line 7 returns a pending promise."
+   },
+   {
+    "line": 8,
+    "stack": [
+     "script",
+     "console.log(…)"
+    ],
+    "log": "2 · the page keeps going",
+    "note": "The rest of the script runs. Clicks, timers and rendering can run too while the request is in flight."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "The script is done. The event loop is free: the page stays responsive."
+   },
+   {
+    "apis": [],
+    "micro": [
+     "resume loadStalls"
+    ],
+    "note": "The status and headers arrive: the fetch promise fulfils, and resuming loadStalls is queued as a microtask."
+   },
+   {
+    "line": 4,
+    "stack": [
+     "loadStalls() · resumed"
+    ],
+    "micro": [],
+    "log": "3 · arrived 200",
+    "note": "loadStalls continues right after the await, with response in hand. Its local variables survived the wait."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "Done. The promise that loadStalls() returned is fulfilled. A thrown error here would have rejected it instead."
+   }
+  ]
+ }
+]</script>
+  </div>
+  <aside class="notes">
+    <p>~0:27, four minutes. Step through "timer · promise · fetch" (the quiz) and read each note aloud in your own words. The loop: run the script to the end; then run <em>every</em> microtask; then take <em>one</em> task, possibly render, repeat. Then the "async / await" program: at step 5 the function's frame leaves the stack while the request is in flight; that's why the page stays responsive during <code>await</code>. The network response is shown queuing a microtask directly; precisely, the browser queues a task that resolves the promise, whose callback is then a microtask. Playground: <code>playgrounds/loop-lab.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="What goes in which queue">
+  <p class="kicker">Event loop · the queues</p>
+  <h2>Three buckets: task, microtask, now</h2>
+  <table class="dtable st buckets">
+    <tr><th></th><th class="q-task">Task queue</th><th class="q-micro">Microtask queue</th><th class="q-now">No queue</th></tr>
+    <tr><td>What</td>
+      <td><ul><li>a <code>&lt;script&gt;</code>, a module</li><li><code>setTimeout</code>, <code>setInterval</code></li><li>user events: click, input, keydown</li><li>network and I/O: <code>fetch</code>, XHR, WebSocket</li><li><code>postMessage</code>, worker messages</li></ul></td>
+      <td><ul><li><code>.then</code>, <code>.catch</code>, <code>.finally</code> callbacks</li><li>the rest of an <code>async</code> function after <code>await</code></li><li><code>queueMicrotask(fn)</code></li><li><code>MutationObserver</code> callbacks</li></ul></td>
+      <td><ul><li>the <code>new Promise(fn)</code> executor</li><li><code>el.click()</code>, <code>dispatchEvent</code></li><li><code>forEach</code>, <code>map</code>, <code>sort</code> callbacks</li></ul></td></tr>
+    <tr><td>Queued</td><td>when the event happens: the timer fires, the user acts, the data arrives</td><td>when the promise settles, or at once if it already has</td><td>never</td></tr>
+    <tr><td>Runs</td><td><strong>one</strong> per turn of the loop</td><td><strong>all</strong> of them after each task, newcomers included</td><td>right now, on the current stack</td></tr>
+  </table>
+  <p>Between tasks the browser may render; <code>requestAnimationFrame</code> callbacks run just before that paint.</p>
+  <aside class="notes">
+    <p>~0:31. "Task" is the spec's word; older articles say "macrotask". There are several task queues (timers, user input, networking) and the browser picks which to serve next, usually favouring input; within one source, tasks keep their order. There is one microtask queue. <code>fetch</code> touches both: the response arriving is a task, which settles the promise; your <code>.then</code> callback is then a microtask. Consequences: a long task delays rendering and every click behind it; a microtask that queues another microtask forever freezes the page just like a <code>while (true)</code>, because the loop never gets back to rendering; a <code>setTimeout</code> loop doesn't, because each round is a new task. Timers nested five deep are clamped to at least 4 ms, and background tabs throttle them to once a second or less. The third bucket is the classic trap: a <code>Promise</code> executor and a programmatic <code>el.click()</code> run synchronously; only a real user click is a task. Node has the same two levels (plus <code>process.nextTick</code>, which runs before promise callbacks), with its own task phases instead of rendering.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which queue?">
+  <p class="kicker">Quick check · which queue?</p>
+  <h2>Seven letters. In which order?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">button.addEventListener("click", () => console.log("A"));
+setTimeout(() => console.log("B"), 0);
+new Promise((resolve) => {
+  console.log("C");
+  resolve();
+}).then(() => {
+  console.log("D");
+  queueMicrotask(() => console.log("E"));
+});
+queueMicrotask(() => console.log("F"));
+button.click();
+console.log("G");</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>C A G D F E B</code></div>
+      <div class="reveal-box step">No queue: the executor (C) and <code>button.click()</code> (A) run synchronously, then G. Microtasks in order: D, F, then E, which D queued: the loop drains the queue, newcomers included. Then one task: B.</div>
+      <div class="reveal-box step">A real click is a task: its A would print after all of this, never in the middle of the script.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:33. Expect A last (people think "event" means "later") and C after G (people think everything around a promise is async). Ask for the queue of each line before the order: listener registered now, B task, C now, D microtask when <code>resolve()</code> runs, F microtask, A now, G now. E is the one that tests the rule: it's queued while the microtask queue is being drained, and it still runs before B. <code>requestAnimationFrame</code> is left out on purpose: whether it runs before or after a 0 ms timer depends on where the frame boundary falls.</p>
+  </aside>
+</section>
+
+<section data-title="Promises: then, catch, finally">
+  <p class="kicker">Promises · the chain</p>
+  <h2><code>.then</code>, <code>.catch</code>, <code>.finally</code></h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js" class="small">function loadStalls() {
+  return fetch("/api/stalls").then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  });
+}
+
+loadStalls()
+  .then((stalls) => render(stalls))
+  .catch((error) => showError(error))
+  .finally(() => hideSpinner());</script>
+    <div class="stack">
+      <div class="card"><p><code>.then(f)</code> returns a <strong>new</strong> promise: <code>f</code>'s return value fulfils it, a returned promise is waited for, a <code>throw</code> rejects it.</p></div>
+      <div class="card"><p><code>.catch(f)</code> handles a rejection from <em>any</em> step before it. <code>.finally(f)</code> runs after either outcome.</p></div>
+      <div class="card"><p>No <code>.catch</code> anywhere: <code>Uncaught (in promise)</code> in the console.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:31. The two mistakes: forgetting <code>return</code> inside a <code>.then</code> (the next step gets <code>undefined</code> and doesn't wait), and nesting <code>.then</code> inside <code>.then</code> instead of returning (the "pyramid" that promises were meant to remove). Before promises, async APIs took callbacks: <code>setTimeout(callback, ms)</code> is one; error handling with callbacks is why promises exist.</p>
+  </aside>
+</section>
+
+<section data-title="Two styles, same promises">
+  <p class="kicker">async / await</p>
+  <h2>The same code, two styles</h2>
+  <div class="vs2">
+    <div>
+      <h3>.then / .catch</h3>
+      <script type="text/x-code" data-lang="js" class="small">function start() {
+  showSpinner();
+  return getStalls()
+    .then((stalls) => render(stalls))
+    .catch((error) => showError(error))
+    .finally(() => hideSpinner());
+}</script>
+    </div>
+    <div>
+      <h3>async / await</h3>
+      <script type="text/x-code" data-lang="js" class="small">async function start() {
+  showSpinner();
+  try {
+    render(await getStalls());
+  } catch (error) {
+    showError(error);
+  } finally {
+    hideSpinner();
+  }
+}</script>
+    </div>
+  </div>
+  <p class="step"><code>async</code>/<code>await</code> is syntax over promises: an <code>async</code> function returns one, <code>await</code> waits for one and <code>throw</code>s if it rejects. Independent requests: start both, then <code>await Promise.all([a(), b()])</code>.</p>
+  <aside class="notes">
+    <p>~0:33. Today's code uses <code>await</code>; libraries, docs and older code use <code>.then</code>, so they need to read both. <code>await</code> works inside <code>async</code> functions and at the top level of modules (the project's <code>main.js</code>). The exercise editors run classic scripts, so there it's <code>.then()</code> or an <code>async function start()</code>. A common slowdown: <code>await a(); await b();</code> runs them one after the other even when they're independent.</p>
+  </aside>
+</section>
+
+<section data-title="fetch in one slide">
+  <p class="kicker">fetch()</p>
+  <h2>Two awaits: first the head, then the body</h2>
+  <script type="text/x-code" data-lang="js" class="mid">const response = await fetch("/api/stalls?tag=food");
+
+response.status;                      // 200
+response.ok;                          // true for 200–299
+response.headers.get("Content-Type"); // "application/json; …"
+
+const stalls = await response.json(); // [{ … }, { … }, …]</script>
+  <p class="step">The first promise resolves as soon as the status and headers arrive. The body may still be downloading: <code>json()</code> reads the rest of the stream and parses it, so it's a second promise.</p>
+  <aside class="notes">
+    <p>~0:34. The two-step design lets you decide what to do from the status before downloading a large body, or abort it. Other body readers: <code>text()</code>, <code>blob()</code>, <code>formData()</code>; the body can be read once. <code>fetch(url)</code> with no options is a GET. Relative URLs resolve against the page: <code>/api/stalls</code> on a page served from localhost:3000 means <code>http://localhost:3000/api/stalls</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="fetch and 404">
+  <p class="kicker">Quick check · fetch and errors</p>
+  <h2>The stall doesn't exist. What happens?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="js" class="small">try {
+  const url = "/api/stalls/pizza";
+  const response = await fetch(url);
+  const stall = await response.json();
+  render(stall);
+} catch (error) {
+  showError(error);
+}</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>render</code> is called with <code>{ error: "not_found", message: … }</code>. No exception: a 404 is a <em>response</em>, and <code>fetch</code> resolves.</div>
+      <div class="reveal-box step"><code>fetch</code> rejects only when there is no usable response: network down, DNS failure, CORS blocked, aborted. Then it's a <code>TypeError</code> (or an <code>AbortError</code>).</div>
+      <div class="reveal-box step">So every caller checks <code>response.ok</code>. Write it once, in a helper.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:36. The most common fetch bug in production code. axios and most other HTTP libraries reject on 4xx/5xx; <code>fetch</code> deliberately doesn't, because a 404 can be a perfectly good answer ("no such user: show the sign-up form").</p>
+  </aside>
+</section>
+
+<section data-title="getJSON">
+  <p class="kicker">A helper</p>
+  <h2>One helper for every request</h2>
+  <div class="vs2">
+    <div>
+      <h3>getJSON</h3>
+      <script type="text/x-code" data-lang="js" class="small">async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const body = await response.json()
+      .catch(() => null);
+    throw new HttpError(response, body);
+  }
+  return response.json();
+}</script>
+    </div>
+    <div>
+      <h3>HttpError</h3>
+      <script type="text/x-code" data-lang="js" class="small">class HttpError extends Error {
+  constructor(response, body) {
+    const reason = body?.message
+      ?? response.statusText;
+    super(`${response.status} ${reason}`);
+    this.name = "HttpError";
+    this.status = response.status;
+    this.body = body;
+  }
+}</script>
+    </div>
+  </div>
+  <p class="step">A 404 or a 503 now rejects, with <code>error.status</code> and the server's error body in <code>error.body</code>. Every request in the project goes through it.</p>
+  <aside class="notes">
+    <p>~0:37. <code>options</code> is passed through so callers can add headers or an abort signal (Act 5). The <code>.catch</code> on the error path only: on a 2xx, a <code>SyntaxError</code> from <code>json()</code> is a bug you want to see (a dev server answering a wrong URL with its <code>index.html</code>, typically). Reading the body twice fails ("body stream already read"): <code>response.clone()</code> if you must. Exercise 2's case 2 is a smaller version of this.</p>
+  </aside>
+</section>
+
+<section data-title="Live: fetch">
+  <p class="kicker">Live · a script, a preview, a Network tab</p>
+  <h2>fetch, in the browser</h2>
+  <div class="fill live-js" data-api data-module data-market data-show-html data-layout="wide-code">
+    <script type="text/plain" data-role="html"><ul class="vendor-list"></ul></script>
+    <textarea>
+const list = document.querySelector(".vendor-list");
+
+const response = await fetch("/api/stalls?tag=food");
+const total = response.headers.get("X-Total-Count");
+console.log(response.status, total);
+
+const stalls = await response.json();
+list.replaceChildren(...stalls.map((s) => {
+  const li = document.createElement("li");
+  li.className = "vendor-card";
+  li.textContent = `${s.name} · ★ ${s.rating}`;
+  return li;
+}));
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>~0:39. Live-code: open the Network tab and click the request. Change <code>tag=food</code> to <code>tag=pizza</code>: a 400 with a message, and <code>stalls.map</code> fails because the body is an error object, not an array. Then <code>/api/stalls/pizza</code>. That's the case for checking <code>response.ok</code>. This editor is a module (top-level <code>await</code>), unlike the exercises. Playground: <code>playgrounds/fetch-sandbox.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="From data.js to api.js">
+  <p class="kicker">The project</p>
+  <h2>One module talks to the network</h2>
+  <div class="vs2">
+    <div>
+      <h3>Lecture 5</h3>
+      <script type="text/x-code" data-lang="js" class="small">// state.js
+import { stalls } from "./data.js";
+
+export function visibleStalls() {
+  return stalls.filter(…);
+}
+
+// main.js
+load();
+render();</script>
+    </div>
+    <div>
+      <h3>Lecture 8</h3>
+      <script type="text/x-code" data-lang="js" class="small">// state.js
+export const state = {
+  status: "loading",
+  error: "",
+  stalls: [],
+  // tag, query, saved: as before
+};
+
+export function visibleStalls() {
+  return state.stalls.filter(…);
+}
+
+// main.js
+restore();
+await loadStalls();</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:41. The stalls move from a constant into <code>state</code>: they change over time (empty, loaded, reloaded); <code>render.js</code> gains the status branches, <code>card()</code> is untouched. Lecture 5's <code>load()</code> (from <code>localStorage</code>) is renamed <code>restore()</code>, so "load" means the network. <code>main.js</code> is a module, so top-level <code>await</code> works. This is what they build in the team block, starting from the <code>harbour-market-starter</code> repository (Lecture 5's market). Only <code>api.js</code> calls <code>fetch</code>; if the API's URL or auth changes, one file changes. That's the same separation of concerns as Lecture 5's modules.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Load the market">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 2 · solo · 12 min</p>
+  <div class="ex-head"><h2>Load the market</h2><button class="timer" data-min="12"></button></div>
+  <ol>
+    <li><code>loadStalls()</code>: fetch <code>/api/stalls</code>, render all 10.</li>
+    <li><code>getJSON(url)</code>: reject on a 404 or a 503, with the server's message.</li>
+    <li>Filters on the server: <code>?tag=food</code> built with <code>URLSearchParams</code>.</li>
+  </ol>
+  <p class="where mt">08-fetch → <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/02-load.html" target="_blank" rel="noopener">Exercise 2 · Load the market</a></b>. The Network tab is next to the console. Bonus at home: sorting.</p>
+  <aside class="notes">
+    <p>~0:42 → 0:54. Watch for top-level <code>await</code> in the classic-script editors (SyntaxError: the hint says so) and for <code>?tag=all</code> in case 3: the server answers 400, which is the point. Debrief: case 2, show the helper again, one minute.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · ASYNC UI STATE
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Async UI state" data-at="0:54" data-title="Act 3 — Async UI state">
+  <div class="act-deco">…</div>
+  <div class="act-num">act 03</div>
+  <h1>Loading, error, empty</h1>
+  <div class="act-meta"><span class="chip">0:54 – 1:15</span><span>time and failure are state</span></div>
+  <div class="act-list"><span>request lifecycle</span><span>status</span><span>try / catch / finally</span><span>failure modes</span><span>aria-busy</span><span>retry</span></div>
+</section>
+
+<section data-title="Four states">
+  <p class="kicker">The lifecycle of a request</p>
+  <h2>Every list from a server has four states</h2>
+  <div class="life">
+    <div class="l1"><b>loading</b><p>Request in flight. Say so; keep the old data visible if there is some.</p></div>
+    <div class="l2"><b>ready</b><p>The data. What we've rendered since Lecture 5.</p></div>
+    <div class="l3"><b>error</b><p>No data. A sentence, and a way out: <em>Try again</em>.</p></div>
+    <div class="l4"><b>empty</b><p>Success with <code>[]</code>. Not an error: "No stalls yet".</p></div>
+  </div>
+  <p>Designs usually show only <em>ready</em>. The other three are where apps feel broken: a blank list on a slow connection, a spinner that spins forever after an error.</p>
+  <aside class="notes">
+    <p>~0:55. Today's code (slide 28, the project) blanks the list while loading, the simple version; keeping the old results dimmed is in team brief 3. Ask: which of the four does a typical Figma file have? Ready, maybe empty. The other states are the developer's job to notice and to ask the designer about.</p>
+  </aside>
+</section>
+
+<section data-title="One status, not three booleans">
+  <p class="kicker">State</p>
+  <h2>One status field, so impossible states can't happen</h2>
+  <div class="vs2">
+    <div>
+      <h3>Three booleans</h3>
+      <script type="text/x-code" data-lang="js" class="small">const state = {
+  isLoading: false,
+  isError: false,
+  hasData: false,
+  stalls: [],
+};
+// 2 × 2 × 2 = 8 combinations.
+// isLoading && isError?
+// Every bug fix adds one.</script>
+    </div>
+    <div>
+      <h3>One status</h3>
+      <script type="text/x-code" data-lang="js" class="small">const state = {
+  // "loading" | "ready" | "error"
+  status: "loading",
+  stalls: [],
+  error: "",
+};
+// 3 values, 3 branches in render().
+// "empty" is derived:
+//   ready && stalls.length === 0</script>
+    </div>
+  </div>
+  <p class="step">A union of string literals is the standard way to model this: TypeScript checks it, and libraries such as TanStack Query expose exactly <code>status: "pending" | "error" | "success"</code>.</p>
+  <aside class="notes">
+    <p>Lecture 5's rule, applied: store the minimum, derive the rest. "Making impossible states impossible" is the phrase if they want to search for it.</p>
+  </aside>
+</section>
+
+<section data-title="loadStalls()">
+  <p class="kicker">The pattern</p>
+  <h2>Set, render, request, set, render</h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js">async function loadStalls() {
+  state.status = "loading";
+  render();
+  try {
+    state.stalls = await getStalls();
+    state.status = "ready";
+  } catch (error) {
+    console.error(error);
+    state.error = describe(error);
+    state.status = "error";
+  }
+  render();
+}</script>
+    <div class="stack">
+      <div class="card"><p><strong>Two renders</strong>: one before the request, so "Loading…" appears at once; one after, whatever happened.</p></div>
+      <div class="card"><p><strong>The error twice</strong>: the details to the console for you, a sentence in <code>state.error</code> for the person using the page.</p></div>
+      <div class="card"><p><strong>Retry</strong> is a second call: the function always starts by setting the state it needs.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:57. Started from <code>main.js</code> with a top-level <code>await loadStalls();</code> (a module). <code>finally</code> is an alternative for the second <code>render()</code>; here both branches set a status first, so a plain call after the <code>try</code> reads better. Next slide: what <code>render()</code> does with each status.</p>
+  </aside>
+</section>
+
+<section data-title="render() for every status">
+  <p class="kicker">The pattern · rendering</p>
+  <h2><code>render()</code> draws every status</h2>
+  <div class="split l3">
+    <script type="text/x-code" data-lang="js" class="small">function render() {
+  const { status, stalls } = state;
+  list.setAttribute("aria-busy", String(status === "loading"));
+  retry.hidden = status !== "error";
+  errorText.textContent = "";
+
+  if (status === "loading") {
+    statusLine.textContent = "Loading the vendors…";
+    list.replaceChildren();
+  } else if (status === "error") {
+    statusLine.textContent = "";
+    errorText.textContent = state.error;
+    list.replaceChildren();
+  } else {
+    statusLine.textContent = `${stalls.length} stalls`;
+    list.replaceChildren(...visibleStalls().map(card));
+  }
+}</script>
+    <div class="stack">
+      <div class="card"><p><code>statusLine</code> is a <code>role="status"</code> region; <code>errorText</code> a <code>role="alert"</code>. Both stay in the HTML; only their text changes, so screen readers announce it.</p></div>
+      <div class="card"><p>Try again hides itself when loading starts. Move focus first: <code>statusLine.focus(); loadStalls();</code></p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:58. One branch per status. "Empty" (ready with no stalls: "No stalls yet.") is derived, not stored; it's Exercise 3's bonus. The focus line matters for keyboard users: a hidden button can't keep focus, and it would fall back to <code>&lt;body&gt;</code>. Exercise 3 is this slide and the previous one, in three steps.</p>
+  </aside>
+</section>
+
+<section data-title="How a request fails">
+  <p class="kicker">Failure modes</p>
+  <h2>Four ways to fail, three of them reject</h2>
+  <table class="dtable st">
+    <tr><th>What happened</th><th>What your code sees</th><th>Where to handle it</th><th>The user should see</th></tr>
+    <tr><td>Network: offline, DNS, refused, CORS</td><td><code>fetch</code> rejects with a <code>TypeError</code> ("Failed to fetch" in Chrome)</td><td><code>catch</code></td><td>"No connection" + Try again</td></tr>
+    <tr><td>HTTP error: 4xx, 5xx</td><td>resolves, <code>response.ok === false</code></td><td>your helper throws → <code>catch</code></td><td>5xx: Try again · 4xx: what to change</td></tr>
+    <tr><td>Body isn't JSON</td><td><code>response.json()</code> rejects: <code>SyntaxError</code></td><td>error status: helper ignores the body · 2xx: let it throw (wrong URL)</td><td>like an HTTP error</td></tr>
+    <tr><td>Aborted or timed out</td><td>rejects: <code>AbortError</code> / <code>TimeoutError</code></td><td><code>catch</code>, check <code>error.name</code></td><td>nothing, if you aborted it on purpose</td></tr>
+  </table>
+  <p>Without a timeout, a request to a hanging server can stay pending for minutes: <code>fetch(url, { signal: AbortSignal.timeout(8000) })</code>.</p>
+  <aside class="notes">
+    <p>~0:59. Messages differ per browser: Firefox says "NetworkError when attempting to fetch resource", Safari "Load failed"; check <code>error.name</code>, never the message. The CORS row surprises people: a CORS failure looks exactly like a network failure in JavaScript (a TypeError with no details, on purpose: a page mustn't learn anything about a server that didn't allow it). The details are only in the console. Act 5.</p>
+  </aside>
+</section>
+
+<section data-title="Accessible async UI">
+  <p class="kicker">Accessibility · perceived performance</p>
+  <h2>Tell everyone what's happening, including screen readers</h2>
+  <div class="grid-3 habits">
+    <div class="card"><span class="label">aria-busy</span><p><code>aria-busy="true"</code> marks a region as being updated. Support varies: a hint, not a substitute for a status message.</p></div>
+    <div class="card"><span class="label">role="status"</span><p>A polite live region: "Loading the market…", then "10 stalls", announced without moving focus.</p></div>
+    <div class="card"><span class="label">role="alert"</span><p>For the error: announced immediately. Keep the element in the page; change only its text.</p></div>
+    <div class="card"><span class="label">keep what you have</span><p>Reloading? Keep the old list visible and dimmed rather than blanking the page.</p></div>
+    <div class="card"><span class="label">skeletons</span><p>Grey placeholder cards of the right size: no layout shift when the data arrives.</p></div>
+    <div class="card"><span class="label">don't flash</span><p>A response in 50 ms needs no spinner. Show it after ~300 ms, or use a skeleton.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~1:01. Live regions must exist in the DOM before their text changes, otherwise nothing is announced: that's why the status line is in the HTML and JavaScript only changes its text.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Stuck loading">
+  <p class="kicker">Quick check · the forever spinner</p>
+  <h2>The server answers 503. What does the user see?</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="js" class="mid">async function loadStalls() {
+  state.status = "loading";
+  render();
+  state.stalls = await getStalls();
+  state.status = "ready";
+  render();
+}
+loadStalls();</script>
+    <div class="stack">
+      <div class="reveal-box step solid">"Loading…", forever. <code>getStalls</code> throws, the function stops at the <code>await</code>, the last two lines never run.</div>
+      <div class="reveal-box step">And <code>Uncaught (in promise) HttpError: 503</code> in the console: nobody handled the rejected promise.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:02. This is Exercise 3's starting point. An unhandled rejection doesn't crash the page, which is exactly why it goes unnoticed.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3 — Slow and broken">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 3 · solo · 12 min</p>
+  <div class="ex-head"><h2>Slow and broken</h2><button class="timer" data-min="12"></button></div>
+  <ol>
+    <li>Loading: "Loading the market…" and <code>aria-busy</code>, on a slow server.</li>
+    <li>Error: <code>try … catch</code>, the error box, for a 503 and for a dead network.</li>
+    <li>Try again: the button reloads, the error box disappears at once.</li>
+  </ol>
+  <p class="where mt">08-fetch → <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/03-states.html" target="_blank" rel="noopener">Exercise 3 · Slow and broken</a></b>. The checks run your page against a slow, a failing and an offline server. Bonus: empty.</p>
+  <aside class="notes">
+    <p>~1:03 → 1:15. Common miss in case 2: the error box shows, but "Loading…" is still in the status line, because the status line's branch doesn't know about errors. The check "no Loading…" catches it. Last minute: show case 2's render once, then break.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:15" data-title="Break">
+  <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break. <em>15 min.</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: sending data, CORS, races, then the team build on a real server.</p>
+  <aside class="notes">
+    <p>Start the timer. The break is a break: server setup happens in the team build's first five minutes. During the break, prepare the CORS demo (run sheet, checklist item 2) so slide "CORS, live" takes three minutes, not six.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · SENDING DATA
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="Sending data" data-at="1:30" data-title="Act 4 — Sending data">
+  <div class="act-deco">POST</div>
+  <div class="act-num">act 04</div>
+  <h1>Sending data</h1>
+  <div class="act-meta"><span class="chip">1:30 – 1:54</span><span>the page writes to the server</span></div>
+  <div class="act-list"><span>method</span><span>body</span><span>Content-Type</span><span>FormData</span><span>201</span><span>422</span><span>idempotency</span></div>
+</section>
+
+<section data-title="A POST in fetch">
+  <p class="kicker">fetch(url, init)</p>
+  <h2>A POST: a method, a header, a body</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">// url = "/api/stalls/taco-bike/reviews"
+const response = await fetch(url, {
+  ⟦method: "POST"⟧,
+  headers: {
+    ⟦"Content-Type": "application/json"⟧,
+  },
+  body: ⟦JSON.stringify(review)⟧,
+});
+
+if (response.status === 201) {
+  const created = await response.json();
+}</script>
+<pre class="raw sm"><mark><span class="m">POST</span></mark> <span class="p">/api/stalls/taco-bike/reviews</span> HTTP/1.1
+<span class="h">Host:</span> localhost:3000
+<mark><span class="h">Content-Type:</span> application/json</mark>
+<span class="h">Content-Length:</span> 66
+
+<mark><span class="b">{"author":"Ana","rating":5,"text":"…"}</span></mark></pre>
+  </div>
+  <p class="step">The second argument maps one-to-one onto the request. <code>body</code> is a string you produce; <code>fetch</code> doesn't serialise objects for you.</p>
+  <aside class="notes">
+    <p>~1:31. Show the request lab's "as fetch()" panel again if useful: it's the same mapping. The other init options they'll meet: <code>signal</code> (Act 5), <code>credentials</code> (cookies across origins), <code>cache</code>, <code>keepalive</code> (send analytics while the page unloads).</p>
+  </aside>
+</section>
+
+<section data-title="Three ways to get a POST wrong">
+  <p class="kicker">Three bugs, three status codes</p>
+  <h2>What the server receives when you forget something</h2>
+  <div class="grid-3 habits">
+    <div class="card"><span class="label">body: review</span><p>An object as the body is converted with <code>String()</code>. The server receives <code>[object Object]</code>.</p><p class="err">400 · The body is not valid JSON</p></div>
+    <div class="card"><span class="label">no Content-Type</span><p>A string body is sent as <code>text/plain;charset=UTF-8</code>. The server won't guess.</p><p class="err">415 · Unsupported Media Type</p></div>
+    <div class="card"><span class="label">rating: "5"</span><p>Every form value is a string. The API's contract says <em>number</em>.</p><p class="err">422 · rating: A number, not a string</p></div>
+  </div>
+  <p>All three are visible in the Network panel's <strong>Payload</strong> tab before you read a line of server code.</p>
+  <aside class="notes">
+    <p>~1:32. These are the request lab's presets; the Harbour server sends deliberately specific messages. Real servers are often less helpful (a bare 400), which is one more reason to look at the payload first.</p>
+  </aside>
+</section>
+
+<section data-title="Form to JSON">
+  <p class="kicker">From a form</p>
+  <h2>FormData → an object → the types the API wants</h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js" class="small">form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  // all strings: { rating: "5", … }
+
+  const review = {
+    author: data.author.trim(),
+    rating: Number(data.rating),
+    text: data.text.trim(),
+  };
+  await postJSON(`/stalls/${id}/reviews`, review);
+});</script>
+    <table class="dtable st">
+      <tr><th>body</th><th>Content-Type if you don't set one</th></tr>
+      <tr><td><code>JSON.stringify(x)</code></td><td><code>text/plain;charset=UTF-8</code>: set <code>application/json</code> yourself</td></tr>
+      <tr><td><code>new FormData(form)</code></td><td><code>multipart/form-data</code> (files)</td></tr>
+      <tr><td><code>new URLSearchParams(x)</code></td><td><code>application/x-www-form-urlencoded</code></td></tr>
+      <tr><td><code>file</code> (a Blob)</td><td>the file's type</td></tr>
+    </table>
+  </div>
+  <aside class="notes">
+    <p>~1:34. <code>postJSON</code> is the project's helper: paths are relative to <code>/api</code>. Checkboxes: an unchecked box is absent from FormData, so <code>data.has("news")</code> is the boolean. Multiple values with the same name (a multi-select): <code>formData.getAll("tags")</code>. Send FormData directly only if the server expects multipart; never set its Content-Type yourself (the boundary is generated).</p>
+  </aside>
+</section>
+
+<section data-title="Render the server's copy">
+  <p class="kicker">After a 201</p>
+  <h2>Render what the server stored, not what you sent</h2>
+  <div class="vs2">
+    <div class="card">
+      <h3>Pessimistic (today)</h3>
+      <p>Wait for the 201, then render the response body: it has the <code>id</code>, the <code>createdAt</code>, the trimmed text. The page shows the truth.</p>
+      <script type="text/x-code" data-lang="js" class="small">const created = await postJSON(url, review);
+reviews.prepend(reviewItem(created));
+form.reset();</script>
+    </div>
+    <div class="card step">
+      <h3>Optimistic</h3>
+      <p>Render immediately, send in the background, roll back if it fails. Feels instant; needs a temporary id and an undo path.</p>
+      <script type="text/x-code" data-lang="js" class="small">const temp = { ...review, id: "tmp" };
+const li = reviewItem(temp);
+reviews.prepend(li);
+try {
+  await postJSON(url, review);
+} catch {
+  li.remove();
+  showError(…);
+}</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:35. Optimistic UI suits actions that almost never fail and are cheap to undo: a ♥, a like. It's one of the team-build briefs ("Saved on the server"). For a review that the server may reject for validation reasons, pessimistic UI avoids showing something that then disappears.</p>
+  </aside>
+</section>
+
+<section data-title="Validation on both sides">
+  <p class="kicker">422 Unprocessable Content</p>
+  <h2>The browser validates for speed. The server validates because it must.</h2>
+  <div class="split">
+<pre class="raw">HTTP/1.1 <span class="s4">422 Unprocessable Content</span>
+<span class="h">Content-Type:</span> application/json
+
+<span class="b">{
+  "error": "validation_failed",
+  "fields": {
+    "rating": "A whole number from 1 to 5.",
+    "text": "10–280 characters."
+  }
+}</span></pre>
+    <script type="text/x-code" data-lang="js" class="small">try {
+  const created = await postJSON(url, review);
+  reviews.prepend(reviewItem(created));
+  form.reset();
+} catch (error) {
+  if (error.status === 422) {
+    showErrors(error.body.fields);
+  } else {
+    formStatus.textContent =
+      "Couldn't post your review. Try again.";
+  }
+}</script>
+  </div>
+  <aside class="notes">
+    <p>~1:36. <code>required</code> and <code>maxlength</code> catch the obvious before a request is sent; anyone can send a request without your form (<code>curl</code>, DevTools), so the server is the only place a rule is enforced. Two ways to read a 422: branch on <code>response.status</code> with plain <code>fetch</code> (Exercise 4), or catch the <code>HttpError</code> that <code>api.js</code> throws and read <code>error.body.fields</code> (the team build). <code>showErrors(fields)</code> puts each message in the <code>.field-error</code> with the matching <code>data-for</code> and sets <code>aria-invalid</code>; it's Exercise 4's case 2. Never clear the form after a failure. The 10-character minimum exists only on the server, so the client can't know about it. A real form links each message with <code>aria-describedby</code> and moves focus to the first invalid field.</p>
+  </aside>
+</section>
+
+<section data-title="Idempotency">
+  <p class="kicker">Double submits</p>
+  <h2>Click twice, get two reviews: POST is not idempotent</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">button.disabled = true;
+formStatus.textContent = "Posting…";
+try {
+  const created = await postJSON(url, review);
+  reviews.prepend(reviewItem(created));
+  form.reset();
+} catch (error) {
+  handle(error); // 422: fields, else a message
+} finally {
+  button.disabled = false;
+}</script>
+    <div class="stack">
+      <div class="card"><p><strong>Client</strong>: disable the control while pending; re-enable in <code>finally</code>.</p></div>
+      <div class="card"><p><strong>Server</strong>: an <code>Idempotency-Key</code> header (a UUID per submission); repeats are ignored. Payment APIs support it.</p></div>
+      <div class="card"><p><strong>Design</strong>: make it idempotent where you can: <code>PUT /api/saved/mezcal</code>, not <code>POST /api/saved</code>.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:38. Double submits come from slow networks, impatient users, and automatic retries. A disabled button is enough for this course; the Idempotency-Key is what makes "retry on timeout" safe for a POST. <code>crypto.randomUUID()</code> generates the key.</p>
+  </aside>
+</section>
+
+<section data-title="PUT, PATCH, DELETE">
+  <p class="kicker">The other methods</p>
+  <h2>PUT, PATCH, DELETE, and a header for auth</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">// PUT: 204, no body to read
+await fetch("/api/saved/mezcal", {
+  method: "PUT",
+});
+
+// DELETE: 204, or 404 if gone
+await fetch("/api/reviews/r3", {
+  method: "DELETE",
+});</script>
+    <script type="text/x-code" data-lang="js" class="small">// PATCH: only what changes
+await fetch("/api/stalls/mezcal", {
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({ soldOut: false }),
+});</script>
+  </div>
+  <p class="step">No token or an invalid one: 401. A valid token that may not edit this stall: 403. A real token never goes in your source: it comes from a login.</p>
+  <aside class="notes">
+    <p>~1:40. With the project's helper these are <code>request("PUT", "/saved/mezcal")</code> and so on. DELETE returning 404 when the thing is already gone is a design choice; some APIs return 204 to stay idempotent in the response too.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 4 — Leave a review">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 4 · solo · 13 min</p>
+  <div class="ex-head"><h2>Leave a review</h2><button class="timer" data-min="13"></button></div>
+  <ol>
+    <li>POST the review as JSON, <code>rating</code> a number; render the server's copy.</li>
+    <li>422: each message under its field. Anything else: a sentence. Keep their text.</li>
+    <li>One click, one review: disabled while posting, re-enabled in <code>finally</code>.</li>
+  </ol>
+  <p class="where mt">08-fetch → <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/04-post.html" target="_blank" rel="noopener">Exercise 4 · Leave a review</a></b>. Read your own request in the Network tab before asking for help.</p>
+  <aside class="notes">
+    <p>~1:41 → 1:54. Case 1's checks map to the "three bugs" slide: header, stringify, number. If someone is stuck, ask "what does the Payload say?" before anything else. Debrief (1 min): who forgot <code>Number()</code>?</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 5 · ORIGINS AND RACES
+     ===================================================================== -->
+
+<section class="act" data-act="5" data-act-name="Origins & races" data-at="1:54" data-title="Act 5 — Origins & races">
+  <div class="act-deco">CORS</div>
+  <div class="act-num">act 05</div>
+  <h1>Origins &amp; races</h1>
+  <div class="act-meta"><span class="chip">1:54 – 2:11</span><span>where a request may go, and when it comes back</span></div>
+  <div class="act-list"><span>same-origin policy</span><span>CORS</span><span>preflight</span><span>race conditions</span><span>AbortController</span><span>secrets</span></div>
+</section>
+
+<section data-title="Same-origin policy">
+  <p class="kicker">The same-origin policy</p>
+  <h2>A page may send simple requests anywhere. Reading the response is the question.</h2>
+  <table class="dtable">
+    <tr><th>Page at <code>http://localhost:3000</code> fetches…</th><th>Same origin?</th><th>Why</th></tr>
+    <tr><td><code>http://localhost:3000/api/stalls</code></td><td class="yes">yes</td><td>scheme, host and port match</td></tr>
+    <tr><td><code>http://localhost:8080/api/stalls</code></td><td class="no">no</td><td>different port</td></tr>
+    <tr><td><code>https://localhost:3000/api/stalls</code></td><td class="no">no</td><td>different scheme</td></tr>
+    <tr><td><code>http://127.0.0.1:3000/api/stalls</code></td><td class="no">no</td><td>different host, even if it's the same machine</td></tr>
+    <tr><td><code>https://api.open-meteo.com/v1/forecast</code></td><td class="no">no</td><td>allowed anyway: that server sends CORS headers</td></tr>
+  </table>
+  <p>Why: your browser holds cookies for your bank. Without this rule, any page you visit could read <code>bank.example/account</code> with your session.</p>
+  <aside class="notes">
+    <p>~1:54. Non-simple requests (a JSON POST, an <code>Authorization</code> header) aren't even sent without the server's permission: next slide. The point of the policy is the user's credentials and private network, not the server's data: <code>curl</code> can read any public API, because <code>curl</code> has no cookies of yours. CORS (next slide) is how a server opts in to being read by pages from other origins.</p>
+  </aside>
+</section>
+
+<section data-title="CORS">
+  <p class="kicker">CORS · Cross-Origin Resource Sharing</p>
+  <h2>The server says who may read its responses</h2>
+  <div class="seq">
+    <div class="who">Browser<small>page at localhost:8080</small></div>
+    <div></div>
+    <div class="who">Server<small>localhost:3000</small></div>
+    <div class="side-note">preflight: "may I?"</div>
+    <div class="msg r pre"><b>OPTIONS</b> /api/stalls/taco-bike/reviews · Origin: http://localhost:8080 · Access-Control-Request-Method: POST · …-Headers: content-type</div>
+    <div></div>
+    <div></div>
+    <div class="msg l pre"><b>204</b> · Access-Control-Allow-Origin: http://localhost:8080 · Allow-Methods: GET, POST, PUT, PATCH, DELETE · Allow-Headers: Content-Type, Authorization</div>
+    <div class="side-note">"yes"</div>
+    <div class="side-note">the real request</div>
+    <div class="msg r ok"><b>POST</b> /api/stalls/taco-bike/reviews · Origin: http://localhost:8080</div>
+    <div></div>
+    <div></div>
+    <div class="msg l ok"><b>201</b> · Access-Control-Allow-Origin: http://localhost:8080 · {…}</div>
+    <div class="side-note">readable</div>
+  </div>
+  <p><em>Simple</em> (GET, HEAD, or a POST with a form or text body, no custom headers): no preflight, it reaches the server. A JSON body, PUT / PATCH / DELETE or <code>Authorization</code>: preflight first.</p>
+  <aside class="notes">
+    <p>~1:56. Without <code>Access-Control-Allow-Origin</code> on the response, the request may still have reached the server and done its work (for a simple request); the browser just refuses to hand the response to JavaScript. The preflight exists so that non-simple requests (which older servers never expected from a browser) are not sent at all unless the server agrees. <code>Access-Control-Allow-Origin: *</code> is fine for public data; it's not allowed together with credentials (cookies).</p>
+  </aside>
+</section>
+
+<section data-title="CORS, live">
+  <p class="kicker">Live · break it, then fix it on the server</p>
+  <h2>The error message, and where the fix goes</h2>
+  <ol class="tasks">
+    <li>Run the local server (<code>project/server</code>, CORS off) and serve the connected market with live-server; <code>API</code> = <code>http://localhost:3000/api</code>.</li>
+    <li>Reload. The page says "no connection"; the console says:</li>
+  </ol>
+  <p class="err" style="font-size:19px">Access to fetch at 'http://localhost:3000/api/stalls' from origin 'http://localhost:8080' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.</p>
+  <ol class="tasks" start="3" style="counter-reset: n 2">
+    <li>Restart: <code>node server.js --cors http://localhost:8080</code>, with the exact origin in the address bar (<code>127.0.0.1</code> ≠ <code>localhost</code>). Reload: ten vendors.</li>
+  </ol>
+  <p class="step">Fix it on the server. <code>mode: "no-cors"</code> doesn't.</p>
+  <aside class="notes">
+    <p>~1:58, three minutes, live. The course server (harbour-api.lopin.me) sends <code>Access-Control-Allow-Origin: *</code>: that's why their pages on localhost:8080 can call it, and point it out. The demo uses the local server in <code>project/server</code>, which has CORS off unless started with <code>--cors</code>. Show the failed request in the Network panel: status "CORS error", and for the GET there's no preflight. Then post a review from that page to show the OPTIONS request appear once CORS is on. In development, the usual alternative is a dev-server proxy (Vite's <code>server.proxy</code>): the page and the API look same-origin to the browser.</p>
+  </aside>
+</section>
+
+<section data-title="Race lab">
+  <p class="kicker">Race lab · responses arrive out of order</p>
+  <h2>Search as you type: which response wins?</h2>
+  <div class="fill race-lab" data-word="taco"></div>
+  <aside class="notes">
+    <p>~2:01. Naive, press ▶: the box says taco, the list shows "t". The server answers short queries slower (more matches), so the first request finishes last and overwrites the right answer. Ignore stale: correct, but every response is still downloaded. AbortController: correct, and the obsolete requests are cancelled. Tick debounce: fewer requests, but debounce alone doesn't guarantee order (type, pause 300 ms, type again). Playground: <code>playgrounds/race-lab.html</code>.</p>
+  </aside>
+</section>
+
+<section data-title="AbortController">
+  <p class="kicker">AbortController · AbortSignal</p>
+  <h2>Cancel the request you no longer need</h2>
+  <div class="split l2">
+    <script type="text/x-code" data-lang="js" class="small">let controller = null;
+
+search.addEventListener("input", async () => {
+  controller?.abort();
+  controller = new AbortController();
+  const url = urlFor(search.value);
+  try {
+    const stalls = await getJSON(url, {
+      signal: controller.signal,
+    });
+    render(stalls);
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    showError(error);
+  }
+});</script>
+    <div class="stack">
+      <div class="card"><p>The aborted <code>fetch</code> rejects with an <code>AbortError</code>; its <code>render</code> never runs. The browser cancels the request: no more bytes are downloaded.</p></div>
+      <div class="card"><p><code>AbortSignal.timeout(ms)</code>: a timeout. <code>AbortSignal.any([a, b])</code>: whichever comes first.</p></div>
+      <div class="card"><p>Also for: leaving a page or closing a dialog while its data is loading.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~2:03. On HTTP/1.1 cancelling closes the connection; on HTTP/2 it resets only that stream. Aborting doesn't undo anything on the server: an aborted POST may well have been stored. Abort reads freely; for writes, abort only means "I stopped waiting".</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 5 — Search without races">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 5 · solo · 6 min</p>
+  <div class="ex-head"><h2>Search without races</h2><button class="timer" data-min="6"></button></div>
+  <ol>
+    <li>One <code>AbortController</code> per search; abort the previous one first.</li>
+    <li>Ignore <code>AbortError</code>. Let real errors through.</li>
+    <li>Type quickly, then read the Network tab: canceled, canceled, 200.</li>
+  </ol>
+  <p class="where mt">08-fetch → <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/05-races.html" target="_blank" rel="noopener">Exercise 5 · Search without races</a></b>. Bonus at home: debounce.</p>
+  <aside class="notes">
+    <p>~2:05 → 2:11. Short on purpose: the slide before showed the solution's shape. The check "no uncaught errors" catches a missing <code>AbortError</code> filter.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     WRAP + TEAM BUILD
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Wrap" data-at="2:11" data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>The page is a client</h2>
+  <div class="grid-3">
+    <div class="card"><span class="label">HTTP</span><p>Method, URL, headers, body. Status, headers, body. Read it in the Network panel first.</p></div>
+    <div class="card"><span class="label">async &amp; fetch</span><p>One thread; callbacks wait in queues, microtasks first. A 404 resolves: check <code>response.ok</code>, in one helper.</p></div>
+    <div class="card"><span class="label">async UI state</span><p>loading · ready · error · empty, in one <code>status</code>. Retry is <code>loadStalls()</code> again.</p></div>
+    <div class="card"><span class="label">sending</span><p><code>Content-Type</code>, <code>JSON.stringify</code>, real types. 201: render the server's copy. 422: field errors.</p></div>
+    <div class="card"><span class="label">origins &amp; trust</span><p>Cross-origin reads need the server's CORS headers. Keys in browser code are public; server data is user input: <code>textContent</code>.</p></div>
+    <div class="card"><span class="label">time</span><p>Responses arrive out of order: abort what's obsolete. Disable what mustn't run twice.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:11. One sentence per card. Keep it under two minutes: the team build is waiting.</p>
+  </aside>
+</section>
+
+<section data-title="Homework">
+  <p class="kicker">Until next time</p>
+  <h2>Homework &amp; reading</h2>
+  <div class="split">
+    <div>
+      <h3>Homework</h3>
+      <ul>
+        <li><strong>Finish connecting the market</strong>, with chaos on: a pull request to <code>harbour-market-starter</code>.</li>
+        <li>The bonus cases: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/02-load.html" target="_blank" rel="noopener">2</a> (sort), <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/03-states.html" target="_blank" rel="noopener">3</a> (empty), <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/exercises/05-races.html" target="_blank" rel="noopener">5</a> (debounce).</li>
+        <li><strong>One brief</strong> on top of it, in a second PR: at least its four core items.</li>
+        <li>Next class opens with 3-minute demos of the briefs.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Reading</h3>
+      <ul class="reading">
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch" target="_blank" rel="noopener">MDN · Using the Fetch API</a> <span class="muted">— options, bodies, errors</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" target="_blank" rel="noopener">MDN · HTTP response status codes</a> <span class="muted">— the full list</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank" rel="noopener">MDN · CORS</a> <span class="muted">— simple requests, preflight, credentials</span></li>
+        <li><a href="https://jakearchibald.com/2015/thats-so-fetch/" target="_blank" rel="noopener">Jake Archibald · That's so fetch!</a> <span class="muted">— why fetch is designed this way</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~2:12. Everything is in github.com/nlopin/programming-interactivity-exercises → 08-fetch.</p>
+  </aside>
+</section>
+
+<section data-act="6" data-act-name="Team build" data-at="2:13" data-title="Team build — connect the market">
+  <p class="kicker">Team build · 45 min · solo or in pairs</p>
+  <h2>Connect the market to the API</h2>
+  <div class="split">
+    <ol class="tasks">
+      <li><strong>api.js</strong>: <code>request()</code> and <code>HttpError</code>; nothing else calls <code>fetch</code>.</li>
+      <li><strong>state</strong>: the stalls come from <code>GET /api/stalls</code>; <code>data.js</code> goes.</li>
+      <li><strong>What people see</strong>: loading, an error with Try again, ten stalls with ratings.</li>
+      <li><strong>Chaos</strong>: all of it with chaos on (control page).</li>
+    </ol>
+<pre class="raw"><span class="c"># fork, clone, branch</span>
+git switch -c connect-the-market
+npm start        <span class="c"># localhost:8080</span>
+
+<span class="c"># your market, chaos, reset:</span>
+harbour-api.lopin.me
+
+<span class="c"># your code: starter/js/</span>
+<span class="c"># hand in: a pull request</span></pre>
+  </div>
+  <p>Repository: <a href="https://github.com/nlopin/harbour-market-starter" target="_blank" rel="noopener">github.com/nlopin/harbour-market-starter</a>. Steps and checks: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/team/connect.html" target="_blank" rel="noopener">Connect the market</a>.</p>
+  <aside class="notes">
+    <p>~2:13. Everyone does the same task: the market from Lecture 5 (the <code>harbour-market-starter</code> repository) loads its vendors from the API; they hand it in as a pull request. It's the class material in one exercise: a helper, the stalls in state, the four states, the failure modes. The briefs (reviews, orders, search, saved, admin, weather) are the next step for those who finish, and homework for everyone. Everyone's market lives on harbour-api.lopin.me (Cloudflare Worker, one Durable Object per GitHub username); <code>npx wrangler tail</code> in <code>worker/</code> shows the requests live. Your reference: <code>.private/solution/</code> (<code>cd project/server &amp;&amp; npm start</code> serves it against the local server).</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Team build — go">
+  <span class="sticker your-turn">build</span>
+  <p class="kicker">Team build · until 3:00</p>
+  <div class="ex-head"><h2>Connect the market</h2><button class="timer" data-min="45"></button></div>
+  <ol>
+    <li>Minute 12: <code>getJSON("/stalls")</code> gives ten stalls in the console.</li>
+    <li>Minute 30: ten vendors on the page, loading and error handled.</li>
+    <li>Minute 42: ratings, chaos on, push, open a PR.</li>
+  </ol>
+  <p class="where mt">Brief: <b><a href="https://lopin.me/harbour/programming-interactivity-8-fetch/team/connect.html" target="_blank" rel="noopener">Connect the market</a></b>. API: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/api.html" target="_blank" rel="noopener">api.html</a>.</p>
+  <aside class="notes">
+    <p>2:15 → 3:00. Announce minutes 12, 30 and 42. Minute 12 is the checkpoint: whoever can't run the console check is stuck on setup (page opened from the file system, server not running, wrong port). If several people hit the same problem, stop everyone for 60 seconds and show the fix on the projector. Demos open the next class.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Over the wire. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="wire-title" style="font-size:150px">Over <em>the</em><br><span class="out">wire.</span></h1>
+      <p class="title-sub">exercises · playgrounds · the server · the briefs →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="dp" aria-hidden="true">
+<pre class="raw">HTTP/1.1 <span class="s2">204 No Content</span>
+<span class="h">X-See-You:</span> next class</pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

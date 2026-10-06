@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fetch sandbox</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.live-js { height: 40rem; margin: 1.5rem 0; font-size: 1.05rem; }</style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">fetch</span>
+    <h1>fetch <em>sandbox</em></h1>
+    <p class="intro">A script, a preview, a console and a <strong>Network</strong> tab. Requests to <code>/api/…</code> go to the Harbour Market API (documented in <a href="../api.html">api.html</a>); the server restarts on every run, so data you POST lasts until the next one. Click a row in the Network tab to see its headers and body.</p>
+    <div class="live-js" data-api data-module data-market data-console="big">
+      <script type="text/plain" data-role="html"><h2>Stalls</h2>
+<ul class="vendor-list"></ul></script>
+      <textarea>
+const list = document.querySelector(".vendor-list");
+
+const response = await fetch("/api/stalls?tag=food");
+console.log(response.status, response.headers.get("X-Total-Count"));
+
+const stalls = await response.json();
+console.table(stalls.map((s) => s.name));
+
+list.replaceChildren(...stalls.map((s) => {
+  const li = document.createElement("li");
+  li.className = "vendor-card";
+  li.textContent = `${s.name} · ★ ${s.rating ?? "–"}`;
+  return li;
+}));
+</textarea>
+    </div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Change the URL to <code>/api/stalls/pizza</code>. Does <code>fetch</code> throw? What does <code>response.ok</code> say?</li>
+      <li>POST a review to <code>/api/stalls/taco-bike/reviews</code> and log the created review. Then GET the reviews in the same script.</li>
+      <li>Send <code>body: { author: "Ana" }</code> without <code>JSON.stringify</code>. Open the request in the Network tab: what was actually sent?</li>
+      <li>Wrap the fetch in <code>try … catch</code>, then add <code>{ signal: AbortSignal.timeout(100) }</code>. What's the error's <code>name</code>?</li>
+    </ol>
+  </div>
+</body>
+</html>

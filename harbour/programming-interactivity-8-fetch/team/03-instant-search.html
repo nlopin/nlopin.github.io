@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 3 · Instant search</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 3 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 3</span>
+    <h1><em>Instant search</em></h1>
+    <p class="intro">Replace the in-browser search with the server's: <code>GET /api/stalls?q=…</code> searches names <em>and</em> blurbs. It has to feel instant, show the right results for what's in the box, and live in the URL so a search can be shared and the Back button works. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“Somebody said there's a stall with pineapple. Which one was it?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> type "pineapple" quickly: one request after you stop, and Taco Bike. Copy the URL into a new tab: same search, same result. Type, then press Back: the previous search comes back.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>Typing searches on the server: <code>GET /api/stalls?q=</code>, built with <code>URLSearchParams</code>.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Each search aborts the previous one; <code>AbortError</code> never reaches the user or the console.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Debounced: one request once typing pauses for ~250 ms.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Loading (old results dimmed), "No stall matches …", and an error message.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>GET /api/stalls?q=</code> built with <code>URLSearchParams</code>, combined with the tag filter (<code>?tag=food&amp;q=…</code>).</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Debounced: one request once typing pauses for ~250 ms.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Every new search aborts the one in flight (<code>AbortController</code>).</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Results, "No stall matches …" and an error each render from state; the old results stay visible, dimmed, while a search is loading.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The query and the tag are in the page's URL (<code>?q=pineapple&amp;tag=food</code>), and the page starts from them on load.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Back and Forward restore earlier searches.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>AbortError</code> is never shown to the user and never reaches the console.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A 503 shows a message and keeps the previous results.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Typing faster than the server never shows results for an older query.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState"><code>history.replaceState</code></a> / <code>pushState</code> and the <code>popstate</code> event: change the URL without reloading.</p></div>
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>GET</code></td><td><code>/api/stalls?q=&amp;tag=&amp;sort=</code></td><td>200 · array, <code>X-Total-Count</code> · 400 for an unknown tag</td></tr>
+    </table></div>
+    <p>The server answers short queries slowly and long ones fast (more matches to rank): <code>q=t</code> takes about 0.7 s, <code>q=pineapple</code> about 0.1 s. Out-of-order responses are guaranteed.</p>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Type "t", wait half a second, type "aco". What's in the list?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Clear the box: all stalls again, and the URL has no <code>q=</code>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Open <code>/?q=%3Cb%3E</code> (a query with HTML in it).</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Back, Back, Forward.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Chaos on, type, go Offline (DevTools) mid-search.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Highlight the matched text in names, without <code>innerHTML</code>.</li>
+      <li>Keyboard: <kbd>/</kbd> focuses the search box, <kbd>Esc</kbd> clears it.</li>
+      <li>Cache: the same query twice in 30 s doesn't hit the network.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Debounce and abort solve two different problems. Which one does each solve, and which one makes the result correct?</p></details>
+      <details><summary>Hint 2</summary><p>replaceState or pushState: should every keystroke be a Back step?</p></details>
+      <details><summary>Hint 3</summary><p>On load, the URL has a query. What runs first: reading it, or the first render?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The list shows the results for "t" while the box says "taco".</li>
+      <li>"pineapple": the Network panel shows Taco Bike in the response, the page shows nothing (something on the client is still filtering by name).</li>
+      <li>"Uncaught (in promise) AbortError" in the console.</li>
+      <li>Back changes the URL but not the list.</li>
+      <li>The search box and the URL disagree after Back.</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: Typing sends <code>GET /api/stalls?q=…</code>; with fast typing, earlier ones show <em>(canceled)</em> in the Network panel.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

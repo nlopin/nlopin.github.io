@@ -280,6 +280,35 @@ Spares: **Lights Out** ★☆☆, **Hangman** ★☆☆, **Connect Four** ★★
   dictionary hunting.
 - **Sets in the state** don't survive `JSON.stringify` (the L5 trap again).
 
+## Lecture 8 · "Over the wire" (written)
+
+Data fetching and sending, on the market. Written:
+`programming-interactivity-8-fetch/` (deck, 5 exercises, 3 playgrounds, API
+reference, team briefs, run sheet). Assumes Lecture 5. Teaches asynchronous
+JavaScript itself in Act 2 (the run sheet says how to shorten it to a recap if
+Lectures 6–7 covered it).
+
+| Act | Content | Practice |
+| --- | --- | --- |
+| 1 · HTTP | request and response as text, URL and origin, methods, status codes, headers, Network panel | Ex 1: probe the API with the request lab |
+| 2 · Async & fetch | one thread, the event loop (step-through lab), promises `.then` / `.catch` / `.finally`, `async` / `await`; two awaits, Response, 404 resolves, `getJSON` + `HttpError`, URLSearchParams | event loop quiz; Ex 2: load the market, filter on the server |
+| 3 · Async UI state | loading / ready / error / empty in one `status`, failure modes, aria-busy | Ex 3: loading, error, retry |
+| 4 · Sending data | POST JSON, 400 / 415 / 422, render the 201, field errors, double submits, PUT / PATCH / DELETE | Ex 4: leave a review |
+| 5 · Origins & races | same-origin policy, CORS + preflight (live), out-of-order responses, AbortController | Ex 5: search without races |
+| Team build · 45 min | connect the Lecture 5 market to the API (github.com/nlopin/harbour-market-starter, handed in as a PR); six briefs after it | demos next class |
+
+Infrastructure: `project/server/api-core.js` is the API's logic (no I/O),
+shared by the course server (harbour-api.lopin.me: a Cloudflare Worker in
+`worker/`, one Durable Object per student's GitHub username, chaos and reset
+per market), the local Node server (fallback, CORS demo), the exercise editors
+(fake `fetch` + Network tab, `data-api` in kit.js) and the request/race/loop
+labs. One set of rules everywhere. Students fork
+github.com/nlopin/harbour-market-starter and hand in pull requests.
+
+Not covered, candidates for later: WebSockets / server-sent events (brief 2
+polls instead), caching headers in depth, service workers and offline,
+authentication flows (login, cookies, sessions), deploy.
+
 ## Open questions
 
 - Is the next class Friday of week 1 or Monday of week 2?

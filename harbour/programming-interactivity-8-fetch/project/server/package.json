@@ -1,0 +1,13 @@
+{
+  "name": "harbour-market-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Harbour Market API and the market's static files. No dependencies.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "chaos": "node server.js --latency 1200 --fail 0.3"
+  },
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 7 · spare · Prices in your currency</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 7 · spare · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 7 · spare</span>
+    <h1><em>Prices in your currency</em></h1>
+    <p class="intro">Visitors come from everywhere. A select next to the filters shows every price in EUR, GBP, USD or CHF, using today's rates from the <a href="https://frankfurter.dev">Frankfurter</a> API (public, no key, CORS enabled). The server's prices stay in euros; the conversion is display only. <span class="stars" title="difficulty">★☆☆</span></p>
+    <p class="story">“Is €12 for a record a lot? What's that in pounds?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> switch to GBP: every price changes, with the right currency symbol and decimals. Switch again: no new request. Reload: the choice is remembered.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>One <code>GET</code> to Frankfurter for today's rates.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A select (EUR, GBP, USD, CHF) in state; prices converted on render.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Prices formatted with <code>Intl.NumberFormat</code>; "free" stays "free".</span></li>
+      <li><input type="checkbox" aria-label="done"><span>If the rates fail, the select is hidden and prices stay in euros.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>One <code>GET https://api.frankfurter.dev/v1/latest?base=EUR&amp;symbols=GBP,USD,CHF</code>, cached for the day.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The chosen currency in state and in <code>localStorage</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Prices formatted with <code>Intl.NumberFormat</code>, not string concatenation.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>While the rates load, the select is disabled and prices show in euros.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>"free" stays "free" in every currency.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A note with the rates' date: "Rates of 2 October".</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>If the rates fail, the select is hidden and everything stays in euros.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>An unknown currency in <code>localStorage</code> falls back to EUR.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat"><code>Intl.NumberFormat</code></a> with <code>style: "currency"</code>.</p></div>
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Offline with no cached rates.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>A cached rate from yesterday.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Switch currency while the stalls are still loading.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Detect a default from <code>navigator.language</code>.</li>
+      <li>Round to friendly prices (£10.50, not £10.21) and say so.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Is the converted price state, or derived from state?</p></details>
+      <details><summary>Hint 2</summary><p>Where should the conversion happen: in card(), or before the data reaches it?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>£10.200000000000001.</li>
+      <li>Prices convert twice after switching back and forth.</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: The Frankfurter request is in the Network panel and <code>rates.GBP</code> is in the console.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

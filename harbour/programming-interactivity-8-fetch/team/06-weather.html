@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 6 · Weather for the night</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 6 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 6</span>
+    <h1><em>Weather for the night</em></h1>
+    <p class="intro">The market is outdoors. Add a strip above the vendors: the temperature, the chance of rain and the wind for the evening (the market runs 19:00–01:00, so the hours 19:00 to 00:00), from <a href="https://open-meteo.com/en/docs">Open-Meteo</a>, a public weather API that needs no key and sends CORS headers. Different server, different shape of data, same rules. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“Do I need a jacket? Does the market close if it rains?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> the strip with six hourly columns, 19:00 to 00:00. Reload: no request, it came from the cache. Turn off Wi-Fi (or DevTools → Offline) with an empty cache: the strip says the forecast isn't available, and the vendors still load.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>One <code>GET</code> to Open-Meteo for Moll de la Fusta: temperature and precipitation probability, hourly, Europe/Madrid.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A strip with 19:00–00:00 of the market evening, read from the parallel arrays.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Loading and error for the strip; a failure never affects the vendor list.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The weather and the stalls load independently: two async functions started one after the other, each rendering its own part when its response arrives.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>One <code>GET</code> to Open-Meteo for Moll de la Fusta (latitude 41.38, longitude 2.18), hourly temperature, precipitation probability and wind, time zone Europe/Madrid.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The answer cached in <code>localStorage</code> with the time it was fetched; reused for 30 minutes.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The weather request and <code>GET /api/stalls</code> start together; each renders its part as soon as it has it.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Loading, error and ready for the strip, independent of the vendor list.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Hours 19 to 00 of the market evening, read from Open-Meteo's parallel arrays.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A one-line verdict from the data: "Dry night, 18 °C" or "Bring a jacket: rain likely after 22:00".</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The weather failing never breaks the vendor list.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A stale cache (older than 30 min) is used if the network fails, labelled "as of 18:05".</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A broken cache entry (invalid JSON) is ignored, not fatal.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Open-Meteo answers with <em>parallel arrays</em>: <code>hourly.time[i]</code>, <code>hourly.temperature_2m[i]</code>… Index <code>i</code> is the same hour in every array. Its <a href="https://open-meteo.com/en/docs">docs page</a> builds the URL for you.</p></div>
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Starting two requests without waiting for each other: call two <code>async</code> functions without <code>await</code>ing the first before starting the second. <code>await Promise.all([…])</code> waits for <em>both</em>: right when you need both values together, wrong when the vendors shouldn't wait for the weather.</p></div>
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → Offline, with and without a cached forecast.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Put <code>{</code> into the cache entry by hand (Application panel), reload.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Change the clock? No: change the cache's timestamp to 31 minutes ago, reload.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Block the request (right-click → Block request URL).</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Run the page from a phone-sized window.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Icons from the <code>weather_code</code> field (WMO codes).</li>
+      <li>A °C / °F toggle that converts locally, without a new request.</li>
+      <li>Spare brief 7: prices in the visitor's currency, from another public API.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>The response has one array of times and one of temperatures. How do you turn them into one array of hours?</p></details>
+      <details><summary>Hint 2</summary><p>Cache: what do you store besides the data, so you can tell later whether it's too old?</p></details>
+      <details><summary>Hint 3</summary><p>await, await: does the second request start before the first one ends? Does the vendor list have to wait for anything but its own response?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The hours are off by one or two (time zone).</li>
+      <li>The vendor list waits for the weather to load.</li>
+      <li>A cached forecast from yesterday shows as today's.</li>
+      <li>The strip shows NaN °C after the cache was edited by hand.</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: The Open-Meteo request is in the Network panel with a 200, and <code>hourly.temperature_2m</code> is in the console.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

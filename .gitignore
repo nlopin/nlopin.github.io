@@ -3,3 +3,9 @@
 .DS_Store
 # Meridian CTF answers and walkthrough: never publish
 harbour/meridian-desk/.private/
+
+# Lecture 8 worker
+node_modules/
+harbour/programming-interactivity-8-fetch/worker/dist/
+harbour/programming-interactivity-8-fetch/worker/.wrangler/
+harbour/programming-interactivity-8-fetch/.private/

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 2 · Order board</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 2 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 2</span>
+    <h1><em>Order board</em></h1>
+    <p class="intro">Order from a stall without queueing: your name, a button, and a ticket that updates by itself from <em>placed</em> to <em>preparing</em> to <em>ready</em>. The server has no push: the page asks every two seconds, and stops when there's nothing left to ask. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“I'll get the dumplings, you hold the table. They'll call my name, right?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> order from Taco Bike as "Ana": a ticket appears and changes state twice on its own. When it's ready, the Network panel goes quiet. Order from Churros: the server says sold out, and the page says it better.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>An Order button on every card (the server decides what can be ordered) and a name field; <code>POST /api/orders</code>.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A ticket per order, showing its status.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Polling every 2 s while not <code>ready</code>, stopped when it is; one poller per order.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>409 sold out: a sentence on that card.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>An "Order" button on every card, and a name field (asked once, remembered in <code>localStorage</code>). The page doesn't decide what's orderable: the server does, with a 409.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>POST /api/orders</code> with <code>{ stallId, name }</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Poll <code>GET /api/orders/:id</code> every 2 s while the order isn't <code>ready</code>; then stop.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A list of my tickets: stall, name, status. Each status looks different; "ready" is impossible to miss.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>My orders survive a reload: their ids in <code>localStorage</code>, their status from the server.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Ordering is disabled while the POST is in flight.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>409 <code>sold_out</code>: a sentence on that card, not an alert.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A failed poll doesn't kill the polling: the ticket says "reconnecting…" and the next tick tries again.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>No two pollers for the same order, ever.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Repeating work: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval"><code>setInterval</code></a> / <code>clearInterval</code>, or a <code>setTimeout</code> that schedules the next one after each response.</p></div>
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API"><code>document.visibilityState</code></a>: is anyone looking at this tab?</p></div>
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>POST</code></td><td><code>/api/orders</code></td><td>201 <code>{ id, status: "placed", … }</code> · 409 sold out · 422 <code>{ fields }</code></td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/orders/:id</code></td><td>200 · <code>status</code>: <code>placed</code> → <code>preparing</code> (after 5 s) → <code>ready</code> (after 15 s) · 404</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/orders</code></td><td>200 · every order, newest first</td></tr>
+    </table></div>
+    <p>Resetting your market (control page) forgets the orders, and the ids in your <code>localStorage</code> then answer 404. Handle it.</p>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Place three orders quickly: three tickets, each updating, each stopping.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Sell a stall out after the page loaded (console: <code>PATCH /api/stalls/taco-bike</code> with <code>{ "soldOut": true }</code> and the admin token, see api.html), then order from it.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Reload while an order is <em>preparing</em>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Reset your market: what happens to the old tickets?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Chaos on: a poll answers 503. Does the next one still run?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Leave the tab for a minute and come back.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Pause polling while the tab is hidden; poll once immediately when it's visible again.</li>
+      <li>A sound or a <code>Notification</code> when an order is ready (ask for permission on a click).</li>
+      <li>Back off: after a failed poll, wait 4 s, then 8 s… and reset after a success.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>setInterval or a chain of setTimeouts: which one can start a new request before the previous one answered?</p></details>
+      <details><summary>Hint 2</summary><p>Where do you keep the timer ids, so the code that sees "ready" can stop the right one?</p></details>
+      <details><summary>Hint 3</summary><p>After a reload, the ids are in localStorage. What's the first request for each of them?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The Network panel shows the same order polled twice as often after you placed a second order.</li>
+      <li>A ticket says "ready" and the requests keep coming.</li>
+      <li>After a 503 the ticket freezes forever.</li>
+      <li>Polling continues for an order the server no longer knows (404 every 2 s).</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: An Order button sends <code>POST /api/orders</code>: 201 in the Network panel, and the order's <code>id</code> in the console.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

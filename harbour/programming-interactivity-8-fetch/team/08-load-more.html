@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 8 · spare · Load more</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 8 · spare · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 8 · spare</span>
+    <h1><em>Load more</em></h1>
+    <p class="intro">Forty stalls are coming next month. The vendor list loads four at a time with <code>?limit=4&amp;page=n</code>, shows how many there are in total, and has a <em>Load more</em> button that appends the next page, until there isn't one. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“Do I really have to scroll past all the food to get to the records?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> the first four, "4 of 10". Load more twice: twelve requested, ten shown, the button gone. Click Food: back to page 1 of the food stalls.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><code>GET /api/stalls?limit=4&amp;page=1</code>, then the next page on Load more, appended.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>"Showing 8 of 10" from <code>X-Total-Count</code>.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>No Load more button after the last page (from <code>Link</code>, or from the total).</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Load more shows its own loading state and can't load the same page twice.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>GET /api/stalls?limit=4&amp;page=1</code>, then page 2, 3…</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The total from the <code>X-Total-Count</code> header; whether there's a next page from the <code>Link</code> header.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Changing the filter starts again from page 1 (the server filters: <code>&amp;tag=food</code>).</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>"Showing 8 of 10".</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Load more shows its own loading state; the cards already there stay.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>No Load more button on the last page.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A failed page keeps the cards you have and offers Retry for that page only.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A double click on Load more never loads the same page twice.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Changing the filter while a page is loading never mixes the two lists.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> Reading a header: <code>response.headers.get("Link")</code>. The format is described on <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Link">MDN · Link</a>.</p></div>
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>GET</code></td><td><code>/api/stalls?limit=&amp;page=&amp;tag=</code></td><td>200 · <code>X-Total-Count</code> · <code>Link: &lt;…&amp;page=3&gt;; rel="next"</code></td></tr>
+    </table></div>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Chaos on: double-click Load more.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Click Food while page 2 of All is loading.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Reset your market between two pages.</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Infinite scroll with <code>IntersectionObserver</code> instead of the button.</li>
+      <li>Keep the page in the URL: <code>?page=3</code> loads pages 1–3.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Your getJSON returns only the body. Where do the headers go?</p></details>
+      <details><summary>Hint 2</summary><p>Two lists in flight, one for All and one for Food: which may append?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The same four stalls twice.</li>
+      <li>Food shows music stalls appended at the bottom.</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: <code>?limit=4&amp;page=1</code> in the Network panel, and the <code>X-Total-Count</code> header read in the console.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 5 · Vendor admin</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 5 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 5</span>
+    <h1><em>Vendor admin</em></h1>
+    <p class="intro">A page for the market's organisers and vendors: add a stall, edit it, mark it sold out, remove it. The routes that change stalls need a token in an <code>Authorization</code> header, and the server says no in five different ways. The public page shows the changes on its next load. <span class="stars" title="difficulty">★★★</span></p>
+    <p class="story">“Churros just restocked. Can somebody take the sold-out sign off?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> with the admin token, add "Crêpe Escape", mark Mezcal Moon as no longer sold out, delete a stall. Then each error: no token and a made-up token (401), Taco Bike's vendor token on Mezcal Moon (403), a duplicate name (409), a price of -3 (422).</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><code>starter/admin.html</code> and <code>js/admin.js</code> are there as a starter (a token field, an empty table): fill the table from <code>GET /api/stalls</code>, with loading and error.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A token field (kept in <code>sessionStorage</code>), sent as <code>Authorization: Bearer …</code> on every change.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A sold-out checkbox per row: <code>PATCH</code> <code>{ soldOut }</code>, the row redrawn from the response.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>401 → "enter a valid token", focus on the token field; 403 → "this token can't edit that stall".</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The separate page <code>starter/admin.html</code> (open <code>localhost:8080/admin.html</code>), with its own module <code>js/admin.js</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>A token field; the token is kept in <code>sessionStorage</code> and sent as <code>Authorization: Bearer …</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>POST</code> a stall, <code>PATCH</code> fields (sold out is a checkbox), <code>DELETE</code> with a confirmation.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>The stall list as a table, with loading, error and empty states.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Each row's buttons are disabled while that row has a request in flight.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>After every success the table shows the server's version of the row.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>401 (no token, or an invalid one) → "Enter a valid token" and focus the token field. 403 (a valid vendor token, the wrong stall) → "This token can't edit Mezcal Moon".</span></li>
+        <li><input type="checkbox" aria-label="done"><span>422 → field messages next to the fields. 409 → "A stall with that name exists".</span></li>
+        <li><input type="checkbox" aria-label="done"><span>404 on PATCH or DELETE (someone else deleted it) → the row disappears with a note.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"><code>sessionStorage</code></a>: like localStorage, forgotten when the tab closes.</p></div>
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>POST</code></td><td><code>/api/stalls</code></td><td>201 + <code>Location</code> · 401 · 403 (vendor token) · 409 · 422 <code>{ fields }</code></td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/api/stalls/:id</code></td><td>200 · 401 · 403 (another vendor's stall) · 404 · 422</td></tr>
+      <tr><td><code>DELETE</code></td><td><code>/api/stalls/:id</code></td><td>204 · 401 · 403 · 404</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/stalls</code></td><td>200 · no token needed</td></tr>
+    </table></div>
+    <p>Tokens: <code>harbour-admin-2026</code> may do everything; <code>vendor-&lt;stall id&gt;</code> (e.g. <code>vendor-taco-bike</code>) may only PATCH its own stall. They're printed here because this is a course server; a real token comes from a login and never appears in your code.</p>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Every route with no token, with a made-up one, and with a vendor token.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Add the same name twice. Add a name with an accent: what id does the server make?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Delete a stall in one tab, edit it in another.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Chaos on: double-click Save.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>The public page after each change (reload it).</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Edit in place: click a cell, it becomes an input, <kbd>Enter</kbd> sends a PATCH with only that field.</li>
+      <li>Optimistic sold-out toggle with rollback.</li>
+      <li>Show which fields changed before sending: compare the form with the row.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Every admin request needs the same header. How many places in your code should know how to add it?</p></details>
+      <details><summary>Hint 2</summary><p>PATCH: what do you send, the whole stall or only what changed? What does the API's contract say?</p></details>
+      <details><summary>Hint 3</summary><p>A 401 and a 403 both mean "no". After which one should the user type a different token, and after which one should they ask someone else?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>Every request answers 401 though the token is right (look at the header's exact text).</li>
+      <li>A price arrives as <code>"4"</code>: 422.</li>
+      <li>The table shows the edit, the public page doesn't: or the other way round.</li>
+      <li>A preflight OPTIONS request appears in the Network panel (only if the page is on another origin).</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: <code>PATCH /api/stalls/mezcal</code> with <code>{ "soldOut": false }</code> answers 401 without the header and 200 with it.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

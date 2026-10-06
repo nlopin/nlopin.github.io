@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 3 · Loading, error, retry</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 34rem; margin-top: 1rem; }
+    .case .panel.tall { height: 42rem; }
+    .case .panel.huge { height: 50rem; }
+    .case > p, .case > ul, .case > ol { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+</head>
+<body class="page wire listen">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Exercise 3 · 12 min · cases 1–3 in class</span></div>
+    <span class="eyebrow-tag">Act 3 · async UI state</span>
+    <h1>Slow and <em>broken</em></h1>
+    <p class="intro">A request takes time, and sometimes it fails. Both are states of the page, so they go into <code>state</code> and <code>render()</code> draws them, like every other state since Lecture 5. The checks run the page against a slow server, a server that answers 503, and a dead network.</p>
+    <div class="tip"><p style="margin:0"><strong>The pattern.</strong> <code>state.status</code> is one of <code>"loading"</code> · <code>"ready"</code> · <code>"error"</code>. <code>loadStalls()</code>: set loading, render; <code>try</code> the request; set ready or error; render again. One variable for the status, so the page can never be loading <em>and</em> failed at the same time.</p></div>
+    <section class="case">
+      <header><b>1</b><h2>Say that it's loading</h2></header>
+      <p class="complaint">On a slow connection the list is blank for two seconds. Is it broken? Empty?</p>
+      <p>Make <code>loadStalls()</code> render once <em>before</em> the request (status <code>"loading"</code>) and once after (status <code>"ready"</code>). <code>render()</code> shows <code>"Loading the market…"</code> in <code>.status</code> and sets <code>aria-busy</code> on the list to <code>"true"</code> while loading, <code>"false"</code> otherwise. The preview server is slow on purpose: about half a second.</p>
+      <div class="live-js panel" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Loading is a state: render it.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="status" role="status" tabindex="-1"></p>
+<div class="error-box">
+  <p class="error-text" role="alert"></p>
+  <button type="button" class="retry" hidden>Try again</button>
+</div>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+// A sentence for people. The details go to the console.
+function describe(error) {
+  if (error.status) return `The market didn't load: the server answered ${error.status}. Try again in a moment.`;
+  if (error.name === "TypeError") return "The market didn't load: no connection. Check your network and try again.";
+  return "The market didn't load. Try again in a moment.";
+}
+
+const list = document.querySelector(".vendor-list");
+const statusLine = document.querySelector(".status");
+const errorText = document.querySelector(".error-text");   // role="alert": always in the page
+const retry = document.querySelector(".retry");</script>
+        <textarea>
+const state = {
+  status: &quot;loading&quot;,   // &quot;loading&quot; | &quot;ready&quot; | &quot;error&quot;
+  stalls: [],
+  error: &quot;&quot;,
+};
+
+function render() {
+  // While loading: &quot;Loading the market…&quot; in the status line,
+  // and aria-busy=&quot;true&quot; on the list
+  list.replaceChildren(...state.stalls.map(card));
+  statusLine.textContent = `${state.stalls.length} stalls`;
+}
+
+async function loadStalls() {
+  state.stalls = await getJSON(&quot;/api/stalls&quot;);
+  render();
+}
+
+loadStalls();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "While the request is in flight: \"Loading…\" and aria-busy=\"true\"", "run": "await wait(150); return /loading/i.test(text('.status')) && $('.vendor-list').getAttribute('aria-busy') === 'true';", "api": {"latency": 500}}, {"label": "When it arrives: 10 cards, \"10 stalls\", aria-busy=\"false\"", "run": "await wait(800); return $$('.stall').length === 10 && text('.status') === '10 stalls' && $('.vendor-list').getAttribute('aria-busy') === 'false';", "api": {"latency": 500}, "timeout": 2000}]</script>
+      </div>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>Say that it failed</h2></header>
+      <p class="complaint">The server is down. The page says "Loading the market…" forever, and the console has an Uncaught error.</p>
+      <p>Wrap the request in <code>try … catch</code>. On failure: <code>state.status = "error"</code>, a sentence for people in <code>state.error</code> (<code>describe(error)</code> is in the locked part; log the error itself with <code>console.error</code>), no stalls. <code>render()</code> writes the sentence into <code>.error-text</code> and shows the Try again button; when there's no error, the text is empty and the button hidden. <code>.error-text</code> has <code>role="alert"</code> and stays in the page: only its text changes. Both a 503 and a network failure end up in the same <code>catch</code>.</p>
+      <div class="live-js panel tall" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Errors are a state too.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="status" role="status" tabindex="-1"></p>
+<div class="error-box">
+  <p class="error-text" role="alert"></p>
+  <button type="button" class="retry" hidden>Try again</button>
+</div>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+// A sentence for people. The details go to the console.
+function describe(error) {
+  if (error.status) return `The market didn't load: the server answered ${error.status}. Try again in a moment.`;
+  if (error.name === "TypeError") return "The market didn't load: no connection. Check your network and try again.";
+  return "The market didn't load. Try again in a moment.";
+}
+
+const list = document.querySelector(".vendor-list");
+const statusLine = document.querySelector(".status");
+const errorText = document.querySelector(".error-text");   // role="alert": always in the page
+const retry = document.querySelector(".retry");</script>
+        <textarea>
+const state = {
+  status: &quot;loading&quot;,   // &quot;loading&quot; | &quot;ready&quot; | &quot;error&quot;
+  stalls: [],
+  error: &quot;&quot;,
+};
+
+function render() {
+  const loading = state.status === &quot;loading&quot;;
+  list.setAttribute(&quot;aria-busy&quot;, String(loading));
+  list.replaceChildren(...state.stalls.map(card));
+  statusLine.textContent = loading ? &quot;Loading the market…&quot; : `${state.stalls.length} stalls`;
+}
+
+async function loadStalls() {
+  state.status = &quot;loading&quot;;
+  render();
+  // A 503 or a dead network rejects here: catch it, keep a sentence for
+  // people in state (describe(error) is in the locked part), and let
+  // render() show it in .error-text, with the Try again button
+  state.stalls = await getJSON(&quot;/api/stalls&quot;);
+  state.status = &quot;ready&quot;;
+  render();
+}
+
+loadStalls();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "A 503: a message in .error-text, Try again visible, no cards, no \"Loading…\"", "run": "await wait(150); return visible('.retry') && text('.error-text').length > 3 && $$('.stall').length === 0 && !/loading/i.test(text('.status'));", "api": {"fail": 20}}, {"label": "A dead network (fetch rejects with a TypeError): a sentence, not \"Failed to fetch\"", "run": "await wait(150); const t = text('.error-text'); return visible('.retry') && t.length > 10 && !/failed to fetch|typeerror/i.test(t) && $$('.stall').length === 0;", "api": {"offline": true}}, {"label": "No uncaught errors in the console when it fails", "run": "await wait(200); return errors().length === 0;", "api": {"fail": 20}}, {"label": "When it works: no message, no Try again, 10 cards", "run": "await wait(150); return !visible('.retry') && text('.error-text') === '' && $$('.stall').length === 10;"}]</script>
+      </div>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>Try again</h2></header>
+      <p class="complaint">The error box has a Try again button that does nothing.</p>
+      <p>A click on <code>.retry</code> runs <code>loadStalls()</code> again. Because it starts by setting <code>"loading"</code> and rendering, the message should clear the moment the button is clicked. The button hides itself at that moment, and a hidden element can't keep keyboard focus: move focus to the status line first (it has <code>tabindex="-1"</code> for that). The checks make the first request (or the first two) fail.</p>
+      <div class="live-js panel tall" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Retry is loadStalls() again, focus kept.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="status" role="status" tabindex="-1"></p>
+<div class="error-box">
+  <p class="error-text" role="alert"></p>
+  <button type="button" class="retry" hidden>Try again</button>
+</div>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+// A sentence for people. The details go to the console.
+function describe(error) {
+  if (error.status) return `The market didn't load: the server answered ${error.status}. Try again in a moment.`;
+  if (error.name === "TypeError") return "The market didn't load: no connection. Check your network and try again.";
+  return "The market didn't load. Try again in a moment.";
+}
+
+const list = document.querySelector(".vendor-list");
+const statusLine = document.querySelector(".status");
+const errorText = document.querySelector(".error-text");   // role="alert": always in the page
+const retry = document.querySelector(".retry");</script>
+        <textarea>
+const state = {
+  status: &quot;loading&quot;,   // &quot;loading&quot; | &quot;ready&quot; | &quot;error&quot;
+  stalls: [],
+  error: &quot;&quot;,
+};
+
+function render() {
+  const loading = state.status === &quot;loading&quot;;
+  list.setAttribute(&quot;aria-busy&quot;, String(loading));
+  list.replaceChildren(...state.stalls.map(card));
+  // the alert stays in the page; only its text changes, so it&#x27;s announced
+  errorText.textContent = state.status === &quot;error&quot; ? state.error : &quot;&quot;;
+  retry.hidden = state.status !== &quot;error&quot;;
+  statusLine.textContent =
+    loading ? &quot;Loading the market…&quot; :
+    state.status === &quot;ready&quot; ? `${state.stalls.length} stalls` : &quot;&quot;;
+}
+
+async function loadStalls() {
+  state.status = &quot;loading&quot;;
+  render();
+  try {
+    state.stalls = await getJSON(&quot;/api/stalls&quot;);
+    state.status = &quot;ready&quot;;
+  } catch (error) {
+    console.error(error);            // the details, for you
+    state.stalls = [];
+    state.error = describe(error);   // a sentence, for them
+    state.status = &quot;error&quot;;
+  }
+  render();
+}
+
+// The Try again button: what should a click do?
+// (It hides itself when loading starts: where should keyboard focus go?)
+
+loadStalls();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Try again: the message clears and \"Loading…\" shows straight away", "run": "await wait(250); if (!visible('.retry')) return false; click('.retry'); await wait(40); return text('.error-text') === '' && /loading/i.test(text('.status'));", "api": {"fail": 1, "latency": 150}}, {"label": "…and the second attempt renders the 10 stalls", "run": "await wait(250); click('.retry'); await wait(350); return !visible('.retry') && $$('.stall').length === 10;", "api": {"fail": 1, "latency": 150}}, {"label": "Keyboard focus isn't lost when the button hides itself", "run": "await wait(250); const b = $('.retry'); b.focus(); b.click(); await wait(40); return doc.activeElement !== doc.body && doc.activeElement !== null && !doc.activeElement.hidden;", "api": {"fail": 1, "latency": 150}}, {"label": "Fails twice, works the third time", "run": "await wait(250); click('.retry'); await wait(300); if (!visible('.retry')) return false; click('.retry'); await wait(300); return $$('.stall').length === 10;", "api": {"fail": 2, "latency": 120}, "timeout": 2500}]</script>
+      </div>
+    </section>
+    <p class="sep">Homework · bonus</p>
+    <section class="case">
+      <header><b class="bonus">4 · bonus</b><h2>Empty is not an error</h2></header>
+      <p>On the afternoon before the market, the server answers <code>200</code> with <code>[]</code>. That's a successful, empty result: show <code>"No stalls yet. Check back at 19:00."</code> in the status line, no error box.</p>
+      <div class="live-js panel tall" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Four states: loading, error, empty, ready.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<p class="status" role="status" tabindex="-1"></p>
+<div class="error-box">
+  <p class="error-text" role="alert"></p>
+  <button type="button" class="retry" hidden>Try again</button>
+</div>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+// A sentence for people. The details go to the console.
+function describe(error) {
+  if (error.status) return `The market didn't load: the server answered ${error.status}. Try again in a moment.`;
+  if (error.name === "TypeError") return "The market didn't load: no connection. Check your network and try again.";
+  return "The market didn't load. Try again in a moment.";
+}
+
+const list = document.querySelector(".vendor-list");
+const statusLine = document.querySelector(".status");
+const errorText = document.querySelector(".error-text");   // role="alert": always in the page
+const retry = document.querySelector(".retry");</script>
+        <textarea>
+const state = {
+  status: &quot;loading&quot;,   // &quot;loading&quot; | &quot;ready&quot; | &quot;error&quot;
+  stalls: [],
+  error: &quot;&quot;,
+};
+
+function render() {
+  const loading = state.status === &quot;loading&quot;;
+  list.setAttribute(&quot;aria-busy&quot;, String(loading));
+  list.replaceChildren(...state.stalls.map(card));
+  // the alert stays in the page; only its text changes, so it&#x27;s announced
+  errorText.textContent = state.status === &quot;error&quot; ? state.error : &quot;&quot;;
+  retry.hidden = state.status !== &quot;error&quot;;
+  statusLine.textContent =
+    loading ? &quot;Loading the market…&quot; :
+    state.status === &quot;ready&quot; ? `${state.stalls.length} stalls` : &quot;&quot;;
+}
+
+async function loadStalls() {
+  state.status = &quot;loading&quot;;
+  render();
+  try {
+    state.stalls = await getJSON(&quot;/api/stalls&quot;);
+    state.status = &quot;ready&quot;;
+  } catch (error) {
+    console.error(error);            // the details, for you
+    state.stalls = [];
+    state.error = describe(error);   // a sentence, for them
+    state.status = &quot;error&quot;;
+  }
+  render();
+}
+
+retry.addEventListener(&quot;click&quot;, () =&gt; {
+  statusLine.focus();   // the button is about to be hidden: keep focus nearby
+  loadStalls();
+});
+
+loadStalls();
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "An empty array is a success, not an error: \"No stalls yet…\"", "run": "await wait(150); return /no stalls/i.test(text('.status')) && !visible('.retry') && $$('.stall').length === 0;", "api": {"force": [{"match": "GET /api/stalls", "status": 200, "body": []}]}}, {"label": "Ten stalls still say \"10 stalls\"", "run": "await wait(150); return text('.status') === '10 stalls';"}]</script>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 5 · Search without races</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 34rem; margin-top: 1rem; }
+    .case .panel.tall { height: 42rem; }
+    .case .panel.huge { height: 50rem; }
+    .case > p, .case > ul, .case > ol { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+</head>
+<body class="page wire listen">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Exercise 5 · 6 min · case 1 in class</span></div>
+    <span class="eyebrow-tag">Act 5 · AbortController</span>
+    <h1>Search without <em>races</em></h1>
+    <p class="intro">Search as you type, on the server: <code>GET /api/stalls?q=tac</code>. Type quickly and the box says one thing while the list shows another, because the response to <code>"t"</code> arrives <em>after</em> the response to <code>"tac"</code>. The <a href="../playgrounds/race-lab.html">Race lab</a> draws it.</p>
+    <div class="tip"><p style="margin:0"><strong>The pattern.</strong> <code>const controller = new AbortController()</code>, pass <code>{ signal: controller.signal }</code> to <code>fetch</code>, call <code>controller.abort()</code> when the request is obsolete. The aborted <code>fetch</code> rejects with an error whose <code>name</code> is <code>"AbortError"</code>: catch it and ignore it. <code>getJSON(url, options)</code> passes <code>options</code> on to <code>fetch</code>.</p></div>
+    <section class="case">
+      <header><b>1</b><h2>Abort the obsolete request</h2></header>
+      <p class="complaint">Type "tac" quickly: the box says tac, the list shows everything with a t in it.</p>
+      <p>Keep the current request's <code>AbortController</code> outside the listener. On every input: abort the previous one, make a new one, pass its signal. Ignore <code>AbortError</code> in a <code>catch</code>; let real errors through. Type quickly in the preview, then look at the Network tab.</p>
+      <div class="live-js panel" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ The last request wins, because it&#x27;s the only one left.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<div class="finder">
+  <label for="search">Search</label>
+  <input id="search" type="search" autocomplete="off">
+</div>
+<p class="count"></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+const list = document.querySelector(".vendor-list");
+const count = document.querySelector(".count");
+
+function render(stalls) {
+  list.replaceChildren(...stalls.map(card));
+  count.textContent = `${stalls.length} ${stalls.length === 1 ? "stall" : "stalls"}`;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+const search = document.querySelector("#search");</script>
+        <textarea>
+// One request per keystroke. The server answers short queries
+// slowly and long ones fast, so the responses arrive out of order.
+search.addEventListener(&quot;input&quot;, async () =&gt; {
+  const params = new URLSearchParams({ q: search.value });
+  const stalls = await getJSON(`/api/stalls?${params}`);
+  render(stalls);
+});
+
+getJSON(&quot;/api/stalls&quot;).then(render);
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "After typing t · ta · tac: the list shows the results for \"tac\" (Taco Bike only)", "run": "await wait(60); for (const q of ['t', 'ta', 'tac']) { type('#search', q); await wait(60); } await wait(1100); return $$('.stall').length === 1 && text('.vendor-list').includes('Taco Bike') && text('.count') === '1 stall';", "api": {"delayScale": 1}, "timeout": 3500}, {"label": "The two obsolete requests are aborted (canceled in the Network tab)", "run": "const net = () => win.__net || []; const searches = () => net().filter((e) => e.url.includes('q=')); await wait(60); for (const q of ['t', 'ta', 'tac']) { type('#search', q); await wait(60); } await wait(1100); const s = searches(); return s.length >= 3 && s.filter((e) => e.state === 'canceled').length === s.length - 1 && s.at(-1).state === 'done';", "api": {"delayScale": 1}, "timeout": 3500}, {"label": "Aborting isn't an error: nothing uncaught in the console", "run": "await wait(60); for (const q of ['t', 'ta', 'tac']) { type('#search', q); await wait(60); } await wait(1100); return errors().length === 0;", "api": {"delayScale": 1}, "timeout": 3500}]</script>
+      </div>
+    </section>
+    <p class="sep">Homework · bonus</p>
+    <section class="case">
+      <header><b class="bonus">2 · bonus</b><h2>Debounce</h2></header>
+      <p>Aborting fixes the display, but every keystroke still costs the server a search. Wait until typing pauses for 250 ms, then search: <code>clearTimeout</code> + <code>setTimeout</code> on every input. Keep the abort: a pause in the middle of a word can still start a slow request.</p>
+      <div class="live-js panel" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Debounce for the server, abort for correctness.">
+        <script type="text/plain" data-role="html"><h2>Vendors</h2>
+<div class="finder">
+  <label for="search">Search</label>
+  <input id="search" type="search" autocomplete="off">
+</div>
+<p class="count"></p>
+<ul class="vendor-list"></ul>
+<template id="stall-template">
+  <li class="stall">
+    <article class="vendor-card">
+      <span class="tag"></span>
+      <h3></h3>
+      <small class="price"></small>
+      <small class="rating"></small>
+      <strong class="badge" hidden>Sold out</strong>
+    </article>
+  </li>
+</template></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">const template = document.querySelector("#stall-template");
+
+// Data in, element out (Lecture 5)
+function card(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.dataset.id = stall.id;
+  li.querySelector(".tag").textContent = stall.tag;
+  li.querySelector("h3").textContent = stall.name;
+  li.querySelector(".price").textContent = stall.price === 0 ? "free" : `from €${stall.price}`;
+  li.querySelector(".rating").textContent = stall.rating ? `★ ${stall.rating} (${stall.reviewCount})` : "";
+  li.querySelector(".vendor-card").classList.toggle("sold-out", Boolean(stall.soldOut));
+  li.querySelector(".badge").hidden = !stall.soldOut;
+  return li;
+}
+
+const list = document.querySelector(".vendor-list");
+const count = document.querySelector(".count");
+
+function render(stalls) {
+  list.replaceChildren(...stalls.map(card));
+  count.textContent = `${stalls.length} ${stalls.length === 1 ? "stall" : "stalls"}`;
+}
+
+// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+const search = document.querySelector("#search");</script>
+        <textarea>
+let controller = null;
+
+// Wait until typing pauses for 250 ms, then search once.
+search.addEventListener(&quot;input&quot;, async () =&gt; {
+  controller?.abort();                  // the previous search is obsolete
+  controller = new AbortController();
+  const params = new URLSearchParams({ q: search.value });
+  try {
+    const stalls = await getJSON(`/api/stalls?${params}`, { signal: controller.signal });
+    render(stalls);
+  } catch (error) {
+    if (error.name === &quot;AbortError&quot;) return;   // we cancelled it: not a failure
+    console.error(error);
+  }
+});
+
+getJSON(&quot;/api/stalls&quot;).then(render);
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "Three quick keystrokes send one search request", "run": "const net = () => win.__net || []; const searches = () => net().filter((e) => e.url.includes('q=')); await wait(60); for (const q of ['t', 'ta', 'tac']) { type('#search', q); await wait(40); } await wait(800); return searches().length === 1 && searches()[0].url.includes('q=tac');", "api": {"delayScale": 1}, "timeout": 3000}, {"label": "…and the list shows its results", "run": "await wait(60); for (const q of ['t', 'ta', 'tac']) { type('#search', q); await wait(40); } await wait(800); return $$('.stall').length === 1 && text('.vendor-list').includes('Taco Bike');", "api": {"delayScale": 1}, "timeout": 3000}, {"label": "Typing with pauses still aborts the slow one", "run": "const net = () => win.__net || []; const searches = () => net().filter((e) => e.url.includes('q=')); await wait(60); type('#search', 't'); await wait(300); type('#search', 'tac'); await wait(900); const s = searches(); return s.length === 2 && s[0].state === 'canceled' && $$('.stall').length === 1;", "api": {"delayScale": 1}, "timeout": 3000}]</script>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

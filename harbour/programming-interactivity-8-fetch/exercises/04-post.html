@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 4 · Leave a review</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <script type="module" src="../../race/race.js"></script>
+  <style>
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--ink); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 800 0.85rem var(--font-mono); background: var(--ink); color: var(--yellow); padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case header b.bonus { background: var(--paper-2); color: var(--ink); border: 2px solid var(--ink); }
+    .case h2 { margin: 0; }
+    .case .panel { height: 34rem; margin-top: 1rem; }
+    .case .panel.tall { height: 42rem; }
+    .case .panel.huge { height: 50rem; }
+    .case > p, .case > ul, .case > ol { max-width: 72ch; }
+    .complaint { font: italic 400 1.35rem/1.35 var(--font-serif); color: var(--ink-2); margin: 0.6rem 0; }
+    .complaint::before { content: "The problem ·"; font-style: normal; font: 700 0.8rem var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 0.3rem; }
+    details { margin-top: 1rem; max-width: 72ch; background: var(--white); border: 2px solid var(--ink); border-radius: 0.6rem; padding: 0.7rem 1rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details pre.code { font-size: 0.95rem; margin-top: 0.6rem; }
+    .sep { margin: 3.5rem 0 0; font: 700 0.85rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-muted, var(--muted)); }
+  </style>
+</head>
+<body class="page wire change">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Exercise 4 · 13 min · cases 1–3 in class</span></div>
+    <span class="eyebrow-tag">Act 4 · POST</span>
+    <h1>Leave a <em>review</em></h1>
+    <p class="intro">Taco Bike's page lists its reviews (<code>GET /api/stalls/taco-bike/reviews</code>, already done) and has a form. The form sends the review to the server with <code>POST</code>, renders what the server stored, and handles the server rejecting it. The Network tab shows exactly what your code sent.</p>
+    <div class="tip"><p style="margin:0"><strong>The pattern.</strong> <code>fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })</code>. Success is <code>201 Created</code> with the new resource in the body. Validation failures are <code>422</code> with <code>{ fields: { name: message } }</code>: the API's contract is in <a href="../api.html">api.html</a>.</p></div>
+    <section class="case">
+      <header><b>1</b><h2>Send it</h2></header>
+      <p class="complaint">The form logs the review to the console and nothing else. Nobody will ever read it.</p>
+      <p>On submit, POST the review to <code>`${STALL}/reviews`</code> as JSON. The API wants <code>rating</code> as a <strong>number</strong>; every form value is a string. On <code>201</code>, render the review from the <em>response body</em> (it has the server's <code>id</code> and <code>createdAt</code>) at the top of the list and reset the form. <code>reviewItem(review)</code> is done.</p>
+      <div class="live-js panel huge" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ POST, JSON, 201: the server&#x27;s copy rendered.">
+        <script type="text/plain" data-role="html"><p class="eyebrow">food · from €6</p>
+<h2>Taco Bike</h2>
+<form class="review-form">
+  <label for="author">Your name</label>
+  <input id="author" name="author" required maxlength="40" autocomplete="nickname">
+  <p class="field-error" data-for="author" hidden></p>
+
+  <label for="rating">Rating</label>
+  <select id="rating" name="rating">
+    <option value="5">★★★★★</option>
+    <option value="4">★★★★</option>
+    <option value="3">★★★</option>
+    <option value="2">★★</option>
+    <option value="1">★</option>
+  </select>
+  <p class="field-error" data-for="rating" hidden></p>
+
+  <label for="text">Your review</label>
+  <textarea id="text" name="text" rows="2" required maxlength="280"></textarea>
+  <p class="field-error" data-for="text" hidden></p>
+
+  <button type="submit">Post review</button>
+  <p class="form-status" role="status"></p>
+</form>
+<h3>Reviews</h3>
+<ul class="reviews"></ul></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+const STALL = "/api/stalls/taco-bike";
+const form = document.querySelector(".review-form");
+const reviews = document.querySelector(".reviews");
+const formStatus = document.querySelector(".form-status");
+
+function reviewItem(review) {
+  const li = document.createElement("li");
+  li.dataset.id = review.id;
+  const who = document.createElement("strong");
+  who.textContent = review.author;
+  const stars = document.createElement("span");
+  stars.className = "stars";
+  stars.textContent = "★".repeat(review.rating);
+  const text = document.createElement("p");
+  text.textContent = review.text;
+  li.append(who, stars, text);
+  return li;
+}
+
+// The reviews that are already there, newest first
+getJSON(`${STALL}/reviews`).then((list) => reviews.replaceChildren(...list.map(reviewItem)));</script>
+        <textarea>
+form.addEventListener(&quot;submit&quot;, async (event) =&gt; {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  console.log(data);   // look at rating
+
+  // 1. POST it to `${STALL}/reviews` as JSON
+  // 2. on 201: the review the server sends back goes first in the list,
+  //    and the form is cleared
+});
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "One POST to /api/stalls/taco-bike/reviews with Content-Type: application/json", "run": "const net = () => win.__net || []; const posts = () => net().filter((e) => e.method === 'POST'); await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); const p = posts(); return p.length === 1 && p[0].url === '/api/stalls/taco-bike/reviews' && /^application\\/json/.test(p[0].reqHeaders['content-type'] || '');"}, {"label": "The body is JSON, and rating is the number 4, not \"4\"", "run": "const net = () => win.__net || []; const posts = () => net().filter((e) => e.method === 'POST'); await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); const p = posts(); if (p.length !== 1) return false; let b; try { b = JSON.parse(p[0].reqBody); } catch (e) { return false; } return b.author === 'Ana' && b.rating === 4 && b.text === 'Tacos worth crossing the city for.';"}, {"label": "201: the server's review, with its id, is first in the list", "run": "const net = () => win.__net || []; const posts = () => net().filter((e) => e.method === 'POST'); await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(200); const p = posts(); if (!p.length || p[0].status !== 201) return false; const created = JSON.parse(p[0].resBody); const li = $('.reviews li'); return !!li && li.dataset.id === created.id && li.textContent.includes('crossing the city');"}, {"label": "The form is cleared after a 201", "run": "const net = () => win.__net || []; await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(200); return $('#text').value === '' && $('#author').value === '';"}]</script>
+      </div>
+    </section>
+    <section class="case">
+      <header><b>2</b><h2>When the server says no</h2></header>
+      <p class="complaint">The server rejects a review that's too short, the page shows nothing, and the user retypes everything.</p>
+      <p>On <code>422</code>, read <code>fields</code> from the body and put each message into the <code>.field-error</code> for that field (<code>data-for</code>), with <code>aria-invalid="true"</code> on its input; clear old errors on every submit. Any other failure, including no response at all, gets a sentence in <code>.form-status</code>. Never clear the form when it failed.</p>
+      <div class="live-js panel huge" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ 422 → field errors, everything else → a message.">
+        <script type="text/plain" data-role="html"><p class="eyebrow">food · from €6</p>
+<h2>Taco Bike</h2>
+<form class="review-form">
+  <label for="author">Your name</label>
+  <input id="author" name="author" required maxlength="40" autocomplete="nickname">
+  <p class="field-error" data-for="author" hidden></p>
+
+  <label for="rating">Rating</label>
+  <select id="rating" name="rating">
+    <option value="5">★★★★★</option>
+    <option value="4">★★★★</option>
+    <option value="3">★★★</option>
+    <option value="2">★★</option>
+    <option value="1">★</option>
+  </select>
+  <p class="field-error" data-for="rating" hidden></p>
+
+  <label for="text">Your review</label>
+  <textarea id="text" name="text" rows="2" required maxlength="280"></textarea>
+  <p class="field-error" data-for="text" hidden></p>
+
+  <button type="submit">Post review</button>
+  <p class="form-status" role="status"></p>
+</form>
+<h3>Reviews</h3>
+<ul class="reviews"></ul></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+const STALL = "/api/stalls/taco-bike";
+const form = document.querySelector(".review-form");
+const reviews = document.querySelector(".reviews");
+const formStatus = document.querySelector(".form-status");
+
+function reviewItem(review) {
+  const li = document.createElement("li");
+  li.dataset.id = review.id;
+  const who = document.createElement("strong");
+  who.textContent = review.author;
+  const stars = document.createElement("span");
+  stars.className = "stars";
+  stars.textContent = "★".repeat(review.rating);
+  const text = document.createElement("p");
+  text.textContent = review.text;
+  li.append(who, stars, text);
+  return li;
+}
+
+// The reviews that are already there, newest first
+getJSON(`${STALL}/reviews`).then((list) => reviews.replaceChildren(...list.map(reviewItem)));</script>
+        <textarea>
+// Field errors from a 422 body look like: { &quot;fields&quot;: { &quot;text&quot;: &quot;10–280 characters.&quot; } }
+function showErrors(fields = {}) {
+  for (const el of form.querySelectorAll(&quot;.field-error&quot;)) {
+    const name = el.dataset.for;
+    // the message for this field, or hide it;
+    // and aria-invalid on the input with that name
+  }
+}
+
+form.addEventListener(&quot;submit&quot;, async (event) =&gt; {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  const review = { ...data, rating: Number(data.rating) };
+
+  const response = await fetch(`${STALL}/reviews`, {
+    method: &quot;POST&quot;,
+    headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+    body: JSON.stringify(review),
+  });
+  if (response.ok) {
+    reviews.prepend(reviewItem(await response.json()));
+    form.reset();
+  }
+  // 422: the body is { fields: { … } } → showErrors(fields).
+  // Anything else, including no response at all (fetch rejects):
+  // a sentence in formStatus. The text they typed must survive.
+});
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "422: the server's message under the right field, aria-invalid on its input", "run": "await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); const e = $('.field-error[data-for=text]'); return visible(e) && e.textContent.includes('Please say a little more') && $('#text').getAttribute('aria-invalid') === 'true' && !visible('.field-error[data-for=author]') && $('#author').getAttribute('aria-invalid') !== 'true';", "api": {"force": [{"match": "POST /api/stalls/*/reviews", "status": 422, "body": {"error": "validation_failed", "message": "Some fields are invalid.", "fields": {"text": "Please say a little more: 10–280 characters."}}}]}}, {"label": "Fixed and sent again: the errors go away, the review is posted", "run": "await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); type('#text', 'Tacos worth crossing the city for, twice.'); submit('.review-form'); await wait(150); return !visible('.field-error[data-for=text]') && $('#text').getAttribute('aria-invalid') !== 'true' && text('.reviews li').includes('twice');", "api": {"force": [{"match": "POST /api/stalls/*/reviews", "status": 422, "body": {"error": "validation_failed", "message": "Some fields are invalid.", "fields": {"text": "Please say a little more: 10–280 characters."}}, "times": 1}]}}, {"label": "503: a message in .form-status, and the text is still in the box", "run": "await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); return text('.form-status').length > 3 && $('#text').value.includes('crossing the city') && !text('.reviews').includes('crossing the city');", "api": {"force": [{"match": "POST /api/stalls/*/reviews", "status": 503, "body": {"error": "unavailable", "message": "The server is overloaded."}}]}}, {"label": "No connection: a message, no uncaught error", "run": "await wait(80); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(150); return text('.form-status').length > 3 && errors().length === 0 && $('#text').value.includes('crossing the city');", "api": {"force": [{"match": "POST /api/stalls/*/reviews", "network": true}]}}]</script>
+      </div>
+    </section>
+    <section class="case">
+      <header><b>3</b><h2>One click, one review</h2></header>
+      <p class="complaint">On a slow connection someone clicked Post three times. Taco Bike now has three identical reviews.</p>
+      <p>Disable the submit button while the request is in flight and put <code>"Posting…"</code> in <code>.form-status</code>. Re-enable it when the request is over, whether it succeeded, failed with a status, or failed without a response: that's what <code>finally</code> is for.</p>
+      <div class="live-js panel huge" data-api data-market data-show-html data-show-before data-layout="wide-code" data-solved="✓ Pending state, finally, no duplicates.">
+        <script type="text/plain" data-role="html"><p class="eyebrow">food · from €6</p>
+<h2>Taco Bike</h2>
+<form class="review-form">
+  <label for="author">Your name</label>
+  <input id="author" name="author" required maxlength="40" autocomplete="nickname">
+  <p class="field-error" data-for="author" hidden></p>
+
+  <label for="rating">Rating</label>
+  <select id="rating" name="rating">
+    <option value="5">★★★★★</option>
+    <option value="4">★★★★</option>
+    <option value="3">★★★</option>
+    <option value="2">★★</option>
+    <option value="1">★</option>
+  </select>
+  <p class="field-error" data-for="rating" hidden></p>
+
+  <label for="text">Your review</label>
+  <textarea id="text" name="text" rows="2" required maxlength="280"></textarea>
+  <p class="field-error" data-for="text" hidden></p>
+
+  <button type="submit">Post review</button>
+  <p class="form-status" role="status"></p>
+</form>
+<h3>Reviews</h3>
+<ul class="reviews"></ul></script>
+        <script type="text/plain" data-role="css">[hidden]{display:none !important}
+.price{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#b6ff3b}
+.rating{font:700 .75rem/1 ui-monospace,Menlo,monospace;color:#ffb547}
+.count,.status{margin:0 0 .6rem;color:#c9c1b3;font-size:.9rem;min-height:1.3em}
+.vendor-list[aria-busy=true]{opacity:.35}
+.error-box{margin:0 0 1rem}
+.error-box:has(.retry:not([hidden])){border:2px solid #ff6b4a;border-radius:12px;padding:.8rem 1rem;background:#2a1712}
+.error-box p{color:#ff8a70;margin:0}
+.error-box p:not(:empty){margin:0 0 .5rem}
+.retry{font:700 .85rem system-ui;background:#ff6b4a;color:#12151d;border:0;border-radius:99px;padding:.5rem .9rem;cursor:pointer}
+.reviews{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+.reviews li{background:#1b202b;border:2px solid #3a4254;border-radius:10px;padding:.55rem .8rem}
+.reviews .stars{color:#ffb547;font-size:.85rem;margin-left:.4rem}
+.reviews p{margin:.2rem 0 0;font-size:.9rem}
+.field-error{color:#ff8a70;font-size:.8rem;margin:0}
+[aria-invalid=true]{border-color:#ff6b4a !important}
+.form-status{font-size:.85rem;margin:.3rem 0 0;min-height:1.2em}
+button:disabled{opacity:.5;cursor:progress}
+.finder{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}
+.finder input{max-width:14rem}
+.sorter{display:flex;gap:.5rem;align-items:center;margin:0 0 .8rem;font-size:.85rem}
+.sorter select{width:auto}</script>
+        <script type="text/plain" data-role="before">// From Exercise 2: the parsed body, or an Error (with .status) for any non-2xx
+async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    // error bodies explain themselves; one that isn't JSON is ignored
+    const body = await response.json().catch((e) => { if (e.name === "AbortError") throw e; return null; });
+    const error = new Error(`${response.status} ${body?.message ?? response.statusText}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+const STALL = "/api/stalls/taco-bike";
+const form = document.querySelector(".review-form");
+const reviews = document.querySelector(".reviews");
+const formStatus = document.querySelector(".form-status");
+
+function reviewItem(review) {
+  const li = document.createElement("li");
+  li.dataset.id = review.id;
+  const who = document.createElement("strong");
+  who.textContent = review.author;
+  const stars = document.createElement("span");
+  stars.className = "stars";
+  stars.textContent = "★".repeat(review.rating);
+  const text = document.createElement("p");
+  text.textContent = review.text;
+  li.append(who, stars, text);
+  return li;
+}
+
+// The reviews that are already there, newest first
+getJSON(`${STALL}/reviews`).then((list) => reviews.replaceChildren(...list.map(reviewItem)));</script>
+        <textarea>
+function showErrors(fields = {}) {
+  for (const el of form.querySelectorAll(&quot;.field-error&quot;)) {
+    const name = el.dataset.for;
+    const message = fields[name];
+    el.textContent = message ?? &quot;&quot;;
+    el.hidden = !message;
+    form.elements[name].setAttribute(&quot;aria-invalid&quot;, String(Boolean(message)));
+  }
+}
+
+form.addEventListener(&quot;submit&quot;, async (event) =&gt; {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  const review = { ...data, rating: Number(data.rating) };
+  showErrors();
+  formStatus.textContent = &quot;&quot;;
+  // While the request is in flight: the button is disabled and the
+  // status says &quot;Posting…&quot;. Afterwards, whatever happened, it&#x27;s enabled again.
+
+  try {
+    const response = await fetch(`${STALL}/reviews`, {
+      method: &quot;POST&quot;,
+      headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+      body: JSON.stringify(review),
+    });
+
+    if (response.ok) {
+      reviews.prepend(reviewItem(await response.json()));
+      form.reset();
+    } else if (response.status === 422) {
+      const { fields } = await response.json();
+      showErrors(fields);
+    } else {
+      formStatus.textContent = `Couldn&#x27;t post your review (${response.status}). Try again.`;
+    }
+  } catch (error) {
+    console.error(error);   // the details, for you
+    formStatus.textContent = error.name === &quot;TypeError&quot;
+      ? &quot;No connection. Your review is still here: try again.&quot;
+      : &quot;Something went wrong. Your review is still here: try again.&quot;;
+  }
+});
+</textarea>
+        <script type="application/json" data-role="checks">[{"label": "While posting: the button is disabled and the status says so", "run": "await wait(350); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(100); return $('.review-form button').disabled && /post|send/i.test(text('.form-status'));", "api": {"latency": 300}, "timeout": 2500}, {"label": "A double click sends one POST", "run": "const net = () => win.__net || []; const posts = () => net().filter((e) => e.method === 'POST'); await wait(350); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(30); submit('.review-form'); await wait(500); return posts().length === 1;", "api": {"latency": 300}, "timeout": 2500}, {"label": "Afterwards the button works again, after a success…", "run": "await wait(350); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(450); return !$('.review-form button').disabled;", "api": {"latency": 300}, "timeout": 2500}, {"label": "…and after a failure", "run": "await wait(350); type('#author', 'Ana'); type('#text', 'Tacos worth crossing the city for.'); $('#rating').value = '4'; submit('.review-form'); await wait(450); return !$('.review-form button').disabled && text('.form-status').length > 3;", "api": {"latency": 300, "force": [{"match": "POST /api/stalls/*/reviews", "network": true, "delay": 300}]}, "timeout": 2500}]</script>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harbour Market API · reference</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <script src="assets/kit.js" defer></script>
+  <style>
+    .toc { columns: 2 16rem; padding-left: 1.2rem; }
+    .ep { margin: 2.2rem 0 0; padding-top: 1.4rem; border-top: 1.5px solid var(--w-line); }
+    .ep h3 { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: baseline; margin: 0 0 0.6rem; font: 600 1.25rem "IBM Plex Mono", monospace; }
+    .ep h3 .m { font-size: 0.85rem; padding: 0.25rem 0.55rem; border-radius: 4px; color: #03101b; background: var(--c, #3ee6ff); }
+    .m.get { --c: #3ee6ff; } .m.post { --c: #b6ff3b; } .m.put { --c: #ffb547; } .m.patch { --c: #a98bff; } .m.delete { --c: #ff6b5a; }
+    .ep h3 small { font: 500 0.85rem "IBM Plex Mono", monospace; color: var(--w-muted); }
+    .ep p, .ep ul { max-width: 72ch; }
+    table.ref { border-collapse: collapse; margin: 0.6rem 0; font-size: 0.95rem; width: 100%; max-width: 60rem; }
+    table.ref th, table.ref td { border: 1px solid var(--w-line); padding: 0.4rem 0.7rem; text-align: left; vertical-align: top; }
+    table.ref th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.06em; color: var(--w-muted); }
+    table.ref td:first-child { white-space: nowrap; font-family: "IBM Plex Mono", monospace; }
+    .ok { color: #b6ff3b; } .warn { color: #ffb547; } .bad { color: #ff6b5a; }
+    .page pre.code { font-size: 0.88rem; max-width: 60rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Over the wire · all materials</a><span>Reference · v1.0</span></div>
+    <span class="eyebrow-tag">API reference</span>
+    <h1>Harbour Market <em>API</em></h1>
+    <p class="intro">A JSON API for the Harbour Night Market: stalls, reviews, saved stalls and orders. It runs on the course server, and <strong>everyone has their own market</strong> on it, named after their GitHub username:</p>
+    <pre class="code" data-lang="js">https://harbour-api.lopin.me/&lt;your-github-username&gt;/api</pre>
+    <p>That's the base URL; every path on this page (<code>/api/stalls</code>, <code>/api/reviews/:id</code>…) is relative to your market, so <code>GET /api/stalls</code> means <code>GET https://harbour-api.lopin.me/&lt;you&gt;/api/stalls</code>. In code, put the base URL in one constant and keep paths relative to it: <code>API = "https://harbour-api.lopin.me/&lt;you&gt;/api"</code>, then <code>getJSON("/stalls")</code>, not <code>"/api/stalls"</code> (that would request <code>…/api/api/stalls</code>, a 404). The control page <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a> checks your URL, sets chaos and resets your market. The same implementation also runs in the exercise editors and the request lab.</p>
+
+    <h2>Conventions</h2>
+    <ul class="tasks">
+      <li><strong>Resources, not actions.</strong> Nouns in the path, the verb is the method: <code>GET /api/stalls</code> (the collection), <code>GET /api/stalls/mezcal</code> (one item), <code>POST /api/stalls/mezcal/reviews</code> (add to a sub-collection), <code>DELETE /api/reviews/r3</code>. Never <code>/api/getStalls</code> or a GET that changes data.</li>
+      <li><strong>Bodies are JSON.</strong> Requests with a body (POST, PUT, PATCH) must send <code>Content-Type: application/json</code>, or the server answers <span class="warn">415</span>. Invalid JSON is <span class="warn">400</span>.</li>
+      <li><strong>Types are checked.</strong> A number sent as a string (<code>"5"</code>) is a validation error, not converted.</li>
+      <li><strong>Errors have one shape:</strong> <code>{ "error": "code", "message": "for humans" }</code>, plus <code>"fields": { "name": "message" }</code> on a <span class="warn">422</span>.</li>
+      <li><strong>Unknown paths</strong> answer <span class="warn">404</span>; a known path with the wrong method answers <span class="warn">405</span> with an <code>Allow</code> header.</li>
+      <li><strong>Changing stalls needs a token</strong> in <code>Authorization: Bearer &lt;token&gt;</code>. Two kinds: the admin token <code>harbour-admin-2026</code> may do everything; a vendor token <code>vendor-&lt;stall id&gt;</code> (e.g. <code>vendor-taco-bike</code>) may only PATCH its own stall. <span class="warn">401</span>: no token, or an invalid one ("who are you?"). <span class="warn">403</span>: a valid token that isn't allowed to do this ("I know who you are, and no"). The tokens are public because this is a course server.</li>
+      <li><strong>Times</strong> are ISO 8601 strings in UTC: <code>"2026-10-16T19:42:07.311Z"</code>.</li>
+      <li><strong>Chaos</strong>, per market: <code>PUT /api/_chaos</code> with <code>{ "latency": 1200, "fail": 0.3 }</code> delays every response by 1.2 s and answers <span class="bad">503</span> (with <code>Retry-After: 2</code>) to 30 % of requests; <code>GET /api/_chaos</code> shows the settings. <code>?chaos=1</code> on any request makes that one request slow and unreliable. The control page <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a> has switches for both.</li>
+      <li><strong>Reset</strong>: <code>POST /api/_reset</code> puts your market back to the seed data. Your data otherwise persists: it's still there tomorrow.</li>
+      <li><strong>CORS</strong>: every response carries <code>Access-Control-Allow-Origin: *</code>, so a page on any origin (your <code>localhost:8080</code>) can read it; JSON bodies and <code>Authorization</code> trigger a preflight, which is answered.</li>
+      <li><strong>Limits</strong>, per market: 500 reviews, 500 orders, 60 stalls (then <span class="warn">409</span> <code>"namespace_full"</code>: reset), bodies up to 100 kB (<span class="warn">413</span>).</li>
+    </ul>
+
+    <h2>Endpoints</h2>
+    <ol class="toc">
+      <li><a href="#stalls">GET /api/stalls</a></li>
+      <li><a href="#stall">GET /api/stalls/:id</a></li>
+      <li><a href="#stall-create">POST /api/stalls</a> 🔑</li>
+      <li><a href="#stall-patch">PATCH /api/stalls/:id</a> 🔑</li>
+      <li><a href="#stall-delete">DELETE /api/stalls/:id</a> 🔑</li>
+      <li><a href="#reviews">GET /api/stalls/:id/reviews</a></li>
+      <li><a href="#review-create">POST /api/stalls/:id/reviews</a></li>
+      <li><a href="#review">GET · DELETE /api/reviews/:id</a></li>
+      <li><a href="#saved">GET /api/saved · PUT · DELETE /api/saved/:id</a></li>
+      <li><a href="#orders">POST · GET /api/orders</a></li>
+      <li><a href="#headers">Headers this API uses</a></li>
+    </ol>
+
+    <h2>The Stall object</h2>
+    <pre class="code" data-lang="js">{
+  "id": "mezcal",              // a slug, never changes
+  "name": "Mezcal Moon",
+  "tag": "drinks",             // "food" | "music" | "crafts" | "drinks"
+  "price": 9,                  // whole euros, 0 = free
+  "soldOut": true,
+  "featured": true,            // only on some stalls
+  "blurb": "Small-batch mezcal and …",
+  "rating": 3.7,               // average of its reviews, one decimal, null if none
+  "reviewCount": 3
+}</pre>
+
+    <section class="ep" id="stalls">
+      <h3><span class="m get">GET</span>/api/stalls</h3>
+      <p>Every stall. Filtering, searching, sorting and pagination happen on the server through query parameters, which can be combined.</p>
+      <table class="ref">
+        <tr><th>Parameter</th><th>Example</th><th>Effect</th></tr>
+        <tr><td>tag</td><td><code>?tag=food</code></td><td>only that tag; an unknown tag is <span class="warn">400</span></td></tr>
+        <tr><td>q</td><td><code>?q=taco</code></td><td>case-insensitive search in names and blurbs. Short queries are answered more slowly (up to ~1 s for one letter)</td></tr>
+        <tr><td>sort</td><td><code>?sort=price</code> <code>?sort=-rating</code></td><td><code>name</code>, <code>price</code> or <code>rating</code>; a leading <code>-</code> sorts descending; anything else is <span class="warn">400</span></td></tr>
+        <tr><td>limit, page</td><td><code>?limit=4&amp;page=2</code></td><td>pagination (limit 1–50, default 4 when either is present)</td></tr>
+      </table>
+      <p><span class="ok">200</span> · an array of Stall objects. Headers: <code>X-Total-Count</code> (matches before pagination), and with pagination <code>Link: &lt;/api/stalls?…page=3&gt;; rel="next", &lt;…&gt;; rel="prev"</code>.</p>
+    </section>
+
+    <section class="ep" id="stall">
+      <h3><span class="m get">GET</span>/api/stalls/:id</h3>
+      <p><span class="ok">200</span> · one Stall. <span class="warn">404</span> if there's no stall with that id.</p>
+    </section>
+
+    <section class="ep" id="stall-create">
+      <h3><span class="m post">POST</span>/api/stalls <small>🔑 admin</small></h3>
+      <p>Body: <code>{ "name", "tag", "price", "blurb" }</code>, all required; <code>soldOut</code> optional. The id is made from the name (<code>"Crêpe Escape"</code> → <code>"crepe-escape"</code>).</p>
+      <p><span class="ok">201</span> · the Stall, with <code>Location: /api/stalls/:id</code>. <span class="warn">401</span> no or invalid token · <span class="warn">403</span> a vendor token. <span class="warn">409</span> a stall with that id exists. <span class="warn">422</span> fields: <code>name</code> 1–40 characters, <code>tag</code> one of the four, <code>price</code> integer 0–100, <code>blurb</code> up to 200 characters, <code>soldOut</code> boolean.</p>
+    </section>
+
+    <section class="ep" id="stall-patch">
+      <h3><span class="m patch">PATCH</span>/api/stalls/:id <small>🔑 admin or that stall's vendor</small></h3>
+      <p>Body: only the fields to change, same rules as POST. Admin token, or the stall's own vendor token. <span class="ok">200</span> · the updated Stall. <span class="warn">401</span> no or invalid token · <span class="warn">403</span> another vendor's token · <span class="warn">404 · 422</span>.</p>
+      <pre class="code" data-lang="js">fetch("/api/stalls/mezcal", {
+  method: "PATCH",
+  headers: { "Content-Type": "application/json", Authorization: "Bearer harbour-admin-2026" },
+  body: JSON.stringify({ soldOut: false }),
+});</pre>
+    </section>
+
+    <section class="ep" id="stall-delete">
+      <h3><span class="m delete">DELETE</span>/api/stalls/:id <small>🔑 admin</small></h3>
+      <p><span class="ok">204</span> · no body; the stall's reviews and its saved entry go too. <span class="warn">401</span> · <span class="warn">403</span> a vendor token · <span class="warn">404</span>.</p>
+    </section>
+
+    <section class="ep" id="reviews">
+      <h3><span class="m get">GET</span>/api/stalls/:id/reviews</h3>
+      <p><span class="ok">200</span> · an array of reviews, newest first, with <code>X-Total-Count</code>. <span class="warn">404</span> unknown stall.</p>
+      <pre class="code" data-lang="js">{ "id": "r12", "stallId": "mezcal", "author": "Rosa", "rating": 5, "text": "Ask for the espadín.", "createdAt": "2026-10-16T16:22:00.000Z" }</pre>
+    </section>
+
+    <section class="ep" id="review-create">
+      <h3><span class="m post">POST</span>/api/stalls/:id/reviews</h3>
+      <p>Body: <code>{ "author", "rating", "text" }</code>. Other fields are ignored.</p>
+      <table class="ref">
+        <tr><th>Field</th><th>Rule</th><th>Message on a 422</th></tr>
+        <tr><td>author</td><td>string, 1–40 characters after trimming</td><td>Required, up to 40 characters.</td></tr>
+        <tr><td>rating</td><td>integer 1–5, a number</td><td>A whole number from 1 to 5. / A number, not a string ("5").</td></tr>
+        <tr><td>text</td><td>string, 10–280 characters after trimming</td><td>10–280 characters.</td></tr>
+      </table>
+      <p><span class="ok">201</span> · the review as stored (with <code>id</code> and <code>createdAt</code>), and <code>Location: /api/reviews/:id</code>. <span class="warn">400</span> invalid JSON · <span class="warn">404</span> unknown stall · <span class="warn">415</span> not JSON · <span class="warn">422</span> <code>{ "fields": { … } }</code>.</p>
+    </section>
+
+    <section class="ep" id="review">
+      <h3><span class="m get">GET</span><span class="m delete">DELETE</span>/api/reviews/:id</h3>
+      <p>GET: <span class="ok">200</span> · the review. DELETE: <span class="ok">204</span>. Both <span class="warn">404</span> for an unknown id. (No ownership check: a course simplification. A real API would only let the author delete.)</p>
+    </section>
+
+    <section class="ep" id="saved">
+      <h3><span class="m get">GET</span><span class="m put">PUT</span><span class="m delete">DELETE</span>/api/saved · /api/saved/:id</h3>
+      <ul>
+        <li><code>GET /api/saved</code> → <span class="ok">200</span> · an array of stall ids: <code>["mezcal", "taco-bike"]</code>.</li>
+        <li><code>PUT /api/saved/:id</code> → <span class="ok">204</span>; <span class="warn">404</span> for an unknown stall. No body needed. Idempotent: saving twice is saving once.</li>
+        <li><code>DELETE /api/saved/:id</code> → <span class="ok">204</span>, also when it wasn't saved. Idempotent.</li>
+      </ul>
+      <p>One list per server: everyone using the same server shares it.</p>
+    </section>
+
+    <section class="ep" id="orders">
+      <h3><span class="m post">POST</span><span class="m get">GET</span>/api/orders</h3>
+      <ul>
+        <li><code>POST /api/orders</code> with <code>{ "stallId", "name" }</code> → <span class="ok">201</span> · the order, <code>Location: /api/orders/:id</code>. <span class="warn">409</span> <code>"sold_out"</code> when the stall is sold out. <span class="warn">422</span> fields: <code>stallId</code> must exist, <code>name</code> 1–24 characters.</li>
+        <li><code>GET /api/orders/:id</code> → <span class="ok">200</span> · the order with its current <code>status</code>: <code>"placed"</code>, then <code>"preparing"</code> after 5 seconds, then <code>"ready"</code> after 15. <span class="warn">404</span> unknown id.</li>
+        <li><code>GET /api/orders</code> → <span class="ok">200</span> · every order, newest first.</li>
+      </ul>
+      <pre class="code" data-lang="js">{ "id": "o1", "stallId": "taco-bike", "stallName": "Taco Bike", "name": "Ana", "placedAt": "2026-10-16T19:50:11.020Z", "status": "preparing" }</pre>
+    </section>
+
+    <section class="ep" id="headers">
+      <h3>Headers this API uses</h3>
+      <table class="ref">
+        <tr><th>Header</th><th>Direction</th><th>What it says</th></tr>
+        <tr><td>Content-Type</td><td>both</td><td>the body's format; requests with a body must send <code>application/json</code></td></tr>
+        <tr><td>Accept</td><td>request</td><td>the formats the client can read (this API always answers JSON)</td></tr>
+        <tr><td>Authorization</td><td>request</td><td><code>Bearer &lt;token&gt;</code> for the routes that change stalls</td></tr>
+        <tr><td>WWW-Authenticate</td><td>response</td><td>sent with a 401: which scheme to use</td></tr>
+        <tr><td>Location</td><td>response</td><td>the URL of a created resource (201)</td></tr>
+        <tr><td>Allow</td><td>response</td><td>the methods a path supports (405)</td></tr>
+        <tr><td>X-Total-Count · Link</td><td>response</td><td>pagination: the total, the next and previous pages</td></tr>
+        <tr><td>Retry-After</td><td>response</td><td>seconds to wait after a 503</td></tr>
+        <tr><td>Cache-Control</td><td>response</td><td><code>no-store</code>: API responses are never cached</td></tr>
+        <tr><td>Origin · Access-Control-*</td><td>both</td><td>CORS: <code>Access-Control-Allow-Origin: *</code> on every response; <code>Access-Control-Expose-Headers</code> lets your page read Location, X-Total-Count, Link, Retry-After, Allow</td></tr>
+      </table>
+    </section>
+
+    <section class="ep">
+      <h3><span class="m get">GET</span>/api</h3>
+      <p><span class="ok">200</span> · the API's name, version and resources. A good first request to check that the server is up.</p>
+    </section>
+  </div>
+</body>
+</html>

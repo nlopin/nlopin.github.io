@@ -1,0 +1,15 @@
+{
+  "name": "harbour-api",
+  "private": true,
+  "type": "module",
+  "description": "The Harbour Market API on Cloudflare Workers: one Durable Object per student.",
+  "scripts": {
+    "test": "node test/worker.test.js",
+    "dry-run": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

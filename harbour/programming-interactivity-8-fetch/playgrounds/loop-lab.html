@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event loop lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.loop-lab { font-size: 1.6rem; margin: 1.5rem 0; height: 42rem; } @media (max-width: 760px) { .loop-lab { height: auto; } .ll-main { grid-template-columns: 1fr; } .ll-state { grid-template-rows: none; } .ll-box { min-height: 4rem; } }</style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Async</span>
+    <h1>Event loop <em>lab</em></h1>
+    <p class="intro">JavaScript runs one thing at a time, on one call stack. Waiting (for the network, for a timer) happens in the browser; when it's done, a callback is queued. Step through two programs and watch where each piece of work is: on the <strong>call stack</strong>, in the <strong>browser</strong>, in the <strong>microtask queue</strong> (promise callbacks, resuming after <code>await</code>) or in the <strong>task queue</strong> (timers, events).</p>
+    <div class="loop-lab">
+      <script type="application/json" data-role="programs">[
+ {
+  "label": "timer · promise · fetch",
+  "code": "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nfetch(\"/api/stalls\").then(() => console.log(\"C\"));\nPromise.resolve().then(() => console.log(\"D\"));\nconsole.log(\"E\");",
+  "frames": [
+   {
+    "line": 0,
+    "stack": [
+     "script"
+    ],
+    "note": "The script starts. It runs from top to bottom on the call stack, without interruption."
+   },
+   {
+    "line": 1,
+    "stack": [
+     "script",
+     "console.log(\"A\")"
+    ],
+    "log": "A",
+    "note": "A plain call: it runs now, and the stack goes back to the script."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script",
+     "setTimeout(…)"
+    ],
+    "apis": [
+     "timer · 0 ms · B"
+    ],
+    "note": "setTimeout hands the callback to the browser's timer and returns at once. JavaScript doesn't wait."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script"
+    ],
+    "apis": [],
+    "tasks": [
+     "B callback"
+    ],
+    "note": "0 ms later the timer is done: its callback waits in the task queue. It can't run yet: the stack isn't empty."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script",
+     "fetch(…)"
+    ],
+    "apis": [
+     "network · GET /api/stalls"
+    ],
+    "note": "fetch starts the request in the browser and returns a pending promise. .then only registers C for later."
+   },
+   {
+    "line": 4,
+    "stack": [
+     "script"
+    ],
+    "micro": [
+     "D callback"
+    ],
+    "note": "Promise.resolve() is already fulfilled, so its .then callback goes straight into the microtask queue. It still waits for the stack to empty."
+   },
+   {
+    "line": 5,
+    "stack": [
+     "script",
+     "console.log(\"E\")"
+    ],
+    "log": "E",
+    "note": "Synchronous again: E prints before any callback."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "The script is done and the stack is empty. Now the event loop decides what runs next: all microtasks first."
+   },
+   {
+    "stack": [
+     "D callback"
+    ],
+    "micro": [],
+    "log": "D",
+    "note": "Microtasks (promise callbacks) run before the next task, so D beats B although B was queued earlier."
+   },
+   {
+    "stack": [
+     "B callback"
+    ],
+    "tasks": [],
+    "log": "B",
+    "note": "Microtask queue empty: the loop takes one task, the timer callback. Between tasks the browser may render."
+   },
+   {
+    "stack": [],
+    "apis": [],
+    "micro": [
+     "C callback"
+    ],
+    "note": "About 40 ms later the response arrives. The fetch promise fulfils and its .then callback is queued as a microtask."
+   },
+   {
+    "stack": [
+     "C callback"
+    ],
+    "micro": [],
+    "log": "C",
+    "note": "C runs last: the network is slower than everything else here. The order was A E D B C."
+   },
+   {
+    "stack": [],
+    "note": "Nothing left: the event loop waits for the next event (a click, a timer, a response)."
+   }
+  ]
+ },
+ {
+  "label": "async / await",
+  "code": "async function loadStalls() {\n  console.log(\"1 · sending\");\n  const response = await fetch(\"/api/stalls\");\n  console.log(\"3 · arrived\", response.status);\n}\n\nloadStalls();\nconsole.log(\"2 · the page keeps going\");",
+  "frames": [
+   {
+    "line": 0,
+    "stack": [
+     "script"
+    ],
+    "note": "The script starts. Declaring loadStalls runs nothing."
+   },
+   {
+    "line": 7,
+    "stack": [
+     "script",
+     "loadStalls()"
+    ],
+    "note": "Calling an async function runs its body synchronously, up to the first await."
+   },
+   {
+    "line": 2,
+    "stack": [
+     "script",
+     "loadStalls()"
+    ],
+    "log": "1 · sending",
+    "note": "Still synchronous."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script",
+     "loadStalls()",
+     "fetch(…)"
+    ],
+    "apis": [
+     "network · GET /api/stalls"
+    ],
+    "note": "fetch starts the request and returns a pending promise."
+   },
+   {
+    "line": 3,
+    "stack": [
+     "script"
+    ],
+    "note": "await on a pending promise suspends loadStalls: its frame is saved and leaves the stack. The call on line 7 returns a pending promise."
+   },
+   {
+    "line": 8,
+    "stack": [
+     "script",
+     "console.log(…)"
+    ],
+    "log": "2 · the page keeps going",
+    "note": "The rest of the script runs. Clicks, timers and rendering can run too while the request is in flight."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "The script is done. The event loop is free: the page stays responsive."
+   },
+   {
+    "apis": [],
+    "micro": [
+     "resume loadStalls"
+    ],
+    "note": "The status and headers arrive: the fetch promise fulfils, and resuming loadStalls is queued as a microtask."
+   },
+   {
+    "line": 4,
+    "stack": [
+     "loadStalls() · resumed"
+    ],
+    "micro": [],
+    "log": "3 · arrived 200",
+    "note": "loadStalls continues right after the await, with response in hand. Its local variables survived the wait."
+   },
+   {
+    "line": 0,
+    "stack": [],
+    "note": "Done. The promise that loadStalls() returned is fulfilled. A thrown error here would have rejected it instead."
+   }
+  ]
+ }
+]</script>
+    </div>
+    <h2>The rules</h2>
+    <ol class="tasks">
+      <li>Code on the call stack runs to the end. Nothing interrupts it: not a click, not a timer, not a response.</li>
+      <li>When the stack is empty, the event loop runs <strong>every</strong> microtask, including ones queued by microtasks.</li>
+      <li>Then it takes <strong>one</strong> task from the task queue, and the browser may render. Repeat.</li>
+      <li><code>await</code> suspends only its own function: the function's frame leaves the stack, the caller carries on, and resuming is a microtask.</li>
+    </ol>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li>Before stepping through "timer · promise · fetch", write down the order of the letters. Which one surprised you?</li>
+      <li>Why does D print before B, although <code>setTimeout</code> was called first?</li>
+      <li>In "async / await", at which step is <code>loadStalls</code> no longer on the stack, and what is still holding on to its variables?</li>
+      <li>What would happen to the page if the request on line 3 were synchronous and took two seconds?</li>
+    </ol>
+  </div>
+</body>
+</html>

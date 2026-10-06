@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect the market · Over the wire</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Everyone · 45 min · solo or in pairs</span></div>
+    <span class="eyebrow-tag">Team build · step 1</span>
+    <h1>Connect the <em>market</em></h1>
+    <p class="intro">The market from Lecture 5 still reads its vendors from <code>js/data.js</code>, typed by hand. The course server has the real list, with two more stalls and their ratings, and you have your own copy of it. Connect the two: every request through one module, the stalls in <code>state</code>, and a page that says what's happening while the data is on its way, or when it doesn't arrive.</p>
+    <p class="story">“The website says eight stalls. The market has ten.”</p>
+    <div class="tip"><p style="margin:0"><strong>Done means:</strong> <code>localhost:8080</code> shows ten vendors with ratings, loaded with one <code>GET …/api/stalls</code> from your market. With chaos on (<a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>), a reload shows "Loading the vendors…", a failed one shows a sentence and a Try again button that recovers, and the console has no <code>Uncaught</code>. <code>data.js</code> is deleted.</p></div>
+
+    <h2>Set up <em>(5 minutes)</em></h2>
+    <ol class="tasks">
+      <li>Fork <a href="https://github.com/nlopin/harbour-market-starter">github.com/nlopin/harbour-market-starter</a> on GitHub, clone your fork, and create a branch: <code>git switch -c connect-the-market</code>.</li>
+      <li>Open <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>, type your GitHub username, press <strong>Check</strong>. Copy your API's URL into <code>API</code> at the top of <code>starter/js/api.js</code>.</li>
+      <li>In the repository's folder: <code>npm start</code> (live-server, through <code>npx</code>; no <code>npm install</code>). Open <a href="http://localhost:8080">http://localhost:8080</a>: eight vendors, typed by hand.</li>
+      <li>DevTools → Network → Fetch/XHR: no requests yet. Keep it open. Your code goes in <code>starter/</code>.</li>
+      <li>Keep <a href="../api.html">api.html</a> and the <a href="../cheatsheet.html">cheat sheet</a> in other tabs.</li>
+    </ol>
+
+    <h2>The steps <em>(tick as you go)</em></h2>
+    <p>Each step says how you know it works. Check before moving on.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>1 · api.js</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>HttpError</code>: <code>name</code>, a message with the status and the server's <code>message</code>, <code>status</code> and <code>body</code> on it.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>request(method, path, data, options)</code>: <code>fetch(API + path, …)</code>; a JSON body and its <code>Content-Type</code> when there is <code>data</code>; on a non-2xx, read the error body (ignore it if it isn't JSON) and throw an <code>HttpError</code>; <code>null</code> for a 204; otherwise the parsed body.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>describe(error)</code>: a short sentence for people, from the error's <code>status</code> or <code>name</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><strong>Check</strong>, in the console: <code>const api = await import("/js/api.js")</code>, then <code>await api.getJSON("/stalls")</code> gives 10 stalls and <code>await api.getJSON("/stalls/pizza")</code> rejects with an error whose <code>status</code> is 404.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>2 · state and loading</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>state</code> gets <code>status</code> (<code>"loading"</code> · <code>"ready"</code> · <code>"error"</code>), <code>error</code> and <code>stalls: []</code>. <code>visibleStalls()</code> and <code>render()</code> read <code>state.stalls</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>loadStalls()</code> in <code>main.js</code>: loading, render, request, ready or error, render. Started with a top-level <code>await</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Nothing imports <code>data.js</code>: delete it.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><strong>Check</strong>: ten vendors, Brass &amp; Bones included; one <code>GET /api/stalls</code> in the Network panel; the filters, the search and the ♥ still work.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>3 · what people see</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>A status line (a live region already in the HTML): "Loading the vendors…", then "10 stalls".</span></li>
+        <li><input type="checkbox" aria-label="done"><span>An error: a sentence in a <code>role="alert"</code> element that stays in the page, and a Try again button that's hidden unless there's an error. Try again moves focus to the status line, then calls <code>loadStalls()</code>.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Each card shows its rating: <code>★ 4.7 · 3 reviews</code>, or "no reviews yet".</span></li>
+        <li><input type="checkbox" aria-label="done"><span><strong>Check</strong> with chaos on (<a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>: 1.2 s, 30 %): reload five times. Loading, failure and recovery all look right; nothing <code>Uncaught</code>.</span></li>
+      </ul></div>
+    </div>
+
+    <h2>Edge cases <em>(minutes 36–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → <em>Offline</em>, reload: "no connection", not "the server answered undefined".</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Back online, press Try again.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Failures set to "all → 503" on the control page: the message names the status; Try again keeps failing politely.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Filter to Music, then reload with chaos on: the filter survives (<code>localStorage</code>), the stalls arrive later.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Use the page with the keyboard only: Tab to Try again, press <kbd>Enter</kbd>. Where is focus afterwards?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → throttling <em>Slow 4G</em>: is the loading state visible, and does it go away?</span></li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then the console. Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Which modules import <code>stalls</code> from <code>data.js</code> today, and what should each of them read instead?</p></details>
+      <details><summary>Hint 2</summary><p><code>render()</code> runs before the stalls arrive. What should it draw when <code>state.stalls</code> is empty because they're still loading, and when it's empty because the market has no stalls?</p></details>
+      <details><summary>Hint 3</summary><p>Which of the four failure modes from slide "How a request fails" can <code>loadStalls()</code> meet, and which line of your code turns each one into <code>state.status = "error"</code>?</p></details>
+      <details><summary>Hint 4</summary><p>The error message and the Try again button: which of them must stay in the page all the time, and why?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The page is blank and the console says <code>The requested module './data.js' …</code> or a 404 for <code>data.js</code>.</li>
+      <li>Ten stalls arrive, but the count still says "8" or the filters show the old eight.</li>
+      <li><code>Unexpected token '&lt;'</code>, or a 404 for <code>/api/api/stalls</code>.</li>
+      <li>"Loading the vendors…" forever, and <code>Uncaught (in promise)</code> in the console.</li>
+      <li>The error box shows "the server answered undefined".</li>
+      <li>A 404 with "Every request names your market first": the username is missing from <code>API</code>.</li>
+      <li>The request in the Network panel goes to <code>localhost:8080/api/…</code>: <code>API</code> is still a relative path.</li>
+    </ul></details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · run</b>Fork, clone, your API's URL, <code>npm start</code>, Network panel open.</div>
+      <div class="checkpoint"><b>5–12 · api.js</b>At 12: the console check of step 1 passes.</div>
+      <div><b>12–30 · state</b>Step 2, then step 3's status line and error.</div>
+      <div><b>30–42 · finish</b>Ratings, chaos on, the edge cases.</div>
+      <div><b>42–45 · PR</b>Commit, push, open a pull request. Done early? Pick a brief.</div>
+    </div>
+
+    <h2>Hand it in</h2>
+    <p>Push your branch to your fork and open a <strong>pull request</strong> against <a href="https://github.com/nlopin/harbour-market-starter">harbour-market-starter</a>'s <code>main</code>. In the description: what works, what doesn't yet, and how you tested it with chaos on. A PR that's still in progress is fine: mark it as a draft and finish it at home.</p>
+
+    <h2>Done early?</h2>
+    <p>Pick one of the <a href="index.html">briefs</a>: they all start from a connected market. A new branch on top of this one, a second pull request; start its core in class, finish at home, demo next class.</p>
+  </div>
+</body>
+</html>

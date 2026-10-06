@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build 1 · Review wall</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Team build · all briefs</a><span>Brief 1 · after "Connect the market" · demo next class</span></div>
+    <span class="eyebrow-tag">Team build · brief 1</span>
+    <h1><em>Review wall</em></h1>
+    <p class="intro">Every card gets a <em>Reviews</em> button. It opens a dialog with that stall's reviews, newest first, and a form to add one. The server validates; the dialog shows what it says. <span class="stars" title="difficulty">★☆☆</span></p>
+    <p class="story">“Four and a half stars from two people. Who are they, and what did they eat?”</p>
+    <div class="tip"><p style="margin:0"><strong>You'll demo (next class):</strong> open Taco Bike's reviews, post one, see it at the top with the server's id. Post one that's too short: the message appears under the text field and nothing you typed is lost. Delete the review you just wrote.</p></div>
+
+    <h2>The core <em>(start in class if you've connected, the minimum for the demo)</em></h2>
+    <p>Four things, on top of your connected market. They count when they work with chaos on (<a href="https://harbour-api.lopin.me">control page</a>).</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>A <em>Reviews</em> button on each card opens a <code>&lt;dialog&gt;</code> with that stall's reviews (<code>GET</code>), with a loading and an error state.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A form in the dialog <code>POST</code>s a review; on 201 the server's review appears at the top.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>422: each message under its field; any other failure: a sentence; the text is kept.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The submit button is disabled while posting.</span></li>
+    </ul>
+
+    <h2>The full feature <em>(finish at home)</em></h2>
+    <p>What has to work for the demo next class, not how. The core above is part of it.</p>
+    <div class="lanes">
+      <div class="lane req"><h3>Requests</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span><code>GET /api/stalls/:id/reviews</code> when the dialog opens, for the stall that was clicked.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>POST</code> a review as JSON; <code>rating</code> is a number.</span></li>
+        <li><input type="checkbox" aria-label="done"><span><code>DELETE /api/reviews/:id</code> for reviews posted from this browser (remember their ids). The server doesn't check ownership (a course simplification): a real API would, because a client-side rule is no rule.</span></li>
+      </ul></div>
+      <div class="lane states"><h3>States</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>Loading, empty ("No reviews yet: be the first"), error and ready, inside the dialog.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>After a 201: the server's review at the top, the form cleared, the card's rating and count updated.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>The submit button is disabled while posting.</span></li>
+      </ul></div>
+      <div class="lane errors"><h3>Errors</h3><ul>
+        <li><input type="checkbox" aria-label="done"><span>422: each field's message under its field, <code>aria-invalid</code> on the input.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Any other failure: a sentence in the dialog; the form keeps its text.</span></li>
+        <li><input type="checkbox" aria-label="done"><span>Opening a second stall while the first one's reviews are loading never shows the first stall's reviews.</span></li>
+      </ul></div>
+    </div>
+
+    <div class="tip"><p style="margin:0"><strong>New tool:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"><code>&lt;dialog&gt;</code></a> and <code>showModal()</code>: a modal with focus handling and <kbd>Esc</kbd> built in.</p></div>
+    <h2>The endpoints you need</h2>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>Method</th><th>Path</th><th>Answers</th></tr>
+      <tr><td><code>GET</code></td><td><code>/api/stalls/:id/reviews</code></td><td>200 · array, newest first · 404</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/stalls/:id/reviews</code></td><td>201 + <code>Location</code> · 400 · 415 · 422 <code>{ fields }</code> · 404</td></tr>
+      <tr><td><code>DELETE</code></td><td><code>/api/reviews/:id</code></td><td>204 · 404</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/stalls/:id</code></td><td>200 · the stall with a fresh <code>rating</code> and <code>reviewCount</code></td></tr>
+    </table></div>
+
+    <h2>Edge cases <em>(with chaos on, minutes 38–43)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Open, close and open another stall quickly, with chaos on.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Double-click Post.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Post with DevTools → Network → Offline.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>A review containing <code>&lt;img src=x onerror=alert(1)&gt;</code>.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Reload: is "delete" still offered only for your own reviews?</span></li>
+    </ul>
+
+    <h2>Stretch, if you're done early</h2>
+    <ul class="stretch">
+      <li>Star rating as five radio buttons styled as stars, keyboard-accessible.</li>
+      <li>Relative times: "12 minutes ago" with <code>Intl.RelativeTimeFormat</code>.</li>
+      <li>Mirror the server's rules in the HTML (<code>minlength</code>), and keep the server's messages anyway.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <p>Network panel first: is the request sent, with what, and what came back? Then a hint.</p>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Where does the dialog find out which stall it's for? The click happened on a card that render() may have replaced since.</p></details>
+      <details><summary>Hint 2</summary><p>After a POST, which number on the card is now wrong, and who knows the right value?</p></details>
+      <details><summary>Hint 3</summary><p>Two requests for two different stalls are in flight. The slower one arrives last. What does the dialog show?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+    <ul class="gotchas">
+      <li>The dialog shows the previous stall's reviews for a moment, or for good.</li>
+      <li>Every review posted twice after the dialog was opened twice.</li>
+      <li>A review renders as an image, or an alert pops up.</li>
+      <li>The card still says "2 reviews" after you posted a third.</li>
+    </ul></details>
+
+    <h2>Before you start</h2>
+    <p>This brief assumes <a href="connect.html">Connect the market</a> is done: <code>api.js</code> works, the stalls come from the API, loading and errors are handled. Then: Click a card's button: <code>GET …/reviews</code> appears in the Network panel with a 200, and the JSON is in the console.</p>
+
+    <h2>Demo · next class, 3 minutes</h2>
+    <div class="demo"><b>Your 3 minutes</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and the panel or the message that showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>

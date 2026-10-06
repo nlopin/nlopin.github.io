@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Over the wire · cheat sheet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <script src="assets/kit.js" defer></script>
+  <style>
+    .sheet { columns: 3 19rem; column-gap: 1.25rem; }
+    .box { break-inside: avoid; background: #0b1426; color: #e3ecff; border: 1.5px solid #1f3052; border-left: 4px solid var(--c, #3ee6ff); border-radius: 0.5rem; padding: 0.8rem 1rem 0.9rem; margin: 0 0 1.25rem; }
+    .box h2 { margin: 0 0 0.5rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
+    .box h2 span { font: 600 0.7rem "IBM Plex Mono", monospace; background: var(--c, #3ee6ff); color: #03101b; padding: 0.2rem 0.45rem; border-radius: 0.25rem; }
+    .box pre.code { font-size: 0.78rem; padding: 0.6rem 0.75rem; margin: 0.4rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .box table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .box td { padding: 0.25rem 0.3rem; border-bottom: 1px solid #1f3052; vertical-align: top; }
+    .box td:first-child { width: 52%; }
+    .box td code { overflow-wrap: anywhere; }
+    .box p, .box li { font-size: 0.88rem; margin: 0.3rem 0; color: #cfdcf7; }
+    .box ol, .box ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+    .c1 { --c: #3ee6ff; } .c2 { --c: #b6ff3b; } .c3 { --c: #ff4fd8; } .c4 { --c: #ffb547; } .c5 { --c: #a98bff; } .c6 { --c: #ff6b5a; }
+    .print { font: 600 0.85rem "IBM Plex Mono", monospace; border: 1.5px solid #3ee6ff; color: #3ee6ff; background: transparent; padding: 0.5rem 0.9rem; border-radius: 0.4rem; cursor: pointer; }
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .page { background: #fff !important; color: #000; font-size: 10pt; }
+      .page-top, .print, .intro { display: none; }
+      .page-wrap { padding: 0; max-width: none; }
+      .page h1 { font-size: 20pt; margin-bottom: 4mm; color: #000; }
+      .sheet { columns: 3; column-gap: 5mm; }
+      .box { background: #fff; color: #000; border: 1px solid #000; border-left-width: 3px; padding: 2.5mm 3mm; margin-bottom: 3mm; }
+      .box h2, .box p, .box li { color: #000; }
+      .box code { background: #eee !important; color: #000 !important; border: 0 !important; }
+      .box pre.code { font-size: 7pt; }
+      .box td, .box p, .box li { font-size: 8pt; }
+    }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Over the wire · all materials</a><button class="print" type="button" onclick="print()">🖨 Print (A4 landscape)</button></div>
+    <h1>Over the wire <em>on one page</em></h1>
+    <p class="intro">Everything from Lecture 8, condensed. Print it, stick it next to your screen.</p>
+
+    <div class="sheet">
+      <section class="box c1">
+        <h2><span>1</span> An HTTP exchange</h2>
+        <pre class="code" data-lang="js">POST /api/stalls/taco-bike/reviews HTTP/1.1   // method · target
+Content-Type: application/json                // headers
+                                              // empty line
+{"author":"Ana","rating":5,"text":"…"}        // body
+
+HTTP/1.1 201 Created                          // status
+Location: /api/reviews/r17                    // headers
+{"id":"r17", …}                               // body</pre>
+        <p><strong>Origin</strong> = scheme + host + port. The fragment (<code>#…</code>) is never sent.</p>
+      </section>
+
+      <section class="box c1">
+        <h2><span>1</span> Methods &amp; statuses</h2>
+        <table>
+          <tr><td><code>GET</code> read</td><td>safe, idempotent</td></tr>
+          <tr><td><code>POST</code> create / action</td><td>neither: don't retry blindly</td></tr>
+          <tr><td><code>PUT</code> set at a URL · <code>DELETE</code></td><td>idempotent</td></tr>
+          <tr><td><code>PATCH</code> change some fields</td><td>not guaranteed</td></tr>
+          <tr><td><code>200</code> · <code>201</code> · <code>204</code></td><td>OK · Created · no body</td></tr>
+          <tr><td><code>400</code> · <code>401</code> · <code>403</code> · <code>404</code></td><td>malformed · no or invalid credentials · valid but not allowed · not found</td></tr>
+          <tr><td><code>409</code> · <code>415</code> · <code>422</code> · <code>429</code></td><td>conflict · not JSON · invalid values · slow down</td></tr>
+          <tr><td><code>500</code> · <code>503</code></td><td>server bug · try again later</td></tr>
+        </table>
+      </section>
+
+      <section class="box c2">
+        <h2><span>2</span> The event loop</h2>
+        <p>One thread. Code on the stack runs to the end; then <strong>every</strong> microtask (promise callbacks, resuming after <code>await</code>); then <strong>one</strong> task (timer, event); maybe a render; repeat.</p>
+        <pre class="code" data-lang="js">console.log("A");
+setTimeout(() => console.log("B"), 0);
+Promise.resolve().then(() => console.log("C"));
+console.log("D");                 // A D C B</pre>
+      </section>
+
+      <section class="box c2">
+        <h2><span>2</span> Two styles, same promise</h2>
+        <pre class="code" data-lang="js">getStalls()
+  .then((stalls) => render(stalls))
+  .catch((error) => showError(error))
+  .finally(() => hideSpinner());
+
+try { render(await getStalls()); }
+catch (error) { showError(error); }
+finally { hideSpinner(); }</pre>
+        <p><code>.then</code> returns a new promise; return a value or a promise from it, <code>throw</code> to reject. <code>await</code> only in <code>async</code> functions and modules. Independent: <code>await Promise.all([a(), b()])</code>.</p>
+      </section>
+
+      <section class="box c2">
+        <h2><span>2</span> fetch</h2>
+        <pre class="code" data-lang="js">const response = await fetch("/api/stalls?tag=food");
+response.status;        // 200
+response.ok;            // 200–299
+response.headers.get("X-Total-Count");
+const data = await response.json();   // second await: the body</pre>
+        <p>A 404 or a 500 <strong>resolves</strong>. <code>fetch</code> rejects only without a response: network, CORS, abort. Body readers: <code>json()</code> · <code>text()</code> · <code>blob()</code>, once each response.</p>
+      </section>
+
+      <section class="box c2">
+        <h2><span>2</span> One helper</h2>
+        <pre class="code" data-lang="js">async function getJSON(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const body = await response.json().catch((e) => {
+      if (e.name === "AbortError") throw e;
+      return null;          // an error page that isn't JSON
+    });
+    throw new HttpError(response, body); // .status, .body
+  }
+  return response.status === 204 ? null : response.json();
+}</pre>
+      </section>
+
+      <section class="box c2">
+        <h2><span>2</span> URLs</h2>
+        <pre class="code" data-lang="js">const params = new URLSearchParams();
+if (tag !== "all") params.set("tag", tag);
+params.set("q", "rock & roll");      // encoded for you
+fetch(`/api/stalls?${params}`);</pre>
+      </section>
+
+      <section class="box c3">
+        <h2><span>3</span> Async UI state</h2>
+        <pre class="code" data-lang="js">state.status = "loading";   // "loading" | "ready" | "error"
+render();
+try {
+  state.stalls = await getStalls();
+  state.status = "ready";
+} catch (error) {
+  console.error(error);
+  state.error = describe(error);   // a sentence, not "Failed to fetch"
+  state.status = "error";
+}
+render();                   // empty = ready && stalls.length === 0</pre>
+        <p><code>role="status"</code> for messages · <code>role="alert"</code> for the error, always in the page, only its text changes · Try again = <code>loadStalls()</code>, focus moved first.</p>
+      </section>
+
+      <section class="box c3">
+        <h2><span>3</span> How it fails</h2>
+        <table>
+          <tr><td>no network, CORS</td><td><code>TypeError</code> (message varies by browser)</td></tr>
+          <tr><td>4xx / 5xx</td><td>resolves, <code>ok === false</code></td></tr>
+          <tr><td>body isn't JSON</td><td><code>json()</code> → <code>SyntaxError</code> (on a 2xx: wrong URL)</td></tr>
+          <tr><td>aborted · timed out</td><td><code>AbortError</code> · <code>TimeoutError</code></td></tr>
+        </table>
+      </section>
+
+      <section class="box c4">
+        <h2><span>4</span> POST JSON</h2>
+        <pre class="code" data-lang="js">const data = Object.fromEntries(new FormData(form));
+const review = { ...data, rating: Number(data.rating) };
+
+const response = await fetch(url, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(review),
+});</pre>
+        <p>Forget <code>JSON.stringify</code> → <code>[object Object]</code> (400). Forget the header → <code>text/plain</code> (415). A string number → 422.</p>
+      </section>
+
+      <section class="box c4">
+        <h2><span>4</span> After the response</h2>
+        <ul>
+          <li><strong>201</strong>: render the server's copy (it has the <code>id</code>), reset the form.</li>
+          <li><strong>422</strong>: <code>body.fields[name]</code> under each field, <code>aria-invalid</code>, keep the input.</li>
+          <li><strong>Other</strong>: a sentence, keep the input.</li>
+          <li><code>button.disabled = true</code> before, <code>false</code> in <code>finally</code>.</li>
+          <li><strong>204</strong>: no body. Don't call <code>json()</code>.</li>
+          <li>Project helper paths are relative to <code>/api</code>: <code>postJSON("/stalls/taco-bike/reviews", review)</code>.</li>
+          <li>Through the helper, a 422 is thrown: <code>catch (e) { if (e.status === 422) showErrors(e.body.fields); }</code></li>
+        </ul>
+      </section>
+
+      <section class="box c5">
+        <h2><span>5</span> CORS</h2>
+        <p>A page may read a cross-origin response only if the server sends <code>Access-Control-Allow-Origin</code>. JSON POSTs and <code>Authorization</code> trigger a preflight (<code>OPTIONS</code>). The fix is on the server; <code>mode: "no-cors"</code> gives an unreadable response.</p>
+      </section>
+
+      <section class="box c5">
+        <h2><span>5</span> Abort what's obsolete</h2>
+        <pre class="code" data-lang="js">let controller = null;
+input.addEventListener("input", async () => {
+  controller?.abort();
+  controller = new AbortController();
+  try {
+    render(await getJSON(url, { signal: controller.signal }));
+  } catch (error) {
+    if (error.name !== "AbortError") showError(error);
+  }
+});
+fetch(url, { signal: AbortSignal.timeout(8000) });  // a timeout</pre>
+      </section>
+
+      <section class="box c6">
+        <h2><span>✓</span> When a request misbehaves</h2>
+        <ol>
+          <li>Network panel: is it sent? Method, URL, status?</li>
+          <li>Payload: what did you really send? Types?</li>
+          <li>Response: what does the server say?</li>
+          <li>Console: CORS? Uncaught (in promise)?</li>
+          <li>Then the API's docs. Then the code.</li>
+        </ol>
+        <p>Keys and tokens in browser code are public. Server data is user input: <code>textContent</code>.</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

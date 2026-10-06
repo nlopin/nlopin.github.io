@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Race lab</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <script src="../assets/kit.js" defer></script>
+  <style>.race-lab { font-size: 1.3rem; margin: 1.5rem 0; height: 40rem; } @media (max-width: 760px) { .race-lab { height: auto; } .rc-main { grid-template-columns: 1fr; } .rc-time { min-height: 12rem; } }</style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Playground</span></div>
+    <span class="eyebrow-tag">Async</span>
+    <h1>Race <em>lab</em></h1>
+    <p class="intro">Search as you type sends one request per keystroke. The server answers short queries slower than long ones (more matches to rank), so the responses come back <strong>out of order</strong>. Each bar is one request, from the moment it was sent to the moment its response arrived; the list on the left shows whichever response was rendered last.</p>
+    <div class="race-lab" data-word="taco"></div>
+    <h2>Try this</h2>
+    <ol class="tasks">
+      <li><strong>Naive</strong>, press ▶. The box says "taco"; what does the list show, and why is the bar for "t" the longest?</li>
+      <li><strong>Ignore stale</strong>: every request still reaches the server, but only the latest one may render. Which bars are "dropped"?</li>
+      <li><strong>AbortController</strong>: the previous request is cancelled. Compare the number of finished requests with Ignore stale.</li>
+      <li>Tick <strong>debounce</strong> and press ▶ in each mode. How many requests are sent now? Is the race gone, or just less likely?</li>
+      <li>Type slowly by hand in Naive mode. Does the bug appear? A bug that depends on timing is called a <em>race condition</em>.</li>
+    </ol>
+  </div>
+</body>
+</html>

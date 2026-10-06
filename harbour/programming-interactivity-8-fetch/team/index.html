@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team build · Over the wire</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="team.css">
+  <script src="../assets/kit.js" defer></script>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Team build · 45 min · demos next class</span></div>
+    <span class="eyebrow-tag">Team build</span>
+    <h1>Connect it, then <em>ship a feature</em></h1>
+    <p class="intro">Solo or in pairs, against the course's HTTP server: everyone has their own market on it. Step 1 is the same for everyone: the market from Lecture 5 stops reading <code>data.js</code> and loads its vendors from the API. Step 2 is one feature from the briefs below, started in class if there's time and finished at home for the demo next class.</p>
+
+    <h2>Step 1 · everyone <em>(the 45 minutes)</em></h2>
+    <ul class="tasks-grid">
+      <li><a href="connect.html"><small>Everyone · 45 min</small><b>Connect the market</b><span>api.js, the stalls in state, loading / error / ready, ratings, and all of it with chaos on.</span></a></li>
+    </ul>
+
+    <h2>The rule</h2>
+    <div class="tip"><p style="margin:0"><strong>Done means done with chaos on.</strong> Your work behaves with chaos on, set on the control page <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a> (every response 1.2 s late, 30 % of them a 503): there is a loading state, every failure says something and recovers, and nothing happens twice.</p></div>
+
+    <h2>Step 2 · pick a brief <em>(start in class, finish at home)</em></h2>
+    <p>Every brief starts from a connected market: your own after step 1, in a new branch and a second pull request to <a href="https://github.com/nlopin/harbour-market-starter">harbour-market-starter</a>. Your feature goes in a new module in <code>starter/js/</code>, imported from <code>main.js</code>, and every request goes through your <code>api.js</code>. Paths are relative to <code>/api</code>: <code>getJSON("/stalls/taco-bike/reviews")</code>; third-party APIs take a full <code>https://…</code> URL. Each brief has four core items: those are the minimum for the demo.</p>
+
+    <h3>The six briefs <em>(and two spares)</em></h3>
+    <ul class="tasks-grid">
+      <li><a href="01-review-wall.html"><small>Brief 1 · <span class="stars">★☆☆</span></small><b>Review wall</b><span>A stall's reviews in a dialog: read, post, validation errors, delete your own.</span></a></li>
+      <li><a href="02-order-board.html"><small>Brief 2 · <span class="stars">★★☆</span></small><b>Order board</b><span>Order without queueing. The ticket polls until it's ready, then stops.</span></a></li>
+      <li><a href="03-instant-search.html"><small>Brief 3 · <span class="stars">★★☆</span></small><b>Instant search</b><span>Server-side search: debounced, aborted, in the URL, Back works.</span></a></li>
+      <li><a href="04-saved-on-the-server.html"><small>Brief 4 · <span class="stars">★★☆</span></small><b>Saved on the server</b><span>The ♥ with PUT and DELETE: optimistic, rolled back when it fails.</span></a></li>
+      <li><a href="05-vendor-admin.html"><small>Brief 5 · <span class="stars">★★★</span></small><b>Vendor admin</b><span>Create, edit, remove stalls with a Bearer token. Five ways to say no.</span></a></li>
+      <li><a href="06-weather.html"><small>Brief 6 · <span class="stars">★★☆</span></small><b>Weather for the night</b><span>A third-party API (Open-Meteo), independent requests, a cache with an expiry.</span></a></li>
+      <li><a href="07-currency.html"><small>Spare · <span class="stars">★☆☆</span></small><b>Prices in your currency</b><span>Today's rates from a public API, formatted with Intl.NumberFormat.</span></a></li>
+      <li><a href="08-load-more.html"><small>Spare · <span class="stars">★★☆</span></small><b>Load more</b><span>Pagination with limit and page, the total and the next page from the headers.</span></a></li>
+    </ul>
+
+    <h2>How you work</h2>
+    <ul class="tasks">
+      <li><strong>In pairs, one laptop runs the code</strong>; the other person reads the brief, watches the Network panel and runs the checks.</li>
+      <li><strong>Minute 12 is the checkpoint</strong>: step 1's console check passes (<code>getJSON("/stalls")</code> gives 10 stalls). Not there? Usually setup (the username missing from <code>API</code>, live-server not running, the server not running): ask.</li>
+      <li><strong>When something fails</strong>: the request in the Network panel (Headers, Payload, Response), then api.html, then a hint, then the teacher.</li>
+    </ul>
+
+    <h2>Your market</h2>
+    <p>Everyone has their own copy of the market on the course server: <code>https://harbour-api.lopin.me/&lt;your-github-username&gt;/api</code>. The control page <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a> checks it, turns chaos on and off (latency, 503s), and resets it to the seed data. Nothing you do there affects anyone else. One slow and unreliable request only: add <code>?chaos=1</code> to its URL.</p>
+
+    <h2>Demos <em>next class</em></h2>
+    <p>One per team, about your brief from step 2 (or, if you didn't get that far, the connected market).</p>
+    <div class="demo"><b>3 minutes per team</b>
+      <ol>
+        <li><b>The happy path</b>, with the Network panel open next to the page.</li>
+        <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>
+        <li><b>One request in code</b>: the call, the status codes you handle, where the state changes.</li>
+        <li><b>One bug</b> you hit, and what showed it to you.</li>
+      </ol></div>
+  </div>
+</body>
+</html>
