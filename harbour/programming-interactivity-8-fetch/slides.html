@@ -169,7 +169,7 @@
 /* exercises */
 .slide.exercise ol > li { font-size: 30px; }
 
-/* team build */
+/* build */
 .briefs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .briefs .card { padding: 16px 20px; }
 .briefs h3 { font-size: 27px !important; margin: 0 0 6px; }
@@ -280,7 +280,7 @@ render();</script>
 
 <section data-title="The day in five acts">
   <p class="kicker">The plan · 3 hours</p>
-  <h2>Five acts, one market, one team build</h2>
+  <h2>Five acts, one market, one build</h2>
   <div class="map">
     <div class="mf"><b>00</b><strong>Why</strong>a server<time>0:00</time></div>
     <div class="m1"><b>01</b><strong>HTTP</strong>requests, responses, status codes<time>0:05</time></div>
@@ -289,11 +289,11 @@ render();</script>
     <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:15</time></div>
     <div class="m4"><b>04</b><strong>Sending data</strong>POST, validation, 201 / 422<time>1:30</time></div>
     <div class="m5"><b>05</b><strong>Origins &amp; races</strong>CORS, AbortController<time>1:54</time></div>
-    <div class="m6"><b>06</b><strong>Team build</strong>connect the market to the API<time>2:13 → 3:00</time></div>
+    <div class="m6"><b>06</b><strong>Build</strong>connect the market to the API<time>2:13 → 3:00</time></div>
   </div>
-  <p>Five short exercises, then 45 minutes connecting the market to the API. Materials: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/index.html" target="_blank" rel="noopener">08-fetch</a>: <code>git pull</code> now. For the team build: a GitHub account, and Node for live-server (<code>node --version</code>).</p>
+  <p>Five short exercises, then 45 minutes connecting the market to the API. Materials: <a href="https://lopin.me/harbour/programming-interactivity-8-fetch/index.html" target="_blank" rel="noopener">08-fetch</a>: <code>git pull</code> now. For the build: a GitHub account, and Node for live-server (<code>node --version</code>).</p>
   <aside class="notes">
-    <p>~0:04. About 100 of the 180 minutes are theirs. The team build needs a GitHub account (fork, pull request) and live-server (Node). Ask now, not at 2:13; anyone without either pairs with someone who has both.</p>
+    <p>~0:04. About 100 of the 180 minutes are theirs. The build needs a GitHub account (fork, pull request) and live-server (Node). Ask now, not at 2:13; everyone works on their own laptop, so anyone missing either sets it up in the break.</p>
   </aside>
 </section>
 
@@ -507,7 +507,7 @@ JSON.stringify(review);
   </div>
   <p>Right-click a row → <strong>Copy as fetch</strong> or <strong>Copy as cURL</strong>. Throttling (<em>Slow 4G</em>, <em>Offline</em>) shows your loading and error states.</p>
   <aside class="notes">
-    <p>~0:15, one minute. The live version comes in Act 2 (slide "Live: fetch", the Network tab in the editor) and on the real server in the team build. The habit to build: when a request "doesn't work", open the request in this panel before touching the code. Is it sent? With which method, headers and body? What status came back, and what does the body say? Most of the time the answer is there. The editors in today's exercises have a small Network tab next to the console with the same information.</p>
+    <p>~0:15, one minute. The live version comes in Act 2 (slide "Live: fetch", the Network tab in the editor) and on the real server in the build. The habit to build: when a request "doesn't work", open the request in this panel before touching the code. Is it sent? With which method, headers and body? What status came back, and what does the body say? Most of the time the answer is there. The editors in today's exercises have a small Network tab next to the console with the same information.</p>
   </aside>
 </section>
 
@@ -1061,7 +1061,7 @@ await loadStalls();</script>
     </div>
   </div>
   <aside class="notes">
-    <p>~0:41. The stalls move from a constant into <code>state</code>: they change over time (empty, loaded, reloaded); <code>render.js</code> gains the status branches, <code>card()</code> is untouched. Lecture 5's <code>load()</code> (from <code>localStorage</code>) is renamed <code>restore()</code>, so "load" means the network. <code>main.js</code> is a module, so top-level <code>await</code> works. This is what they build in the team block, starting from the <code>harbour-market-starter</code> repository (Lecture 5's market). Only <code>api.js</code> calls <code>fetch</code>; if the API's URL or auth changes, one file changes. That's the same separation of concerns as Lecture 5's modules.</p>
+    <p>~0:41. The stalls move from a constant into <code>state</code>: they change over time (empty, loaded, reloaded); <code>render.js</code> gains the status branches, <code>card()</code> is untouched. Lecture 5's <code>load()</code> (from <code>localStorage</code>) is renamed <code>restore()</code>, so "load" means the network. <code>main.js</code> is a module, so top-level <code>await</code> works. This is what they build in the last 45 minutes, starting from the <code>harbour-market-starter</code> repository (Lecture 5's market). Only <code>api.js</code> calls <code>fetch</code>; if the API's URL or auth changes, one file changes. That's the same separation of concerns as Lecture 5's modules.</p>
   </aside>
 </section>
 
@@ -1103,7 +1103,7 @@ await loadStalls();</script>
   </div>
   <p>Designs usually show only <em>ready</em>. The other three are where apps feel broken: a blank list on a slow connection, a spinner that spins forever after an error.</p>
   <aside class="notes">
-    <p>~0:55. Today's code (slide 28, the project) blanks the list while loading, the simple version; keeping the old results dimmed is in team brief 3. Ask: which of the four does a typical Figma file have? Ready, maybe empty. The other states are the developer's job to notice and to ask the designer about.</p>
+    <p>~0:55. Today's code (slide 28, the project) blanks the list while loading, the simple version; keeping the old results dimmed is in brief 3. Ask: which of the four does a typical Figma file have? Ready, maybe empty. The other states are the developer's job to notice and to ask the designer about.</p>
   </aside>
 </section>
 
@@ -1275,9 +1275,9 @@ loadStalls();</script>
   <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
   <h2>Break. <em>15 min.</em></h2>
   <button class="timer" data-min="15"></button>
-  <p>After the break: sending data, CORS, races, then the team build on a real server.</p>
+  <p>After the break: sending data, CORS, races, then the build on a real server.</p>
   <aside class="notes">
-    <p>Start the timer. The break is a break: server setup happens in the team build's first five minutes. During the break, prepare the CORS demo (run sheet, checklist item 2) so slide "CORS, live" takes three minutes, not six.</p>
+    <p>Start the timer. The break is a break: server setup happens in the build's first five minutes. During the break, prepare the CORS demo (run sheet, checklist item 2) so slide "CORS, live" takes three minutes, not six.</p>
   </aside>
 </section>
 
@@ -1391,7 +1391,7 @@ try {
     </div>
   </div>
   <aside class="notes">
-    <p>~1:35. Optimistic UI suits actions that almost never fail and are cheap to undo: a ♥, a like. It's one of the team-build briefs ("Saved on the server"). For a review that the server may reject for validation reasons, pessimistic UI avoids showing something that then disappears.</p>
+    <p>~1:35. Optimistic UI suits actions that almost never fail and are cheap to undo: a ♥, a like. It's one of the briefs ("Saved on the server"). For a review that the server may reject for validation reasons, pessimistic UI avoids showing something that then disappears.</p>
   </aside>
 </section>
 
@@ -1423,7 +1423,7 @@ try {
 }</script>
   </div>
   <aside class="notes">
-    <p>~1:36. <code>required</code> and <code>maxlength</code> catch the obvious before a request is sent; anyone can send a request without your form (<code>curl</code>, DevTools), so the server is the only place a rule is enforced. Two ways to read a 422: branch on <code>response.status</code> with plain <code>fetch</code> (Exercise 4), or catch the <code>HttpError</code> that <code>api.js</code> throws and read <code>error.body.fields</code> (the team build). <code>showErrors(fields)</code> puts each message in the <code>.field-error</code> with the matching <code>data-for</code> and sets <code>aria-invalid</code>; it's Exercise 4's case 2. Never clear the form after a failure. The 10-character minimum exists only on the server, so the client can't know about it. A real form links each message with <code>aria-describedby</code> and moves focus to the first invalid field.</p>
+    <p>~1:36. <code>required</code> and <code>maxlength</code> catch the obvious before a request is sent; anyone can send a request without your form (<code>curl</code>, DevTools), so the server is the only place a rule is enforced. Two ways to read a 422: branch on <code>response.status</code> with plain <code>fetch</code> (Exercise 4), or catch the <code>HttpError</code> that <code>api.js</code> throws and read <code>error.body.fields</code> (the build). <code>showErrors(fields)</code> puts each message in the <code>.field-error</code> with the matching <code>data-for</code> and sets <code>aria-invalid</code>; it's Exercise 4's case 2. Never clear the form after a failure. The 10-character minimum exists only on the server, so the client can't know about it. A real form links each message with <code>aria-describedby</code> and moves focus to the first invalid field.</p>
   </aside>
 </section>
 
@@ -1625,7 +1625,7 @@ search.addEventListener("input", async () => {
 </section>
 
 <!-- =====================================================================
-     WRAP + TEAM BUILD
+     WRAP + BUILD
      ===================================================================== -->
 
 <section data-act="F" data-act-name="Wrap" data-at="2:11" data-title="Today in one slide">
@@ -1640,7 +1640,7 @@ search.addEventListener("input", async () => {
     <div class="card"><span class="label">time</span><p>Responses arrive out of order: abort what's obsolete. Disable what mustn't run twice.</p></div>
   </div>
   <aside class="notes">
-    <p>~2:11. One sentence per card. Keep it under two minutes: the team build is waiting.</p>
+    <p>~2:11. One sentence per card. Keep it under two minutes: the build is waiting.</p>
   </aside>
 </section>
 
@@ -1672,8 +1672,8 @@ search.addEventListener("input", async () => {
   </aside>
 </section>
 
-<section data-act="6" data-act-name="Team build" data-at="2:13" data-title="Team build — connect the market">
-  <p class="kicker">Team build · 45 min · individually</p>
+<section data-act="6" data-act-name="Build" data-at="2:13" data-title="Build — connect the market">
+  <p class="kicker">Build · 45 min · individually</p>
   <h2>Connect the market to the API</h2>
   <div class="split">
     <ol class="tasks">
@@ -1719,9 +1719,9 @@ harbour-api.lopin.me
   </aside>
 </section>
 
-<section class="exercise" data-title="Team build — go">
+<section class="exercise" data-title="Build — go">
   <span class="sticker your-turn">build</span>
-  <p class="kicker">Team build · until 3:00</p>
+  <p class="kicker">Build · until 3:00</p>
   <div class="ex-head"><h2>Connect the market</h2><button class="timer" data-min="45"></button></div>
   <ol>
     <li>Minute 12: <code>getJSON("/stalls")</code> gives ten stalls in the console.</li>

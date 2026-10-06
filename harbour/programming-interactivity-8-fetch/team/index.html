@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Team build · Over the wire</title>
+  <title>Build · Over the wire</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="../assets/kit.css">
   <link rel="stylesheet" href="team.css">
@@ -12,10 +12,10 @@
 </head>
 <body class="page wire">
   <div class="page-wrap">
-    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Team build · 45 min · demos next class</span></div>
-    <span class="eyebrow-tag">Team build</span>
+    <div class="page-top"><a href="../index.html">← Over the wire · all materials</a><span>Build · 45 min · individually · demos next class</span></div>
+    <span class="eyebrow-tag">Build</span>
     <h1>Connect it, then <em>ship a feature</em></h1>
-    <p class="intro">Solo or in pairs, against the course's HTTP server: everyone has their own market on it. Step 1 is the same for everyone: the market from Lecture 5 stops reading <code>data.js</code> and loads its vendors from the API. Step 2 is one feature from the briefs below, started in class if there's time and finished at home for the demo next class.</p>
+    <p class="intro">Individually, against the course's HTTP server: everyone has their own market on it. Step 1 is the same for everyone: the market from Lecture 5 stops reading <code>data.js</code> and loads its vendors from the API. Step 2 is one feature from the briefs below, started in class if there's time and finished at home for the demo next class.</p>
 
     <h2>Step 1 · everyone <em>(the 45 minutes)</em></h2>
     <ul class="tasks-grid">
@@ -42,7 +42,7 @@
 
     <h2>How you work</h2>
     <ul class="tasks">
-      <li><strong>In pairs, one laptop runs the code</strong>; the other person reads the brief, watches the Network panel and runs the checks.</li>
+      <li><strong>Your own laptop, fork and market</strong>: everyone builds and hands in their own pull request. Keep the brief and the Network panel open next to the page.</li>
       <li><strong>Minute 12 is the checkpoint</strong>: step 1's console check passes (<code>getJSON("/stalls")</code> gives 10 stalls). Not there? Usually setup (the username missing from <code>API</code>, live-server not running, the server not running): ask.</li>
       <li><strong>When something fails</strong>: the request in the Network panel (Headers, Payload, Response), then api.html, then a hint, then the teacher.</li>
     </ul>
@@ -51,8 +51,8 @@
     <p>Everyone has their own copy of the market on the course server: <code>https://harbour-api.lopin.me/&lt;your-github-username&gt;/api</code>. The control page <a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a> checks it, turns chaos on and off (latency, 503s), and resets it to the seed data. Nothing you do there affects anyone else. One slow and unreliable request only: add <code>?chaos=1</code> to its URL.</p>
 
     <h2>Demos <em>next class</em></h2>
-    <p>One per team, about your brief from step 2 (or, if you didn't get that far, the connected market).</p>
-    <div class="demo"><b>3 minutes per team</b>
+    <p>One per person, about your brief from step 2 (or, if you didn't get that far, the connected market).</p>
+    <div class="demo"><b>3 minutes each</b>
       <ol>
         <li><b>The happy path</b>, with the Network panel open next to the page.</li>
         <li><b>Chaos on</b>: the loading state, one failure, and how the page recovers.</li>

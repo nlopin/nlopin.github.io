@@ -1,11 +1,11 @@
 # Lecture 8 — Over the wire · run sheet
 
-Three hours, one 15-minute break, a 45-minute team build at the end. The
+Three hours, one 15-minute break, a 45-minute individual build at the end. The
 Harbour Night Market stops reading its vendors from `data.js` and becomes a
 client of the Harbour Market API: HTTP, asynchronous JavaScript (the event loop,
 promises, `.then` and `async`/`await`), `fetch`, async UI state, `POST` with
 validation, CORS and race conditions. About 71 minutes of teaching, 49 of
-exercises, 15 of break, 45 of team build.
+exercises, 15 of break, 45 of build.
 
 **Audience:** adult programmers; JavaScript is recent for most of them. Lecture
 5 (state, render, modules, `localStorage`) is assumed. Asynchronous JavaScript
@@ -13,7 +13,7 @@ is taught here, in Act 2 (slides 17–23): one thread, the event loop (with a
 step-through lab), promises with `.then` / `.catch` / `.finally`, and the same
 code with `async` / `await`. If Lectures 6–7 already covered it, run those
 slides as a 6-minute recap (skip the second lab program) and give the time to
-the team build.
+the build.
 
 ## The story in one paragraph
 
@@ -72,7 +72,7 @@ new source of events: a response arriving.
 - Serve the repository root over HTTP (`npx live-server` in the repo): the
   editors load `project/server/api-core.js` with a `<script>` tag, and the
   exercise pages load the race board's `../../race/race.js`.
-- Students need: a GitHub account and Node (live-server) for the team build, an editor, a browser, the
+- Students need: a GitHub account and Node (live-server) for the build, an editor, a browser, the
   exercises repo (github.com/nlopin/programming-interactivity-exercises →
   `08-fetch/`). Slide 4 asks them to check `node --version`.
 - `p` opens presenter view (notes, next slide, per-act clock).
@@ -97,13 +97,13 @@ includes about a minute of debrief and transition.
 | 1:54 | **Act 5 · Origins & races** (49–54) — same-origin policy, CORS + preflight, CORS live demo (3 min), race lab, AbortController | 11 | | | `playgrounds/race-lab.html` |
 | 2:05 | **Ex 5 · Search without races** (55) — case 1 | | 6 | AbortController | `exercises/05-races.html` |
 | 2:11 | **Wrap** (56–57) — today in one slide (incl. keys and tokens are public), homework | 2 | | | |
-| 2:13 | **Team build intro** (58–59) — connect the market: the four steps (individually); then the homework: feature requests as GitHub issues, one PR for review, AI allowed | 2 | | | `team/connect.html` |
-| 2:15 | **Team build** (60) — fork, clone, `npm start` in the first 5 minutes | | 45 | connect the market to the API, chaos on, a pull request | `team/connect.html`, the starter repo |
+| 2:13 | **Build intro** (58–59) — connect the market: the four steps (individually); then the homework: feature requests as GitHub issues, one PR for review, AI allowed | 2 | | | `team/connect.html` |
+| 2:15 | **Build** (60) — fork, clone, `npm start` in the first 5 minutes | | 45 | connect the market to the API, chaos on, a pull request | `team/connect.html`, the starter repo |
 | 3:00 | end | | | | |
 
-**The team build is the buffer.** If the first half runs 5 minutes late, the
+**The build is the buffer.** If the first half runs 5 minutes late, the
 build is 40 minutes: the four core items still fit; skip the chaos phase and
-tell teams to run it at home. The full briefs are homework by design.
+tell students to run it at home. The full briefs are homework by design.
 
 **Act 2 is the longest act** (19 minutes): async first (slides 17–23, about
 10 minutes), then fetch. The event loop lab is the centre: predict on slide
@@ -230,7 +230,7 @@ two requests are canceled, nothing uncaught. A request-counter solution
 the exercise is about `AbortController`. Bonus: debounce 250 ms + keep the
 abort.
 
-## The team build
+## The build
 
 **Everyone does the same task first: connect the market** (`team/connect.html`).
 Students fork **github.com/nlopin/harbour-market-starter**: `starter/`,
@@ -277,10 +277,10 @@ states · errors) is homework. Brief 6's point is the opposite of
 | 7 Currency (spare) | third-party API, `Intl.NumberFormat` | float noise, converting twice |
 | 8 Load more (spare) | pagination headers | `getJSON` hides headers; mixing two lists |
 
-Minute 12 is the checkpoint: every team shows you one request of theirs in the
-Network panel. A team that can't is stuck on setup: page opened from the file
+Minute 12 is the checkpoint: everyone shows you one request of theirs in the
+Network panel. Anyone who can't is stuck on setup: page opened from the file
 system, wrong port, server not running. Demos open the next class (3 minutes
-per team: happy path with the Network panel, chaos on, one request in code, one
+each: happy path with the Network panel, chaos on, one request in code, one
 bug).
 
 ## Things students ask, and short answers
