@@ -9,10 +9,23 @@ routes = [
   { pattern = "harbour-api.lopin.me", custom_domain = true }
 ]
 
+# Share of API requests answered with a random 500, for every market.
+# Students can't change it; "0" turns it off.
+[vars]
+RANDOM_500_RATE = "0.1"
+
 [[durable_objects.bindings]]
 name = "MARKET"
 class_name = "Market"
 
+[[durable_objects.bindings]]
+name = "REGISTRY"
+class_name = "Registry"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Market"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Registry"]

@@ -24,6 +24,20 @@ Routes:
 ?chaos=1                  1.2 s + 30 % 503s for one request
 ```
 
+`RANDOM_500_RATE` (wrangler.toml, `"0.1"`) answers that share of every
+market's API requests with a 500 before they reach the API; students can't
+turn it off. Set it to `"0"` and redeploy to disable.
+
+Teacher routes need `Authorization: Bearer <TEACHER_KEY>` (a wrangler secret;
+the key is in `../.private/teacher-key.txt`, gitignored):
+
+```sh
+K=$(cat ../.private/teacher-key.txt)
+curl -H "Authorization: Bearer $K" https://harbour-api.lopin.me/_markets          # every market: last seen, counts
+curl -H "Authorization: Bearer $K" https://harbour-api.lopin.me/<user>/api/_dump  # one market's stored data
+npx wrangler secret put TEACHER_KEY                                                # change the key
+```
+
 Every response carries `Access-Control-Allow-Origin: *`; preflights are
 answered. Limits per namespace: 500 reviews, 500 orders, 60 stalls, 100 kB
 bodies. The free plan covers a class comfortably (100,000 requests a day).

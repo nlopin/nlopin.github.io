@@ -1,30 +1,41 @@
 // Runs the Worker in Node with an in-memory stand-in for Durable Objects.
 // node test/worker.test.js
 import assert from "node:assert/strict";
-import worker, { Market } from "../src/index.js";
+import worker, { Market, Registry } from "../src/index.js";
 
-// --- a fake MARKET binding: one Market per name, storage in a Map --------------------
+// --- fake Durable Object bindings: one instance per name, storage in a Map ---------
 const storages = new Map();
 const instances = new Map();
-function makeEnv({ fresh = false } = {}) {
-  if (fresh) instances.clear(); // a new process: objects are rebuilt from storage
+const TEACHER_KEY = "test-teacher-key";
+let vars = { RANDOM_500_RATE: "0", TEACHER_KEY };
+function binding(prefix, Class, env) {
   return {
-    MARKET: {
-      idFromName: (name) => name,
-      get: (id) => {
-        if (!instances.has(id)) {
-          if (!storages.has(id)) storages.set(id, new Map());
-          const map = storages.get(id);
-          const state = {
-            storage: { get: async (k) => structuredClone(map.get(k)), put: async (k, v) => { map.set(k, structuredClone(v)); }, delete: async (k) => map.delete(k) },
-            blockConcurrencyWhile: (fn) => fn(),
-          };
-          instances.set(id, new Market(state));
-        }
-        return instances.get(id);
-      },
+    idFromName: (name) => prefix + name,
+    get: (id) => {
+      if (!instances.has(id)) {
+        if (!storages.has(id)) storages.set(id, new Map());
+        const map = storages.get(id);
+        const state = {
+          storage: {
+            get: async (k) => structuredClone(map.get(k)),
+            put: async (k, v) => { map.set(k, structuredClone(v)); },
+            delete: async (k) => map.delete(k),
+            list: async ({ prefix: p = "" } = {}) => new Map([...map].filter(([k]) => k.startsWith(p)).map(([k, v]) => [k, structuredClone(v)])),
+          },
+          blockConcurrencyWhile: (fn) => fn(),
+        };
+        instances.set(id, new Class(state, env));
+      }
+      return instances.get(id);
     },
   };
+}
+function makeEnv({ fresh = false } = {}) {
+  if (fresh) instances.clear(); // a new process: objects are rebuilt from storage
+  const env = { ...vars };
+  env.MARKET = binding("market:", Market, env);
+  env.REGISTRY = binding("registry:", Registry, env);
+  return env;
 }
 let env = makeEnv();
 const BASE = "https://harbour-api.lopin.me";
@@ -141,13 +152,72 @@ await test("pagination Link headers point into the namespace", async () => {
 });
 
 await test("a namespace has limits", async () => {
-  const m = env.MARKET.get("frank");
+  const m = env.MARKET.get(env.MARKET.idFromName("frank"));
   await m.ready;
   m.api.db.reviews.length = 0;
   for (let i = 0; i < 500; i++) m.api.db.reviews.push({ id: "x" + i, stallId: "mezcal" });
   const r = await post("/frank/api/stalls/mezcal/reviews", { author: "F", rating: 3, text: "One review too many." });
   assert.equal(r.status, 409);
   assert.equal((await r.json()).error, "namespace_full");
+});
+
+await test("random 500s: the configured share, nothing stored, other routes exempt", async () => {
+  vars = { ...vars, RANDOM_500_RATE: "1" };
+  env = makeEnv({ fresh: true });
+  const r = await post("/grace/api/stalls/mezcal/reviews", { author: "Grace", rating: 4, text: "Should not be stored." });
+  assert.equal(r.status, 500);
+  assert.equal((await r.json()).error, "internal_error");
+  assert.equal(r.headers.get("access-control-allow-origin"), "*", "a 500 is still readable cross-origin");
+  assert.equal((await call("/grace/api/_chaos")).status, 200, "course endpoints are exempt");
+  vars = { ...vars, RANDOM_500_RATE: "0" };
+  env = makeEnv({ fresh: true });
+  const list = await (await call("/grace/api/stalls/mezcal/reviews")).json();
+  assert.ok(!list.some((x) => x.author === "Grace"), "the failed POST stored nothing");
+  vars = { ...vars, RANDOM_500_RATE: "0.1" };
+  env = makeEnv({ fresh: true });
+  let fails = 0;
+  for (let i = 0; i < 400; i++) if ((await call("/heidi/api/stalls/mezcal")).status === 500) fails++;
+  assert.ok(fails > 15 && fails < 75, `about 10 % (${fails} of 400)`);
+  vars = { ...vars, RANDOM_500_RATE: "0" };
+  env = makeEnv({ fresh: true });
+});
+
+await test("teacher routes need the key", async () => {
+  assert.equal((await call("/_markets")).status, 401);
+  assert.equal((await call("/alice/api/_dump")).status, 401);
+  assert.equal((await call("/_markets", { headers: { Authorization: "Bearer wrong" } })).status, 401);
+});
+
+await test("teacher: one market's whole content", async () => {
+  await post("/ivan/api/stalls/taco-bike/reviews", { author: "Ivan", rating: 5, text: "For the teacher's dump." });
+  await call("/ivan/api/saved/mezcal", { method: "PUT" });
+  const r = await call("/ivan/api/_dump", { headers: { Authorization: `Bearer ${TEACHER_KEY}` } });
+  assert.equal(r.status, 200);
+  const d = await r.json();
+  assert.equal(d.market, "ivan");
+  assert.deepEqual(d.saved, ["mezcal"]);
+  assert.ok(d.reviews.some((x) => x.author === "Ivan"));
+  assert.ok(Array.isArray(d.stalls) && d.chaos);
+});
+
+await test("teacher: the list of markets, most recent first", async () => {
+  const r = await call("/_markets", { headers: { Authorization: `Bearer ${TEACHER_KEY}` } });
+  assert.equal(r.status, 200);
+  const { count, markets } = await r.json();
+  assert.ok(count >= 2);
+  const ivan = markets.find((m) => m.name === "ivan");
+  assert.ok(ivan && ivan.saved === 1 && ivan.reviews >= 17);
+  assert.equal(markets[0].name, "ivan", "the latest write is first");
+});
+
+await test("without a TEACHER_KEY secret, teacher routes say how to set it", async () => {
+  vars = { ...vars, TEACHER_KEY: undefined };
+  env = makeEnv();
+  const r = await call("/_markets");
+  assert.equal(r.status, 503);
+  assert.match((await r.json()).message, /wrangler secret put TEACHER_KEY/);
+  vars = { ...vars, TEACHER_KEY };
+  env = makeEnv();
 });
 
 console.log(`\n${passed} passed`);

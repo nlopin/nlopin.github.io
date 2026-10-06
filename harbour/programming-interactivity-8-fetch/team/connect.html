@@ -17,7 +17,7 @@
     <h1>Connect the <em>market</em></h1>
     <p class="intro">The market from Lecture 5 still reads its vendors from <code>js/data.js</code>, typed by hand. The course server has the real list, with two more stalls and their ratings, and you have your own copy of it. Connect the two: every request through one module, the stalls in <code>state</code>, and a page that says what's happening while the data is on its way, or when it doesn't arrive.</p>
     <p class="story">“The website says eight stalls. The market has ten.”</p>
-    <div class="tip"><p style="margin:0"><strong>Done means:</strong> <code>localhost:8080</code> shows ten vendors with ratings, loaded with one <code>GET …/api/stalls</code> from your market. With chaos on (<a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>), a reload shows "Loading the vendors…", a failed one shows a sentence and a Try again button that recovers, and the console has no <code>Uncaught</code>. <code>data.js</code> is deleted.</p></div>
+    <div class="tip"><p style="margin:0"><strong>Done means:</strong> <code>localhost:8080</code> shows ten vendors with ratings, loaded with one <code>GET …/api/stalls</code> from your market. The course server fails about 1 request in 10 with a 500 on purpose, so the error path runs even without chaos. With chaos on (<a href="https://harbour-api.lopin.me">harbour-api.lopin.me</a>), a reload shows "Loading the vendors…", a failed one shows a sentence and a Try again button that recovers, and the console has no <code>Uncaught</code>. <code>data.js</code> is deleted.</p></div>
 
     <h2>Set up <em>(5 minutes)</em></h2>
     <ol class="tasks">
@@ -56,6 +56,7 @@
       <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → <em>Offline</em>, reload: "no connection", not "the server answered undefined".</span></li>
       <li><input type="checkbox" aria-label="checked"><span>Back online, press Try again.</span></li>
       <li><input type="checkbox" aria-label="checked"><span>Failures set to "all → 503" on the control page: the message names the status; Try again keeps failing politely.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Reload ten times without chaos: about one load hits the random 500. The page says so and Try again works.</span></li>
       <li><input type="checkbox" aria-label="checked"><span>Filter to Music, then reload with chaos on: the filter survives (<code>localStorage</code>), the stalls arrive later.</span></li>
       <li><input type="checkbox" aria-label="checked"><span>Use the page with the keyboard only: Tab to Try again, press <kbd>Enter</kbd>. Where is focus afterwards?</span></li>
       <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → throttling <em>Slow 4G</em>: is the loading state visible, and does it go away?</span></li>

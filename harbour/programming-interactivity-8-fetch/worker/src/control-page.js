@@ -45,7 +45,7 @@ export function controlPage(origin) {
 
   <section>
     <h2>Chaos</h2>
-    <p>Make your market slow and unreliable, to test loading and error states. Only your market is affected. One request only: add <code>?chaos=1</code> to its URL.</p>
+    <p>Make your market slow and unreliable, to test loading and error states. Only your market is affected. One request only: add <code>?chaos=1</code> to its URL. Independently of these switches, the server answers about 1 request in 10 with a 500, always: your page has to handle it.</p>
     <div class="row">
       <label for="latency" style="margin:0">Latency</label>
       <select id="latency"><option value="0">none</option><option value="500">0.5 s</option><option value="1200">1.2 s</option><option value="3000">3 s</option></select>
@@ -92,7 +92,10 @@ export function controlPage(origin) {
     try {
       const r = await fetch(base() + "/stalls");
       const data = await r.json();
-      $("#check-out").textContent = "GET " + base() + "/stalls → " + r.status + " · " + data.length + " stalls · " + Math.round(performance.now() - t) + " ms";
+      const ms = Math.round(performance.now() - t) + " ms";
+      $("#check-out").textContent = r.ok
+        ? "GET " + base() + "/stalls → " + r.status + " · " + data.length + " stalls · " + ms
+        : "GET " + base() + "/stalls → " + r.status + " · " + (data.message || data.error) + " · " + ms + (r.status === 500 ? " (the random 500: press Check again)" : "");
     } catch (e) { $("#check-out").textContent = "No response: " + e.message; }
   });
   $("#save").addEventListener("click", async () => {

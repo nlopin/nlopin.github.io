@@ -56,7 +56,12 @@ new source of events: a response arriving.
   isolated, resettable. Chaos is per market (`PUT /api/_chaos`) or per request
   (`?chaos=1`); the control page at the root sets both and resets. Every
   response sends `Access-Control-Allow-Origin: *`. `npx wrangler tail` in
-  `worker/` shows everyone's requests live.
+  `worker/` shows everyone's requests live. About 10 % of requests get a random
+  500 (`RANDOM_500_RATE` in `worker/wrangler.toml`), on purpose: the error
+  path runs even without chaos. Teacher routes, with the key in
+  `.private/teacher-key.txt`: `GET /_markets` (every market, last seen,
+  counts: who's connected) and `GET /<user>/api/_dump` (one market's data);
+  see `worker/README.md` for the curl commands.
 - **The local server** (`npm start` in `project/server`) is the fallback for a
   dead classroom network and the Act 5 CORS demo: it serves
   `.private/solution/` and `/api` on `http://localhost:3000`, CORS off unless

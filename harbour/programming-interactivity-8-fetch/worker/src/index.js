@@ -13,6 +13,14 @@
      PUT  /<ns>/api/_chaos          { "latency": 1200, "fail": 0.3 }
      POST /<ns>/api/_reset          back to the seed data
      ?chaos=1 on any request        slow and unreliable for that request only
+
+   On top of the chaos settings, RANDOM_500_RATE (wrangler.toml, server-wide,
+   students can't turn it off) answers that share of API requests with a 500
+   before they reach the API.
+
+   Teacher routes, with Authorization: Bearer <TEACHER_KEY> (a wrangler secret):
+     GET /_markets                  every market: last activity, counts
+     GET /<ns>/api/_dump            one market's stored data, whole
    ========================================================================== */
 import HarbourAPI from "../../project/server/api-core.js";
 import { controlPage } from "./control-page.js";
@@ -47,6 +55,13 @@ export default {
     }
     if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
 
+    if (url.pathname === "/_markets") {
+      const denied = teacherOnly(request, env);
+      if (denied) return denied;
+      const registry = env.REGISTRY.get(env.REGISTRY.idFromName("all"));
+      return registry.fetch(new Request("https://registry.internal/list"));
+    }
+
     const match = url.pathname.match(/^\/([^/]+)(\/api(?:\/.*)?)$/);
     if (!match) {
       return json(404, {
@@ -63,9 +78,17 @@ export default {
     }
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: PREFLIGHT });
 
+    if (match[2] === "/api/_dump") {
+      const denied = teacherOnly(request, env);
+      if (denied) return denied;
+    }
+
     const stub = env.MARKET.get(env.MARKET.idFromName(namespace));
     const inner = new URL(match[2] + url.search, "https://market.internal");
-    const response = await stub.fetch(new Request(inner, request));
+    const forwarded = new Request(inner, request);
+    forwarded.headers.set("X-Market", namespace);
+    forwarded.headers.set("X-Random-500", String(Number(env.RANDOM_500_RATE ?? 0) || 0));
+    const response = await stub.fetch(forwarded);
     const headers = new Headers(response.headers);
     for (const [k, v] of Object.entries(CORS)) headers.set(k, v);
     // the API speaks in /api/… paths; from outside, they live under /<namespace>
@@ -77,10 +100,20 @@ export default {
   },
 };
 
+function teacherOnly(request, env) {
+  if (!env.TEACHER_KEY) return json(503, { error: "not_configured", message: "Set the secret: npx wrangler secret put TEACHER_KEY" });
+  if (request.headers.get("Authorization") !== `Bearer ${env.TEACHER_KEY}`) {
+    return json(401, { error: "unauthorized", message: "Teacher route: Authorization: Bearer <TEACHER_KEY>" }, { "WWW-Authenticate": 'Bearer realm="harbour-teacher"' });
+  }
+  return null;
+}
+
 /* ---- one market per namespace ------------------------------------------------ */
 export class Market {
-  constructor(state) {
+  constructor(state, env) {
     this.state = state;
+    this.env = env;
+    this.lastReport = 0;
     this.chaos = { latency: 0, fail: 0 };
     this.ready = state.blockConcurrencyWhile(async () => {
       const saved = await state.storage.get("db");
@@ -95,6 +128,8 @@ export class Market {
     const method = request.method.toUpperCase();
     const path = url.pathname;
 
+    this.name = request.headers.get("X-Market") || this.name;
+    if (path === "/api/_dump") return json(200, { market: this.name, chaos: this.chaos, ...this.api.dump() });
     if (path === "/api/_chaos") return this.chaosEndpoint(request, method);
     if (path === "/api/_reset") {
       if (method !== "POST") return json(405, { error: "method_not_allowed", message: "POST /api/_reset" }, { Allow: "POST" });
@@ -106,6 +141,13 @@ export class Market {
     const body = method === "GET" || method === "HEAD" ? null : await request.text();
     if (body && body.length > MAX_BODY) return json(413, { error: "too_large", message: "The body is larger than 100 kB." });
 
+    // the server-wide random failure: before the API, so nothing is stored
+    const rate = Number(request.headers.get("X-Random-500")) || 0;
+    if (rate && Math.random() < rate) {
+      await this.report(false);
+      return json(500, { error: "internal_error", message: "Something went wrong on the server. Try again." });
+    }
+
     const full = this.full(method, path);
     if (full) return json(409, { error: "namespace_full", message: `This market already has ${LIMITS[full]} ${full}. Reset it: POST /api/_reset.` });
 
@@ -116,7 +158,9 @@ export class Market {
     this.api.config.failRate = chaos.fail;
 
     const out = this.api.handle({ method, path, query, headers: Object.fromEntries(request.headers), body });
-    if (method !== "GET" && method !== "HEAD" && out.status < 400) await this.state.storage.put("db", this.api.dump());
+    const wrote = method !== "GET" && method !== "HEAD" && out.status < 400;
+    if (wrote) await this.state.storage.put("db", this.api.dump());
+    await this.report(wrote);
 
     const wait = (chaos.latency || 0) + (out.delay || 0);
     if (wait) await new Promise((resolve) => setTimeout(resolve, wait));
@@ -125,6 +169,18 @@ export class Market {
       statusText: out.statusText,
       headers: { ...out.headers, "Cache-Control": "no-store" },
     });
+  }
+
+  // Tells the registry this market is alive: at most every 30 s, or after a write
+  async report(wrote) {
+    const now = Date.now();
+    if (!this.env?.REGISTRY || !this.name || (!wrote && now - this.lastReport < 30_000)) return;
+    this.lastReport = now;
+    const db = this.api.db;
+    const info = { name: this.name, lastSeen: new Date(now).toISOString(), reviews: db.reviews.length, orders: db.orders.length, saved: db.saved.size, stalls: db.stalls.length, chaos: this.chaos };
+    try {
+      await this.env.REGISTRY.get(this.env.REGISTRY.idFromName("all")).fetch(new Request("https://registry.internal/report", { method: "POST", body: JSON.stringify(info) }));
+    } catch { /* the registry is a convenience: never fail a student's request for it */ }
   }
 
   full(method, path) {
@@ -149,5 +205,23 @@ export class Market {
     this.chaos = { latency: Math.round(latency), fail };
     await this.state.storage.put("chaos", this.chaos);
     return json(200, this.chaos);
+  }
+}
+
+/* ---- the list of markets, for the teacher --------------------------------------- */
+export class Registry {
+  constructor(state) {
+    this.state = state;
+  }
+
+  async fetch(request) {
+    if (request.method === "POST") {
+      const info = await request.json();
+      await this.state.storage.put("m:" + info.name, info);
+      return new Response(null, { status: 204 });
+    }
+    const entries = await this.state.storage.list({ prefix: "m:" });
+    const markets = [...entries.values()].sort((a, b) => (a.lastSeen < b.lastSeen ? 1 : -1));
+    return json(200, { count: markets.length, markets });
   }
 }
