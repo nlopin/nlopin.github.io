@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <title>Quiz · Pick a surface</title>
+  <!-- the race board reads this page: one question per fieldset[data-q], the options from its radios -->
+  <meta name="race-tasks" content="5">
+  <meta name="race-quiz" content="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+  <style>
+    :root { color-scheme: dark; --bg: #060b17; --card: #0b1426; --line: #1f3052; --ink: #e3ecff; --muted: #8599c2; --act: #3ee6ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px 96px; background: var(--bg); color: var(--ink); font: 400 18px/1.45 "Space Grotesk", system-ui, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; }
+    .kicker { font: 600 13px "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--act); margin: 0; }
+    h1 { font-size: 34px; line-height: 1.05; letter-spacing: -0.03em; margin: 6px 0 8px; }
+    .lede { color: var(--muted); margin: 0 0 24px; }
+    fieldset { border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); margin: 0 0 14px; padding: 14px 16px 16px; }
+    /* float keeps a two-line question inside the box instead of across its border */
+    legend { float: left; width: 100%; padding: 0; margin: 0 0 10px; font-weight: 700; color: #fff; }
+    .options { clear: both; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
+    label { position: relative; display: block; text-align: center; padding: 12px 6px; border: 1.5px solid var(--line); border-radius: 8px; font: 600 16px "IBM Plex Mono", monospace; cursor: pointer; }
+    label input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+    label:has(input:checked) { background: var(--act); border-color: var(--act); color: #03101b; }
+    label:has(input:focus-visible) { outline: 3px solid #fff; outline-offset: 2px; }
+    .gate { border: 1.5px dashed var(--act); border-radius: 10px; padding: 18px 16px; text-align: center; }
+    .gate p { margin: 0 0 12px; }
+    .gate button { font: 700 17px "Space Grotesk", sans-serif; color: #03101b; background: var(--act); border: 0; border-radius: 99px; padding: 12px 20px; cursor: pointer; }
+    .status { font: 500 15px "IBM Plex Mono", monospace; color: var(--muted); margin: 18px 0 0; }
+    .status b { color: var(--act); }
+  </style>
+</head>
+<body>
+<main>
+  <p class="kicker">Lecture 9 · quick check</p>
+  <h1>HTML, SVG or canvas?</h1>
+  <p class="lede">Pick a surface for each picture. You can change an answer until we look at the results.</p>
+
+  <div class="gate">
+    <p>Join first: your name and the code on the big screen.</p>
+    <button type="button" class="join">🏁 Join to see the questions</button>
+  </div>
+
+  <form class="quiz" hidden>
+    <fieldset data-q="0">
+      <legend>1 · The 64 bits of a JavaScript number, click to flip one</legend>
+      <div class="options">
+        <label><input type="radio" name="q0" value="html">HTML</label>
+        <label><input type="radio" name="q0" value="svg">SVG</label>
+        <label><input type="radio" name="q0" value="canvas">canvas</label>
+      </div>
+    </fieldset>
+    <fieldset data-q="1">
+      <legend>2 · 50 000 cars on a ring road</legend>
+      <div class="options">
+        <label><input type="radio" name="q1" value="html">HTML</label>
+        <label><input type="radio" name="q1" value="svg">SVG</label>
+        <label><input type="radio" name="q1" value="canvas">canvas</label>
+      </div>
+    </fieldset>
+    <fieldset data-q="2">
+      <legend>3 · A line chart with a tooltip per point</legend>
+      <div class="options">
+        <label><input type="radio" name="q2" value="html">HTML</label>
+        <label><input type="radio" name="q2" value="svg">SVG</label>
+        <label><input type="radio" name="q2" value="canvas">canvas</label>
+      </div>
+    </fieldset>
+    <fieldset data-q="3">
+      <legend>4 · A photo, before and after a filter</legend>
+      <div class="options">
+        <label><input type="radio" name="q3" value="html">HTML</label>
+        <label><input type="radio" name="q3" value="svg">SVG</label>
+        <label><input type="radio" name="q3" value="canvas">canvas</label>
+      </div>
+    </fieldset>
+    <fieldset data-q="4">
+      <legend>5 · A graph of 30 nodes and their links, draggable</legend>
+      <div class="options">
+        <label><input type="radio" name="q4" value="html">HTML</label>
+        <label><input type="radio" name="q4" value="svg">SVG</label>
+        <label><input type="radio" name="q4" value="canvas">canvas</label>
+      </div>
+    </fieldset>
+  </form>
+  <p class="status" aria-live="polite"></p>
+</main>
+
+<script type="module">
+  // Answers live in this browser first; race.js sends them to the board once joined.
+  const KEY = `quiz:${location.pathname}`;
+  const form = document.querySelector(".quiz");
+  const gate = document.querySelector(".gate");
+  // the dock's button belongs to race.js and opens its join dialog
+  gate.querySelector(".join").addEventListener("click", () => document.querySelector(".race-dock button")?.click());
+  const status = document.querySelector(".status");
+  const total = form.querySelectorAll("fieldset[data-q]").length;
+  let joined = false;
+
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
+  const save = (answers) => { try { localStorage.setItem(KEY, JSON.stringify(answers)); } catch (e) {} };
+  const answers = load();
+
+  const send = (q, value) => document.dispatchEvent(new CustomEvent("race:answer", { detail: { task: q, value } }));
+
+  function render() {
+    for (const [name, value] of Object.entries(answers)) {
+      const input = form.querySelector(`input[name="${name}"][value="${value}"]`);
+      if (input) input.checked = true;
+    }
+    form.hidden = !joined;
+    gate.hidden = joined;
+    const count = Object.keys(answers).length;
+    status.innerHTML = joined ? `<b>${count} of ${total}</b> answered · sent to the board` : "";
+  }
+
+  form.addEventListener("change", (event) => {
+    const input = event.target;
+    answers[input.name] = input.value;
+    save(answers);
+    send(Number(input.name.slice(1)), input.value);
+    render();
+  });
+
+  document.addEventListener("race:joined", () => {
+    joined = true;
+    for (const [name, value] of Object.entries(answers)) send(Number(name.slice(1)), value);
+    render();
+  });
+
+  render();
+</script>
+<script type="module" src="../../race/race.js"></script>
+</body>
+</html>

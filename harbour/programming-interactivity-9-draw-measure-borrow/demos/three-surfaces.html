@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three surfaces · the same bar chart</title>
+<style>
+  :root { color-scheme: dark; --bg: #12151c; --card: #1b202b; --line: #2c3342; --ink: #e8ecf4; --muted: #8a93a6; --bar: #3ee6ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; font: 16px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  .lede { margin: 0 0 24px; color: var(--muted); max-width: 70ch; }
+  .surfaces { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+  h2 { margin: 0 0 12px; font-size: 18px; }
+  h2 small { font-weight: 400; color: var(--muted); }
+  .out { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+  pre { margin: 0; padding: 12px 14px; background: #0b0e14; border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; }
+  .hint { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+
+  /* the three charts: each 200 × 100, scaled to the column */
+  .chart, svg, canvas { display: block; width: 100%; aspect-ratio: 2 / 1; height: auto; }
+
+  /* HTML + CSS */
+  .chart { display: flex; align-items: end; gap: 5%; }
+  .chart div { width: 15%; background: var(--bar); }
+
+  /* SVG */
+  svg rect { fill: var(--bar); }
+</style>
+</head>
+<body>
+<h1>The same bar chart, three times</h1>
+<p class="lede">Five numbers, drawn with HTML and CSS, with SVG, and with canvas. Open DevTools → Elements and look inside each one: the HTML and the inline SVG are elements you can select, style and click; the canvas is one element, and what's drawn on it is a bitmap.</p>
+
+<div class="surfaces">
+  <section>
+    <h2>HTML + CSS <small>· elements</small></h2>
+    <div class="out" id="html-out">
+      <div class="chart">
+        <div style="height: 90%"></div>
+        <div style="height: 60%"></div>
+        <div style="height: 75%"></div>
+        <div style="height: 40%"></div>
+        <div style="height: 55%"></div>
+      </div>
+    </div>
+    <pre id="html-code"></pre>
+    <p class="hint">Plus two CSS rules: <code>.chart { display: flex; align-items: end; gap: 5%; }</code> and <code>.chart div { width: 15%; background: … }</code>.</p>
+  </section>
+
+  <section>
+    <h2>SVG <small>· elements</small></h2>
+    <div class="out" id="svg-out">
+      <svg viewBox="0 0 200 100" role="img" aria-label="Five bars: 90, 60, 75, 40, 55">
+        <rect x="0"   y="10" width="30" height="90" />
+        <rect x="40"  y="40" width="30" height="60" />
+        <rect x="80"  y="25" width="30" height="75" />
+        <rect x="120" y="60" width="30" height="40" />
+        <rect x="160" y="45" width="30" height="55" />
+      </svg>
+    </div>
+    <pre id="svg-code"></pre>
+    <p class="hint">The <code>viewBox</code> is a coordinate system: 200 × 100 units, whatever the size on screen. y grows downwards, so a bar of height 90 starts at y = 10.</p>
+  </section>
+
+  <section>
+    <h2>canvas <small>· pixels, JavaScript only</small></h2>
+    <div class="out">
+      <canvas width="200" height="100" aria-label="Five bars: 90, 60, 75, 40, 55">Five bars: 90, 60, 75, 40, 55</canvas>
+    </div>
+    <pre id="canvas-code"></pre>
+    <p class="hint">The canvas has no markup to show: the elements panel has one <code>&lt;canvas&gt;</code>, nothing inside it. On a 2× screen these bars are slightly soft: see "The blurry canvas" in the slides.</p>
+  </section>
+</div>
+
+<script id="draw">
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+const heights = [90, 60, 75, 40, 55];
+
+ctx.fillStyle = "#3ee6ff";
+heights.forEach((h, i) => {
+  ctx.fillRect(i * 40, 100 - h, 30, h);
+});
+</script>
+
+<script>
+// Show the code that actually drew each chart: the markup as it is in this file,
+// and the canvas script above. Nothing below this line draws anything.
+function dedent(text) {
+  const lines = text.replace(/^\n+|\s+$/g, "").split("\n");
+  const indent = Math.min(...lines.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
+  return lines.map((l) => l.slice(indent)).join("\n");
+}
+document.querySelector("#html-code").textContent = dedent(document.querySelector("#html-out").innerHTML);
+document.querySelector("#svg-code").textContent = dedent(document.querySelector("#svg-out").innerHTML);
+document.querySelector("#canvas-code").textContent = dedent(document.querySelector("#draw").textContent);
+</script>
+</body>
+</html>

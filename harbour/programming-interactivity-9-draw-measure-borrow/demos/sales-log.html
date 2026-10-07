@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales log · Harbour Night Market</title>
+<style>
+  :root { color-scheme: dark; --bg: #12151c; --card: #1b202b; --line: #2c3342; --ink: #e8ecf4; --muted: #8a93a6; --gold: #ffb547; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { position: sticky; top: 0; z-index: 1; display: flex; gap: 16px; align-items: center; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 20px; }
+  input { font: inherit; padding: 8px 12px; width: 280px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+  .count { color: var(--muted); margin-left: auto; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; padding: 20px; }
+  .log { list-style: none; margin: 0; padding: 0; }
+  .row { display: grid; grid-template-columns: 60px 180px minmax(0, 1fr) 70px 140px; gap: 12px; align-items: center; height: 32px; padding: 0 10px; border-bottom: 1px solid var(--line); }
+  .row time, .row .qty { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .track { height: 8px; background: var(--line); border-radius: 4px; }
+  .bar { height: 100%; background: var(--gold); border-radius: 4px; }
+  aside { position: sticky; top: 80px; align-self: start; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  aside h2 { margin: 0 0 8px; font-size: 16px; }
+  aside ol { margin: 0; padding-left: 20px; }
+  aside li { display: flex; justify-content: space-between; gap: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sales log</h1>
+  <input type="search" placeholder="Search stalls and items…" aria-label="Search the sales log">
+  <span class="count" aria-live="polite"></span>
+</header>
+<main>
+  <ul class="log"></ul>
+  <aside>
+    <h2>Top items tonight</h2>
+    <ol class="top"></ol>
+  </aside>
+</main>
+
+<script type="module">
+// The data: 100 000 sales from one night, generated from a fixed seed
+// so everyone sees the same log.
+const STALLS = {
+  "Dumpling Dynasty": ["pork dumplings", "veg dumplings", "chilli oil", "bao"],
+  "Taco Bike": ["al pastor", "carnitas", "veg taco", "horchata"],
+  "Churros Till Late": ["churros", "chocolate", "dulce de leche"],
+  "Noodle Boat": ["dan dan", "pho", "ramen", "cold noodles"],
+  "Grill Nation": ["skewers", "corn", "halloumi", "lemonade"],
+  "Sweet Harbour": ["mochi", "waffles", "ice cream", "bubble tea"],
+  "Arepa Corner": ["reina pepiada", "domino", "papelón"],
+  "Spice Route": ["samosa", "chai", "pani puri", "lassi"],
+};
+const names = Object.keys(STALLS);
+
+let seed = 42;
+const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+
+const sales = [];
+for (let i = 0; i < 100_000; i++) {
+  const stall = names[Math.floor(random() * names.length)];
+  const items = STALLS[stall];
+  const minute = Math.floor((i / 100_000) * 360); // 18:00 → 24:00
+  sales.push({
+    id: i,
+    time: `${18 + Math.floor(minute / 60)}:${String(minute % 60).padStart(2, "0")}`,
+    stall,
+    item: items[Math.floor(random() * items.length)],
+    qty: 1 + Math.floor(random() * 4),
+    total: Math.round((3 + random() * 12) * 100) / 100,
+  });
+}
+const maxTotal = sales.reduce((max, s) => Math.max(max, s.total), 0);
+
+const state = { query: "" };
+
+const input = document.querySelector("input");
+const list = document.querySelector(".log");
+const count = document.querySelector(".count");
+const top = document.querySelector(".top");
+
+function matches(sale, query) {
+  return sale.stall.toLowerCase().includes(query) || sale.item.toLowerCase().includes(query);
+}
+
+function topItems() {
+  const items = [...new Set(sales.map((s) => `${s.stall} · ${s.item}`))];
+  return items
+    .map((name) => ({
+      name,
+      sold: sales.filter((s) => `${s.stall} · ${s.item}` === name).reduce((sum, s) => sum + s.qty, 0),
+    }))
+    .sort((a, b) => b.sold - a.sold)
+    .slice(0, 5);
+}
+
+function row(sale) {
+  const li = document.createElement("li");
+  li.className = "row";
+  li.innerHTML = `<time></time><b></b><span></span><span class="qty"></span><div class="track"><div class="bar"></div></div>`;
+  li.querySelector("time").textContent = sale.time;
+  li.querySelector("b").textContent = sale.stall;
+  li.querySelector("span").textContent = sale.item;
+  li.querySelector(".qty").textContent = `×${sale.qty}`;
+  li.querySelector(".bar").style.width = `${(sale.total / maxTotal) * 100}%`;
+  return li;
+}
+
+function render() {
+  const query = state.query.trim().toLowerCase();
+  const visible = sales.filter((s) => matches(s, query));
+
+  list.replaceChildren();
+  for (const sale of visible) list.append(row(sale));
+  count.textContent = `${visible.length.toLocaleString("en")} sales`;
+
+  top.replaceChildren(...topItems().map(({ name, sold }) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span></span><b></b>`;
+    li.querySelector("span").textContent = name;
+    li.querySelector("b").textContent = sold;
+    return li;
+  }));
+}
+
+input.addEventListener("input", () => {
+  state.query = input.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

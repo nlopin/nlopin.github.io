@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 2 · Profile it</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <style>
+    .page-top { flex-wrap: wrap; }
+    .case { margin: 3rem 0 0; padding-top: 2rem; border-top: 2px solid var(--w-line); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; }
+    .case header b { font: 700 0.85rem "IBM Plex Mono", monospace; padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case h2 { margin: 0; }
+    .case > p { max-width: 72ch; }
+    .open { font: 700 1rem "Space Grotesk", sans-serif; }
+    .findings { max-width: 52rem; margin: 1.2rem 0 0; padding: 1rem 1.1rem 1.2rem; background: var(--w-bg2); border: 1.5px solid var(--w-line); border-left: 4px solid var(--w-act); border-radius: 8px; }
+    .findings legend { float: left; width: 100%; padding: 0; margin: 0 0 0.8rem; font: 600 0.75rem "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--w-act); }
+    .fields { clear: both; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem 1rem; }
+    .field { display: grid; gap: 0.3rem; min-width: 0; }
+    .field.wide { grid-column: 1 / -1; }
+    .field > label, .field > span { font: 500 0.78rem "IBM Plex Mono", monospace; letter-spacing: 0.04em; color: var(--w-muted); }
+    .where { display: grid; grid-template-columns: 11rem minmax(0, 1fr) 7rem; gap: 0.5rem; }
+    .ms { display: flex; align-items: center; gap: 0.4rem; color: var(--w-muted); font: 500 0.85rem "IBM Plex Mono", monospace; }
+    .findings input, .findings select, .findings textarea, .stretch input { width: 100%; min-width: 0; font: 400 1rem "Space Grotesk", sans-serif; color: var(--w-ink); background: #040812; border: 1.5px solid var(--w-line); border-radius: 6px; padding: 0.5rem 0.6rem; }
+    .findings, .findings *, .stretch * { box-sizing: border-box; }
+    .findings textarea { min-height: 4.2rem; resize: vertical; }
+    .findings input:focus, .findings select:focus, .findings textarea:focus, .stretch input:focus { outline: 2px solid var(--w-act); outline-offset: 1px; border-color: var(--w-act); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .saved { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 2.5rem; color: var(--w-muted); font: 500 0.85rem "IBM Plex Mono", monospace; }
+    .saved button { font: 600 0.85rem "IBM Plex Mono", monospace; color: var(--w-ink); background: transparent; border: 1.5px solid var(--w-line); border-radius: 99px; padding: 0.4rem 0.9rem; cursor: pointer; }
+    .saved button:hover, .saved button:focus-visible { border-color: var(--w-act); color: var(--w-act); }
+    @media (max-width: 700px) {
+      .fields { grid-template-columns: minmax(0, 1fr); }
+      .where { grid-template-columns: minmax(0, 1fr) 7rem; }
+      .where select { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Draw, measure, borrow · all materials</a><span>Exercise 2 · pairs · 15 min</span></div>
+    <span class="eyebrow-tag">Act 2 · measure</span>
+    <h1>Exercise 2 · <em>Profile it</em></h1>
+    <p class="intro">Three slow pages. Find where the time goes on each one. Don't fix anything yet: fixing is Exercise 3. Pairs, 15 minutes.</p>
+
+    <h2>Setup</h2>
+    <ol class="tasks">
+      <li>Chrome, in an Incognito or Guest window, so extensions stay out of the recording. Open each page in its own tab.</li>
+      <li>DevTools (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>I</kbd> or <kbd>F12</kbd>) → <strong>Performance</strong>.</li>
+      <li>Capture settings (the gear) → <strong>CPU: 4× slowdown</strong>. Every number on this sheet is at 4×.</li>
+      <li>Record (<kbd>●</kbd>), do the action once, Stop. Keep recordings short: a few seconds, one action.</li>
+      <li>In the recording: find the long task on the Main track, click it, and read the Summary. Then the Bottom-Up tab.</li>
+    </ol>
+
+    <section class="case">
+      <header><b>1</b><h2>The sales log</h2></header>
+      <p><a class="open" href="../demos/sales-log.html" target="_blank" rel="noopener">Open the sales log ↗</a></p>
+      <p><strong>Action:</strong> type <code>t</code> in the search box. Wait until the rows appear, then stop. To record again, reload the page first.</p>
+      <fieldset class="findings">
+        <legend>Findings · the sales log</legend>
+        <div class="fields">
+          <div class="field"><label for="c1-action">Action</label><input id="c1-action" name="c1-action" placeholder="What you recorded"></div>
+          <div class="field"><label for="c1-task">Long task, at 4×</label><div class="ms"><input id="c1-task" name="c1-task" type="number" inputmode="decimal" min="0" step="any">ms</div></div>
+          <div class="field wide"><span id="c1-where">Where the time went: the largest part</span>
+            <div class="where" role="group" aria-labelledby="c1-where">
+              <label class="sr-only" for="c1-colour">Colour</label>
+              <select id="c1-colour" name="c1-colour"><option value="">Colour…</option><option>yellow · scripting</option><option>purple · rendering</option><option>green · painting</option><option>grey · system</option></select>
+              <label class="sr-only" for="c1-name">Function or browser step</label>
+              <input id="c1-name" name="c1-name" placeholder="Function or browser step">
+              <div class="ms"><label class="sr-only" for="c1-ms">Milliseconds</label><input id="c1-ms" name="c1-ms" type="number" inputmode="decimal" min="0" step="any">ms</div>
+            </div>
+          </div>
+          <div class="field wide"><label for="c1-hypothesis">Hypothesis</label><textarea id="c1-hypothesis" name="c1-hypothesis" placeholder="One sentence: what to remove, or do less of."></textarea></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="case">
+      <header><b>2</b><h2>Takings bars</h2></header>
+      <p><a class="open" href="02-profile-it/takings-bars.html" target="_blank" rel="noopener">Open the takings bars ↗</a></p>
+      <p><strong>Action:</strong> click <strong>Sort by takings</strong>. The button then sorts back by pitch: every click is the same work, so record as many as you like.</p>
+      <fieldset class="findings">
+        <legend>Findings · takings bars</legend>
+        <div class="fields">
+          <div class="field"><label for="c2-action">Action</label><input id="c2-action" name="c2-action" placeholder="What you recorded"></div>
+          <div class="field"><label for="c2-task">Long task, at 4×</label><div class="ms"><input id="c2-task" name="c2-task" type="number" inputmode="decimal" min="0" step="any">ms</div></div>
+          <div class="field wide"><span id="c2-where">Where the time went: the largest part</span>
+            <div class="where" role="group" aria-labelledby="c2-where">
+              <label class="sr-only" for="c2-colour">Colour</label>
+              <select id="c2-colour" name="c2-colour"><option value="">Colour…</option><option>yellow · scripting</option><option>purple · rendering</option><option>green · painting</option><option>grey · system</option></select>
+              <label class="sr-only" for="c2-name">Function or browser step</label>
+              <input id="c2-name" name="c2-name" placeholder="Function or browser step">
+              <div class="ms"><label class="sr-only" for="c2-ms">Milliseconds</label><input id="c2-ms" name="c2-ms" type="number" inputmode="decimal" min="0" step="any">ms</div>
+            </div>
+          </div>
+          <div class="field wide"><label for="c2-hypothesis">Hypothesis</label><textarea id="c2-hypothesis" name="c2-hypothesis" placeholder="One sentence: what to remove, or do less of."></textarea></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="case">
+      <header><b>3</b><h2>Find a dish</h2></header>
+      <p><a class="open" href="02-profile-it/slow-search.html" target="_blank" rel="noopener">Open the dish search ↗</a></p>
+      <p><strong>Action:</strong> type <code>sat</code> in the search box, one letter at a time. Each keystroke is its own task: write down the longest.</p>
+      <fieldset class="findings">
+        <legend>Findings · find a dish</legend>
+        <div class="fields">
+          <div class="field"><label for="c3-action">Action</label><input id="c3-action" name="c3-action" placeholder="What you recorded"></div>
+          <div class="field"><label for="c3-task">Long task, at 4×</label><div class="ms"><input id="c3-task" name="c3-task" type="number" inputmode="decimal" min="0" step="any">ms</div></div>
+          <div class="field wide"><span id="c3-where">Where the time went: the largest part</span>
+            <div class="where" role="group" aria-labelledby="c3-where">
+              <label class="sr-only" for="c3-colour">Colour</label>
+              <select id="c3-colour" name="c3-colour"><option value="">Colour…</option><option>yellow · scripting</option><option>purple · rendering</option><option>green · painting</option><option>grey · system</option></select>
+              <label class="sr-only" for="c3-name">Function or browser step</label>
+              <input id="c3-name" name="c3-name" placeholder="Function or browser step">
+              <div class="ms"><label class="sr-only" for="c3-ms">Milliseconds</label><input id="c3-ms" name="c3-ms" type="number" inputmode="decimal" min="0" step="any">ms</div>
+            </div>
+          </div>
+          <div class="field wide"><label for="c3-hypothesis">Hypothesis</label><textarea id="c3-hypothesis" name="c3-hypothesis" placeholder="One sentence: what to remove, or do less of."></textarea></div>
+        </div>
+      </fieldset>
+    </section>
+
+    <section class="case stretch">
+      <header><b>+</b><h2>Stretch</h2></header>
+      <p>DevTools → ⋮ → More tools → <strong>Performance monitor</strong>. On the sales log, read <strong>DOM nodes</strong> with an empty search box, then after typing <code>t</code>.</p>
+      <div class="findings">
+        <div class="field"><label for="s-nodes">DOM nodes: empty search → after <code>t</code></label><input id="s-nodes" name="s-nodes" placeholder="before → after"></div>
+      </div>
+    </section>
+
+    <p class="saved"><span>Your notes are saved in this browser as you type. Nothing is sent anywhere.</span><button type="button" class="clear">Clear my notes</button></p>
+  </div>
+
+  <script>
+    const KEY = "pi9-ex2-profile-it";
+    const fields = document.querySelectorAll("input[name], select[name], textarea[name]");
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
+    }
+    function save() {
+      const notes = {};
+      for (const field of fields) if (field.value) notes[field.name] = field.value;
+      try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch {}
+    }
+
+    const notes = load();
+    for (const field of fields) if (typeof notes[field.name] === "string") field.value = notes[field.name];
+
+    document.addEventListener("input", save);
+    document.addEventListener("change", save);
+    document.querySelector(".clear").addEventListener("click", () => {
+      if (!confirm("Clear all your notes on this sheet?")) return;
+      for (const field of fields) field.value = "";
+      try { localStorage.removeItem(KEY); } catch {}
+    });
+  </script>
+</body>
+</html>

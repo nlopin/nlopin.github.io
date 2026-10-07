@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find a dish · Harbour Night Market</title>
+<style>
+  :root { color-scheme: dark; --bg: #12151c; --card: #1b202b; --line: #2c3342; --ink: #e8ecf4; --muted: #8a93a6; --gold: #ffb547; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 20px; }
+  input { font: inherit; padding: 8px 12px; width: 280px; max-width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+  .count { color: var(--muted); margin-left: auto; }
+  main { padding: 20px; max-width: 860px; }
+  .hint { margin: 0 0 12px; color: var(--muted); }
+  .results { list-style: none; margin: 0; padding: 0; }
+  .result { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .result b { font-weight: 600; }
+  .result .price { color: var(--gold); font-variant-numeric: tabular-nums; }
+  .result small { grid-column: 1 / -1; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Find a dish</h1>
+  <input type="search" placeholder="Dish, ingredient, stall or market…" aria-label="Search dishes" autocomplete="off">
+  <span class="count" aria-live="polite"></span>
+</header>
+<main>
+  <p class="hint">Typos are fine: “dumplng” finds dumplings.</p>
+  <ol class="results"></ol>
+</main>
+
+<template id="result-template">
+  <li class="result">
+    <b></b>
+    <span class="price"></span>
+    <small></small>
+  </li>
+</template>
+
+<script type="module">
+// The data: every dish on sale at the season's markets,
+// generated from a fixed seed so everyone sees the same list.
+const STYLES = ["smoked", "crispy", "spicy", "sweet", "grilled", "steamed", "fried", "glazed", "pickled", "charred", "fresh", "slow-cooked", "honey", "garlic", "sesame", "lemon"];
+const FILLINGS = ["pork", "chicken", "beef", "lamb", "tofu", "mushroom", "prawn", "halloumi", "aubergine", "chorizo", "paneer", "salmon", "jackfruit", "squid", "duck", "cheese", "potato", "pumpkin"];
+const DISHES = ["dumplings", "taco", "skewers", "bao", "noodles", "wrap", "burger", "curry", "satay", "empanada", "arepa", "flatbread", "rice bowl", "pierogi", "gyoza", "samosa", "toastie", "ramen", "pancake", "croquettes"];
+const STALLS = ["Dumpling Dynasty", "Taco Bike", "Noodle Boat", "Grill Nation", "Arepa Corner", "Spice Route", "Bao House", "Smoke Shack", "Wok Republic", "Pierogi Cart", "Satay Club", "Ramen Lab", "Empanada Window", "Curry Garden", "Flatbread Social", "Toastie Works"];
+const MARKETS = ["Harbour Night Market", "Dockside Saturday", "Old Town Square", "Riverside Friday", "Canal Street Late"];
+const EXTRAS = ["coriander", "spring onion", "kimchi", "chilli oil", "lime", "peanuts", "pickled onion", "yoghurt", "tahini", "black beans", "sweetcorn", "slaw", "miso", "ginger", "fennel", "mint", "salsa verde", "avocado", "cucumber", "seaweed"];
+const SIDES = ["fries", "rice", "salad", "flatbread", "pickles", "broth", "dipping sauce", "slaw"];
+
+let seed = 11;
+const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+const pick = (list) => list[Math.floor(random() * list.length)];
+
+const dishes = [];
+for (let id = 0; id < 100_000; id++) {
+  const name = `${pick(STYLES)} ${pick(FILLINGS)} ${pick(DISHES)}`;
+  const description = `with ${pick(EXTRAS)}, ${pick(EXTRAS)} and ${pick(EXTRAS)}, served with ${pick(SIDES)}`;
+  const stall = pick(STALLS);
+  const market = pick(MARKETS);
+  dishes.push({
+    id,
+    name: name[0].toUpperCase() + name.slice(1),
+    description,
+    stall,
+    market,
+    price: Math.round((4 + random() * 10) * 2) / 2,
+    text: `${name} ${description.replaceAll(",", "")} ${stall} ${market}`.toLowerCase(),
+  });
+}
+
+const state = { query: "" };
+
+const input = document.querySelector("input");
+const results = document.querySelector(".results");
+const count = document.querySelector(".count");
+const template = document.querySelector("#result-template");
+const euro = new Intl.NumberFormat("en", { style: "currency", currency: "EUR" });
+
+// How far the query is from the closest word in the text: the fewest
+// letters to add, remove or change so the query becomes the start of a word.
+// 0 is an exact prefix match.
+function fuzzyScore(query, text) {
+  let best = Infinity;
+  for (const word of text.split(" ")) {
+    let previous = [];
+    for (let j = 0; j <= word.length; j++) previous.push(j);
+    for (let i = 1; i <= query.length; i++) {
+      const current = [i];
+      for (let j = 1; j <= word.length; j++) {
+        const cost = query[i - 1] === word[j - 1] ? 0 : 1;
+        current.push(Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + cost));
+      }
+      previous = current;
+    }
+    for (const distance of previous) best = Math.min(best, distance);
+  }
+  return best;
+}
+
+function search(query) {
+  if (!query) return { matches: dishes.length, top: dishes.slice(0, 20) };
+  const maxTypos = query.length < 4 ? 0 : query.length < 7 ? 1 : 2;
+  const scored = [];
+  for (const dish of dishes) {
+    const score = fuzzyScore(query, dish.text);
+    if (score <= maxTypos) scored.push({ dish, score });
+  }
+  scored.sort((a, b) => a.score - b.score || a.dish.price - b.dish.price);
+  return { matches: scored.length, top: scored.slice(0, 20).map((s) => s.dish) };
+}
+
+function result(dish) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.querySelector("b").textContent = dish.name;
+  li.querySelector(".price").textContent = euro.format(dish.price);
+  li.querySelector("small").textContent = `${dish.description} · ${dish.stall} · ${dish.market}`;
+  return li;
+}
+
+function render() {
+  const query = state.query.trim().toLowerCase();
+  const { matches, top } = search(query);
+  results.replaceChildren(...top.map(result));
+  count.textContent = `${matches.toLocaleString("en")} dishes`;
+}
+
+input.addEventListener("input", () => {
+  state.query = input.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

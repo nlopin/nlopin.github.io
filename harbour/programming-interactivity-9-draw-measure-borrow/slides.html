@@ -1,0 +1,1634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Draw, measure, borrow — Lecture 9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide.quiz, .slide.vc { justify-content: center; }
+.slide.quiz h2 { margin-bottom: 36px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #ffffff; --act-ink: #ffffff; }
+.slide.wire[data-act-num="1"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="2"] { --act: #b6ff3b; --act-ink: #b6ff3b; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="4"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+html.theme-wire[data-act="1"] .deck-progress i { background: #3ee6ff; box-shadow: 0 0 12px #3ee6ff; }
+html.theme-wire[data-act="2"] .deck-progress i { background: #b6ff3b; box-shadow: 0 0 12px #b6ff3b; }
+html.theme-wire[data-act="3"] .deck-progress i { background: #ff4fd8; box-shadow: 0 0 12px #ff4fd8; }
+html.theme-wire[data-act="4"] .deck-progress i { background: #ffb547; box-shadow: 0 0 12px #ffb547; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="F"] h3 { background: #070d1a; color: #fff; }
+.deck-menu section[data-act="1"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #b6ff3b; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="4"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="B"] h3 { background: var(--blue); color: #fff; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 50px; height: 100%; align-items: center; }
+.big-title { font: 700 150px/0.88 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; }
+.big-title .d { color: #3ee6ff; text-shadow: 0 0 80px rgb(62 230 255 / 0.35); }
+.big-title .m { color: #b6ff3b; text-shadow: 0 0 80px rgb(182 255 59 / 0.35); }
+.big-title .b { color: #ffb547; text-shadow: 0 0 80px rgb(255 181 71 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.title-art { border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; padding: 20px; }
+.title-art svg { display: block; width: 100%; height: auto; }
+
+/* raw text panels (terminal, URLs, files) */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw .c { color: #4d5b7a; } .raw .k { color: #ffb547; } .raw .s { color: #b6ff3b; } .raw .n { color: #3ee6ff; }
+
+/* URL anatomy */
+.url { font: 500 30px/1 "IBM Plex Mono", monospace; display: flex; flex-wrap: wrap; margin: 10px 0 30px; }
+.url { gap: 0 6px; }
+.url span { display: flex; flex-direction: column; gap: 14px; padding: 12px 4px 10px; border-top: 4px solid var(--c); color: #fff; }
+.url span small { font: 600 15px/1 "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.url span.dot { border-top-color: transparent; }
+.u1 { --c: #8599c2; } .u2 { --c: #3ee6ff; } .u3 { --c: #ffb547; } .u4 { --c: #b6ff3b; } .u5 { --c: #ff4fd8; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.55fr 1fr 1fr 0.7fr 0.55fr 1fr 0.7fr 1fr; gap: 8px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 10px; min-height: 300px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 17px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 20px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 23px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 16px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .ex { border-style: dashed; }
+.map .brk { background: var(--blue); border-color: var(--blue); color: #dfe4ff; --c: #fff; }
+.m1 { --c: #3ee6ff; } .m2 { --c: #b6ff3b; } .m3 { --c: #ff4fd8; } .m4 { --c: #ffb547; } .mf { --c: #ffffff; }
+
+/* code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.vs2 h3, .vs3 h3 { font-size: 28px; margin-bottom: 10px; }
+.vb .vb-out { height: 250px; border: 1.5px solid #1f3052; border-radius: 6px; background: #040812; display: grid; place-items: center; }
+.vb .vb-out svg, .vb .vb-out img { width: 240px; height: 240px; display: block; }
+.vb .vb-out svg circle { fill: #3ee6ff; }
+.vb .vb-out img { image-rendering: pixelated; }
+.vb .vb-cap { font: 500 17px/1.3 "IBM Plex Mono", monospace; color: #8599c2; margin: 10px 0 14px; }
+.vb .vb-cap code { font-size: 16px; }
+.slide .vb ul li { font-size: 25px; margin-bottom: 8px; }
+.slide ol.qa > li { font-size: 30px; margin-bottom: 18px; }
+.qa .ans { display: inline-block; margin-left: 14px; color: var(--act); font-family: var(--font-wm); font-size: 25px; font-weight: 500; }
+.costs { margin-top: 6px; }
+.cost h3 { font: 600 20px "IBM Plex Mono", monospace; color: var(--act); letter-spacing: 0; margin-bottom: 18px; }
+.cost-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) 100px; gap: 14px; align-items: center; margin-bottom: 16px; }
+.cost-row .who { font: 600 19px "IBM Plex Mono", monospace; color: #fff; }
+.cost-row .track { display: flex; height: 54px; border-bottom: 1.5px solid #1f3052; }
+.cost-row b { font: 600 22px "IBM Plex Mono", monospace; color: #fff; text-align: right; }
+.costs i.m1, .cost-legend i.m1 { background: #ff6b5a; }
+.costs i.m2, .cost-legend i.m2 { background: #ffb0a6; }
+.costs i.w1, .cost-legend i.w1 { background: #4d5b7a; }
+.costs i.w2, .cost-legend i.w2 { background: #8599c2; }
+.costs .track i { display: block; height: 100%; }
+.cost-row { margin-bottom: 4px !important; }
+.slide .stages { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 16px 184px; font: 500 15px "IBM Plex Mono", monospace; color: #cfdcf7; }
+.stages i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.cost-main { font: 500 19px "IBM Plex Mono", monospace; color: #8599c2; margin: 6px 0 0; }
+.cost-main strong { color: #ff6b5a; }
+.cost-legend { display: flex; gap: 28px; font: 500 18px "IBM Plex Mono", monospace; color: #cfdcf7; margin: 22px 0 6px; }
+.cost-legend i { display: inline-block; width: 16px; height: 16px; border-radius: 3px; margin-right: 4px; vertical-align: -2px; }
+.cost-legend i + i { margin-right: 10px; }
+.v8fig { background: #fff; border-radius: 8px; padding: 12px 16px 10px; align-self: start; }
+.v8fig img { display: block; height: 500px; width: auto; margin: 0 auto; }
+.v8fig figcaption { color: #333; font-size: 15px; margin-top: 6px; }
+.v8fig figcaption a { color: #2f49ff; }
+.cdnflow { display: grid; grid-template-columns: 1fr 150px 1.2fr 170px 1.1fr; align-items: center; margin: 10px 0 26px; }
+.cdnflow .node { border: 2px solid var(--c); border-radius: 10px; padding: 18px 20px; background: color-mix(in srgb, var(--c) 10%, #060b17); }
+.cdnflow .node b { display: block; font: 700 32px/1 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; margin-bottom: 8px; }
+.cdnflow .node span { font: 500 17px/1.35 "IBM Plex Mono", monospace; color: var(--c); }
+.n-b { --c: #8599c2; } .n-e { --c: #ffb547; } .n-o { --c: #3ee6ff; }
+.cdnflow .arrow { position: relative; height: 4px; margin: 0 10px; background: #ffb547; }
+.cdnflow .arrow::after { content: ""; position: absolute; right: -2px; top: -9px; border: 11px solid transparent; border-left: 16px solid #ffb547; border-right: 0; }
+.cdnflow .arrow.dashed { background: repeating-linear-gradient(90deg, #3ee6ff 0 10px, transparent 10px 18px); }
+.cdnflow .arrow.dashed::after { border-left-color: #3ee6ff; }
+.cdnflow .arrow span { position: absolute; left: 0; right: 0; top: 14px; text-align: center; font: 500 15px "IBM Plex Mono", monospace; color: #8599c2; }
+.slide .cdnterms ul li { font-size: 26px; }
+.buy td, .buy th { font-size: 23px; padding: 14px 14px; }
+.buy td.b { font: 600 26px "IBM Plex Mono", monospace; color: #ff6b5a; white-space: nowrap; }
+.buy td.a { font: 600 26px "IBM Plex Mono", monospace; color: #b6ff3b; white-space: nowrap; }
+.slide > p.answers-link.answers-link { margin-top: auto; margin-bottom: 0; font: 500 18px "IBM Plex Mono", monospace; color: #8599c2; }
+.slide .answers-link b { font-weight: 600; }
+.pathcmd td { padding: 9px 12px; font-size: 23px; }
+.pathcmd td:first-child { white-space: nowrap; }
+.pathcmd td code { font-size: 21px; }
+.pathdemo { border: 1.5px solid #1f3052; border-radius: 6px; background: #040812; padding: 14px; }
+.pathdemo svg { display: block; width: 100%; height: auto; }
+.pathdemo .a { fill: rgb(62 230 255 / 0.25); stroke: #3ee6ff; stroke-width: 2; }
+.pathdemo .b { fill: none; stroke: #3ee6ff; stroke-width: 2; }
+.pathdemo .ctl { fill: none; stroke: #8599c2; stroke-width: 1; stroke-dasharray: 3 3; }
+.pathdemo circle { fill: #ffb547; }
+.vs3.surfaces { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr); }
+.surfaces .out { height: 150px; margin-bottom: 14px; padding: 14px 18px; border: 1.5px solid #1f3052; border-radius: 6px; background: #040812; }
+/* all three pictures 200 × 100, like the code */
+.surfaces .out > svg, .surfaces .out > img, .surfaces .out > .html-bars { display: block; height: 100%; width: auto; aspect-ratio: 2 / 1; margin: 0 auto; }
+.surfaces .out > .html-bars { display: flex; align-items: end; gap: 5%; }
+.html-bars div { width: 15%; flex: none; background: #3ee6ff; }
+.slide .surfaces pre.code.xs { font-size: 16px !important; }
+.surfaces svg rect { fill: #3ee6ff; }
+.vs3 h3 small { font: 500 18px "IBM Plex Mono", monospace; color: var(--w-muted); margin-left: 8px; letter-spacing: 0; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { font-weight: 600; color: #fff; }
+.dtable .yes { color: #b6ff3b; font-weight: 700; } .dtable .no { color: #ff6b5a; font-weight: 700; }
+
+/* error / message boxes */
+.err { font: 500 21px/1.4 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+.ok { font: 500 21px/1.4 "IBM Plex Mono", monospace; color: #b6ff3b; background: #0d1a06; border: 1.5px solid #34521a; border-left: 5px solid #b6ff3b; border-radius: 6px; padding: 14px 20px; }
+
+/* the frame pipeline (Chrome's colours: scripting yellow, rendering purple, painting green) */
+.pipe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; margin: 20px 0 30px; }
+.pipe div { position: relative; border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 12%, #060b17); padding: 20px 18px; margin-right: 26px; border-radius: 8px; }
+.pipe div:not(:last-child)::after { content: "→"; position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font: 600 26px "IBM Plex Mono", monospace; color: #8599c2; }
+.pipe b { display: block; font: 700 30px/1 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.pipe small { display: block; font: 500 17px/1.35 "IBM Plex Mono", monospace; color: var(--c); margin-top: 10px; }
+.c-js { --c: #f2c94c; } .c-style, .c-layout { --c: #a98bff; } .c-paint, .c-comp { --c: #6fcf97; }
+.budget { display: flex; height: 40px; border: 1.5px solid #1f3052; border-radius: 6px; overflow: hidden; font: 600 16px/40px "IBM Plex Mono", monospace; color: #03101b; }
+.budget span { background: var(--c); padding: 0 10px; white-space: nowrap; overflow: hidden; }
+.budget .idle { background: transparent; color: #8599c2; flex: 1; }
+
+/* flame chart mock */
+.flame { position: relative; height: 470px; border: 1.5px solid #1f3052; border-radius: 8px; background: #0d1117; overflow: hidden; font: 500 15px/1 "IBM Plex Mono", monospace; }
+.flame .ruler { position: absolute; left: 0; right: 0; top: 0; height: 28px; border-bottom: 1px solid #1f3052; color: #6e7681; }
+.flame .ruler span { position: absolute; top: 7px; }
+.flame .track-name { position: absolute; left: 10px; top: 38px; color: #8599c2; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; }
+.flame .f { position: absolute; height: 26px; line-height: 26px; padding: 0 6px; color: #10131a; white-space: nowrap; overflow: hidden; border-right: 1px solid #0d1117; background: var(--c); }
+.flame .task { --c: #9aa3b2; }
+.flame .long::after { content: ""; position: absolute; right: 0; top: 0; border: 10px solid transparent; border-top-color: #ff3b30; border-right-color: #ff3b30; }
+.flame .comb { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px); color: transparent; }
+.flame .y { --c: #f2c94c; } .flame .p { --c: #a98bff; } .flame .g { --c: #6fcf97; }
+.flame .tag { position: absolute; font: 700 16px "IBM Plex Mono", monospace; color: #03101b; background: var(--act); padding: 4px 10px; border-radius: 4px; box-shadow: 0 0 18px color-mix(in srgb, var(--act) 60%, transparent); white-space: nowrap; z-index: 2; }
+.flame .summary { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; border-top: 1px solid #1f3052; padding: 14px 18px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 20px; align-items: center; color: #c9d1d9; font-size: 16px; }
+.flame .donut { display: flex; gap: 18px; flex-wrap: wrap; }
+.flame .donut i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; background: var(--c); border-radius: 2px; vertical-align: -1px; }
+
+/* timelines: debounce / throttle */
+.tl { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 12px 20px; align-items: center; font: 500 19px "IBM Plex Mono", monospace; color: #8599c2; }
+.tl .lane { position: relative; height: 40px; border-bottom: 1.5px solid #1f3052; }
+.tl .lane i { position: absolute; bottom: 6px; width: 14px; height: 26px; border-radius: 3px; background: var(--c, #8599c2); transform: translateX(-50%); }
+.tl .lane i.call { --c: var(--act); width: 22px; height: 30px; box-shadow: 0 0 14px var(--act); }
+.tl .lane i.wait { background: transparent; border: 2px dashed var(--act); height: 30px; transform: none; border-radius: 4px; }
+.tl .lane i.wait em { position: absolute; left: 0; right: 0; top: 2px; text-align: center; font: 500 14px "IBM Plex Mono", monospace; font-style: normal; color: var(--act); }
+.tl .lane.dense i:not(.call) { width: 6px; }
+.tl .scale { position: relative; height: 22px; font: 500 14px "IBM Plex Mono", monospace; color: #5e7299; }
+.tl .scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+
+/* virtualisation diagram */
+.virt { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 50px; align-items: start; }
+.vlist { position: relative; height: 560px; border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; overflow: hidden; font: 500 15px "IBM Plex Mono", monospace; }
+.vlist .spacer { position: absolute; left: 14px; right: 14px; top: 14px; bottom: 14px; border: 2px dashed #3a4f7a; border-radius: 6px; color: #8599c2; padding: 8px 10px; }
+.vlist .window { position: absolute; left: 6px; right: 6px; top: 190px; height: 170px; border: 3px solid var(--act); border-radius: 6px; box-shadow: 0 0 30px color-mix(in srgb, var(--act) 40%, transparent); background: rgb(255 79 216 / 0.06); }
+.vlist .window b { position: absolute; right: 8px; top: -26px; color: var(--act); font-size: 15px; }
+.vlist .rows { position: absolute; left: 24px; right: 24px; top: 176px; }
+.vlist .rows div { height: 22px; margin-bottom: 4px; border-radius: 3px; background: #1b2a4a; color: #cfdcf7; padding-left: 8px; line-height: 22px; font-size: 13px; }
+.vlist .rows div.in { background: color-mix(in srgb, var(--act) 35%, #1b2a4a); color: #fff; }
+.vlist .note { position: absolute; left: 24px; bottom: 26px; color: #8599c2; font-size: 14px; }
+
+/* catalogue of libraries */
+.cat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cat .card { padding: 16px 20px; }
+.cat .card .label { margin-bottom: 8px; }
+.cat .card p { font-size: 22px; line-height: 1.35; margin: 0; color: #fff; }
+
+/* bridge table: today → next */
+.bridge td:first-child { color: #ffb547; }
+.bridge td:nth-child(2) { color: #8599c2; font: 600 22px "IBM Plex Mono", monospace; text-align: center; width: 60px; }
+.bridge td:last-child code { color: #b6ff3b; }
+
+/* break */
+.slide.breakslide { background: var(--blue); color: #fff; justify-content: center; align-items: center; text-align: center; padding-top: 170px; }
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide h2 { font-size: 150px; letter-spacing: -0.05em; margin: 0; max-width: none; color: #fff !important; }
+.breakslide h2 em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); }
+.breakslide .timer { font-size: 110px; border-width: 6px; margin: 30px 0; color: var(--yellow); }
+.breakslide p { font-size: 28px; color: #dfe4ff !important; max-width: 1200px; }
+.lanterns { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; pointer-events: none; }
+.lantern { width: 70px; transform-origin: 50% 0; animation: swing 3s ease-in-out infinite alternate; }
+.lantern::before { content: ""; display: block; width: 3px; height: 90px; margin: 0 auto; background: rgb(255 255 255 / 0.5); }
+.lantern::after { content: ""; display: block; width: 70px; height: 90px; border-radius: 45% 45% 40% 40%; background: radial-gradient(circle at 50% 40%, #ffd23f, #ff5a36 70%); box-shadow: 0 0 40px rgb(255 160 60 / 0.8); }
+.lantern:nth-child(2n) { animation-delay: -1.5s; } .lantern:nth-child(3n) { animation-duration: 3.7s; }
+.lantern:nth-child(2)::before { height: 150px; } .lantern:nth-child(4)::before { height: 60px; } .lantern:nth-child(5)::before { height: 130px; }
+@keyframes swing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@media (prefers-reduced-motion: reduce) { .lantern { animation: none; } }
+
+/* exercises, reading */
+.slide.exercise ol > li { font-size: 30px; }
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+.slide .live-js { font-size: 21px; }
+.slide .card h3 { margin-top: 0; }
+.slide .split > ul li, .slide .split > ol li, .slide .vs2 > ul li, .slide .split > .stack > p, .slide .vs2 > div > ul li { font-size: 27px; line-height: 1.3; margin-bottom: 14px; }
+.slide .split > pre.code, .slide .vs2 > pre.code { align-self: start; }
+.cards3 .card p { font-size: 23px; line-height: 1.35; }
+.cards4 .card { padding: 18px 20px; }
+.cards4 .card p { font-size: 21px; line-height: 1.35; margin: 0; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Draw, measure, borrow.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 9</p>
+      <h1 class="big-title"><span class="d">Draw,</span><br><span class="m">measure,</span><br><span class="b">borrow.</span></h1>
+      <p class="title-sub">SVG · canvas · the Performance panel · virtualisation · workers · CDNs · import maps · packages</p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+      <svg viewBox="0 0 520 300">
+        <g stroke="#1f3052" stroke-width="1"><line x1="0" y1="75" x2="520" y2="75"/><line x1="0" y1="150" x2="520" y2="150"/><line x1="0" y1="225" x2="520" y2="225"/></g>
+        <path d="M 0 270 L 40 255 L 80 240 L 120 210 L 160 170 L 200 120 L 240 90 L 280 60 L 320 75 L 360 110 L 400 150 L 440 200 L 480 240 L 520 262" fill="none" stroke="#3ee6ff" stroke-width="4"/>
+        <g fill="#b6ff3b"><rect x="270" y="20" width="22" height="12"/><rect x="292" y="20" width="60" height="12" fill="#a98bff"/><rect x="352" y="20" width="18" height="12" fill="#6fcf97"/></g>
+        <text x="270" y="50" fill="#8599c2" font-family="IBM Plex Mono, monospace" font-size="13">a frame: 16.7 ms</text>
+      </svg>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Three separate topics: putting a picture on screen, finding out why a page is slow, and loading code someone else wrote. They don't build on each other; each has its own exercises.</p>
+  </aside>
+</section>
+
+<section data-title="The day in four acts">
+  <p class="kicker">The plan · about 2 h 15</p>
+  <h2>Three topics, two exercises</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Intro</strong>the plan<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>Draw</strong>HTML, SVG, canvas<time>0:04</time></div>
+    <div class="m2"><b>02</b><strong>Measure</strong>performance, part 1<time>0:31</time></div>
+    <div class="m2 ex"><b>✎ 2</b><strong>Profile it</strong>15 min<time>0:47</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:02</time></div>
+    <div class="m3"><b>03</b><strong>Do less</strong>performance, part 2<time>1:17</time></div>
+    <div class="m3 ex"><b>✎ 3</b><strong>Test hypotheses</strong>25 min<time>1:30</time></div>
+    <div class="m4"><b>04</b><strong>Borrow</strong>CDNs, import maps, packages<time>1:55 → 2:15</time></div>
+  </div>
+  <p>Materials: <a href="https://lopin.me/harbour/programming-interactivity-9-draw-measure-borrow/index.html" target="_blank" rel="noopener">09-draw-measure-borrow</a>: <code>git pull</code> now. Today needs Chrome or Edge for the Performance panel.</p>
+  <aside class="notes">
+    <p>~0:01. Three independent topics: drawing (Act 1), performance (Acts 2 and 3, one story: find the problem, then fix it), dependencies (Act 4). About 45 of the 135 minutes are theirs: the surface quiz and Exercises 2 and 3. Firefox and Safari have profilers too, but the screens in the slides are Chrome's; ask Firefox users to install Chrome now, not at minute 47.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · DRAW
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Draw" data-at="0:04" data-title="Act 1 — Draw">
+  <div class="act-deco">&lt;svg&gt;
+2d</div>
+  <div class="act-num">act 01</div>
+  <h1>Draw</h1>
+  <div class="act-meta"><span class="chip">0:04 – 0:16</span><span>three surfaces for a picture</span></div>
+  <div class="act-list"><span>HTML boxes</span><span>SVG</span><span>viewBox</span><span>path</span><span>canvas</span><span>devicePixelRatio</span><span>pixels</span><span>accessibility</span></div>
+</section>
+
+<section data-title="Three surfaces">
+  <p class="kicker">The same bar chart, three times</p>
+  <h2>Boxes, SVG, canvas</h2>
+  <div class="vs3 surfaces">
+    <div>
+      <h3>HTML + CSS <small>elements</small></h3>
+      <div class="out" aria-hidden="true">
+        <div class="html-bars"><div style="height:90%"></div><div style="height:60%"></div><div style="height:75%"></div><div style="height:40%"></div><div style="height:55%"></div></div>
+      </div>
+      <script type="text/x-code" data-lang="html" class="xs"><div class="chart">
+  <div style="height: 90%"></div>
+  <div style="height: 60%"></div>
+  <div style="height: 75%"></div>
+  <div style="height: 40%"></div>
+  <div style="height: 55%"></div>
+</div></script>
+    </div>
+    <div>
+      <h3>SVG <small>elements</small></h3>
+      <div class="out" aria-hidden="true">
+        <svg viewBox="0 0 200 100"><rect x="0" y="10" width="30" height="90"/><rect x="40" y="40" width="30" height="60"/><rect x="80" y="25" width="30" height="75"/><rect x="120" y="60" width="30" height="40"/><rect x="160" y="45" width="30" height="55"/></svg>
+      </div>
+      <script type="text/x-code" data-lang="html" class="xs"><svg viewBox="0 0 200 100">
+  <rect x="0"   y="10" width="30" height="90" />
+  <rect x="40"  y="40" width="30" height="60" />
+  <rect x="80"  y="25" width="30" height="75" />
+  <rect x="120" y="60" width="30" height="40" />
+  <rect x="160" y="45" width="30" height="55" />
+</svg></script>
+    </div>
+    <div>
+      <h3>canvas <small>pixels · JS only</small></h3>
+      <div class="out"><img src="images/canvas-bars.png" alt="The same five bars, drawn on a canvas"></div>
+      <script type="text/x-code" data-lang="js" class="xs">// <canvas width="200" height="100">
+const ctx = canvas.getContext("2d");
+const heights = [90, 60, 75, 40, 55];
+
+heights.forEach((h, i) => {
+  ctx.fillRect(i * 40, 100 - h, 30, h);
+});</script>
+    </div>
+  </div>
+  <p>HTML and inline SVG become <strong>elements</strong> in the DOM: styled by CSS, clickable. A canvas is one element; what you draw on it is <strong>pixels</strong>. <a href="demos/three-surfaces.html" target="_blank" rel="noopener">Open all three</a> and look in the Elements panel.</p>
+  <aside class="notes">
+    <p>~0:05. Open <code>demos/three-surfaces.html</code> on the projector with the Elements panel: select a <code>rect</code> in the SVG, then try to select a bar in the canvas. HTML and SVG are markup: the browser keeps the elements and redraws them for you when something changes (retained mode). Canvas has no markup at all, only a drawing API: you issue commands, the browser keeps the pixels and forgets the shapes (immediate mode). If anything changes, you clear and draw everything again. The SVG numbers are the canvas numbers: both use their own coordinates, y growing downwards. The HTML version needs one CSS rule, not shown: <code>.chart { display: flex; align-items: end; gap: 5%; }</code>, and the bars a width. Neither surface is better; they cost different things, which is the rest of this act.</p>
+  </aside>
+</section>
+
+<section data-title="You already draw with HTML">
+  <p class="kicker">Surface 1 · boxes</p>
+  <h2>You already draw with HTML</h2>
+  <div class="split">
+    <ul>
+      <li>A bar is a <code>div</code> with a height. A row of bits is a <code>grid</code> of 8 cells.</li>
+      <li>Text, wrapping and fonts for free. With the right elements (buttons, tables), focus and screen readers too.</li>
+      <li>Layout does the positioning; you set sizes in <code>%</code> or with custom properties.</li>
+      <li>Good when the picture is boxes that line up: bars, grids, tables.</li>
+    </ul>
+    <div class="stack">
+      <script type="text/x-code" data-lang="css" class="small">.bits {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+.bit { aspect-ratio: 1; }
+.bit.on { background: var(--gold); }
+
+.bar { height: calc(var(--share) * 100%); }</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:06. A common mistake is reaching for canvas for something that is really a table or a grid. If the picture is made of rectangles that line up, HTML and CSS draw it, and Lecture 3's layout does the hard part. Setting <code>--share</code> from JavaScript (<code>el.style.setProperty("--share", 0.4)</code>) keeps the maths in CSS.</p>
+  </aside>
+</section>
+
+<section data-title="Vector vs bitmap">
+  <p class="kicker">Two ways to store a picture</p>
+  <h2>Vector: a list of shapes. Bitmap: a grid of pixels.</h2>
+  <div class="vs2 vb">
+    <div>
+      <div class="vb-out" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>
+      <p class="vb-cap">SVG · a circle in a 24 × 24 viewBox · shown at 240 px</p>
+      <ul>
+        <li>Stores <strong>shapes</strong>: "a circle at (12, 12), radius 9".</li>
+        <li>Turned into pixels when drawn, at the screen's resolution: sharp at any size.</li>
+        <li>Size grows with the number of shapes. SVG, font outlines.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="vb-out"><img src="images/circle-24.png" alt="The same circle as a 24 × 24 pixel image, enlarged: the pixels are visible"></div>
+      <p class="vb-cap">PNG · the same circle, 24 × 24 pixels · shown at 240 px</p>
+      <ul>
+        <li>Stores <strong>pixels</strong>: one colour per cell; in memory, 4 bytes each (RGBA).</li>
+        <li>Fixed resolution: enlarged, it turns blocky or blurry.</li>
+        <li>Size grows with width × height. PNG, JPEG, a canvas.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:06. Both pictures here really are what the captions say: the left one is an inline SVG circle, the right one is a real 24 × 24 PNG (<code>images/circle-24.png</code>) shown with <code>image-rendering: pixelated</code>, so each of its 576 pixels is a visible square; with default smoothing it would look blurry instead. On screen everything ends up as pixels: the difference is <em>when</em> they are made. A vector is rasterised by the browser at draw time, for whatever size and screen density it's shown at; a bitmap already is pixels and can only be resampled. That's why an SVG stays sharp on a 2× screen and a canvas needs the <code>devicePixelRatio</code> fix (slide "The blurry canvas"). Memory: a 400 × 200 bitmap is 400 × 200 × 4 = 320 000 bytes uncompressed, whatever is drawn on it; PNG and JPEG compress it for storage. The two mix: SVG can contain bitmaps (<code>&lt;image&gt;</code>), and a canvas can draw paths, which become pixels the moment they're drawn.</p>
+  </aside>
+</section>
+
+<section data-title="SVG">
+  <p class="kicker">Surface 2 · SVG</p>
+  <h2>SVG: a markup language for vector graphics</h2>
+  <div class="split">
+    <div class="stack">
+      <script type="text/x-code" data-lang="html" class="small"><svg viewBox="0 0 400 200" role="img">
+  <title>Visitors per hour</title>
+  <rect x="0" y="120" width="30" height="80" />
+  <circle cx="200" cy="40" r="6" />
+  <line x1="0" y1="200" x2="400" y2="200" />
+  <text x="0" y="16">18:00</text>
+</svg></script>
+    </div>
+    <ul>
+      <li><strong>Scalable Vector Graphics</strong>: XML-based markup that describes shapes. The browser draws them sharp at any size.</li>
+      <li><strong>Inline in HTML</strong>, every tag becomes a DOM element: in the Elements panel, selectable by CSS, with its own events.</li>
+      <li><strong>As a file</strong> (<code>&lt;img src="chart.svg"&gt;</code>) it's an image: your page can't reach the elements inside.</li>
+      <li><code>viewBox="0 0 400 200"</code>: <strong>your</strong> units, scaled to any size on screen. <strong>y grows downwards</strong> from (0, 0) at the top left.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:07. Precise wording matters here: SVG is a language, not "the DOM". A standalone <code>.svg</code> file is XML and must be well-formed; SVG written inside an HTML file is parsed by the HTML parser into SVG elements (<code>SVGRectElement</code>, …) in the same DOM tree as the page. Only that inline form gives you elements to style, script and click; through <code>&lt;img&gt;</code> or a CSS <code>background</code> it's a picture. The viewBox is the key idea: draw in convenient numbers (400 × 200), let CSS decide the size on screen (<code>width: 100%</code>). Strokes scale with it, unless <code>vector-effect: non-scaling-stroke</code>. Shapes are painted with <code>fill</code> and <code>stroke</code>, not <code>background</code> and <code>border</code>; both are attributes and CSS properties. Because inline shapes are elements, Lecture 5's <code>render(state)</code> works unchanged, and Friday's transitions animate them.</p>
+  </aside>
+</section>
+
+<section data-title="Live: a line is one path">
+  <p class="kicker">Live · a path from an array</p>
+  <h2>A line chart is one <code>path</code></h2>
+  <div class="fill live-js" data-show-html data-layout="wide-code">
+    <script type="text/plain" data-role="html"><svg viewBox="0 0 400 200"><path class="line" /></svg></script>
+    <script type="text/plain" data-role="css">svg { width: 100%; background: #0b1426; } .line { fill: none; stroke: #3ee6ff; stroke-width: 3; }</script>
+    <textarea>
+const visitors = [12, 30, 55, 80, 120, 95, 140, 110, 60, 25];
+const path = document.querySelector(".line");
+
+// data → pixels: x by index, y flipped (y grows downwards)
+const x = (i) => (i / (visitors.length - 1)) * 400;
+const y = (v) => 200 - (v / 150) * 200;
+
+const d = visitors
+  .map((v, i) => `${i === 0 ? "M" : "L"} ${x(i)} ${y(v)}`)
+  .join(" ");
+
+path.setAttribute("d", d);
+console.log(d);
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>~0:08. <code>M x y</code> moves the pen, <code>L x y</code> draws a line to a point, <code>Z</code> closes the shape; <code>C</code> draws a Bézier curve. Live: add <code>+ " L 400 200 L 0 200 Z"</code> and change <code>fill</code>: an area chart. The two arrow functions <code>x</code> and <code>y</code> are what chart libraries call <em>scales</em>: domain (your numbers) to range (pixels). That's a linear scale; libraries add log, time and band scales, ticks and round numbers on top.</p>
+  </aside>
+</section>
+
+<section data-title="Path commands">
+  <p class="kicker">SVG · the <code>d</code> attribute of a path</p>
+  <h2>One letter per command, then its numbers</h2>
+  <div class="split l2 center">
+    <table class="dtable pathcmd">
+      <tr><td><code>M x y</code></td><td>move the pen, don't draw</td></tr>
+      <tr><td><code>L x y</code></td><td>straight line to (x, y)</td></tr>
+      <tr><td><code>H x</code> · <code>V y</code></td><td>horizontal · vertical line</td></tr>
+      <tr><td><code>C x1 y1 x2 y2 x y</code></td><td>cubic Bézier, two control points</td></tr>
+      <tr><td><code>Q x1 y1 x y</code></td><td>quadratic Bézier, one control point</td></tr>
+      <tr><td><code>A rx ry rot large sweep x y</code></td><td>elliptical arc</td></tr>
+      <tr><td><code>Z</code></td><td>line back to the start: closed</td></tr>
+    </table>
+    <div class="stack">
+      <div class="pathdemo" aria-hidden="true"><svg viewBox="0 0 220 100"><path class="a" d="M 10 90 L 50 10 L 90 90 Z"/><path class="b" d="M 120 90 C 130 10, 200 10, 210 90"/><path class="ctl" d="M 120 90 L 130 10 M 200 10 L 210 90"/><circle cx="130" cy="10" r="3"/><circle cx="200" cy="10" r="3"/></svg></div>
+      <script type="text/x-code" data-lang="html" class="xs"><path d="M 10 90 L 50 10 L 90 90 Z" />
+<path d="M 120 90 C 130 10, 200 10, 210 90" /></script>
+    </div>
+  </div>
+  <p><strong>Uppercase</strong>: absolute coordinates in the <code>viewBox</code>. <strong>Lowercase</strong> (<code>m l h v c q a z</code>): relative to where the pen is.</p>
+  <aside class="notes">
+    <p>~0:09. The triangle: move to (10, 90), line to (50, 10), line to (90, 90), close. The curve starts at (120, 90) and ends at (210, 90); the dots are its two control points: the curve leaves towards the first and arrives from the direction of the second, without touching either. Commas and spaces are interchangeable. Two more letters exist: <code>S</code> and <code>T</code>, smooth versions of <code>C</code> and <code>Q</code> that reuse the previous control point. A command letter can be omitted when it repeats: after an <code>M</code>, extra coordinate pairs are treated as <code>L</code>. For the arc's five flags and numbers, see MDN; the arc is the one nobody writes by hand twice.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Nothing is drawn">
+  <p class="kicker">Quick check · no error, no circle</p>
+  <h2>Why is nothing drawn?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">const dot = document.createElement("circle");
+dot.setAttribute("cx", 50);
+dot.setAttribute("cy", 50);
+dot.setAttribute("r", 10);
+svg.append(dot);
+// Elements panel: <circle cx="50" cy="50" r="10"></circle></script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>createElement</code> makes an <strong>HTML</strong> element called "circle": an <code>HTMLUnknownElement</code>. It sits in the SVG and draws nothing.</div>
+      <div class="reveal-box step"><code>createElementNS(SVG_NS, "circle")</code> with <code>SVG_NS = "http://www.w3.org/2000/svg"</code>. Or markup: <code>innerHTML</code> on the <code>&lt;svg&gt;</code> parses as SVG.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:09. Predict first. It looks right in the Elements panel, which is what makes it nasty. <code>dot instanceof SVGElement</code> in the console tells the truth. The same trap as CSS in Lecture 2: no error message, just nothing.</p>
+  </aside>
+</section>
+
+<section data-title="A canvas holds a bitmap">
+  <p class="kicker">Surface 3 · canvas</p>
+  <h2>A canvas holds a bitmap: draw everything, every time</h2>
+  <div class="fill live-js" data-show-html data-layout="wide-code">
+    <script type="text/plain" data-role="html"><canvas width="400" height="200"></canvas></script>
+    <script type="text/plain" data-role="css">canvas { width: 100%; background: #0b1426; }</script>
+    <textarea>
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+
+const state = {
+  dots: Array.from({ length: 5000 }, () => ({
+    x: Math.random() * 400,
+    y: Math.random() * 200,
+  })),
+};
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#3ee6ff";
+  for (const { x, y } of state.dots) ctx.fillRect(x, y, 2, 2);
+}
+
+render();
+</textarea>
+  </div>
+  <aside class="notes">
+    <p>~0:10. After <code>fillRect</code> the canvas doesn't know there was a rectangle: there is nothing in the Elements panel, nothing to click, nothing for CSS. That's why it's fast for thousands of things, and why <code>render()</code> clears and redraws all of it. In an animation, that render runs in Friday's <code>requestAnimationFrame</code> loop. Change 5000 to 50 000: still instant. The same in SVG would be 50 000 elements.</p>
+  </aside>
+</section>
+
+<section data-title="The blurry canvas">
+  <p class="kicker">Trap · on high-density screens</p>
+  <h2>The blurry canvas</h2>
+  <div class="split">
+    <div class="stack">
+      <p>A canvas has two sizes. <strong>CSS size</strong>: how big it looks. <strong><code>width</code> / <code>height</code> attributes</strong>: how many pixels it stores.</p>
+      <p>On a 2× screen, a 400 px wide canvas shown 400 CSS px wide is stretched over 800 real pixels. Text and thin lines go soft.</p>
+    </div>
+    <script type="text/x-code" data-lang="js" class="small">const dpr = window.devicePixelRatio || 1;
+const box = canvas.getBoundingClientRect();
+
+canvas.width = Math.round(box.width * dpr);
+canvas.height = Math.round(box.height * dpr);
+// keep drawing in CSS pixels
+ctx.scale(dpr, dpr);</script>
+  </div>
+  <aside class="notes">
+    <p>~0:11. Run it again on resize (a <code>ResizeObserver</code> on the canvas). Setting <code>canvas.width</code> also clears the canvas and resets the context, including the scale: that's why the <code>ctx.scale</code> comes after it. SVG and HTML don't have this problem: they're vectors and text, redrawn at the screen's resolution.</p>
+  </aside>
+</section>
+
+<section data-title="Which dot did I click?">
+  <p class="kicker">Clicks · SVG vs canvas</p>
+  <h2>Which dot did I click?</h2>
+  <div class="vs2">
+    <div>
+      <h3>SVG: the browser finds the shape</h3>
+      <script type="text/x-code" data-lang="js" class="small">// each dot: <circle data-id="…" …>
+svg.addEventListener("click", (event) => {
+  const dot = event.target.closest("circle");
+  if (!dot) return;
+  select(dot.dataset.id);
+});</script>
+    </div>
+    <div>
+      <h3>canvas: you find it, with maths</h3>
+      <script type="text/x-code" data-lang="js" class="small">canvas.addEventListener("click", (event) => {
+  const box = canvas.getBoundingClientRect();
+  // CSS pixels → canvas pixels
+  const sx = canvas.width / box.width;
+  const sy = canvas.height / box.height;
+  const x = (event.clientX - box.left) * sx;
+  const y = (event.clientY - box.top) * sy;
+  const dot = state.dots.find((d) =>
+    Math.hypot(d.x - x, d.y - y) < 5);
+  if (dot) select(dot.id);
+});</script>
+    </div>
+  </div>
+  <p>SVG: each shape is an element, so <code>event.target</code> is the circle you clicked. Canvas: the event's target is the whole canvas; which dot is under the pointer is your code.</p>
+  <aside class="notes">
+    <p>~0:12. The SVG version is Lecture 4's delegation: one listener on the <code>svg</code>, <code>closest</code> to find the shape. The browser hit-tests the painted outline: by default a shape with <code>fill="none"</code> only reacts on its stroke (<code>pointer-events</code> changes that). Hover comes free too: <code>circle:hover</code> in CSS. In canvas there is no hover either: you'd listen to <code>pointermove</code> and run the same maths. The scale factor matters when the canvas is shown at a different size than its <code>width</code> / <code>height</code>; after the <code>devicePixelRatio</code> fix with <code>ctx.scale</code>, you draw in CSS pixels and the factor drops out (you'd compare in CSS pixels instead). <code>find</code> is a loop over every dot on every click: fine for thousands, a spatial index for millions.</p>
+  </aside>
+</section>
+
+<section data-title="Pictures need words">
+  <p class="kicker">Accessibility</p>
+  <h2>Pictures need words</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">svg</span><p><code>role="img"</code> and a <code>&lt;title&gt;</code> as the first child: one sentence of what it shows.</p></div>
+    <div class="card"><span class="label">canvas</span><p>Content between <code>&lt;canvas&gt;…&lt;/canvas&gt;</code> is the fallback, or an <code>aria-label</code>. Interactive canvas needs real buttons next to it.</p></div>
+    <div class="card"><span class="label">the honest one</span><p>A <code>&lt;table&gt;</code> of the same numbers, in a <code>&lt;details&gt;</code>. Readable, searchable, copyable.</p></div>
+  </div>
+  <p>Say what the picture <strong>means</strong>: "Visitors peaked at 21:00 with 140 per 15 minutes", not "a line chart".</p>
+  <aside class="notes">
+    <p>~0:13. Thirty seconds. A screen reader sees an unlabelled canvas as nothing at all. For anything interactive, the controls (sliders, buttons) are HTML anyway: Lecture 2's rules apply.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which surface?">
+  <p class="kicker">Quick check · on your phone first</p>
+  <h2>HTML, SVG or canvas?</h2>
+  <p class="muted small">Answer in <a href="quiz/pick-a-surface.html" target="_blank" rel="noopener">quiz/pick-a-surface.html</a> with the code on the board. Then we look at the results, and reveal here.</p>
+  <ol class="qa">
+    <li>The 64 bits of a JavaScript number, click to flip one <span class="step ans">→ HTML: a grid of 64 buttons</span></li>
+    <li>50 000 cars on a ring road <span class="step ans">→ canvas: too many elements</span></li>
+    <li>A line chart with a tooltip per point <span class="step ans">→ SVG: an element per point, with events</span></li>
+    <li>A photo, before and after a filter <span class="step ans">→ canvas: per-pixel access</span></li>
+    <li>A graph of 30 nodes and their links, draggable <span class="step ans">→ SVG: drag events per node</span></li>
+  </ol>
+  <div class="reveal-box step mt"><strong>How many things?</strong> Thousands → canvas. <strong>Events or CSS per thing?</strong> → SVG or HTML. <strong>Pixels?</strong> → canvas. <strong>Boxes that line up?</strong> → HTML.</div>
+  <aside class="notes">
+    <p>~0:14. Before the slide: open <code>../race/board.html</code>, start "Quiz · Pick a surface", show the code and QR. Two minutes to answer; the board shows how many are connected (click for names) and how many picked each option. Then back here and reveal one by one, starting with the question the room split on. Discuss 2 and 5 briefly. 2: SVG with 50 000 elements is slow to update every frame. 5: SVG, because each node needs drag events; 30 elements are nothing. Mixing is normal: a canvas for the 50 000 particles under an SVG layer for axes and labels.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · MEASURE
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Measure" data-at="0:31" data-title="Act 2 — Measure">
+  <div class="act-deco">16.7
+ms</div>
+  <div class="act-num">act 02</div>
+  <h1>Measure</h1>
+  <div class="act-meta"><span class="chip">0:31 – 0:47</span><span>find out where the time goes</span></div>
+  <div class="act-list"><span>main thread</span><span>frame budget</span><span>Performance panel</span><span>CPU throttling</span><span>flame chart</span><span>long tasks</span><span>forced reflow</span><span>Performance monitor</span></div>
+</section>
+
+<section data-title="The sales log">
+  <p class="kicker">A page from the market · the sales log</p>
+  <h2>100 000 sales. Type one letter in the search.</h2>
+  <div class="split center">
+    <div class="stack">
+      <p class="lede">The page freezes for seconds. The text field doesn't show the letter until the list comes back.</p>
+      <p class="muted">Is it the filter? The DOM? The sidebar? Guessing is how you lose an afternoon.</p>
+    </div>
+    <div class="card"><span class="label">open it</span><p><a href="demos/sales-log.html" target="_blank" rel="noopener">demos/sales-log.html</a></p><p class="muted">Search for <code>t</code>, then <code>ta</code>, then delete it all.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:31. A new topic, unrelated to drawing. Open the page on the projector and type <code>t</code>: about 2.5 s on a fast laptop before the letter appears, longer on theirs. Ask: where does the time go? Collect two or three guesses and write them down; we test them on slide "Live: record the freeze". Don't explain the code now.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="It's slow: the investigation">
+  <p class="kicker">A user writes: "it's slow"</p>
+  <h2>A real bug report. Now find out where the time goes.</h2>
+  <p>Reproduce it, record it, form one hypothesis, change one thing, record again. The debugging loop from Lecture 5, with a stopwatch.</p>
+  <aside class="notes">
+    <p>~0:32. Users report what they feel: "it's slow", "it freezes when I type". That's valid and it's all they can tell you; the investigation is ours. First step: reproduce it (which action, how much data, which device), then record. Back to the guesses from the previous slide: most people guess the filter (it's a loop over 100 000 items, after all). It's 5 ms. Without the recording you'd have optimised the wrong thing.</p>
+  </aside>
+</section>
+
+<section data-title="JS vs an image">
+  <p class="kicker">Same bytes over the wire · measured</p>
+  <h2>Byte for byte, JavaScript costs more than an image</h2>
+  <div class="vs2 costs">
+    <div class="cost">
+      <h3>CPU 1×</h3>
+      <div class="cost-row"><span class="who">D3 · 92 kB</span><span class="track"><i class="w1" style="width:30.9%"></i><i class="m2" style="width:4.1%"></i><i class="m1" style="width:12.7%"></i><i class="w2" style="width:2.3%"></i></span><b>11.0 ms</b></div>
+      <p class="stages"><span><i class="w1"></i>parse + compile 6.8</span><span><i class="m2"></i>compile 0.9</span><span><i class="m1"></i>execute 2.8</span><span><i class="w2"></i>optimise 0.5</span></p>
+      <div class="cost-row"><span class="who">JPEG · 93 kB</span><span class="track"><i class="w1" style="width:11.8%"></i></span><b>2.6 ms</b></div>
+      <p class="stages"><span><i class="w1"></i>decode 2.6</span></p>
+      <p class="cost-main">main thread: <strong>3.7 ms</strong> vs <strong>0 ms</strong></p>
+    </div>
+    <div class="cost">
+      <h3>CPU throttled 4×</h3>
+      <div class="cost-row"><span class="who">D3 · 92 kB</span><span class="track"><i class="w1" style="width:29.1%"></i><i class="m2" style="width:18.2%"></i><i class="m1" style="width:49.5%"></i><i class="w2" style="width:1.8%"></i></span><b>21.7 ms</b></div>
+      <p class="stages"><span><i class="w1"></i>parse + compile 6.4</span><span><i class="m2"></i>compile 4.0</span><span><i class="m1"></i>execute 10.9</span><span><i class="w2"></i>optimise 0.4</span></p>
+      <div class="cost-row"><span class="who">JPEG · 93 kB</span><span class="track"><i class="w1" style="width:12.3%"></i></span><b>2.7 ms</b></div>
+      <p class="stages"><span><i class="w1"></i>decode 2.7</span></p>
+      <p class="cost-main">main thread: <strong>14.9 ms</strong> vs <strong>0 ms</strong></p>
+    </div>
+  </div>
+  <p class="cost-legend"><span><i class="m1"></i><i class="m2"></i>main thread: input waits</span><span><i class="w1"></i><i class="w2"></i>worker threads</span></p>
+  <p class="muted small">D3 7.9.0 minified (280 kB, 92 kB gzipped) and a 93 kB JPEG, each loaded alone. Chrome 149, M-series MacBook, median of 5 runs.</p>
+  <aside class="notes">
+    <p>~0:33. What each one cost after the download, read from Chrome traces (stages are medians of 5 runs; they vary a little run to run). The script: parsed and compiled by V8 in the background while it downloads (<code>v8.parseOnBackground</code>); then run on the main thread (<code>EvaluateScript</code>), where functions are compiled lazily the first time they're called; hot functions get optimised later by V8's Maglev compiler on a worker. The image: decoded on a worker (<code>ImageDecodeTask</code>), nothing image-specific on the main thread. DevTools' CPU throttling slows only the main thread, which is why the worker bars don't grow at 4×. And D3 is a gentle case: loading it mostly defines functions. An app that renders, fetches and wires up listeners at start-up runs far more on the main thread; the next slide shows a real one. Tom Dale's line, quoted on web.dev ("JavaScript Start-up Optimization"): "Byte-for-byte, JavaScript is more expensive for the browser to process than the equivalently sized image or Web Font." Same bytes means same bytes on the wire: JavaScript compresses well (280 kB → 92 kB here), a JPEG is already compressed.</p>
+  </aside>
+</section>
+
+<section data-title="Same JS, three phones">
+  <p class="kicker">The device matters as much as the code</p>
+  <h2>Reddit's JavaScript: 0.35 s on a fast phone, 2.6 s on a cheap one</h2>
+  <figure class="v8fig">
+    <img src="images/reddit-js-processing-devices.svg" alt="Bar chart: JavaScript processing time for reddit.com. Pixel 3 (high-end) about 350 ms, Moto G4 (average) about 1 250 ms, Alcatel 1X (low-end) about 2 600 ms; each bar split into main thread and worker thread.">
+    <figcaption>JavaScript processing for reddit.com · blue: main thread · yellow: worker thread. Source: V8, <a href="https://v8.dev/blog/cost-of-javascript-2019" target="_blank" rel="noopener">The cost of JavaScript in 2019</a> · CC BY 3.0</figcaption>
+  </figure>
+  <aside class="notes">
+    <p>~0:34. From the article: "On mobile, it takes 3–4× longer for a median phone (Moto G4) to execute Reddit's JavaScript compared to a high-end device (Pixel 3), and over 6× as long on a low-end device (the &lt;$100 Alcatel 1X)." Read off the chart: about 0.35 s, 1.25 s and 2.6 s in total. The yellow part is V8 parsing and compiling on a worker thread: the article says V8 cut main-thread parse and compile work by about 40% this way. The blue part still blocks the page. That's why we'll record with CPU throttling on: your laptop is the Pixel 3 here, your users may hold the Alcatel.</p>
+  </aside>
+</section>
+
+<section data-title="One thread, again">
+  <p class="kicker">Lecture 8, again</p>
+  <h2>Your JavaScript and the page's drawing share one thread</h2>
+  <div class="split center">
+    <ul>
+      <li>The <strong>main thread</strong> runs your handlers, recalculates styles, lays out and records paint. One thing at a time.</li>
+      <li>A screen at 60 Hz wants a new frame every <strong>16.7 ms</strong>; at 120 Hz, every 8.3 ms.</li>
+      <li>While your handler runs, no other handler, no style or layout update runs: keystrokes and clicks wait. (Scrolling and <code>transform</code> / <code>opacity</code> animations can go on: another thread, the compositor, runs them.)</li>
+    </ul>
+    <div class="stack">
+      <div class="budget"><span class="c-js" style="flex:5">JS</span><span class="c-style" style="flex:2">style</span><span class="c-layout" style="flex:3">layout</span><span class="c-paint" style="flex:1.5">paint</span><span class="idle" style="flex:5">idle</span></div>
+      <p class="muted small">A frame that fits: about 10 ms of work, the rest idle.</p>
+      <div class="budget"><span class="c-js" style="flex:10">JS · ≈ 1 s</span><span class="c-layout" style="flex:15">style + layout · ≈ 1.5 s</span><span class="c-paint" style="flex:5">paint · ≈ 0.5 s</span></div>
+      <p class="muted small">The sales log, one keystroke: about 3 s before the letter shows, some 180 frames that never happened.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:33. The numbers in the second bar come from recordings of the demo page in Chrome on an M-series MacBook; they vary between runs and machines. JavaScript ≈ 1 s (the filter 5 ms, building the rows ≈ 0.8 s, the "Top items" sidebar ≈ 80 ms), style recalculation and layout ≈ 1.5 s in the same task, then pre-paint and paint ≈ 0.5 s in the next one. They'll find those themselves in Exercise 2. Don't give them away yet beyond "it's not the filter".</p>
+  </aside>
+</section>
+
+<section data-title="One frame">
+  <p class="kicker">What the browser does to show a change</p>
+  <h2>One frame: script, style, layout, paint, composite</h2>
+  <div class="pipe">
+    <div class="c-js"><b>JavaScript</b><small>your handler changes the DOM or a class</small></div>
+    <div class="c-style"><b>Style</b><small>which rules match which elements</small></div>
+    <div class="c-layout"><b>Layout</b><small>sizes and positions of every box</small></div>
+    <div class="c-paint"><b>Paint</b><small>pixels for text, colours, borders</small></div>
+    <div class="c-comp"><b>Composite</b><small>layers put together on the GPU</small></div>
+  </div>
+  <ul>
+    <li>Change <code>width</code>, <code>top</code>, text, add an element → <strong>layout</strong> and everything after it.</li>
+    <li>Change <code>color</code>, <code>background</code> → <strong>paint</strong> and after.</li>
+    <li>Change <code>transform</code>, <code>opacity</code> → often <strong>composite only</strong>. That's why Friday animated those two.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:35. The colours match Chrome's: yellow is scripting, purple is rendering (style and layout), green is painting. They'll see exactly these colours in the panel in two minutes. Layout cost grows with the number of boxes: that's the ≈ 1.5 s in the sales log: 87 554 rows × 7 elements, about a million nodes with their text.</p>
+  </aside>
+</section>
+
+<section data-title="The Performance panel">
+  <p class="kicker">DevTools → Performance</p>
+  <h2>Record, do the slow thing, stop</h2>
+  <div class="flame">
+    <div class="ruler"><span style="left:3%">0 s</span><span style="left:29.7%">1 s</span><span style="left:56.3%">2 s</span><span style="left:83%">3 s</span></div>
+    <div class="track-name">Main</div>
+    <div class="f task long" style="left:3%;width:73.3%;top:62px">Task · 2.75 s</div>
+    <div class="f y" style="left:3%;width:73.3%;top:90px">Event: keypress</div>
+    <div class="f y" style="left:3%;width:73.1%;top:118px">Event: textInput</div>
+    <div class="f y" style="left:3%;width:29.3%;top:146px">Event: input</div>
+    <div class="f p" style="left:32.3%;width:10.4%;top:146px">Recalculate style</div>
+    <div class="f p" style="left:42.7%;width:29.3%;top:146px">Layout</div>
+    <div class="f y" style="left:3%;width:29.3%;top:174px">Function call</div>
+    <div class="f y" style="left:3%;width:29.3%;top:202px">render</div>
+    <div class="f y comb" style="left:3.2%;width:26.5%;top:230px">row</div>
+    <div class="f y" style="left:29.8%;width:2.4%;top:230px">topItems</div>
+    <div class="f task long" style="left:77.7%;width:13.3%;top:62px">Task · 0.5 s</div>
+    <div class="f p" style="left:77.7%;width:10.4%;top:90px">Pre-paint</div>
+    <div class="f g" style="left:88.1%;width:2.4%;top:90px"></div>
+    <span class="tag" style="left:4%;top:270px">3 · ↑ y = the call stack</span>
+    <span class="tag" style="left:40%;top:270px">2 · wide = slow</span>
+    <span class="tag" style="left:60%;top:270px">1 · long tasks: red corners ↑</span>
+    <div class="summary">
+      <b>Summary · ≈ 3.3 s</b>
+      <div class="donut"><span><i style="--c:#f2c94c"></i>Scripting ≈ 1.2 s</span><span><i style="--c:#a98bff"></i>Rendering ≈ 1.9 s</span><span><i style="--c:#6fcf97"></i>Painting ≈ 0.15 s</span><span><i style="--c:#9aa3b2"></i>System</span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:36. A sketch, not a screenshot, drawn from a real trace of one keystroke on the demo page (Chrome 149, M-series MacBook, tracing on, so scripting is a bit slower than without). Bar names are Chrome's. In this trace the style and layout run inside the same task as the keyboard events, not in a separate rendering task. The live recording comes in three slides. Record button (or <kbd>⌘</kbd><kbd>E</kbd> / <kbd>Ctrl</kbd><kbd>E</kbd>), type one letter, stop. Keep recordings short, 3–5 seconds: long ones are hard to read. The Main track is the main thread. Zoom with <kbd>W</kbd> / <kbd>S</kbd>, pan with <kbd>A</kbd> / <kbd>D</kbd>, or the mouse wheel. Click a bar: the bottom panel shows its self time, total time and a link to the line of source.</p>
+  </aside>
+</section>
+
+<section data-title="Throttle the CPU">
+  <p class="kicker">Before you record</p>
+  <h2>Your laptop is not representative</h2>
+  <div class="split center">
+    <ul>
+      <li>The Performance panel's settings: <strong>CPU throttling 4× or 6×</strong>.</li>
+      <li>Developer machines are fast. Your users' phones and older laptops are not: the Reddit chart, 0.35 s vs 2.6 s.</li>
+      <li>Record with throttling on: at 4×, a 30 ms problem becomes a 120 ms one you can see.</li>
+      <li><strong>Network throttling</strong> (Fast 4G, Slow 4G) is the same idea for downloads: Act 4.</li>
+    </ul>
+    <div class="card"><span class="label">rule of thumb</span><p>Under <strong>100 ms</strong> feels instant. Chrome's Interaction to Next Paint (INP) metric rates over <strong>200 ms</strong> "needs improvement", over <strong>500 ms</strong> "poor".</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:37. Throttling slows the CPU for this tab, not the network, and only its main thread: worker threads run at full speed (measured on the JS-vs-image slide). It's an approximation: mobile CPUs also have less memory and worse thermals. INP is one of the Core Web Vitals; the Performance panel's start screen shows it live for whatever you click on the page.</p>
+  </aside>
+</section>
+
+<section data-title="Reading a flame chart">
+  <p class="kicker">Reading the recording</p>
+  <h2>x is time, y is the call stack, width is cost</h2>
+  <div class="split">
+    <ol>
+      <li><strong>Find the long task.</strong> Grey bar with a red corner at the top of the Main track.</li>
+      <li><strong>Look below it.</strong> Each row is one level deeper in the call stack: <code>render</code> calls <code>row</code> 87 554 times. The profiler samples, so <code>row</code> shows as slivers or merged bars, not 87 554 bars.</li>
+      <li><strong>Ask "which colour?"</strong> Yellow: your JS. Purple: the browser laying out what you built.</li>
+      <li><strong>Bottom-Up tab</strong>: functions sorted by <em>self time</em>, the time spent in the function itself, not its callees.</li>
+    </ol>
+    <div class="card"><span class="label">self vs total</span><p><strong>Total</strong> time includes everything a function calls; <strong>self</strong> time is its own lines only. Big total, small self: the cost is further down. Follow it until the self time is big.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:39. Call Tree is top-down (start from the event); Bottom-Up starts from where time is actually spent; Event Log is a list in time order. Bottom-Up answers "what should I fix?" fastest. Clicking a function name opens the source line in the Sources panel.</p>
+  </aside>
+</section>
+
+<section data-title="Live: record the freeze">
+  <p class="kicker">Live · the sales log</p>
+  <h2>Record the freeze</h2>
+  <ol>
+    <li>Open <a href="demos/sales-log.html" target="_blank" rel="noopener">demos/sales-log.html</a>, DevTools → Performance, CPU 4×.</li>
+    <li>Record, type <code>t</code>, stop.</li>
+    <li>Find the long task. Read its colours. Compare with the guesses from the start.</li>
+    <li>Bottom-Up: which function has the most self time?</li>
+  </ol>
+  <aside class="notes">
+    <p>~0:40, three minutes, on the projector. What they should see: one long task. Inside it, under the keyboard events, <code>Event: input</code> → <code>render</code> in yellow: <code>row</code> for most of it, <code>topItems</code> at its end (≈ 80 ms; ≈ 300 ms at 4×). Then, still in the same task, Recalculate Style and a wide purple Layout. Pre-paint and Paint follow in a second task. The filter is a sliver. So the problem isn't JavaScript being slow; it's making 87 000 rows and then laying them out. Don't fix anything: fixing is Act 3. Keep the recording open for the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="Measure in code">
+  <p class="kicker">When you want a number</p>
+  <h2>Measure in code, see it on the timeline</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="js" class="small">const start = performance.now();
+const visible = sales.filter(…);
+console.log(performance.now() - start);
+
+console.time("rows");
+for (const s of visible) list.append(row(s));
+console.timeEnd("rows"); // rows: 776.2 ms
+
+performance.mark("start");
+render();
+performance.measure("render", "start");</script>
+    <ul>
+      <li><code>performance.now()</code>: milliseconds with fractions, since the page started loading.</li>
+      <li><code>console.time</code> / <code>timeEnd</code>: the same, with a label.</li>
+      <li><code>mark</code> / <code>measure</code>: named bars in the <strong>Timings</strong> track of the recording.</li>
+      <li>DOM work isn't finished when the call returns: layout happens later. Only the recording shows that part.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:43. The last bullet matters: <code>console.time</code> around the row-building says 776 ms, but the user waits 2.4 s, because layout runs after the handler returns. Numbers in code for JavaScript; the recording for the whole frame. Run measurements several times: the first run includes the JIT warming up.</p>
+  </aside>
+</section>
+
+<section data-title="Forced layout">
+  <p class="kicker">Forced layout · also called forced reflow</p>
+  <h2>Some reads make the browser lay out the page right now</h2>
+  <div class="split">
+    <ul>
+      <li>Normally the browser lays out <strong>once per frame</strong>, after your JavaScript has finished.</li>
+      <li>Some properties and methods return sizes or positions. If the page changed since the last layout, reading one makes the browser do the layout <strong>now</strong>, in the middle of your code.</li>
+      <li>In a recording: a purple <strong>Layout</strong> inside your function's call stack, not after it.</li>
+    </ul>
+    <div class="card"><span class="label">properties and methods that can force layout</span>
+      <p><code>offsetWidth</code> <code>offsetHeight</code> <code>offsetTop</code> <code>offsetLeft</code><br>
+      <code>clientWidth</code> <code>clientHeight</code><br>
+      <code>scrollWidth</code> <code>scrollHeight</code> <code>scrollTop</code><br>
+      <code>getBoundingClientRect()</code> <code>getClientRects()</code><br>
+      <code>getComputedStyle()</code> <code>innerText</code><br>
+      <code>focus()</code> <code>scrollIntoView()</code></p>
+    </div>
+  </div>
+  <p class="muted small">The full list: Paul Irish, <a href="https://gist.github.com/paulirish/5d52fb081b3570c81e3a" target="_blank" rel="noopener">What forces layout / reflow</a>.</p>
+  <aside class="notes">
+    <p>~0:44. One read is cheap: it's one layout the browser would have done anyway, just earlier. The cost is in how many times it happens and how much has to be laid out each time. Don't say more: Exercise 2's takings-bars page has exactly this problem, and finding it is the exercise. <code>getComputedStyle()</code> forces style, and layout too for layout-dependent values like <code>width</code>. Setting <code>scrollTop</code> forces layout as well, not only reading it.</p>
+  </aside>
+</section>
+
+<section data-title="Performance monitor">
+  <p class="kicker">DevTools → ⋮ → More tools → Performance monitor</p>
+  <h2>Live numbers, while you play with the page</h2>
+  <div class="split center">
+    <ul>
+      <li><strong>CPU usage</strong>: is the page busy when nobody touches it? (An animation that never stops.)</li>
+      <li><strong>DOM nodes</strong>: the sales log has about a million (elements and text).</li>
+      <li><strong>JS heap size</strong>, <strong>event listeners</strong>: should go up and down, not only up.</li>
+      <li><strong>Layouts / sec</strong>, <strong>style recalcs / sec</strong> while scrolling or animating.</li>
+    </ul>
+    <div class="card"><span class="label">only ever climbing?</span><p>A leak. A common one: <code>render()</code> adds a listener to an element that survives the render (the board, <code>window</code>), so every render adds one more (the game jam trap). The page gets slower the longer it runs.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:45. The monitor is the fastest way to answer "is it getting worse over time?" without reading a recording. For memory specifically, the Memory panel's heap snapshot can find detached DOM nodes, but that's beyond today. Show it on the sales log: DOM nodes jump when you clear the search.</p>
+  </aside>
+</section>
+
+<section data-title="Network panel, briefly">
+  <p class="kicker">DevTools → Network</p>
+  <h2>Downloads cost time too</h2>
+  <ul>
+    <li><strong>Waterfall</strong>: when each file started and finished. Files that wait for other files form a staircase.</li>
+    <li><strong>Transferred</strong> vs <strong>resources</strong> size at the bottom: compressed over the wire, uncompressed in memory.</li>
+    <li><strong>Throttling</strong>: Fast 4G, Slow 4G, Offline. <strong>Disable cache</strong> to see a first visit.</li>
+    <li>Your own files are small. The libraries you import may not be: Act 4.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:46. One minute: they know the Network panel from Lecture 8. The new thing is looking at it for size and order, not for status codes.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Profile it">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 2 · pairs · 15 min</p>
+  <div class="ex-head"><h2>Profile it</h2><button class="timer" data-min="15"></button></div>
+  <ol>
+    <li><strong>Find, don't fix.</strong> Three slow pages, one problem each.</li>
+    <li>For each: record with CPU 4×, find the long task, name the function or the browser step.</li>
+    <li>Write one sentence: "<em>X</em> takes <em>N</em> ms because <em>Y</em>."</li>
+    <li>Stretch: the Performance monitor's DOM node count, before and after a search.</li>
+  </ol>
+  <p class="where mt">09-draw-measure-borrow → <b><a href="https://lopin.me/harbour/programming-interactivity-9-draw-measure-borrow/exercises/02-profile-it.html" target="_blank" rel="noopener">Exercise 2 · Profile it</a></b></p>
+  <aside class="notes">
+    <p>~0:47 → 1:02. The three pages: the sales log (too many rows; and the "Top items" recomputed on every keystroke), the takings bars (layout thrashing), and a slow search box (heavy synchronous work on every input). The sentences are the debrief: two or three pairs read one each. Fixes come after the break.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:02" data-title="Break">
+  <div class="lanterns"><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i><i class="lantern"></i></div>
+  <h2>Break. <em>15 min.</em></h2>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: four ways to do less, then fix what you found.</p>
+  <aside class="notes">
+    <p>Start the timer.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · DO LESS
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Do less" data-at="1:17" data-title="Act 3 — Do less">
+  <div class="act-deco">20 of
+100 000</div>
+  <div class="act-num">act 03</div>
+  <h1>Do less</h1>
+  <div class="act-meta"><span class="chip">1:17 – 1:30</span><span>patterns for big, busy pages</span></div>
+  <div class="act-list"><span>debounce</span><span>throttle</span><span>virtualisation</span><span>content-visibility</span><span>Web Workers</span><span>lazy</span><span>memoise</span></div>
+</section>
+
+<section data-title="Four ways to do less">
+  <p class="kicker">The menu</p>
+  <h2>Four ways to do less</h2>
+  <div class="grid-4 cards4">
+    <div class="card"><span class="label">less often</span><p>Debounce, throttle.</p></div>
+    <div class="card"><span class="label">fewer things</span><p>Virtualise, paginate, let the browser skip what's off-screen.</p></div>
+    <div class="card"><span class="label">elsewhere</span><p>A Web Worker: another thread for heavy computation.</p></div>
+    <div class="card"><span class="label">later · once</span><p>Lazy loading, and remembering results you already computed.</p></div>
+  </div>
+  <p>Often the fix isn't faster code. It's not doing the work at all.</p>
+  <aside class="notes">
+    <p>~1:17. Every pattern on the next slides is in one of these four boxes. After this act, Exercise 3 tests the Exercise 2 hypotheses with them.</p>
+  </aside>
+</section>
+
+<section data-title="Debounce">
+  <p class="kicker">Less often · debounce</p>
+  <h2>Debounce: wait until the user pauses</h2>
+  <div class="tl">
+    <span>keystrokes</span><div class="lane"><i style="left:4%"></i><i style="left:10%"></i><i style="left:15%"></i><i style="left:21%"></i><i style="left:55%"></i><i style="left:60%"></i></div>
+    <span>debounce(300)</span><div class="lane"><i class="wait" style="left:21%;width:25%"><em>300 ms</em></i><i class="call" style="left:46%"></i><i class="wait" style="left:60%;width:25%"><em>300 ms</em></i><i class="call" style="left:85%"></i></div>
+    <span></span><div class="scale"><span style="left:0">0</span><span style="left:25%">0.3 s</span><span style="left:50%">0.6 s</span><span style="left:75%">0.9 s</span><span style="left:100%">1.2 s</span></div>
+  </div>
+  <div class="vs2 mt">
+    <script type="text/x-code" data-lang="js" class="small">function debounce(fn, ms) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+const onInput = debounce(search, 300);
+input.addEventListener("input", onInput);</script>
+    <ul>
+      <li>Every keystroke restarts the timer. <code>search</code> runs once, 300 ms after the last one.</li>
+      <li>For: search as you type, autosave, validating a field.</li>
+      <li>The text field still updates instantly: only the expensive part waits.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:19. Lecture 8's race exercise had debounce as a bonus. Six keystrokes, two searches. Debounce doesn't make the work cheaper: one keystroke after a pause still freezes the sales log for 2.5 s. It makes it rarer. That's why Exercise 3 needs more than this. The cost: the result arrives 300 ms after the user stops, never during typing.</p>
+  </aside>
+</section>
+
+<section data-title="Throttle">
+  <p class="kicker">Less often · throttle</p>
+  <h2>Throttle: at most once per interval</h2>
+  <div class="tl">
+    <span>pointermove</span><div class="lane dense"><i style="left:5%"></i><i style="left:7%"></i><i style="left:9%"></i><i style="left:11%"></i><i style="left:13%"></i><i style="left:15%"></i><i style="left:17%"></i><i style="left:19%"></i><i style="left:21%"></i><i style="left:23%"></i><i style="left:25%"></i><i style="left:27%"></i><i style="left:29%"></i><i style="left:31%"></i><i style="left:33%"></i><i style="left:35%"></i><i style="left:37%"></i><i style="left:39%"></i><i style="left:41%"></i><i style="left:43%"></i><i style="left:45%"></i><i style="left:60%"></i><i style="left:62%"></i><i style="left:64%"></i><i style="left:66%"></i><i style="left:68%"></i><i style="left:70%"></i><i style="left:72%"></i><i style="left:74%"></i><i style="left:76%"></i><i style="left:78%"></i><i style="left:80%"></i></div>
+    <span>throttle(100)</span><div class="lane"><i class="call" style="left:5%"></i><i class="call" style="left:15%"></i><i class="call" style="left:25%"></i><i class="call" style="left:35%"></i><i class="call" style="left:45%"></i><i class="call" style="left:60%"></i><i class="call" style="left:70%"></i><i class="call" style="left:80%"></i></div>
+    <span></span><div class="scale"><span style="left:0">0</span><span style="left:25%">0.3 s</span><span style="left:50%">0.6 s</span><span style="left:75%">0.9 s</span><span style="left:100%">1.2 s</span></div>
+  </div>
+  <div class="vs2 mt">
+    <script type="text/x-code" data-lang="js" class="small">function throttle(fn, ms) {
+  let last = 0;
+  return (...args) => {
+    const now = performance.now();
+    if (now - last < ms) return;
+    last = now;
+    fn(...args);
+  };
+}
+
+const onMove = throttle(update, 100);
+canvas.addEventListener("pointermove", onMove);</script>
+    <ul>
+      <li>The first event runs <code>update</code>; the rest are ignored until 100 ms have passed.</li>
+      <li>For: <code>pointermove</code>, <code>scroll</code>, <code>resize</code>, dragging a slider: things that should update <strong>during</strong> the gesture.</li>
+      <li>Debounce would wait until the pointer stops.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:20. 32 events, 8 calls. This version runs on the leading edge and drops everything inside the interval, including the last event: if the pointer stops between two calls, the final position is never processed. Libraries (lodash's <code>throttle</code>) add a trailing call for that.</p>
+  </aside>
+</section>
+
+<section data-title="Virtualisation">
+  <p class="kicker">Fewer things</p>
+  <h2>Virtualisation: render only the rows you can see</h2>
+  <div class="virt">
+    <div class="vlist" aria-hidden="true">
+      <div class="spacer">spacer · 100 000 × 32 px = 3 200 000 px tall</div>
+      <div class="rows"><div>row 17 · 18:03</div><div class="in">row 18 · 18:03</div><div class="in">row 19 · 18:03</div><div class="in">row 20 · 18:04</div><div class="in">row 21 · 18:04</div><div class="in">row 22 · 18:04</div><div class="in">row 23 · 18:04</div><div>row 24 · 18:05</div></div>
+      <div class="window"><b>the viewport</b></div>
+      <div class="note">every other row: never created</div>
+    </div>
+    <div class="stack">
+      <script type="text/x-code" data-lang="js" class="small">const ROW = 32;
+spacer.style.height = `${visible.length * ROW}px`;
+
+function renderWindow() {
+  const first = Math.floor(scroller.scrollTop / ROW);
+  const count = Math.ceil(scroller.clientHeight / ROW) + 1;
+  rows.style.transform = `translateY(${first * ROW}px)`;
+  rows.replaceChildren(
+    ...visible.slice(first, first + count).map(row));
+}
+scroller.addEventListener("scroll", renderWindow);</script>
+      <p class="small">A tall, empty spacer makes the scrollbar right. On scroll, work out which rows are in view and render only those, moved into place.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:22. 87 000 rows become about 20 elements: the list's part of a render drops from seconds to a few milliseconds (the 5 ms filter is now most of it), and about a million DOM nodes in the Performance monitor drop to a few hundred. The state doesn't change: <code>visible</code> is still the filtered array of 87 000 sales. Only the render is smarter. Add a few rows of overscan above and below so fast scrolling doesn't show blank space. This is what every big table, chat history and feed does.</p>
+  </aside>
+</section>
+
+<section data-title="What virtualisation costs">
+  <p class="kicker">Fewer things · the price</p>
+  <h2>What virtualisation costs</h2>
+  <div class="split">
+    <ul>
+      <li><strong>Row heights must be known.</strong> Fixed heights are easy; variable heights need measuring and estimates.</li>
+      <li><strong><kbd>Ctrl</kbd> <kbd>F</kbd> finds nothing</strong> that isn't rendered. Neither do in-page links.</li>
+      <li><strong>Screen readers</strong> see only the rendered rows: <code>aria-setsize</code> and <code>aria-posinset</code> (in a table: <code>aria-rowcount</code>, <code>aria-rowindex</code>) say where they are.</li>
+      <li><strong>Focus</strong> is lost when the focused row scrolls out and is removed.</li>
+    </ul>
+    <div class="card"><span class="label">when not to</span><p>A list of a few hundred rows doesn't need it. Measure first: if the recording shows no long task, the simple version wins.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~1:24. The trade-off slide. Many apps choose pagination or "load more" instead precisely because of these costs: it keeps find-in-page, links and accessibility working.</p>
+  </aside>
+</section>
+
+<section data-title="Fewer things, cheaper">
+  <p class="kicker">Fewer things · without the cost</p>
+  <h2>Two cheaper ways to show less</h2>
+  <div class="vs2">
+    <div class="card"><span class="label">paginate · load more</span><p>Show 100, a button for the next 100. Or an <code>IntersectionObserver</code> on the last row loads more as it scrolls into view.</p></div>
+    <div class="card"><span class="label">content-visibility</span><p>One CSS rule: the browser skips layout and paint for rows that are off-screen. The elements still exist.</p>
+      <script type="text/x-code" data-lang="css" class="small">.row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 32px;
+}</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:25. <code>content-visibility: auto</code> helps with the layout part (the purple ≈ 1.5 s) but not with creating 87 000 rows (the yellow ≈ 1 s), and the nodes still use memory. Try it on the sales log in Exercise 3 and compare the recording: it's a nice demonstration of what the browser can skip by itself. <code>contain-intrinsic-size</code> gives skipped rows a placeholder height so the scrollbar stays right.</p>
+  </aside>
+</section>
+
+<section data-title="Web Workers">
+  <p class="kicker">Elsewhere</p>
+  <h2>A Web Worker: heavy computation on another thread</h2>
+  <div class="vs2">
+    <div>
+      <h3>main.js</h3>
+      <script type="text/x-code" data-lang="js" class="small">const worker = new Worker("worker.js",
+  { type: "module" });
+
+worker.postMessage({ words, guess });
+worker.addEventListener("message", (event) => {
+  state.scores = event.data;
+  render();
+});</script>
+    </div>
+    <div>
+      <h3>worker.js</h3>
+      <script type="text/x-code" data-lang="js" class="small">self.addEventListener("message", (e) => {
+  const { words, guess } = e.data;
+  // 4 seconds of work, off the main thread
+  const scores = scoreAll(words, guess);
+  self.postMessage(scores);
+});
+// no document here: data in, data out</script>
+    </div>
+  </div>
+  <p>The page stays responsive while the worker computes. The recording shows a second track: <strong>Worker</strong>.</p>
+  <aside class="notes">
+    <p>~1:27. Messages are copied (structured clone, like <code>structuredClone</code>), so sending 100 MB back and forth costs time too. Workers can <code>import</code> modules with <code>type: "module"</code>. The code needs a server (live-server), not <code>file://</code>. Good candidates: simulations stepping thousands of agents, scoring every word in a word list, image processing on big photos. Bad candidates: anything that needs the DOM.</p>
+  </aside>
+</section>
+
+<section data-title="Later, and once">
+  <p class="kicker">Later · once</p>
+  <h2>Don't do it yet. Don't do it twice.</h2>
+  <div class="vs2">
+    <div>
+      <h3>Later</h3>
+      <ul>
+        <li><code>&lt;img loading="lazy"&gt;</code>: images below the fold load when they're needed.</li>
+        <li><code>IntersectionObserver</code>: start an animation or a fetch when the element scrolls into view.</li>
+        <li><code>await import("./heavy.js")</code>: load a big module on the first click, not on page load.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Once</h3>
+      <script type="text/x-code" data-lang="js" class="small">// doesn't depend on the search:
+// compute it once, at startup
+const tops = topItems();
+
+// a pure function: memoise it
+const cache = new Map();
+function scoreFor(word) {
+  if (!cache.has(word)) {
+    cache.set(word, score(word));
+  }
+  return cache.get(word);
+}</script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:28. Memoising only works for pure functions: same input, same output, no side effects. That's another payoff of keeping the model free of the DOM (Lecture 5's separation). The sales log's <code>topItems()</code> is the simplest case: its input never changes, so compute it once.</p>
+  </aside>
+</section>
+
+<section data-title="Symptom to pattern">
+  <p class="kicker">Cheat sheet</p>
+  <h2>Symptom → where to look → what to try</h2>
+  <table class="dtable">
+    <tr><th>symptom</th><th>in the recording</th><th>try</th></tr>
+    <tr><td>Typing lags</td><td>a long task on every <code>input</code> event</td><td>debounce · less work per render · a worker</td></tr>
+    <tr><td>Scrolling janks</td><td>wide purple Layout, many DOM nodes</td><td>virtualise · paginate · <code>content-visibility</code></td></tr>
+    <tr><td>Purple with red corners</td><td>"Forced reflow"</td><td>read all, then write all</td></tr>
+    <tr><td>Slow first load</td><td>a long Network waterfall, big parse time</td><td>lazy · smaller dependencies</td></tr>
+    <tr><td>Slower over time</td><td>Performance monitor only ever climbing</td><td>listeners piling up on elements that survive <code>render()</code></td></tr>
+  </table>
+  <aside class="notes">
+    <p>~1:29. Leave it up during Exercise 3.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3 — Test your hypotheses">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 3 · solo · 25 min</p>
+  <div class="ex-head"><h2>Test your hypotheses</h2><button class="timer" data-min="25"></button></div>
+  <ol>
+    <li>The three pages from Exercise 2, as files: download them.</li>
+    <li>Record before. Change the one thing your hypothesis names. Record after.</li>
+    <li>Same results on the page, less time in the recording.</li>
+  </ol>
+  <p class="where mt">09-draw-measure-borrow → <b><a href="https://lopin.me/harbour/programming-interactivity-9-draw-measure-borrow/exercises/03-test-your-hypotheses.html" target="_blank" rel="noopener">Exercise 3 · Test your hypotheses</a></b></p>
+  <aside class="notes">
+    <p>~1:30 → 1:55. Reference fixes, all producing the same results as the original pages: <b>Sales log</b>: compute <code>topItems()</code> once at start-up, and render only the rows in view (fixed 32 px rows, a spacer for the scrollbar, the visible slice moved with <code>transform</code>). <b>Takings bars</b>: read the track width once, before the loop. <b>Find a dish</b>: the dish texts use about 150 distinct words, but <code>fuzzyScore</code> runs its table for every word of every dish (≈ 2.5 million per keystroke): score each distinct word once per query and look it up per dish. Debouncing on top runs it once per pause; a Worker moves it off the main thread. Suggested order: takings bars (minutes), then the dish search, then the sales log (the largest). The numbers are on the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="What the fixes buy">
+  <p class="kicker">Exercise 3 · what one change can buy · CPU 4×</p>
+  <h2>Same results, a fraction of the time</h2>
+  <table class="dtable buy">
+    <tr><th>page · action</th><th>before</th><th>after</th></tr>
+    <tr><td>Sales log · type <code>t</code></td><td class="b">≈ 11 s</td><td class="a">≈ 40 ms</td></tr>
+    <tr><td>Takings bars · sort</td><td class="b">≈ 750 ms</td><td class="a">≈ 130 ms</td></tr>
+    <tr><td>Find a dish · per letter</td><td class="b">≈ 0.8–1.1 s</td><td class="a">≈ 0.2–0.5 s</td></tr>
+  </table>
+  <p class="muted small mt">Time from the action to the next frame. Reference fixes, Chrome 149 on an M-series MacBook, CPU throttled 4×; your laptop's numbers will differ, the ratios less so.</p>
+  <p class="answers-link">Answers: <b><a href="https://lopin.me/harbour/programming-interactivity-9-draw-measure-borrow/exercises/03-answers.html" target="_blank" rel="noopener">Exercise 3 · answers and fixed pages</a></b></p>
+  <aside class="notes">
+    <p>~1:55. Show after the exercise, or as a target during it. The fixes are on the answers page (<code>exercises/03-answers.html</code>). Unthrottled: sales log ≈ 2.8 s → ≈ 10 ms, takings bars ≈ 175 → ≈ 30 ms, dish search ≈ 190–250 → ≈ 50–130 ms per letter. What's left after each fix: the takings bars still rebuild 1 000 rows; the dish search still walks 100 000 dishes and sorts the matches (a word → dishes index would remove most of that). The sales log after: the 5 ms filter is now most of a keystroke.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · BORROW
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="Borrow" data-at="1:55" data-title="Act 4 — Borrow">
+  <div class="act-deco">@7.9.0</div>
+  <div class="act-num">act 04</div>
+  <h1>Borrow</h1>
+  <div class="act-meta"><span class="chip">1:55 – 2:14</span><span>other people's code, without a build step</span></div>
+  <div class="act-list"><span>CDN</span><span>&lt;script src&gt;</span><span>import from a URL</span><span>import map</span><span>versions</span><span>security</span><span>vendoring</span><span>npm</span><span>bundlers</span></div>
+</section>
+
+<section data-title="What a CDN is">
+  <p class="kicker">Content delivery network</p>
+  <h2>A CDN keeps copies of files on servers near the users</h2>
+  <div class="cdnflow">
+    <div class="node n-b"><b>browser</b><span>asks for a URL</span></div>
+    <div class="arrow"><span>nearby</span></div>
+    <div class="node n-e"><b>edge server</b><span>one of many, in many cities<br>(points of presence)</span></div>
+    <div class="arrow dashed"><span>only on a miss</span></div>
+    <div class="node n-o"><b>origin</b><span>the server with the original file</span></div>
+  </div>
+  <div class="vs2 cdnterms">
+    <ul>
+      <li><strong>Cache hit</strong>: the edge has a copy and answers itself.</li>
+      <li><strong>Cache miss</strong>: the edge fetches from the origin, answers, and keeps a copy.</li>
+    </ul>
+    <ul>
+      <li>DNS points the hostname at the CDN, and the request reaches a nearby edge.</li>
+      <li>The origin decides how long copies may be kept: the <code>Cache-Control</code> header.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:56. Why it matters: latency is mostly distance, and every request pays at least one round trip; a nearby edge makes that trip short. The origin also gets only the misses, not every request. Large CDNs: Cloudflare, Fastly, Akamai, Amazon CloudFront. How a request finds a nearby edge depends on the CDN: some answer DNS with a nearby server's address, Cloudflare announces the same addresses from every location (anycast) and the network routes to the closest. It's not only for libraries: this course's pages on GitHub Pages are served through Fastly, and the Lecture 8 API (harbour-api.lopin.me) runs on Cloudflare's network.</p>
+  </aside>
+</section>
+
+<section data-title="A CDN in the headers">
+  <p class="kicker">DevTools → Network → a request → Headers</p>
+  <h2>You can see the CDN in the response headers</h2>
+  <div class="vs2">
+    <div>
+      <h3>lopin.me · GitHub Pages</h3>
+<pre class="raw sm"><span class="n">cache-control</span>: max-age=600
+<span class="n">age</span>: 0
+via: 1.1 varnish
+x-served-by: cache-toj-…-TOJ
+<span class="k">x-cache: MISS</span></pre>
+    </div>
+    <div>
+      <h3>cdn.jsdelivr.net · d3@7.9.0</h3>
+<pre class="raw sm"><span class="n">cache-control</span>: public, max-age=31536000,
+               s-maxage=31536000, immutable
+<span class="n">age</span>: 7408550
+server: cloudflare
+<span class="s">cf-cache-status: HIT</span></pre>
+    </div>
+  </div>
+  <ul class="mt">
+    <li><strong>Standard HTTP</strong>: <code>Cache-Control</code> (who may keep a copy, and for how long: <code>max-age</code> in seconds), <code>Age</code> (seconds this copy has been in the cache: here 86 days).</li>
+    <li><strong>Vendor headers</strong>: <code>x-cache</code>, <code>x-served-by</code> (Fastly), <code>cf-cache-status</code> (Cloudflare): hit or miss, and which edge answered.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:58. Both captured with <code>curl -I</code> while writing this deck; run it again and the values change. The left one: GitHub Pages behind Fastly (Varnish is Fastly's cache software); <code>TOJ</code> is the code of the Fastly location that answered (Madrid), and it didn't have a copy yet. The right one: jsDelivr's file came from Cloudflare's edge, which had held it for 86 days. <code>max-age=31536000</code> is one year; <code>s-maxage</code> is the same limit for shared caches like a CDN; <code>immutable</code> tells the browser not to even revalidate. A CDN can promise that only for URLs whose content never changes: that's why the version is in the URL.</p>
+  </aside>
+</section>
+
+<section data-title="What's out there">
+  <p class="kicker">Hints, not tutorials</p>
+  <h2>What's out there</h2>
+  <div class="cat">
+    <div class="card"><span class="label">charts</span><p>Observable Plot · Chart.js · uPlot · ECharts · D3</p></div>
+    <div class="card"><span class="label">maps</span><p>Leaflet · MapLibre GL</p></div>
+    <div class="card"><span class="label">3D</span><p>three.js</p></div>
+    <div class="card"><span class="label">physics</span><p>Matter.js</p></div>
+    <div class="card"><span class="label">sound</span><p>Tone.js</p></div>
+    <div class="card"><span class="label">maths · data</span><p>math.js · simple-statistics</p></div>
+    <div class="card"><span class="label">colour</span><p>culori · chroma.js</p></div>
+    <div class="card"><span class="label">animation</span><p>Motion · GSAP</p></div>
+  </div>
+  <p>Each one's documentation has examples you can copy and run. The rest of the act is how to load them, and what that costs.</p>
+  <aside class="notes">
+    <p>~1:56. Don't teach any of them. Point out: Plot draws SVG, Chart.js draws canvas, D3 is a toolkit (scales, shapes, data joins) rather than a chart library. How to judge one before adding it: slides "What it costs" and "The package that isn't". Everything here works without a build step.</p>
+  </aside>
+</section>
+
+<section data-title="An external dependency">
+  <p class="kicker">What you take on</p>
+  <h2>Code you didn't write, from a server you don't run</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">it can be down</span><p>The CDN, a bad network, a company firewall.</p></div>
+    <div class="card"><span class="label">it can change</span><p>A new version with a different API, if you didn't pin one.</p></div>
+    <div class="card"><span class="label">it can be big</span><p>Hundreds of kilobytes to parse before your first line runs.</p></div>
+    <div class="card"><span class="label">it can be hostile</span><p>A compromised package runs with all the rights of your page.</p></div>
+    <div class="card"><span class="label">it sees your visitors</span><p>Every page view sends an IP address to the CDN. A privacy question in the EU.</p></div>
+    <div class="card"><span class="label">it saves you weeks</span><p>And it's tested by thousands of other projects. That's why we still do it.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~1:58. Each of the first five has a slide later in the act: versions, size, security, vendoring. The sixth card is the honest reason: almost every real project has dependencies; the skill is choosing and pinning them.</p>
+  </aside>
+</section>
+
+<section data-title="Package CDNs">
+  <p class="kicker">CDNs for open-source packages</p>
+  <h2>Package CDNs serve the npm registry as URLs</h2>
+  <div class="url">
+    <span class="u1">https://<small>scheme</small></span><span class="u2">cdn.jsdelivr.net<small>host</small></span><span class="u1">/npm/<small>registry</small></span><span class="u3">d3<small>package</small></span><span class="u4">@7.9.0<small>version</small></span><span class="u5">/+esm<small>file · build</small></span>
+  </div>
+  <ul>
+    <li><strong>npm</strong> is the registry where JavaScript packages are published. Millions of them.</li>
+    <li><strong>jsDelivr</strong>, <strong>unpkg</strong>, <strong>esm.sh</strong> fetch packages from the npm registry (their origin) and serve any file in them through a CDN. (cdnjs hosts a curated list instead.)</li>
+    <li>Remove the file part and jsDelivr lists every file in the package: <code>cdn.jsdelivr.net/npm/d3@7.9.0/</code></li>
+  </ul>
+  <aside class="notes">
+    <p>~2:00. jsDelivr's <code>/+esm</code> and esm.sh convert a package to an ES module on the fly, rewriting its own imports into more CDN URLs. <code>d3@7.9.0/+esm</code> is a 1.5 kB file that imports 30 more: look at it in the Network panel.</p>
+  </aside>
+</section>
+
+<section data-title="Way 1: script src">
+  <p class="kicker">Way 1 · the oldest</p>
+  <h2><code>&lt;script src&gt;</code>: the library becomes a global</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="html" class="xs"><link rel="stylesheet" href=
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src=
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<script src="main.js"><\/script>
+
+<!-- in main.js: L.map("map"), L is window.L --></script>
+    <ul>
+      <li>The file is a <strong>UMD</strong> build: it puts one global on <code>window</code> (<code>L</code>, <code>Chart</code>, <code>d3</code>).</li>
+      <li><strong>Order matters</strong>: the library's tag before yours.</li>
+      <li>Globals share one namespace with your scripts: a library's <code>d3</code> and your own <code>d3</code> variable, and one silently hides or overwrites the other.</li>
+      <li>Some libraries need their <strong>CSS</strong> too.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:01. Still the most common snippet in READMEs, and still fine for a single library. <code>defer</code> on both tags keeps the order and doesn't block parsing.</p>
+  </aside>
+</section>
+
+<section data-title="Way 2: import from a URL">
+  <p class="kicker">Way 2 · ES modules</p>
+  <h2>Import from a URL, in a module</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// main.js · <script type="module" src="main.js">
+import * as d3 from
+  "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import confetti from
+  "https://esm.sh/canvas-confetti@1.9.3";
+import { formatHex } from "https://esm.sh/culori@4";
+
+d3.scaleLinear([0, 150], [200, 0]);</script>
+    <ul>
+      <li>No globals: the names exist in this module only (Lecture 5).</li>
+      <li><strong>Named</strong> <code>{ formatHex }</code>, <strong>default</strong> <code>confetti</code>, <strong>namespace</strong> <code>* as d3</code>: which one works depends on what the package exports. The README says.</li>
+      <li>Only inside <code>type="module"</code>.</li>
+    </ul>
+    <div class="err step">Uncaught SyntaxError: Cannot use import statement outside a module</div>
+  </div>
+  <aside class="notes">
+    <p>~2:03. The error appears when the script tag lacks <code>type="module"</code>. If a default import gives <code>undefined</code> or "does not provide an export named default", try the namespace import and log it: <code>console.log(d3)</code> shows what's inside. The <code>@4</code> on culori is on purpose: two slides later we see why it should be exact.</p>
+  </aside>
+</section>
+
+<section data-title="Way 3: bare names">
+  <p class="kicker">Way 3 · what the docs show</p>
+  <h2>Bare names fail in the browser</h2>
+  <script type="text/x-code" data-lang="js" class="mid">import * as d3 from "d3"; // copied from the README</script>
+  <div class="err">Uncaught TypeError: Failed to resolve module specifier "d3". Relative references must start with either "/", "./", or "../".</div>
+  <p class="mt"><code>"d3"</code> is a <strong>bare specifier</strong>: a package name, not a URL. Node and bundlers know where npm packages live (<code>node_modules</code>). The browser only knows URLs.</p>
+  <aside class="notes">
+    <p>~2:04. Nearly every README and nearly every AI answer writes imports this way, because nearly every project has a build step. Firefox's message: "The specifier “d3” was a bare specifier, but was not remapped to anything." Two ways out: replace the name with the URL in every file, or tell the browser once: the import map.</p>
+  </aside>
+</section>
+
+<section data-title="Import maps">
+  <p class="kicker">One place for every dependency</p>
+  <h2>An import map: names to URLs</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="html" class="small"><script type="importmap">
+{
+  "imports": {
+    "d3":
+      "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm",
+    "culori": "./vendor/culori-4.0.1.mjs"
+  }
+}
+<\/script>
+<script type="module" src="main.js"><\/script>
+
+<!-- main.js: import * as d3 from "d3"; --></script>
+    <ul>
+      <li>Every module on the page can now <code>import … from "d3"</code>, as the docs write it.</li>
+      <li>Every version in <strong>one file</strong>. Upgrading is one line.</li>
+      <li>It must come <strong>before</strong> the module scripts that use it.</li>
+      <li>A URL or a local path: the code doesn't care which.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:06. Supported everywhere since 2023. The second entry previews vendoring (slide "Vendor it"): switching from CDN to a local copy changes the map, not the code. A trailing-slash entry (<code>"lodash/": "https://…/lodash-es@4.17.21/"</code>) maps a whole folder, for packages imported by path.</p>
+  </aside>
+</section>
+
+<section data-title="Which file?">
+  <p class="kicker">One package, several builds</p>
+  <h2>Which file do I load?</h2>
+  <table class="dtable">
+    <tr><th>build</th><th>looks like</th><th>in a browser</th></tr>
+    <tr><td>ES module</td><td><code>export function …</code> · <code>*.mjs</code> · <code>dist/*.esm.js</code></td><td class="yes"><code>import</code>, in <code>type="module"</code></td></tr>
+    <tr><td>UMD / IIFE</td><td>sets <code>window.Something</code> · <code>*.umd.js</code> · <code>*.iife.js</code></td><td class="yes"><code>&lt;script src&gt;</code></td></tr>
+    <tr><td>CommonJS</td><td><code>module.exports</code> · <code>require(…)</code></td><td class="no">no: <code>require</code> / <code>module is not defined</code></td></tr>
+  </table>
+  <p class="mt">Where to look: the README's <strong>CDN</strong> or <strong>browser</strong> section · the <code>exports</code>, <code>module</code>, <code>main</code> fields in <code>package.json</code> · or let <code>+esm</code> / esm.sh convert it.</p>
+  <aside class="notes">
+    <p>~2:07. CommonJS is Node's original module format; plenty of packages still ship only that. The CDN converters handle it. If the library throws <code>process is not defined</code>, it expects Node or a bundler (<code>process.env.NODE_ENV</code>): try the CDN's converted build, or find another. A <code>.cjs</code> file from jsDelivr isn't even run: Chrome refuses its MIME type, <code>application/node</code>.</p>
+  </aside>
+</section>
+
+<section data-title="What it costs">
+  <p class="kicker">Look before you choose</p>
+  <h2>What a dependency costs, in two panels</h2>
+  <div class="vs2">
+    <div class="card"><span class="label">network</span><p>Filter by <code>JS</code>, disable cache, reload. How many requests did one <code>import</code> start? How many kB transferred? One converted module can import dozens more (<code>d3@7.9.0/+esm</code>: 30): a waterfall.</p></div>
+    <div class="card"><span class="label">performance</span><p>Record and reload. <strong>Compile</strong> and <strong>Evaluate</strong> (Script or Module) in yellow: what the library costs on the main thread before your code runs.</p></div>
+  </div>
+  <p class="mt">A 500 kB library to format one date is a bad trade. <code>Intl.DateTimeFormat</code> is free.</p>
+  <aside class="notes">
+    <p>~2:08. This ties Act 4 back to Act 2. Sizes, minified and gzipped (measured): Leaflet 1.9.4 42 kB, Chart.js 4.4.1 69 kB, D3 7.9.0 92 kB, three.js 0.170 171 kB. Before reaching for a library, check what the platform has: <code>Intl</code> (numbers, dates, plurals), <code>structuredClone</code>, <code>crypto.randomUUID</code>, the Web Animations API.</p>
+  </aside>
+</section>
+
+<section data-title="Versions">
+  <p class="kicker">Semantic versioning</p>
+  <h2>Pin the version, or the code changes under you</h2>
+  <div class="url">
+    <span class="u3">7<small>major · breaks things</small></span><span class="u1 dot">.</span><span class="u2">9<small>minor · adds things</small></span><span class="u1 dot">.</span><span class="u4">0<small>patch · fixes things</small></span>
+  </div>
+  <table class="dtable">
+    <tr><td><code>…/npm/d3/+esm</code></td><td>latest. Can become a new major at any moment.</td></tr>
+    <tr><td><code>…/npm/d3@7/+esm</code></td><td>the newest 7.x. Safer, still moves.</td></tr>
+    <tr><td><code>…/npm/d3@7.9.0/+esm</code></td><td>always version 7.9.0. <strong>Pin.</strong></td></tr>
+  </table>
+  <aside class="notes">
+    <p>~2:10. Semver is a promise, not a guarantee: minors occasionally break things too. A pinned <code>+esm</code> URL keeps the version, not the bytes: jsDelivr generates those files and may rebuild them. Static files (<code>dist/d3.min.js</code>) never change, and only those work with the next slide's integrity hashes; jsDelivr itself says not to use them on generated files.</p>
+  </aside>
+</section>
+
+<section data-title="AI trap: the wrong major">
+  <p class="kicker">Trap · the code is from another era</p>
+  <h2>The AI's code was right, for D3 v3</h2>
+  <script type="text/x-code" data-lang="js" class="mid">const y = d3.scale.linear().domain([0, 150]).range([200, 0]);</script>
+  <div class="err">Uncaught TypeError: Cannot read properties of undefined (reading 'linear')</div>
+  <ul class="mt">
+    <li><code>d3.scale.linear()</code> is D3 v3. Since v4 (2016) it's <code>d3.scaleLinear()</code>. Models learned from years of old examples.</li>
+    <li>Compare the version the code <strong>assumes</strong> with the version you <strong>load</strong>. Ask for the version explicitly.</li>
+    <li>Big jumps have a migration guide or a <code>CHANGELOG.md</code>. Read the one for your major.</li>
+  </ul>
+  <aside class="notes">
+    <p>~2:11. Same family: Chart.js v2 options in a v4 project, Leaflet plugins for 0.7, three.js examples using <code>Geometry</code> (removed in r125). The fix is cheap if you recognise it: the error says "undefined", meaning the namespace exists but not that member.</p>
+  </aside>
+</section>
+
+<section data-title="AI trap: the package that isn't">
+  <p class="kicker">Trap · the package that isn't</p>
+  <h2>Check that the package exists, and is the one you think</h2>
+  <div class="split center">
+    <ul>
+      <li>Models sometimes invent plausible package names.</li>
+      <li>People register those names and publish malware into them (<strong>slopsquatting</strong>). Typos work too (<strong>typosquatting</strong>).</li>
+      <li>Before you add one: the <strong>npm page</strong>. A linked repository, weekly downloads, the last publish date, the maintainers.</li>
+    </ul>
+    <div class="card"><span class="label">two minutes</span><p>npmjs.com/package/<em>name</em> → repository → stars, issues, last commit. A package with 12 downloads and no repository is not your chart library.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:12. This matters more in projects with npm, where <code>npm install</code> runs install scripts on your machine. In a browser page the damage is limited to the page, which leads to the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="It runs with your page's rights">
+  <p class="kicker">Security</p>
+  <h2>A library runs with all of your page's rights</h2>
+  <div class="split center">
+    <div class="stack">
+      <p>It can read the DOM and <code>localStorage</code>, send <code>fetch</code> requests, log keystrokes. There's no sandbox between your code and theirs.</p>
+      <p><strong>Subresource integrity</strong>: the browser refuses the file if a single byte changed.</p>
+    </div>
+    <script type="text/x-code" data-lang="html" class="xs"><script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha384-…"
+  crossorigin="anonymous"><\/script></script>
+  </div>
+  <aside class="notes">
+    <p>~2:13. Libraries often publish the hash with their install snippet (Leaflet's download page does); or compute it: <code>openssl dgst -sha384 -binary leaflet.js | openssl base64 -A</code>. Works on <code>&lt;script&gt;</code> and <code>&lt;link rel="stylesheet"&gt;</code>; import maps have an <code>integrity</code> section in newer browsers. Pin first: a hash for a moving version breaks on the next release. In 2024 the polyfill.io CDN was taken over and served malware to every site still loading it: the case for integrity, and for the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="Vendor it">
+  <p class="kicker">Offline, frozen</p>
+  <h2>Vendor it: a copy in your repository</h2>
+  <div class="split center">
+<pre class="raw"><span class="c"># download the exact file</span>
+curl -L -o vendor/d3-7.9.0.mjs \
+  https://esm.sh/d3@7.9.0/es2022/d3.bundle.mjs
+
+<span class="c"># the import map points at it</span>
+<span class="k">"d3"</span>: <span class="s">"./vendor/d3-7.9.0.mjs"</span></pre>
+    <ul>
+      <li>Works offline, on any Wi-Fi, forever.</li>
+      <li>The version is frozen and visible in the repository.</li>
+      <li>Check it's <strong>one file</strong>: jsDelivr's <code>d3@7.9.0/+esm</code> is 1.5 kB that imports 30 more. esm.sh's <code>d3.bundle.mjs</code> has everything.</li>
+      <li>CSS, fonts, and data files too.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:14. Test it: DevTools → Network → Offline, reload. Anything that fails is still on a CDN. The same goes for API data: a cached JSON file in the repo beats a live API on a bad connection.</p>
+  </aside>
+</section>
+
+<section data-title="From URLs to packages">
+  <p class="kicker">The same ideas, automated</p>
+  <h2>What we did by hand, npm and a bundler do for you</h2>
+  <table class="dtable bridge">
+    <tr><th>today, by hand</th><th></th><th>with npm and a bundler</th></tr>
+    <tr><td>the import map</td><td>→</td><td><code>dependencies</code> in <code>package.json</code></td></tr>
+    <tr><td>an exact version in the URL</td><td>→</td><td>the lockfile, <code>package-lock.json</code></td></tr>
+    <tr><td><code>vendor/</code></td><td>→</td><td><code>node_modules/</code> (not committed)</td></tr>
+    <tr><td>the CDN converting to ESM</td><td>→</td><td>the bundler resolving bare names</td></tr>
+    <tr><td>the order of <code>&lt;script&gt;</code> tags</td><td>→</td><td>the dependency graph</td></tr>
+    <tr><td>checking the npm page</td><td>→</td><td><code>npm audit</code>, Dependabot</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~2:15. The point: none of it is magic. A bundler does what they did by hand today, for hundreds of packages, automatically.</p>
+  </aside>
+</section>
+
+<section data-title="npm and a bundler">
+  <p class="kicker">npm and a bundler</p>
+  <h2>What npm and a bundler add</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">// package.json
+{
+  "name": "market-dashboard",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": { "d3": "^7.9.0" },
+  "devDependencies": { "vite": "^7.0.0" }
+}</script>
+    <ul>
+      <li><code>npm install d3</code>: into <code>node_modules</code>, exact version in the lockfile. Commit the lockfile.</li>
+      <li><code>^7.9.0</code>: any 7.x from 7.9.0. <code>~7.9.0</code>: only 7.9.x.</li>
+      <li>A build tool like <strong>Vite</strong> (bundling with Rollup and esbuild): dev server, bare names, TypeScript, minifying, dropping unused code.</li>
+      <li>The output is still static HTML, CSS and JS.</li>
+      <li>Next: your own code as packages, and frameworks built on all of this.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:16. One slide so the words are familiar. A page with an import map and no build step is a complete, deployable project; a bundler earns its place when there are many dependencies, TypeScript, or a lot of code to split and minify.</p>
+  </aside>
+</section>
+
+<section data-title="Tell your AI">
+  <p class="kicker">Working with an assistant</p>
+  <h2>Tell your AI how this project loads code</h2>
+  <div class="split center">
+<pre class="raw"><span class="c"># AGENTS.md</span>
+<span class="k">## Dependencies</span>
+- No build step. No npm install.
+- Libraries load through the import map
+  in index.html, from vendor/.
+- Exact versions only: d3 7.9.0.
+  Use the API of that version.
+- Ask before adding a dependency.</pre>
+    <ul>
+      <li>Many coding assistants read a file like <code>AGENTS.md</code> (or <code>CLAUDE.md</code>) from the repository before they write.</li>
+      <li>Without it, they often assume npm, a bundler, and whatever version they remember.</li>
+      <li>It's also documentation for whoever reads the repository.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:17. An assistant that follows the project's rules writes code in the shape you expect, and you can check it against the rules.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     WRAP
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Wrap" data-at="2:14" data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>Draw, measure, borrow</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">draw</span><p>Boxes for grids, SVG for shapes with events, canvas for thousands and for pixels. One <code>render(state)</code>.</p></div>
+    <div class="card"><span class="label">measure</span><p>Record with CPU 4×. Long task, colours, Bottom-Up. Read all, then write all.</p></div>
+    <div class="card"><span class="label">do less</span><p>Less often, fewer things, elsewhere, later, once. Virtualise only what needs it.</p></div>
+    <div class="card"><span class="label">borrow</span><p>A CDN URL with an exact version. An import map. Vendored to work offline.</p></div>
+    <div class="card"><span class="label">trust</span><p>Check the package and the major version. Integrity hashes. It runs with your rights.</p></div>
+    <div class="card"><span class="label">next</span><p>npm, lockfiles and bundlers do this at scale. Same ideas.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:14. One sentence per card.</p>
+  </aside>
+</section>
+
+<section data-title="Reading">
+  <p class="kicker">Reading</p>
+  <h2>To go deeper</h2>
+  <ul class="reading">
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch" target="_blank" rel="noopener">MDN · SVG tutorial</a> <span class="muted">— paths, shapes, viewBox</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial" target="_blank" rel="noopener">MDN · Canvas tutorial</a> <span class="muted">— drawing, pixels, animation</span></li>
+        <li><a href="https://developer.chrome.com/docs/devtools/performance" target="_blank" rel="noopener">Chrome · Analyze runtime performance</a> <span class="muted">— the panel, step by step</span></li>
+        <li><a href="https://web.dev/articles/avoid-large-complex-layouts-and-layout-thrashing" target="_blank" rel="noopener">web.dev · Layout thrashing</a> <span class="muted">— what forces layout</span></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap" target="_blank" rel="noopener">MDN · Import maps</a> <span class="muted">— the full syntax</span></li>
+      </ul>
+  <aside class="notes">
+    <p>~2:15. Everything is in github.com/nlopin/programming-interactivity-exercises → 09-draw-measure-borrow.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Draw, measure, borrow. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="big-title"><span class="d">Draw,</span><br><span class="m">measure,</span><br><span class="b">borrow.</span></h1>
+      <p class="title-sub">exercises · demos · the cheatsheet →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw"><span class="c">// the whole lecture</span>
+render(state);      <span class="c">// draw</span>
+performance.mark(); <span class="c">// measure</span>
+import "d3";        <span class="c">// borrow</span></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Takings · Harbour Night Market</title>
+<style>
+  :root { color-scheme: dark; --bg: #12151c; --card: #1b202b; --line: #2c3342; --ink: #e8ecf4; --muted: #8a93a6; --gold: #ffb547; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+  header { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 20px; }
+  button { font: inherit; padding: 8px 14px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+  button:hover { border-color: var(--gold); }
+  .total { color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+  main { padding: 20px; }
+  .bars { list-style: none; margin: 0; padding: 0; }
+  .row { display: grid; grid-template-columns: 50px minmax(0, 200px) minmax(0, 1fr) 90px; gap: 12px; align-items: center; height: 28px; padding: 0 10px; border-bottom: 1px solid var(--line); }
+  .row .pitch, .row .amount { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .row .amount { text-align: right; }
+  .row b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+  .bar { width: 0; height: 100%; background: var(--gold); border-radius: 5px; }
+  @media (max-width: 600px) {
+    .row { grid-template-columns: 40px minmax(0, 1fr) 70px; height: auto; padding: 6px 10px; }
+    .track { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Takings by stall</h1>
+  <button type="button" class="sort">Sort by takings</button>
+  <span class="total" aria-live="polite"></span>
+</header>
+<main>
+  <ol class="bars"></ol>
+</main>
+
+<template id="row-template">
+  <li class="row">
+    <span class="pitch"></span>
+    <b></b>
+    <div class="track"><div class="bar"></div></div>
+    <span class="amount"></span>
+  </li>
+</template>
+
+<script type="module">
+// The data: the season's takings for 1 000 pitches across the harbour,
+// generated from a fixed seed so everyone sees the same numbers.
+const FIRST = ["Dumpling", "Taco", "Churro", "Noodle", "Grill", "Waffle", "Arepa", "Samosa", "Bao", "Crêpe", "Falafel", "Poke", "Ramen", "Satay", "Gyoza", "Pierogi", "Empanada", "Kebab", "Mochi", "Curry"];
+const SECOND = ["Dynasty", "Bike", "Boat", "Nation", "Corner", "Route", "House", "Cart", "Garden", "Lab", "Shack", "Club", "Express", "Bar", "Republic", "Kitchen", "Window", "Social", "Stop", "Works"];
+
+let seed = 7;
+const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+
+const stalls = [];
+for (let pitch = 1; pitch <= 1000; pitch++) {
+  stalls.push({
+    pitch,
+    name: `${FIRST[Math.floor(random() * FIRST.length)]} ${SECOND[Math.floor(random() * SECOND.length)]}`,
+    takings: Math.round(2000 + random() ** 2 * 38000),
+  });
+}
+const maxTakings = Math.max(...stalls.map((s) => s.takings));
+const euro = new Intl.NumberFormat("en", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+
+const state = { sort: "pitch" };
+
+const list = document.querySelector(".bars");
+const sortButton = document.querySelector(".sort");
+const total = document.querySelector(".total");
+const template = document.querySelector("#row-template");
+
+function row(stall) {
+  const li = template.content.firstElementChild.cloneNode(true);
+  li.querySelector(".pitch").textContent = `#${stall.pitch}`;
+  li.querySelector("b").textContent = stall.name;
+  li.querySelector(".amount").textContent = euro.format(stall.takings);
+  return li;
+}
+
+function sorted() {
+  if (state.sort === "takings") return stalls.toSorted((a, b) => b.takings - a.takings);
+  return stalls.toSorted((a, b) => a.pitch - b.pitch);
+}
+
+function render() {
+  const visible = sorted();
+  list.replaceChildren(...visible.map(row));
+
+  const bars = list.querySelectorAll(".bar");
+  const shares = visible.map((s) => s.takings / maxTakings);
+  bars.forEach((bar, i) => {
+    const w = bar.parentElement.offsetWidth;
+    bar.style.width = `${shares[i] * w}px`;
+  });
+
+  sortButton.textContent = state.sort === "takings" ? "Sort by pitch" : "Sort by takings";
+  total.textContent = `${stalls.length.toLocaleString("en")} stalls · ${euro.format(stalls.reduce((sum, s) => sum + s.takings, 0))}`;
+}
+
+sortButton.addEventListener("click", () => {
+  state.sort = state.sort === "takings" ? "pitch" : "takings";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

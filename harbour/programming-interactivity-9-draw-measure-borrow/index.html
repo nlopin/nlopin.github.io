@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draw, measure, borrow · Programming Interactivity 9</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .page.wire .big-links a { font: 700 1.05rem "Space Grotesk", sans-serif; color: #03101b; text-decoration: none; padding: 0.8rem 1.3rem; border-radius: 99px; background: #3ee6ff; box-shadow: 0 0 24px rgb(62 230 255 / 0.4); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+    .page.wire .grid a { display: block; height: 100%; box-sizing: border-box; padding: 1rem 1.1rem 1.1rem; background: #0b1426; border: 1.5px solid #1f3052; border-left: 4px solid var(--c, #3ee6ff); border-radius: 8px; color: #e3ecff; text-decoration: none; }
+    .grid a:hover, .grid a:focus-visible { background: #111d36; outline: none; }
+    .grid b { display: block; font-size: 1.15rem; margin-bottom: 0.25rem; color: #fff; }
+    .grid small { display: block; font: 600 0.72rem "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c, #3ee6ff); margin-bottom: 0.4rem; }
+    .grid span { color: #cfdcf7; font-size: 0.95rem; }
+    .a1 { --c: #3ee6ff; } .a2 { --c: #b6ff3b; } .a3 { --c: #ff4fd8; } .a4 { --c: #ffb547; }
+    .keys { font: 500 0.9rem/1.8 "IBM Plex Mono", monospace; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · Lecture 9</span><span>theory + practice</span></div>
+    <div class="hero">
+      <span class="eyebrow-tag">Lecture 9</span>
+      <h1>Draw, <em>measure</em>, borrow</h1>
+      <p class="intro">Three topics. Drawing: HTML boxes, SVG and canvas, vectors and bitmaps. Performance: the Performance panel, then patterns that do less work, like virtualisation and Web Workers. Dependencies: libraries from a CDN without a build step, import maps, versions, and where npm and bundlers take over.</p>
+      <div class="big-links"><a href="slides.html">▶ Open the slides</a></div>
+    </div>
+
+    <h2>In class</h2>
+    <ul class="grid">
+      <li class="a1"><a href="quiz/pick-a-surface.html"><small>Act 1 · quick check · on your phone</small><b>HTML, SVG or canvas?</b><span>Five pictures, pick a surface for each. Join with the code on the big screen.</span></a></li>
+    </ul>
+
+    <h2>Exercises</h2>
+    <ul class="grid">
+      <li class="a2"><a href="exercises/02-profile-it.html"><small>Exercise 2 · Act 2 · pairs · 15 min</small><b>Profile it</b><span>Three slow pages. Record each with CPU 4× and find where the time goes. No fixing yet.</span></a></li>
+      <li class="a3"><a href="exercises/03-test-your-hypotheses.html"><small>Exercise 3 · Act 3 · solo · 25 min</small><b>Test your hypotheses</b><span>The three slow pages as files. Change what your hypothesis names, record before and after.</span></a></li>
+    </ul>
+
+    <h2>Demos</h2>
+    <ul class="grid">
+      <li class="a1"><a href="demos/three-surfaces.html"><small>Act 1 · draw</small><b>Three surfaces</b><span>The same bar chart in HTML, SVG and canvas, with the code that drew each. Look in the Elements panel.</span></a></li>
+      <li class="a2"><a href="demos/sales-log.html"><small>Act 2 · measure</small><b>The sales log</b><span>100 000 sales and a search box that freezes the page. Record it in the Performance panel.</span></a></li>
+    </ul>
+
+    <h2>For the teacher</h2>
+    <div class="tip">
+      <p class="keys">Slides: <kbd>→</kbd> <kbd>←</kbd> move · <kbd>p</kbd> presenter view · <kbd>m</kbd> slide menu · <kbd>n</kbd> notes drawer · <kbd>f</kbd> fullscreen · <kbd>t</kbd> clock in footer.</p>
+      <p>The quiz runs on the race board: open <a href="../race/board.html">the board</a>, start "Quiz · Pick a surface", show the code. The board shows how many are connected (click for the names) and how many picked each option per question.</p>
+    </div>
+  </div>
+</body>
+</html>

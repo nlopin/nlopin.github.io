@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Exercise 3 · Answers</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <style>
+    .page-top { flex-wrap: wrap; }
+    .case { margin: 2.5rem 0 0; padding-top: 1.8rem; border-top: 2px solid var(--w-line); }
+    .case header { display: flex; gap: 1rem; align-items: baseline; }
+    .case header b { font: 700 0.85rem "IBM Plex Mono", monospace; padding: 0.35rem 0.6rem; border-radius: 0.3rem; }
+    .case h2 { margin: 0; }
+    .case h3 { margin: 1.4rem 0 0.4rem; font-size: 1.05rem; }
+    .case p, .case ul { max-width: 72ch; }
+    .links { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 0.8rem 0; }
+    .links a { font: 700 0.95rem "Space Grotesk", sans-serif; text-decoration: none; padding: 0.5rem 1rem; border-radius: 99px; border: 1.5px solid var(--w-line); color: var(--w-ink); }
+    .links a.fx { background: var(--w-act); border-color: var(--w-act); color: #03101b; }
+    .nums { border-collapse: collapse; margin: 1.2rem 0; font: 500 0.95rem "IBM Plex Mono", monospace; }
+    .nums td, .nums th { padding: 0.4rem 1rem 0.4rem 0; text-align: left; border-bottom: 1px solid var(--w-line); }
+    .nums th { color: var(--w-muted); font-weight: 500; }
+    .nums .b { color: #ff6b5a; } .nums .a { color: #b6ff3b; }
+    details { margin: 1rem 0; }
+    summary { cursor: pointer; font-weight: 700; }
+    .diff { font: 400 0.8rem/1.5 "IBM Plex Mono", monospace; background: #040812; border: 1.5px solid var(--w-line); border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; white-space: pre; color: #8599c2; }
+    .diff .add { color: #b6ff3b; } .diff .del { color: #ff6b5a; } .diff .hunk { color: #3ee6ff; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="03-test-your-hypotheses.html">← Exercise 3 · Test your hypotheses</a><span>answers</span></div>
+    <span class="eyebrow-tag">Exercise 3 · answers</span>
+    <h1>Test your hypotheses · <em>answers</em></h1>
+    <p class="intro">One reference fix per page, each showing exactly the same results as the original. Times are from the action to the next frame, Chrome 149 on an M-series MacBook; your numbers will differ, the ratios less so.</p>
+    
+    <section class="case" id="case-1">
+      <header><b>1</b><h2>The sales log</h2></header>
+      <div class="links"><a href="../demos/sales-log.html" target="_blank" rel="noopener">Original ↗</a><a class="fx" href="03-answers/sales-log.html" target="_blank" rel="noopener">Fixed ↗</a><a href="03-answers/sales-log.html" download="sales-log.fixed.html">⤓ Download fixed</a></div>
+      <h3>What the recording shows</h3><p>One long task per keystroke. Yellow: <code>render</code> → <code>row</code> builds a row for every one of the 87 554 matches, and <code>topItems</code> (≈ 80 ms at 1×) runs at the end of every render. Purple: style and layout of all those rows, in the same task. Then pre-paint and paint in a second task.</p>
+      <h3>The hypothesis</h3><p>Build and lay out only the rows that are visible, not all the matches. Compute "Top items" once: it doesn't depend on the search.</p>
+      <h3>The change</h3><ul><li><code>topItems()</code> runs once at start-up; <code>render</code> reuses the result.</li><li>The list scrolls inside its own box. A spacer as tall as all the rows (<code>visible.length × 32 px</code>) gives the right scrollbar.</li><li>On every scroll, <code>renderWindow</code> works out which rows are in view from <code>scrollTop / 32</code>, renders only those, and moves them into place with <code>transform</code>.</li><li>A new search scrolls back to the top.</li></ul>
+      <table class="nums"><tr><th></th><th>before</th><th>after</th></tr><tr><td>CPU 1×</td><td class="b">≈ 2.8 s</td><td class="a">≈ 10 ms</td></tr><tr><td>CPU 4×</td><td class="b">≈ 11 s</td><td class="a">≈ 40 ms</td></tr></table>
+      <details><summary>The diff</summary><pre class="diff"><span class="hunk">@@ -14,5 +14,7 @@</span>
+   .count { color: var(--muted); margin-left: auto; }
+   main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; padding: 20px; }
+<span class="del">-  .log { list-style: none; margin: 0; padding: 0; }</span>
+<span class="add">+  .scroller { position: relative; height: calc(100vh - 110px); overflow: auto; }</span>
+<span class="add">+  .spacer { height: 0; }</span>
+<span class="add">+  .log { list-style: none; margin: 0; padding: 0; position: absolute; top: 0; left: 0; right: 0; }</span>
+   .row { display: grid; grid-template-columns: 60px 180px minmax(0, 1fr) 70px 140px; gap: 12px; align-items: center; height: 32px; padding: 0 10px; border-bottom: 1px solid var(--line); }
+   .row time, .row .qty { color: var(--muted); font-variant-numeric: tabular-nums; }
+<span class="hunk">@@ -32,5 +34,5 @@</span>
+ &lt;/header&gt;
+ &lt;main&gt;
+<span class="del">-  &lt;ul class=&quot;log&quot;&gt;&lt;/ul&gt;</span>
+<span class="add">+  &lt;div class=&quot;scroller&quot;&gt;&lt;div class=&quot;spacer&quot;&gt;&lt;/div&gt;&lt;ul class=&quot;log&quot;&gt;&lt;/ul&gt;&lt;/div&gt;</span>
+   &lt;aside&gt;
+     &lt;h2&gt;Top items tonight&lt;/h2&gt;
+<span class="hunk">@@ -107,13 +109,26 @@</span>
+ }
+ 
+<span class="add">+const ROW = 32;</span>
+<span class="add">+const scroller = document.querySelector(&quot;.scroller&quot;);</span>
+<span class="add">+const spacer = document.querySelector(&quot;.spacer&quot;);</span>
+<span class="add">+const tops = topItems();</span>
+<span class="add">+let visible = [];</span>
+<span class="add">+</span>
+<span class="add">+function renderWindow() {</span>
+<span class="add">+  const first = Math.floor(scroller.scrollTop / ROW);</span>
+<span class="add">+  const count = Math.ceil(scroller.clientHeight / ROW) + 1;</span>
+<span class="add">+  list.style.transform = `translateY(${first * ROW}px)`;</span>
+<span class="add">+  list.replaceChildren(...visible.slice(first, first + count).map(row));</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+ function render() {
+   const query = state.query.trim().toLowerCase();
+<span class="del">-  const visible = sales.filter((s) =&gt; matches(s, query));</span>
+<span class="del">-</span>
+<span class="del">-  list.replaceChildren();</span>
+<span class="del">-  for (const sale of visible) list.append(row(sale));</span>
+<span class="add">+  visible = sales.filter((s) =&gt; matches(s, query));</span>
+<span class="add">+  spacer.style.height = `${visible.length * ROW}px`;</span>
+<span class="add">+  scroller.scrollTop = 0;</span>
+<span class="add">+  renderWindow();</span>
+   count.textContent = `${visible.length.toLocaleString(&quot;en&quot;)} sales`;
+ 
+<span class="del">-  top.replaceChildren(...topItems().map(({ name, sold }) =&gt; {</span>
+<span class="add">+  top.replaceChildren(...tops.map(({ name, sold }) =&gt; {</span>
+     const li = document.createElement(&quot;li&quot;);
+     li.innerHTML = `&lt;span&gt;&lt;/span&gt;&lt;b&gt;&lt;/b&gt;`;
+<span class="hunk">@@ -123,4 +138,6 @@</span>
+   }));
+ }
+<span class="add">+</span>
+<span class="add">+scroller.addEventListener(&quot;scroll&quot;, renderWindow);</span>
+ 
+ input.addEventListener(&quot;input&quot;, () =&gt; {</pre></details>
+      <h3>Other fixes that work</h3><ul><li><code>content-visibility: auto</code> on <code>.row</code> (with <code>contain-intrinsic-size: auto 32px</code>) lets the browser skip layout and paint of off-screen rows, but all 87 554 rows are still created: it helps the purple part, not the yellow.</li><li>Pagination or "load more": fewer rows, and find-in-page still works.</li><li>Debouncing the input alone doesn't fix it: one keystroke after a pause still takes seconds.</li></ul>
+    </section>
+    <section class="case" id="case-2">
+      <header><b>2</b><h2>Takings bars</h2></header>
+      <div class="links"><a href="02-profile-it/takings-bars.html" target="_blank" rel="noopener">Original ↗</a><a class="fx" href="03-answers/takings-bars.html" target="_blank" rel="noopener">Fixed ↗</a><a href="03-answers/takings-bars.html" download="takings-bars.fixed.html">⤓ Download fixed</a></div>
+      <h3>What the recording shows</h3><p>One long task per click, mostly purple: about a thousand Layout events inside <code>render</code>'s call stack, each one forced by reading <code>offsetWidth</code>. JavaScript and paint are small.</p>
+      <h3>The hypothesis</h3><p>The loop reads <code>offsetWidth</code> right after the previous iteration changed a width, so the browser lays out the page 1 000 times. Read the width once, before the loop.</p>
+      <h3>The change</h3><ul><li>The track width is read once, before the loop. Every bar has the same track width, so the result is identical.</li><li>The loop now only writes: one layout at the end of the frame instead of 1 000 forced ones.</li></ul>
+      <table class="nums"><tr><th></th><th>before</th><th>after</th></tr><tr><td>CPU 1×</td><td class="b">≈ 175 ms</td><td class="a">≈ 30 ms</td></tr><tr><td>CPU 4×</td><td class="b">≈ 750 ms</td><td class="a">≈ 130 ms</td></tr></table>
+      <details><summary>The diff</summary><pre class="diff"><span class="hunk">@@ -93,6 +93,6 @@</span>
+   const bars = list.querySelectorAll(&quot;.bar&quot;);
+   const shares = visible.map((s) =&gt; s.takings / maxTakings);
+<span class="add">+  const w = bars[0].parentElement.offsetWidth;</span>
+   bars.forEach((bar, i) =&gt; {
+<span class="del">-    const w = bar.parentElement.offsetWidth;</span>
+     bar.style.width = `${shares[i] * w}px`;
+   });</pre></details>
+      <h3>Other fixes that work</h3><ul><li>Don't read layout at all: <code>bar.style.width = `${shares[i] * 100}%`</code> sizes each bar relative to its track in CSS.</li><li>What's left after the fix: rebuilding 1 000 rows on every sort.</li></ul>
+    </section>
+    <section class="case" id="case-3">
+      <header><b>3</b><h2>Find a dish</h2></header>
+      <div class="links"><a href="02-profile-it/slow-search.html" target="_blank" rel="noopener">Original ↗</a><a class="fx" href="03-answers/slow-search.html" target="_blank" rel="noopener">Fixed ↗</a><a href="03-answers/slow-search.html" download="slow-search.fixed.html">⤓ Download fixed</a></div>
+      <h3>What the recording shows</h3><p>One long yellow task per keystroke, almost no layout or paint. Bottom-Up: <code>fuzzyScore</code> has most of the self time (≈ 80%), then <code>search</code>.</p>
+      <h3>The hypothesis</h3><p><code>fuzzyScore</code> runs on all 100 000 dishes, word by word, on every keystroke. The dishes share a small vocabulary: score each distinct word once per query, and look the scores up.</p>
+      <h3>The change</h3><ul><li>Each dish keeps its text split into words once, at start-up (<code>dish.words</code>).</li><li><code>search</code> keeps a <code>Map</code> from word to score for the current query: about 150 distinct words get scored instead of ≈ 2.5 million.</li><li>A dish's score is still the best score among its words, so the matches and their order are unchanged.</li></ul>
+      <table class="nums"><tr><th></th><th>before</th><th>after</th></tr><tr><td>CPU 1×</td><td class="b">≈ 190–250 ms</td><td class="a">≈ 50–130 ms</td></tr><tr><td>CPU 4×</td><td class="b">≈ 0.8–1.1 s</td><td class="a">≈ 0.2–0.5 s</td></tr></table>
+      <details><summary>The diff</summary><pre class="diff"><span class="hunk">@@ -71,4 +71,5 @@</span>
+     text: `${name} ${description.replaceAll(&quot;,&quot;, &quot;&quot;)} ${stall} ${market}`.toLowerCase(),
+   });
+<span class="add">+  dishes.at(-1).words = dishes.at(-1).text.split(&quot; &quot;);</span>
+ }
+ 
+<span class="hunk">@@ -105,7 +106,13 @@</span>
+   if (!query) return { matches: dishes.length, top: dishes.slice(0, 20) };
+   const maxTypos = query.length &lt; 4 ? 0 : query.length &lt; 7 ? 1 : 2;
+<span class="add">+  const byWord = new Map();</span>
+<span class="add">+  const scoreWord = (word) =&gt; {</span>
+<span class="add">+    if (!byWord.has(word)) byWord.set(word, fuzzyScore(query, word));</span>
+<span class="add">+    return byWord.get(word);</span>
+<span class="add">+  };</span>
+   const scored = [];
+   for (const dish of dishes) {
+<span class="del">-    const score = fuzzyScore(query, dish.text);</span>
+<span class="add">+    let score = Infinity;</span>
+<span class="add">+    for (const word of dish.words) score = Math.min(score, scoreWord(word));</span>
+     if (score &lt;= maxTypos) scored.push({ dish, score });
+   }</pre></details>
+      <h3>Other fixes that work</h3><ul><li>Debounce the input: the same work, but once per pause instead of once per letter.</li><li>Move <code>search</code> into a Web Worker: the page stays responsive while it runs.</li><li>An index from word to dishes would also remove the walk over 100 000 dishes, which is most of what's left.</li></ul>
+    </section>
+  </div>
+</body>
+</html>

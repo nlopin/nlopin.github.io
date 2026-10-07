@@ -309,6 +309,229 @@ Not covered, candidates for later: WebSockets / server-sent events (brief 2
 polls instead), caching headers in depth, service workers and offline,
 authentication flows (login, cookies, sessions), deploy.
 
+## Lecture 9 · "Draw, measure, borrow" (deck written)
+
+Deck: `programming-interactivity-9-draw-measure-borrow/slides.html` (65
+slides), hook demo `demos/sales-log.html`. Still to write: the five
+exercises, `index.html` (lesson notes), cheatsheet, run sheet. The original
+plan follows; where the deck differs, the deck wins.
+
+Measured on the demo page (MacBook, headless Chrome): first keystroke ≈ 2.5 s
+(filter 5 ms, building 87 554 rows ≈ 0.8 s, layout ≈ 1.6 s, `topItems()` ≈
+80 ms). Layout thrashing can't share that page: it grows with the square of
+the row count (1 000 bars 156 ms vs 6 ms batched, 2 000 bars 683 ms vs 13 ms,
+100 000 rows: minutes). So Exercise 2 is three pages, one slowdown each: the
+sales log (rows + `topItems`), a takings chart with 1 000 thrashing bars, a
+search box with heavy synchronous work.
+
+
+Day 1 of the final-project run-up, after Friday's animation class. About an
+hour of theory, the rest practice. Goal: a student can pick a drawing surface,
+find out *why* a page is slow instead of guessing, knows the patterns that make
+big things fast, and can load someone else's code from a CDN knowing what that
+costs, and what the next courses replace it with.
+
+Not taught: how to use any particular chart / map / 3D library. One catalogue
+slide names what exists; the docs do the rest.
+
+Running data: the market's night as numbers (visitors per 15 minutes, takings,
+100 000 rows of sales and reviews for the big-list parts).
+
+| Act | Theory | Practice |
+| --- | --- | --- |
+| 1 · Draw | ~12 min, slides 5–15 | Ex 1 three ways to draw |
+| 2 · Measure | ~16 min, slides 16–28 | Ex 2 profile it |
+| 3 · Do less | ~13 min, slides 29–39 | Ex 3 a hundred thousand rows |
+| 4 · Borrow | ~19 min, slides 40–58 | Ex 4 fix the imports; Ex 5 bring a library |
+
+Time: ~60 theory + ~75 exercises + 15 break ≈ 2.5 h. The 45-minute
+mini-explorable jam fits only in a longer day; otherwise it moves to Day 2.
+
+### Opening · slides 1–4
+
+1. **Title** · Draw, measure, borrow.
+2. **Hook** · the market's sales log, 100 000 rows, rendered as a list: type
+   in the search box, the page freezes. "Where does the time go?"
+3. **Thesis** · Put things on screen, find out what's slow before fixing it,
+   and don't write what someone else has already written well.
+4. **Four acts, five exercises.**
+
+### Act 1 · Draw · slides 5–15
+
+5. Divider.
+6. **Three surfaces** · HTML/CSS boxes, SVG, canvas. Same bar chart in all
+   three, code side by side.
+7. **You already draw with HTML** · bars as `div`s, a grid of cells with
+   `grid`. Enough for grids, bars, rows of bits.
+8. **SVG** · XML-based markup for vector graphics; inline in HTML, every shape is a DOM element: Elements panel, CSS, events per
+   shape. `viewBox` is a coordinate system; y grows downwards.
+9. **Six elements and a mini-language** · `rect`, `circle`, `line`, `path`,
+   `text`, `g`; `path d`: `M`, `L`, `Z`. A line chart is one path.
+10. **Quiz: nothing is drawn, no error** · `createElement('circle')` →
+    `HTMLUnknownElement`. `createElementNS(SVG_NS, …)` or markup inside the
+    `<svg>`.
+11. **A canvas holds a bitmap** · `getContext('2d')`, every call paints pixels,
+    nothing remembers the shapes. Render = `clearRect`, then draw everything
+    from state.
+12. **Trap: the blurry canvas** · CSS size ≠ bitmap size, `devicePixelRatio`.
+13. **A number becomes a pixel** · one line of maths, domain → range, y
+    flipped. Libraries call it a scale (hint, nothing more).
+14. **Pictures need words** · SVG `<title>` + `role="img"`, canvas fallback
+    content, a data table as the honest alternative.
+15. **Which surface?** · 8×8 grid of bits · 50 000 particles · chart with
+    hover · photo filter. Answers in `<details>`; the rule: how many things,
+    events per thing, pixels.
+
+**Ex 1 · Three ways to draw** (15 min): one array of takings as HTML bars,
+SVG bars, canvas bars. Stretch: 50 000 dots in SVG vs canvas, which keeps up?
+(Sets up Act 2.)
+
+### Act 2 · Measure · slides 16–28
+
+16. Divider.
+17. **"It's slow" is a real bug report; investigate** · reproduce, record, form one hypothesis, change
+    one thing, measure again (Lecture 5's debugging loop).
+18. **One thread, again** · your JS, style, layout, paint and input share the
+    main thread (Lecture 8). A frame is 16.7 ms at 60 Hz, 8.3 at 120.
+19. **One frame** · JS → style → layout → paint → composite. Which property
+    changes cost what; `transform` / `opacity` skip layout (Friday).
+20. **The Performance panel** · record, the main track, the summary
+    (scripting, rendering, painting), frames. Screenshot with marks.
+21. **Your laptop is not the projector's** · CPU throttling 4× / 6×; record
+    with it on.
+22. **Reading a flame chart** · x is time, y is the call stack; wide = slow.
+    Bottom-up tab: which function has the self time.
+23. **Long tasks** · over 50 ms, red corner. Input waits for them: that's the
+    freeze from slide 2.
+24. **Live demo** · record typing in the hook's search; find `render` and
+    10 000 `createElement`s in the flame chart.
+25. **Measure in code** · `performance.now()`, `console.time`,
+    `performance.mark` / `measure` show up in the Timings track.
+26. **Trap: layout thrashing** · write a style, read `offsetHeight`, in a
+    loop → "Forced reflow" in purple. Read everything, then write everything.
+    Quiz: which version is slow?
+27. **Performance monitor** · live CPU, DOM nodes, JS heap, layouts per
+    second. Nodes or heap only ever climbing → a leak (listeners in
+    `render()`, the game-jam trap).
+28. **Network panel, briefly** · waterfall, size, throttling to "Fast 4G".
+    Returns in Act 4.
+
+**Ex 2 · Profile it** (20 min): one market page, three slowdowns (layout
+thrashing in a loop, heavy synchronous work on every keystroke, re-rendering
+the whole list on every change). For each: the screenshot of where it shows
+up in the Performance panel, the cause in one sentence, then the fix, then the
+recording again. Fixes come from Act 3, so this exercise straddles it, or the
+fix half moves after slide 39.
+
+### Act 3 · Do less · slides 29–39
+
+29. Divider.
+30. **Four ways to do less** · less often, fewer things, elsewhere, later.
+31. **Less often: debounce and throttle** · search input waits for a pause;
+    `pointermove` / `scroll` at most once per interval. Six lines each, a
+    timeline diagram.
+32. **Less often: one render per frame** · many state changes, one
+    `requestAnimationFrame` render (a `scheduled` flag).
+33. **Fewer things: virtualisation** · 100 000 rows, ~20 visible. A spacer
+    for the scrollbar, `scrollTop / rowHeight` → which rows, render only those.
+    Diagram in a `<pre>`.
+34. **What virtualisation costs** · fixed row heights, `Ctrl+F` finds nothing
+    off-screen, screen readers need `aria-rowcount` / `aria-rowindex`. When a
+    list is a few hundred rows, don't.
+35. **Fewer things, cheaper** · pagination / "load more" (Lecture 8's brief);
+    `content-visibility: auto` lets the browser skip off-screen work.
+36. **Elsewhere: a Web Worker** · heavy computation on another thread,
+    `postMessage` in and out, `type: 'module'`. A second track in the
+    Performance panel; the page stays responsive.
+37. **Later: lazy** · `loading="lazy"`, `IntersectionObserver` (load or
+    animate when visible), `await import()` for a heavy module.
+38. **Remember results** · a pure function with the same input → cache the
+    output (memoise). Works because the model has no DOM in it.
+39. **Symptom → pattern** · table: input lags → debounce / worker; scroll
+    janks → virtualise / fewer nodes; first load slow → lazy / smaller
+    dependencies; slower over time → leak.
+
+**Ex 3 · A hundred thousand rows** (20 min): the sales log as a virtual list.
+Before / after in the Performance monitor (DOM nodes) and the panel (frame
+time while scrolling). Stretch: the search debounced, the filtering in a
+worker.
+
+Break here.
+
+### Act 4 · Borrow · slides 40–58
+
+40. Divider.
+41. **What's out there** (hints only) · charts: Observable Plot, Chart.js,
+    uPlot, ECharts, D3 · maps: Leaflet, MapLibre · 3D: three.js · physics:
+    Matter.js · sound: Tone.js · maths and data: mathjs, simple-statistics ·
+    colour: culori · animation: Motion, GSAP. Docs and examples are the
+    tutorial.
+42. **Borrow the plumbing, write the idea** · the mechanism your project
+    explains is your code. (Final-project policy, needs a decision.)
+43. **An external dependency** · code you didn't write, on a server you don't
+    run: it can be down, slow, changed, malicious, and it sees your visitors'
+    IP addresses.
+44. **What a CDN is** · npm packages mirrored on servers near the user:
+    jsDelivr, unpkg, esm.sh, cdnjs. URL anatomy with `<mark>`:
+    `https://cdn.jsdelivr.net/npm/culori@4.0.1/+esm` (CDN · package ·
+    version · file).
+45. **Way 1: `<script src>`** · a global (`window.Chart`); order matters,
+    names clash (the Lecture 5 "already declared" bug).
+46. **Way 2: import from a URL** · only in `type="module"`; named, default
+    and namespace imports depend on what the package exports. Trap:
+    `SyntaxError: Cannot use import statement outside a module`.
+47. **Way 3: bare names** · `import { … } from 'culori'` →
+    `TypeError: Failed to resolve module specifier "culori". Relative
+    references must start with either "/", "./", or "../".`
+48. **Import map** · name → URL, every version in one place, before the first
+    module script.
+49. **Which file?** · ESM, UMD, CommonJS builds; the README's CDN section,
+    `exports` / `module` / `main`, the jsDelivr file listing. `require`
+    doesn't run in a browser.
+50. **What it costs** · Network panel: requests, transfer size, the
+    dependency waterfall. Performance panel: parse and compile time on the
+    main thread. Look before you choose.
+51. **Versions** · semver MAJOR.MINOR.PATCH; no version = latest (may change
+    before demo day), `@4` floats, `@4.0.1` is pinned.
+52. **AI trap: the wrong major** · `d3.scale.linear()` is d3 v3 (2016) →
+    `TypeError: Cannot read properties of undefined (reading 'linear')`.
+    Compare the version the code assumes with the one you load.
+53. **AI trap: the package that isn't** · invented names, or names someone
+    registered after models started inventing them. Check the npm page:
+    repository, weekly downloads, last publish.
+54. **It runs with your page's rights** · DOM, `localStorage`, `fetch`;
+    `integrity` + `crossorigin` on `<script src>`; pin first.
+55. **Demo day: vendor it** · download into `vendor/`, import relatively:
+    offline, frozen. CSS files too.
+56. **From URLs to packages** · bridge table, today ↔ the next courses:
+    import map ↔ `dependencies` in `package.json`; pinned URL ↔ lockfile;
+    `vendor/` ↔ `node_modules`; the CDN's `+esm` ↔ a bundler resolving bare
+    names; `<script>` order ↔ the dependency graph.
+57. **What npm and a bundler add** · `npm install`, `package-lock.json`
+    committed, `^` / `~` ranges; Vite: dev server, bundling, minifying,
+    tree-shaking, TypeScript. The output is still static files, like today.
+    Your own code as packages (workspaces, publishing) is where the next
+    courses start.
+58. **Tell your AI** · `AGENTS.md`: no build step, libraries via the import
+    map in `index.html`, exact versions, vendored, ask before adding a
+    package.
+
+**Ex 4 · Fix the imports** (15 min): six broken pages, one symptom each: no
+`type="module"`, a bare name, the import map after the script, a CommonJS
+file, default vs named, AI code for the wrong major.
+**Ex 5 · Bring a library** (10 min): pick one from slide 41 that the final
+project might use; import map, pinned, vendored; its cost in the Network and
+Performance panels.
+
+### Close · slides 59–61
+
+59. **Three questions before you go** · which surface, what will be slow and
+    how you'll know, which dependencies (plumbing or idea?).
+60. **Homework** · for the final project: the surface, the import map with
+    pinned versions, the `AGENTS.md` lines; one Performance recording of the
+    first prototype.
+61. **Closing** · the title, answered.
+
 ## Open questions
 
 - Is the next class Friday of week 1 or Monday of week 2?
