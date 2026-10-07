@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏮%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Borrow — Lecture 10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #ffffff; --act-ink: #ffffff; }
+.slide.wire[data-act-num="1"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+html.theme-wire[data-act="1"] .deck-progress i { background: #ffb547; box-shadow: 0 0 12px #ffb547; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="F"] h3 { background: #070d1a; color: #fff; }
+.deck-menu section[data-act="1"] h3 { background: #070d1a; color: #ffb547; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 50px; height: 100%; align-items: center; }
+.big-title { font: 700 150px/0.88 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; }
+.big-title .b { color: #ffb547; text-shadow: 0 0 80px rgb(255 181 71 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.title-art { border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; padding: 20px; }
+
+/* raw text panels (terminal, URLs, files) */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw .c { color: #4d5b7a; } .raw .k { color: #ffb547; } .raw .s { color: #b6ff3b; } .raw .n { color: #3ee6ff; }
+
+/* URL anatomy */
+.url { font: 500 30px/1 "IBM Plex Mono", monospace; display: flex; flex-wrap: wrap; margin: 10px 0 30px; }
+.url { gap: 0 6px; }
+.url span { display: flex; flex-direction: column; gap: 14px; padding: 12px 4px 10px; border-top: 4px solid var(--c); color: #fff; }
+.url span small { font: 600 15px/1 "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.url span.dot { border-top-color: transparent; }
+.u1 { --c: #8599c2; } .u2 { --c: #3ee6ff; } .u3 { --c: #ffb547; } .u4 { --c: #b6ff3b; } .u5 { --c: #ff4fd8; }
+
+/* code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 28px; margin-bottom: 10px; }
+
+/* CDN diagram */
+.cdnflow { display: grid; grid-template-columns: 1fr 150px 1.2fr 170px 1.1fr; align-items: center; margin: 10px 0 26px; }
+.cdnflow .node { border: 2px solid var(--c); border-radius: 10px; padding: 18px 20px; background: color-mix(in srgb, var(--c) 10%, #060b17); }
+.cdnflow .node b { display: block; font: 700 32px/1 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; margin-bottom: 8px; }
+.cdnflow .node span { font: 500 17px/1.35 "IBM Plex Mono", monospace; color: var(--c); }
+.n-b { --c: #8599c2; } .n-e { --c: #ffb547; } .n-o { --c: #3ee6ff; }
+.cdnflow .arrow { position: relative; height: 4px; margin: 0 10px; background: #ffb547; }
+.cdnflow .arrow::after { content: ""; position: absolute; right: -2px; top: -9px; border: 11px solid transparent; border-left: 16px solid #ffb547; border-right: 0; }
+.cdnflow .arrow.dashed { background: repeating-linear-gradient(90deg, #3ee6ff 0 10px, transparent 10px 18px); }
+.cdnflow .arrow.dashed::after { border-left-color: #3ee6ff; }
+.cdnflow .arrow span { position: absolute; left: 0; right: 0; top: 14px; text-align: center; font: 500 15px "IBM Plex Mono", monospace; color: #8599c2; }
+.slide .cdnterms ul li { font-size: 26px; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { font-weight: 600; color: #fff; }
+.dtable .yes { color: #b6ff3b; font-weight: 700; } .dtable .no { color: #ff6b5a; font-weight: 700; }
+
+/* error boxes */
+.err { font: 500 21px/1.4 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+
+/* catalogue of libraries */
+.cat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cat .card { padding: 16px 20px; }
+.cat .card .label { margin-bottom: 8px; }
+.cat .card p { font-size: 22px; line-height: 1.35; margin: 0; color: #fff; }
+
+/* bridge table: by hand → automated */
+.bridge td:first-child { color: #ffb547; }
+.bridge td:nth-child(2) { color: #8599c2; font: 600 22px "IBM Plex Mono", monospace; text-align: center; width: 60px; }
+.bridge td:last-child code { color: #b6ff3b; }
+
+/* reading, cards */
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+.slide .split > ul li, .slide .split > ol li, .slide .vs2 > ul li, .slide .split > .stack > p, .slide .vs2 > div > ul li { font-size: 27px; line-height: 1.3; margin-bottom: 14px; }
+.cards3 .card p { font-size: 23px; line-height: 1.35; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Borrow.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 10</p>
+      <h1 class="big-title"><span class="b">Borrow.</span></h1>
+      <p class="title-sub">CDNs · import maps · versions · security · packages</p>
+      <p class="title-sub">Materials: <a href="https://lopin.me/harbour/programming-interactivity-10-borrow/index.html" target="_blank" rel="noopener">10-borrow</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">&lt;!-- index.html --&gt;</span>
+&lt;script type="importmap"&gt;
+{ "imports": {
+    <span class="k">"d3"</span>: <span class="s">"./vendor/d3-7.9.0.mjs"</span>
+} }
+&lt;/script&gt;</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00.</b> Loading code someone else wrote, without a build step: where it comes from, how the browser finds it, and what it costs.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · BORROW
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Borrow" data-at="0:01" data-title="Act 1 — Borrow">
+  <div class="act-deco">@7.9.0</div>
+  <div class="act-num">act 01</div>
+  <h1>Borrow</h1>
+  <div class="act-meta"><span class="chip">0:01 – 0:24</span><span>other people's code, without a build step</span></div>
+  <div class="act-list"><span>CDN</span><span>&lt;script src&gt;</span><span>import from a URL</span><span>import map</span><span>versions</span><span>security</span><span>vendoring</span><span>npm</span><span>bundlers</span></div>
+</section>
+
+<section data-title="What a CDN is">
+  <p class="kicker">Content delivery network</p>
+  <h2>A CDN keeps copies of files on servers near the users</h2>
+  <div class="cdnflow">
+    <div class="node n-b"><b>browser</b><span>asks for a URL</span></div>
+    <div class="arrow"><span>nearby</span></div>
+    <div class="node n-e"><b>edge server</b><span>one of many, in many cities<br>(points of presence)</span></div>
+    <div class="arrow dashed"><span>only on a miss</span></div>
+    <div class="node n-o"><b>origin</b><span>the server with the original file</span></div>
+  </div>
+  <div class="vs2 cdnterms">
+    <ul>
+      <li><strong>Cache hit</strong>: the edge has a copy and answers itself.</li>
+      <li><strong>Cache miss</strong>: the edge fetches from the origin, answers, and keeps a copy.</li>
+    </ul>
+    <ul>
+      <li>DNS points the hostname at the CDN, and the request reaches a nearby edge.</li>
+      <li>The origin decides how long copies may be kept: the <code>Cache-Control</code> header.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:02. Why it matters: latency is mostly distance, and every request pays at least one round trip; a nearby edge makes that trip short. The origin also gets only the misses, not every request. Large CDNs: Cloudflare, Fastly, Akamai, Amazon CloudFront. How a request finds a nearby edge depends on the CDN: some answer DNS with a nearby server's address, Cloudflare announces the same addresses from every location (anycast) and the network routes to the closest. It's not only for libraries: this course's pages on GitHub Pages are served through Fastly, and the Lecture 8 API (harbour-api.lopin.me) runs on Cloudflare's network.</p>
+  </aside>
+</section>
+
+<section data-title="A CDN in the headers">
+  <p class="kicker">DevTools → Network → a request → Headers</p>
+  <h2>You can see the CDN in the response headers</h2>
+  <div class="vs2">
+    <div>
+      <h3>lopin.me · GitHub Pages</h3>
+<pre class="raw sm"><span class="n">cache-control</span>: max-age=600
+<span class="n">age</span>: 0
+via: 1.1 varnish
+x-served-by: cache-toj-…-TOJ
+<span class="k">x-cache: MISS</span></pre>
+    </div>
+    <div>
+      <h3>cdn.jsdelivr.net · d3@7.9.0</h3>
+<pre class="raw sm"><span class="n">cache-control</span>: public, max-age=31536000,
+               s-maxage=31536000, immutable
+<span class="n">age</span>: 7408550
+server: cloudflare
+<span class="s">cf-cache-status: HIT</span></pre>
+    </div>
+  </div>
+  <ul class="mt">
+    <li><strong>Standard HTTP</strong>: <code>Cache-Control</code> (who may keep a copy, and for how long: <code>max-age</code> in seconds), <code>Age</code> (seconds this copy has been in the cache: here 86 days).</li>
+    <li><strong>Vendor headers</strong>: <code>x-cache</code>, <code>x-served-by</code> (Fastly), <code>cf-cache-status</code> (Cloudflare): hit or miss, and which edge answered.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:03. Both captured with <code>curl -I</code> while writing this deck; run it again and the values change. The left one: GitHub Pages behind Fastly (Varnish is Fastly's cache software); <code>TOJ</code> is the code of the Fastly location that answered (Madrid), and it didn't have a copy yet. The right one: jsDelivr's file came from Cloudflare's edge, which had held it for 86 days. <code>max-age=31536000</code> is one year; <code>s-maxage</code> is the same limit for shared caches like a CDN; <code>immutable</code> tells the browser not to even revalidate. A CDN can promise that only for URLs whose content never changes: that's why the version is in the URL.</p>
+  </aside>
+</section>
+
+<section data-title="What's out there">
+  <p class="kicker">Hints, not tutorials</p>
+  <h2>What's out there</h2>
+  <div class="cat">
+    <div class="card"><span class="label">charts</span><p>Observable Plot · Chart.js · uPlot · ECharts · D3</p></div>
+    <div class="card"><span class="label">maps</span><p>Leaflet · MapLibre GL</p></div>
+    <div class="card"><span class="label">3D</span><p>three.js</p></div>
+    <div class="card"><span class="label">physics</span><p>Matter.js</p></div>
+    <div class="card"><span class="label">sound</span><p>Tone.js</p></div>
+    <div class="card"><span class="label">maths · data</span><p>math.js · simple-statistics</p></div>
+    <div class="card"><span class="label">colour</span><p>culori · chroma.js</p></div>
+    <div class="card"><span class="label">animation</span><p>Motion · GSAP</p></div>
+  </div>
+  <p>Each one's documentation has examples you can copy and run. The rest of the act is how to load them, and what that costs.</p>
+  <aside class="notes">
+    <p>~0:04. Don't teach any of them. Point out: Plot draws SVG, Chart.js draws canvas, D3 is a toolkit (scales, shapes, data joins) rather than a chart library. How to judge one before adding it: slides "What it costs" and "The package that isn't". Everything here works without a build step.</p>
+  </aside>
+</section>
+
+<section data-title="An external dependency">
+  <p class="kicker">What you take on</p>
+  <h2>Code you didn't write, from a server you don't run</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">it can be down</span><p>The CDN, a bad network, a company firewall.</p></div>
+    <div class="card"><span class="label">it can change</span><p>A new version with a different API, if you didn't pin one.</p></div>
+    <div class="card"><span class="label">it can be big</span><p>Hundreds of kilobytes to parse before your first line runs.</p></div>
+    <div class="card"><span class="label">it can be hostile</span><p>A compromised package runs with all the rights of your page.</p></div>
+    <div class="card"><span class="label">it sees your visitors</span><p>Every page view sends an IP address to the CDN. A privacy question in the EU.</p></div>
+    <div class="card"><span class="label">it saves you weeks</span><p>And it's tested by thousands of other projects. That's why we still do it.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:05. Each of the first five has a slide later in the act: versions, size, security, vendoring. The sixth card is the honest reason: almost every real project has dependencies; the skill is choosing and pinning them.</p>
+  </aside>
+</section>
+
+<section data-title="Package CDNs">
+  <p class="kicker">CDNs for open-source packages</p>
+  <h2>Package CDNs serve the npm registry as URLs</h2>
+  <div class="url">
+    <span class="u1">https://<small>scheme</small></span><span class="u2">cdn.jsdelivr.net<small>host</small></span><span class="u1">/npm/<small>registry</small></span><span class="u3">d3<small>package</small></span><span class="u4">@7.9.0<small>version</small></span><span class="u5">/+esm<small>file · build</small></span>
+  </div>
+  <ul>
+    <li><strong>npm</strong> is the registry where JavaScript packages are published. Millions of them.</li>
+    <li><strong>jsDelivr</strong>, <strong>unpkg</strong>, <strong>esm.sh</strong> fetch packages from the npm registry (their origin) and serve any file in them through a CDN. (cdnjs hosts a curated list instead.)</li>
+    <li>Remove the file part and jsDelivr lists every file in the package: <code>cdn.jsdelivr.net/npm/d3@7.9.0/</code></li>
+  </ul>
+  <aside class="notes">
+    <p>~0:06. jsDelivr's <code>/+esm</code> and esm.sh convert a package to an ES module on the fly, rewriting its own imports into more CDN URLs. <code>d3@7.9.0/+esm</code> is a 1.5 kB file that imports 30 more: look at it in the Network panel.</p>
+  </aside>
+</section>
+
+<section data-title="Way 1: script src">
+  <p class="kicker">Way 1 · the oldest</p>
+  <h2><code>&lt;script src&gt;</code>: the library becomes a global</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="html" class="xs"><link rel="stylesheet" href=
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src=
+  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
+<script src="main.js"><\/script>
+
+<!-- in main.js: L.map("map"), L is window.L --></script>
+    <ul>
+      <li>The file is a <strong>UMD</strong> build: it puts one global on <code>window</code> (<code>L</code>, <code>Chart</code>, <code>d3</code>).</li>
+      <li><strong>Order matters</strong>: the library's tag before yours.</li>
+      <li>Globals share one namespace with your scripts: a library's <code>d3</code> and your own <code>d3</code> variable, and one silently hides or overwrites the other.</li>
+      <li>Some libraries need their <strong>CSS</strong> too.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:07. Still the most common snippet in READMEs, and still fine for a single library. <code>defer</code> on both tags keeps the order and doesn't block parsing.</p>
+  </aside>
+</section>
+
+<section data-title="Way 2: import from a URL">
+  <p class="kicker">Way 2 · ES modules</p>
+  <h2>Import from a URL, in a module</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// main.js · <script type="module" src="main.js">
+import * as d3 from
+  "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import confetti from
+  "https://esm.sh/canvas-confetti@1.9.3";
+import { formatHex } from "https://esm.sh/culori@4";
+
+d3.scaleLinear([0, 150], [200, 0]);</script>
+    <ul>
+      <li>No globals: the names exist in this module only (Lecture 5).</li>
+      <li><strong>Named</strong> <code>{ formatHex }</code>, <strong>default</strong> <code>confetti</code>, <strong>namespace</strong> <code>* as d3</code>: which one works depends on what the package exports. The README says.</li>
+      <li>Only inside <code>type="module"</code>.</li>
+    </ul>
+    <div class="err step">Uncaught SyntaxError: Cannot use import statement outside a module</div>
+  </div>
+  <aside class="notes">
+    <p>~0:09. The error appears when the script tag lacks <code>type="module"</code>. If a default import gives <code>undefined</code> or "does not provide an export named default", try the namespace import and log it: <code>console.log(d3)</code> shows what's inside. The <code>@4</code> on culori is on purpose: two slides later we see why it should be exact.</p>
+  </aside>
+</section>
+
+<section data-title="Way 3: bare names">
+  <p class="kicker">Way 3 · what the docs show</p>
+  <h2>Bare names fail in the browser</h2>
+  <script type="text/x-code" data-lang="js" class="mid">import * as d3 from "d3"; // copied from the README</script>
+  <div class="err">Uncaught TypeError: Failed to resolve module specifier "d3". Relative references must start with either "/", "./", or "../".</div>
+  <p class="mt"><code>"d3"</code> is a <strong>bare specifier</strong>: a package name, not a URL. Node and bundlers know where npm packages live (<code>node_modules</code>). The browser only knows URLs.</p>
+  <aside class="notes">
+    <p>~0:10. Nearly every README and nearly every AI answer writes imports this way, because nearly every project has a build step. Firefox's message: "The specifier “d3” was a bare specifier, but was not remapped to anything." Two ways out: replace the name with the URL in every file, or tell the browser once: the import map.</p>
+  </aside>
+</section>
+
+<section data-title="Import maps">
+  <p class="kicker">One place for every dependency</p>
+  <h2>An import map: names to URLs</h2>
+  <div class="split center">
+    <script type="text/x-code" data-lang="html" class="small"><script type="importmap">
+{
+  "imports": {
+    "d3":
+      "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm",
+    "culori": "./vendor/culori-4.0.1.mjs"
+  }
+}
+<\/script>
+<script type="module" src="main.js"><\/script>
+
+<!-- main.js: import * as d3 from "d3"; --></script>
+    <ul>
+      <li>Every module on the page can now <code>import … from "d3"</code>, as the docs write it.</li>
+      <li>Every version in <strong>one file</strong>. Upgrading is one line.</li>
+      <li>It must come <strong>before</strong> the module scripts that use it.</li>
+      <li>A URL or a local path: the code doesn't care which.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:12. Supported everywhere since 2023. The second entry previews vendoring (slide "Vendor it"): switching from CDN to a local copy changes the map, not the code. A trailing-slash entry (<code>"lodash/": "https://…/lodash-es@4.17.21/"</code>) maps a whole folder, for packages imported by path.</p>
+  </aside>
+</section>
+
+<section data-title="Which file?">
+  <p class="kicker">One package, several builds</p>
+  <h2>Which file do I load?</h2>
+  <table class="dtable">
+    <tr><th>build</th><th>looks like</th><th>in a browser</th></tr>
+    <tr><td>ES module</td><td><code>export function …</code> · <code>*.mjs</code> · <code>dist/*.esm.js</code></td><td class="yes"><code>import</code>, in <code>type="module"</code></td></tr>
+    <tr><td>UMD / IIFE</td><td>sets <code>window.Something</code> · <code>*.umd.js</code> · <code>*.iife.js</code></td><td class="yes"><code>&lt;script src&gt;</code></td></tr>
+    <tr><td>CommonJS</td><td><code>module.exports</code> · <code>require(…)</code></td><td class="no">no: <code>require</code> / <code>module is not defined</code></td></tr>
+  </table>
+  <p class="mt">Where to look: the README's <strong>CDN</strong> or <strong>browser</strong> section · the <code>exports</code>, <code>module</code>, <code>main</code> fields in <code>package.json</code> · or let <code>+esm</code> / esm.sh convert it.</p>
+  <aside class="notes">
+    <p>~0:13. CommonJS is Node's original module format; plenty of packages still ship only that. The CDN converters handle it. If the library throws <code>process is not defined</code>, it expects Node or a bundler (<code>process.env.NODE_ENV</code>): try the CDN's converted build, or find another. A <code>.cjs</code> file from jsDelivr isn't even run: Chrome refuses its MIME type, <code>application/node</code>.</p>
+  </aside>
+</section>
+
+<section data-title="What it costs">
+  <p class="kicker">Look before you choose</p>
+  <h2>What a dependency costs, in two panels</h2>
+  <div class="vs2">
+    <div class="card"><span class="label">network</span><p>Filter by <code>JS</code>, disable cache, reload. How many requests did one <code>import</code> start? How many kB transferred? One converted module can import dozens more (<code>d3@7.9.0/+esm</code>: 30): a waterfall.</p></div>
+    <div class="card"><span class="label">performance</span><p>Record and reload. <strong>Compile</strong> and <strong>Evaluate</strong> (Script or Module) in yellow: what the library costs on the main thread before your code runs.</p></div>
+  </div>
+  <p class="mt">A 500 kB library to format one date is a bad trade. <code>Intl.DateTimeFormat</code> is free.</p>
+  <aside class="notes">
+    <p>~0:14. This ties back to Lecture 9's Measure act. Sizes, minified and gzipped (measured): Leaflet 1.9.4 42 kB, Chart.js 4.4.1 69 kB, D3 7.9.0 92 kB, three.js 0.170 171 kB. Before reaching for a library, check what the platform has: <code>Intl</code> (numbers, dates, plurals), <code>structuredClone</code>, <code>crypto.randomUUID</code>, the Web Animations API.</p>
+  </aside>
+</section>
+
+<section data-title="Versions">
+  <p class="kicker">Semantic versioning</p>
+  <h2>Pin the version, or the code changes under you</h2>
+  <div class="url">
+    <span class="u3">7<small>major · breaks things</small></span><span class="u1 dot">.</span><span class="u2">9<small>minor · adds things</small></span><span class="u1 dot">.</span><span class="u4">0<small>patch · fixes things</small></span>
+  </div>
+  <table class="dtable">
+    <tr><td><code>…/npm/d3/+esm</code></td><td>latest. Can become a new major at any moment.</td></tr>
+    <tr><td><code>…/npm/d3@7/+esm</code></td><td>the newest 7.x. Safer, still moves.</td></tr>
+    <tr><td><code>…/npm/d3@7.9.0/+esm</code></td><td>always version 7.9.0. <strong>Pin.</strong></td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:16. Semver is a promise, not a guarantee: minors occasionally break things too. A pinned <code>+esm</code> URL keeps the version, not the bytes: jsDelivr generates those files and may rebuild them. Static files (<code>dist/d3.min.js</code>) never change, and only those work with the next slide's integrity hashes; jsDelivr itself says not to use them on generated files.</p>
+  </aside>
+</section>
+
+<section data-title="AI trap: the wrong major">
+  <p class="kicker">Trap · the code is from another era</p>
+  <h2>The AI's code was right, for D3 v3</h2>
+  <script type="text/x-code" data-lang="js" class="mid">const y = d3.scale.linear().domain([0, 150]).range([200, 0]);</script>
+  <div class="err">Uncaught TypeError: Cannot read properties of undefined (reading 'linear')</div>
+  <ul class="mt">
+    <li><code>d3.scale.linear()</code> is D3 v3. Since v4 (2016) it's <code>d3.scaleLinear()</code>. Models learned from years of old examples.</li>
+    <li>Compare the version the code <strong>assumes</strong> with the version you <strong>load</strong>. Ask for the version explicitly.</li>
+    <li>Big jumps have a migration guide or a <code>CHANGELOG.md</code>. Read the one for your major.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:17. Same family: Chart.js v2 options in a v4 project, Leaflet plugins for 0.7, three.js examples using <code>Geometry</code> (removed in r125). The fix is cheap if you recognise it: the error says "undefined", meaning the namespace exists but not that member.</p>
+  </aside>
+</section>
+
+<section data-title="AI trap: the package that isn't">
+  <p class="kicker">Trap · the package that isn't</p>
+  <h2>Check that the package exists, and is the one you think</h2>
+  <div class="split center">
+    <ul>
+      <li>Models sometimes invent plausible package names.</li>
+      <li>People register those names and publish malware into them (<strong>slopsquatting</strong>). Typos work too (<strong>typosquatting</strong>).</li>
+      <li>Before you add one: the <strong>npm page</strong>. A linked repository, weekly downloads, the last publish date, the maintainers.</li>
+    </ul>
+    <div class="card"><span class="label">two minutes</span><p>npmjs.com/package/<em>name</em> → repository → stars, issues, last commit. A package with 12 downloads and no repository is not your chart library.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:18. This matters more in projects with npm, where <code>npm install</code> runs install scripts on your machine. In a browser page the damage is limited to the page, which leads to the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="It runs with your page's rights">
+  <p class="kicker">Security</p>
+  <h2>A library runs with all of your page's rights</h2>
+  <div class="split center">
+    <div class="stack">
+      <p>It can read the DOM and <code>localStorage</code>, send <code>fetch</code> requests, log keystrokes. There's no sandbox between your code and theirs.</p>
+      <p><strong>Subresource integrity</strong>: the browser refuses the file if a single byte changed.</p>
+    </div>
+    <script type="text/x-code" data-lang="html" class="xs"><script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha384-…"
+  crossorigin="anonymous"><\/script></script>
+  </div>
+  <aside class="notes">
+    <p>~0:19. Libraries often publish the hash with their install snippet (Leaflet's download page does); or compute it: <code>openssl dgst -sha384 -binary leaflet.js | openssl base64 -A</code>. Works on <code>&lt;script&gt;</code> and <code>&lt;link rel="stylesheet"&gt;</code>; import maps have an <code>integrity</code> section in newer browsers. Pin first: a hash for a moving version breaks on the next release. In 2024 the polyfill.io CDN was taken over and served malware to every site still loading it: the case for integrity, and for the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="Vendor it">
+  <p class="kicker">Offline, frozen</p>
+  <h2>Vendor it: a copy in your repository</h2>
+  <div class="split center">
+<pre class="raw"><span class="c"># download the exact file</span>
+curl -L -o vendor/d3-7.9.0.mjs \
+  https://esm.sh/d3@7.9.0/es2022/d3.bundle.mjs
+
+<span class="c"># the import map points at it</span>
+<span class="k">"d3"</span>: <span class="s">"./vendor/d3-7.9.0.mjs"</span></pre>
+    <ul>
+      <li>Works offline, on any Wi-Fi, forever.</li>
+      <li>The version is frozen and visible in the repository.</li>
+      <li>Check it's <strong>one file</strong>: jsDelivr's <code>d3@7.9.0/+esm</code> is 1.5 kB that imports 30 more. esm.sh's <code>d3.bundle.mjs</code> has everything.</li>
+      <li>CSS, fonts, and data files too.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:20. Test it: DevTools → Network → Offline, reload. Anything that fails is still on a CDN. The same goes for API data: a cached JSON file in the repo beats a live API on a bad connection.</p>
+  </aside>
+</section>
+
+<section data-title="From URLs to packages">
+  <p class="kicker">The same ideas, automated</p>
+  <h2>What we did by hand, npm and a bundler do for you</h2>
+  <table class="dtable bridge">
+    <tr><th>today, by hand</th><th></th><th>with npm and a bundler</th></tr>
+    <tr><td>the import map</td><td>→</td><td><code>dependencies</code> in <code>package.json</code></td></tr>
+    <tr><td>an exact version in the URL</td><td>→</td><td>the lockfile, <code>package-lock.json</code></td></tr>
+    <tr><td><code>vendor/</code></td><td>→</td><td><code>node_modules/</code> (not committed)</td></tr>
+    <tr><td>the CDN converting to ESM</td><td>→</td><td>the bundler resolving bare names</td></tr>
+    <tr><td>the order of <code>&lt;script&gt;</code> tags</td><td>→</td><td>the dependency graph</td></tr>
+    <tr><td>checking the npm page</td><td>→</td><td><code>npm audit</code>, Dependabot</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:21. The point: none of it is magic. A bundler does what they did by hand today, for hundreds of packages, automatically.</p>
+  </aside>
+</section>
+
+<section data-title="npm and a bundler">
+  <p class="kicker">npm and a bundler</p>
+  <h2>What npm and a bundler add</h2>
+  <div class="split">
+    <script type="text/x-code" data-lang="js" class="small">// package.json
+{
+  "name": "market-dashboard",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": { "d3": "^7.9.0" },
+  "devDependencies": { "vite": "^7.0.0" }
+}</script>
+    <ul>
+      <li><code>npm install d3</code>: into <code>node_modules</code>, exact version in the lockfile. Commit the lockfile.</li>
+      <li><code>^7.9.0</code>: any 7.x from 7.9.0. <code>~7.9.0</code>: only 7.9.x.</li>
+      <li>A build tool like <strong>Vite</strong> (bundling with Rollup and esbuild): dev server, bare names, TypeScript, minifying, dropping unused code.</li>
+      <li>The output is still static HTML, CSS and JS.</li>
+      <li>Next: your own code as packages, and frameworks built on all of this.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:22. One slide so the words are familiar. A page with an import map and no build step is a complete, deployable project; a bundler earns its place when there are many dependencies, TypeScript, or a lot of code to split and minify.</p>
+  </aside>
+</section>
+
+<section data-title="Tell your AI">
+  <p class="kicker">Working with an assistant</p>
+  <h2>Tell your AI how this project loads code</h2>
+  <div class="split center">
+<pre class="raw"><span class="c"># AGENTS.md</span>
+<span class="k">## Dependencies</span>
+- No build step. No npm install.
+- Libraries load through the import map
+  in index.html, from vendor/.
+- Exact versions only: d3 7.9.0.
+  Use the API of that version.
+- Ask before adding a dependency.</pre>
+    <ul>
+      <li>Many coding assistants read a file like <code>AGENTS.md</code> (or <code>CLAUDE.md</code>) from the repository before they write.</li>
+      <li>Without it, they often assume npm, a bundler, and whatever version they remember.</li>
+      <li>It's also documentation for whoever reads the repository.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:23. An assistant that follows the project's rules writes code in the shape you expect, and you can check it against the rules.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     WRAP
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Wrap" data-at="0:24" data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>Borrow</h2>
+  <div class="vs2">
+    <div class="card"><span class="label">borrow</span><p>A CDN URL with an exact version. An import map. Vendored to work offline.</p></div>
+    <div class="card"><span class="label">cost</span><p>Requests and kB in the Network panel, Compile and Evaluate in the Performance panel. The platform first.</p></div>
+    <div class="card"><span class="label">trust</span><p>Check the package and the major version. Integrity hashes. It runs with your rights.</p></div>
+    <div class="card"><span class="label">at scale</span><p>npm, lockfiles and bundlers do the same things for hundreds of packages.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:24. One sentence per card.</p>
+  </aside>
+</section>
+
+<section data-title="Reading">
+  <p class="kicker">Reading</p>
+  <h2>To go deeper</h2>
+  <ul class="reading">
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules" target="_blank" rel="noopener">MDN · JavaScript modules</a> <span class="muted">— import, export, type="module"</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap" target="_blank" rel="noopener">MDN · Import maps</a> <span class="muted">— the full syntax</span></li>
+    <li><a href="https://semver.org" target="_blank" rel="noopener">semver.org</a> <span class="muted">— what MAJOR.MINOR.PATCH promises</span></li>
+  </ul>
+  <aside class="notes">
+    <p>~0:25. Everything is in github.com/nlopin/programming-interactivity-exercises → 10-borrow.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Borrow. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="big-title"><span class="b">Borrow.</span></h1>
+      <p class="title-sub">materials →<br><a href="https://github.com/nlopin/programming-interactivity-exercises" target="_blank" rel="noopener">github.com/nlopin/programming-interactivity-exercises</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw"><span class="c">// the whole lecture</span>
+import * as d3 from "d3"; <span class="c">// a name</span>
+<span class="c">// → the import map → a URL</span>
+<span class="c">// → d3@7.9.0, pinned</span></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@
   const MODE = params.has("presenter") ? "presenter" : params.has("embed") ? "embed" : "main";
   const deck = document.querySelector(".deck");
   const slides = [...deck.children].filter((s) => s.tagName === "SECTION");
-  const bc = "BroadcastChannel" in window ? new BroadcastChannel("l9-draw-deck") : null;
+  const bc = "BroadcastChannel" in window ? new BroadcastChannel("l10-borrow-deck") : null;
 
   // --- act propagation: every slide inherits the last act marker -------------
   // data-theme on an act marker switches the look for every slide after it (Part 2 is "wire")
@@ -111,7 +111,7 @@
     if (MODE === "main") {
       const hash = "#" + (idx + 1);
       if (location.hash !== hash) history.replaceState(null, "", hash);
-      document.title = `${idx + 1}. ${s.dataset.title} — Draw, measure, borrow`;
+      document.title = `${idx + 1}. ${s.dataset.title} — Borrow`;
     }
   }
 

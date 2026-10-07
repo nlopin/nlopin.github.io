@@ -309,9 +309,12 @@ Not covered, candidates for later: WebSockets / server-sent events (brief 2
 polls instead), caching headers in depth, service workers and offline,
 authentication flows (login, cookies, sessions), deploy.
 
-## Lecture 9 · "Draw, measure, borrow" (deck written)
+## Lecture 9 · "Draw, measure, do less" (deck written)
 
-Deck: `programming-interactivity-9-draw-measure-borrow/slides.html` (65
+Act 4 (Borrow) moved to Lecture 10: the deck is now Acts 1–3, about 2 h, in
+`programming-interactivity-9-draw-measure/`.
+
+Deck: `programming-interactivity-9-draw-measure/slides.html` (65
 slides), hook demo `demos/sales-log.html`. Still to write: the five
 exercises, `index.html` (lesson notes), cheatsheet, run sheet. The original
 plan follows; where the deck differs, the deck wins.
@@ -349,7 +352,7 @@ mini-explorable jam fits only in a longer day; otherwise it moves to Day 2.
 
 ### Opening · slides 1–4
 
-1. **Title** · Draw, measure, borrow.
+1. **Title** · Draw, measure, do less.
 2. **Hook** · the market's sales log, 100 000 rows, rendered as a list: type
    in the search box, the page freezes. "Where does the time go?"
 3. **Thesis** · Put things on screen, find out what's slow before fixing it,
@@ -458,7 +461,22 @@ worker.
 
 Break here.
 
-### Act 4 · Borrow · slides 40–58
+### Close · slides 59–61
+
+59. **Three questions before you go** · which surface, what will be slow and
+    how you'll know, which dependencies (plumbing or idea?).
+60. **Homework** · for the final project: the surface, the import map with
+    pinned versions, the `AGENTS.md` lines; one Performance recording of the
+    first prototype.
+61. **Closing** · the title, answered.
+
+## Lecture 10 · "Borrow" (deck written)
+
+Deck: `programming-interactivity-10-borrow/slides.html`, Lecture 9's Act 4
+moved as Act 1 (~23 min). Still to write: Ex 4 and Ex 5, and whatever else
+the class holds.
+
+### The original plan (Lecture 9 slides 40–58)
 
 40. Divider.
 41. **What's out there** (hints only) · charts: Observable Plot, Chart.js,
@@ -522,15 +540,6 @@ file, default vs named, AI code for the wrong major.
 **Ex 5 · Bring a library** (10 min): pick one from slide 41 that the final
 project might use; import map, pinned, vendored; its cost in the Network and
 Performance panels.
-
-### Close · slides 59–61
-
-59. **Three questions before you go** · which surface, what will be slow and
-    how you'll know, which dependencies (plumbing or idea?).
-60. **Homework** · for the final project: the surface, the import map with
-    pinned versions, the `AGENTS.md` lines; one Performance recording of the
-    first prototype.
-61. **Closing** · the title, answered.
 
 ## Open questions
 
