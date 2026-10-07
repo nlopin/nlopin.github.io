@@ -61,6 +61,23 @@
 
     .foot { display: flex; gap: 1rem; align-items: center; font: 400 0.9rem var(--font-mono); color: var(--muted); }
     .foot .grow { flex: 1; }
+    /* ---- quiz board ---- */
+    .quizmain { min-height: 0; overflow: auto; border-top: 2px solid var(--ink); padding-top: 1rem; }
+    .people { margin-bottom: 1rem; font-size: 1.3rem; }
+    .people summary { cursor: pointer; font-weight: 600; width: max-content; }
+    .people summary b { font: 700 1.6em var(--font-mono); }
+    .people ul { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; margin: 0.6rem 0 0; }
+    .people li { font: 600 0.9rem var(--font-mono); background: var(--white); border: 1.5px solid var(--ink); border-radius: 99px; padding: 0.2rem 0.7rem; }
+    .people li.off { opacity: 0.4; }
+    .qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; }
+    .qcard { background: var(--white); border: 2px solid var(--ink); border-radius: 12px; padding: 1rem 1.2rem; }
+    .qcard h2 { font: 700 1.25rem/1.25 var(--font-sans); margin: 0 0 0.2rem; }
+    .qcard .answered { font: 400 0.9rem var(--font-mono); color: var(--muted); margin: 0 0 0.7rem; }
+    .opt { display: grid; grid-template-columns: 5.5rem 1fr 2.5rem; gap: 0.6rem; align-items: center; margin-bottom: 0.4rem; }
+    .opt .label { font: 700 1rem var(--font-mono); }
+    .opt .bar { height: 1.6rem; background: var(--paper-2); border-radius: 6px; overflow: hidden; }
+    .opt .bar i { display: block; height: 100%; background: var(--ink); transition: width 0.5s; }
+    .opt b { font: 700 1.4rem var(--font-mono); text-align: right; }
     @media (prefers-reduced-motion: reduce) { .lane, .car { transition: none; } .lane.flash { animation: none; } }
   </style>
 </head>
@@ -72,7 +89,7 @@
 
     // Lessons a race can run on, relative to this page. The races are the pages
     // linked from each lesson's index.html that load race.js, in that order.
-    const LESSONS = ["../programming-interactivity-8-fetch/", "../programming-interactivity-5-data/", "../programming-interactivity-4-responsive-dom/"];
+    const LESSONS = ["../programming-interactivity-9-draw-measure-borrow/", "../programming-interactivity-8-fetch/", "../programming-interactivity-5-data/", "../programming-interactivity-4-responsive-dom/"];
     const MEDALS = ["🥇", "🥈", "🥉"];
     // Every racer gets one, picked from their uid so it survives reloads. All face left; the board flips them.
     const RIDES = ["🏎️", "🚗", "🚙", "🚕", "🛻", "🚓", "🚑", "🚒", "🚌", "🏍️", "🛵", "🚜", "🐎", "🐢", "🦄", "🐌"];
@@ -104,7 +121,17 @@
       const doc = await page(url);
       const declared = doc.querySelector('meta[name="race-tasks"]');
       const total = declared ? +declared.content || 0 : [...doc.querySelectorAll(TASK_SEL)].filter((el) => el.querySelector(':scope > script[data-role="checks"]')).length;
-      return { title: doc.title, total, hooked: !!doc.querySelector('script[src$="race/race.js"]') };
+      return { title: doc.title, total, hooked: !!doc.querySelector('script[src$="race/race.js"]'), quiz: quizOf(doc) };
+    }
+
+    // A quiz page has <meta name="race-quiz">: one question per fieldset[data-q],
+    // its options are the radios (value + label text).
+    function quizOf(doc) {
+      if (!doc.querySelector('meta[name="race-quiz"]')) return null;
+      return [...doc.querySelectorAll("fieldset[data-q]")].map((fs) => ({
+        text: fs.querySelector("legend")?.textContent.trim() || "",
+        options: [...fs.querySelectorAll('input[type="radio"]')].map((input) => ({ value: input.value, label: input.closest("label")?.textContent.trim() || input.value })),
+      }));
     }
 
     /* ---- setup: pick an exercise, open a room ---- */
@@ -128,8 +155,8 @@
         const pages = await Promise.all(urls.map((href) => inspect(new URL(href)).then((info) => ({ url: new URL(href), ...info }), () => null)));
         const races = pages.filter((p) => p && p.hooked);
         if (!races.length) list.append(h("p", { class: "err", text: "No page in this lesson loads race.js." }));
-        for (const { url, title, total } of races) {
-          const msg = h("small", { text: `${total} task${total === 1 ? "" : "s"}` });
+        for (const { url, title, total, quiz } of races) {
+          const msg = h("small", { text: quiz ? `quiz · ${quiz.length} questions` : `${total} task${total === 1 ? "" : "s"}` });
           const go = h("button", { class: "go", type: "button", text: "Start race", onclick: () => start(url, title, total, msg, go) });
           if (!total) go.disabled = true;
           list.append(h("div", { class: "ex" }, h("span", { text: title }), msg, go));
@@ -166,6 +193,9 @@
       const qr = qrcode(0, "M");
       qr.addData(joinUrl.href);
       qr.make();
+
+      const info = await inspect(new URL(meta.ex, location.href)).catch(() => null);
+      if (info && info.quiz) return quizBoard(meta, info.quiz, qr.createDataURL(8, 2));
 
       const track = h("div", { class: "track" });
       const count = h("span");
@@ -234,6 +264,51 @@
         });
         for (const [uid, lane] of lanes) if (!players.some((p) => p.uid === uid)) { lane.remove(); lanes.delete(uid); }
       }
+    }
+
+    /* ---- quiz: who's here, and how many picked what ---- */
+    function quizBoard(meta, questions, qrSrc) {
+      const people = h("details", { class: "people" });
+      const grid = h("div", { class: "qgrid" });
+      const clock = h("span");
+      app.append(h("div", { class: "race" },
+        h("header", { class: "head" },
+          h("div", { class: "title" }, h("h1", { text: meta.title }), h("p", { text: "Open the quiz → 🏁 Join race → type the code → answer" })),
+          h("div", { class: "code", text: room }),
+          h("img", { class: "qr", src: qrSrc, alt: "QR code: join the quiz" })),
+        h("main", { class: "quizmain" }, people, grid),
+        h("footer", { class: "foot" }, clock, h("span", { class: "grow" }),
+          h("button", { type: "button", text: "⛶ fullscreen", onclick: toggleFull }),
+          h("a", { class: "btn", href: "board.html", text: "New race" }))));
+      setInterval(() => {
+        const s = Math.max(0, Math.floor((Date.now() - meta.created) / 1000));
+        clock.textContent = `⏱ ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+      }, 1000);
+
+      onValue(ref(db, `rooms/${room}/players`), (snap) => {
+        const players = Object.values(snap.val() || {}).map((p) => ({ name: p.name || "?", online: !!p.online, answers: p.answers || {} }));
+        players.sort((a, b) => b.online - a.online || a.name.localeCompare(b.name));
+        const online = players.filter((p) => p.online).length;
+
+        // Kept open across updates: only the summary and the list change.
+        people.replaceChildren(
+          h("summary", {}, h("b", { text: String(online) }), ` connected · ${players.length} joined`),
+          h("ul", {}, ...players.map((p) => h("li", { class: p.online ? "" : "off", text: p.name }))));
+
+        grid.replaceChildren(...questions.map((q, i) => {
+          const picks = players.map((p) => p.answers[`q${i}`]).filter(Boolean);
+          const most = Math.max(1, players.length);
+          return h("section", { class: "qcard" },
+            h("h2", { text: q.text }),
+            h("p", { class: "answered", text: `${picks.length} of ${players.length} answered` }),
+            ...q.options.map((o) => {
+              const n = picks.filter((v) => v === o.value).length;
+              const row = h("div", { class: "opt" }, h("span", { class: "label", text: o.label }), h("span", { class: "bar" }, h("i")), h("b", { text: String(n) }));
+              row.querySelector("i").style.width = `${(n / most) * 100}%`;
+              return row;
+            }));
+        }));
+      });
     }
 
     function toggleFull() {

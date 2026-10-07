@@ -19,6 +19,7 @@
             "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24" },
             "online": { ".validate": "newData.isBoolean()" },
             "solved": { "$task": { ".validate": "newData.isNumber()" } },
+            "answers": { "$q": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 20" } },
             "$other": { ".validate": false }
           }
         }

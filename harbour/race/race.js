@@ -6,8 +6,12 @@
    itself knows nothing about the race. A page with its own game loop instead
    declares <meta name="race-tasks" content="N"> and fires
      document.dispatchEvent(new CustomEvent("race:solved", { detail: { task: i } }))
-   for i in 0…N-1. Joining: open the page with ?race=CODE (the board's QR
-   code), or press "Join race" and type the code.
+   for i in 0…N-1. A quiz page (<meta name="race-quiz">) also sends what was
+   picked: dispatch "race:answer" with { detail: { task: i, value: "svg" } };
+   the board counts the values per question. After joining, race.js fires
+   "race:joined" on document, so the page can resend answers picked before.
+   Joining: open the page with ?race=CODE (the board's QR code), or press
+   "Join race" and type the code.
    ========================================================================== */
 import { db, signIn, cleanCode, TASK_SEL, ref, get, set, update, onValue, onDisconnect, serverTimestamp } from "./firebase.js";
 
@@ -139,6 +143,14 @@ async function race(room, uid, name, meta) {
     new MutationObserver(check).observe(el, { attributes: true, attributeFilter: ["class"] });
   });
   document.addEventListener("race:solved", (e) => record(Math.floor(e.detail.task)));
+  // Quiz answers: the latest pick per question wins; answering counts as done.
+  document.addEventListener("race:answer", (e) => {
+    const i = Math.floor(e.detail.task), value = String(e.detail.value || "").slice(0, 20);
+    if (!(i >= 0 && i < total) || !value) return;
+    set(ref(db, `rooms/${room}/players/${uid}/answers/q${i}`), value);
+    record(i);
+  });
+  document.dispatchEvent(new CustomEvent("race:joined"));
 
   function paint(online) {
     dock.textContent = "";
