@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nearest defibrillator · Barcelona</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Nearest defibrillator</h1>
+    <p>Public defibrillators (AEDs) in Barcelona, nearest first.</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <button type="button" id="locate">Locate me</button>
+      <p id="status" role="status"></p>
+    </div>
+
+    <div id="map"></div>
+
+    <section aria-labelledby="nearest-title">
+      <h2 id="nearest-title">Nearest five</h2>
+      <ol id="nearest"></ol>
+    </section>
+  </main>
+
+  <footer></footer>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

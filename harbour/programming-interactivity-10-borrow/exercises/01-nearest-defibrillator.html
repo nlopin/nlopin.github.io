@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🗺️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 1 · Nearest defibrillator</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Borrow · all materials</a><span>Exercise 1 · pairs · 20 min</span></div>
+    <span class="eyebrow-tag">Act 1 · borrow</span>
+    <h1>Exercise 1 · <em>Nearest defibrillator</em></h1>
+    <p class="intro">Someone collapses in the street. The nearest public defibrillator (AED) is somewhere within a few hundred metres. Build the page that says where: a map, the user's position, and the five nearest AEDs from OpenStreetMap.</p>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="01-nearest-defibrillator.zip" download>⤓ Download the starter</a><a href="01-nearest-defibrillator/data/defibrillators.json" target="_blank" rel="noopener">The data ↗</a></div>
+    <ul>
+      <li>Extract the zip and serve the folder from a local server. Opening <code>index.html</code> as a file doesn't work: module scripts and <code>fetch</code> need <code>http://</code>, and geolocation needs <code>localhost</code> or HTTPS.</li>
+    </ul>
+    <pre class="code">cd 01-nearest-defibrillator
+npx live-server --port=8080</pre>
+    <p>It opens <code>http://127.0.0.1:8080</code> and reloads the page when you save. Without Node: VS Code's Live Server extension, or <code>python3 -m http.server 8080</code> (no reload).</p>
+    <ul>
+      <li><code>data/defibrillators.json</code>: all 706 AEDs mapped in Barcelona, an OpenStreetMap snapshot from 1 June 2026, in the Overpass API's format.</li>
+    </ul>
+
+    <h2>Done means</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>Leaflet 1.9.4 loads from a CDN (unpkg or jsDelivr) through an import map: its ES module build, at an exact version.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Leaflet's CSS loads with an <code>integrity</code> hash. Change one character of the hash: what does the console say?</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The map shows OpenStreetMap tiles, with the attribution the data's licence requires.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><em>Locate me</em> puts the user on the map, with the accuracy visible. Nothing asks for the location before the click.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Blocked, unavailable or timed out: the status line says which, and a click on the map sets the position instead.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The five nearest AEDs: in the list, nearest first, with the distance in metres and where to find it (<code>defibrillator:location</code>, when the data has it); and as markers on the map.</span></li>
+    </ul>
+
+    <h2>Check it</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Sensors → Location: London. What does the list say now?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Sensors → Location: "Location unavailable". Then block the permission in the site settings and reload.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Network → Offline, reload. Which requests fail, and are they code or data?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Network panel, filter by the CDN's domain: how many requests, how many kB, for one import?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Use the list with the keyboard only. Can you tell where the nearest AED is without seeing the map?</span></li>
+    </ul>
+
+    <h2>Stretch</h2>
+    <ul class="stretch">
+      <li>Vendor Leaflet: the same files in <code>vendor/</code>, with its licence, and the import map pointing there. Offline, the code still loads.</li>
+      <li><code>watchPosition</code>: the list updates as you walk. Stop watching when the page is hidden.</li>
+      <li>Load Leaflet with <code>import()</code> on the first click, with a loading state.</li>
+      <li>Replace the snapshot with a live query around the user, from the <a href="https://wiki.openstreetmap.org/wiki/Overpass_API">Overpass API</a>: <code>node["emergency"="defibrillator"](around:1000,LAT,LON);out;</code>. Public instances answer 406, 429 and 504 under load: what does your page do then?</li>
+    </ul>
+
+    <p class="muted">Data © OpenStreetMap contributors, available under the Open Database License (ODbL).</p>
+  </div>
+</body>
+</html>

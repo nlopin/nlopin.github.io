@@ -1,0 +1,22 @@
+# Fleet · the live delivery server for Lecture 10 · npx wrangler deploy
+name = "fleet"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = false   # only https://fleet.lopin.me, no *.workers.dev URL
+
+# https://fleet.lopin.me (lopin.me is on Cloudflare DNS)
+routes = [
+  { pattern = "fleet.lopin.me", custom_domain = true }
+]
+
+# Simulated couriers when the Durable Object starts; the teacher page changes it.
+[vars]
+BOTS = "6"
+
+[[durable_objects.bindings]]
+name = "FLEET"
+class_name = "Fleet"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Fleet"]

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🛵%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 2 · Live map</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Borrow · all materials</a><span>Exercise 2 · solo · 10 min</span></div>
+    <span class="eyebrow-tag">Act 2 · live</span>
+    <h1>Exercise 2 · <em>Live map</em></h1>
+    <p class="intro">You're a courier in Barcelona. Your page sends your position to the dispatcher over a WebSocket; a customer follows your order over server-sent events. You write the courier's side of the conversation.</p>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="02-live-map.zip" download>⤓ Download the starter</a><a href="https://fleet.lopin.me/" target="_blank" rel="noopener">The dispatcher map ↗</a></div>
+    <pre class="code">cd 02-live-map
+npx live-server --port=8080</pre>
+    <ul>
+      <li><code>courier.html</code>: your courier. A WebSocket to <code>wss://fleet.lopin.me/courier</code>.</li>
+      <li><code>track.html</code>: the customer's page. An <code>EventSource</code> on one order.</li>
+      <li><code>track.html</code> is complete. <code>courier.js</code> has the map, the order display and the timer; three functions are empty, each with a <code>TODO</code>.</li>
+    </ul>
+
+    <h2>Steps</h2>
+    <ol class="tasks">
+      <li><code>connect(name)</code>: open a WebSocket to <code>SERVER</code>, send the <code>hello</code> once it's open, pass every message to <code>handle()</code>, and when it closes, stop driving and show the close code.</li>
+      <li><code>handle(message)</code>: one branch per message the server sends down: <code>welcome</code>, <code>order</code>, <code>status</code>, <code>message</code>, <code>error</code>. The table below says what each one carries.</li>
+      <li><code>step()</code>: once a second, move your marker to the next point of the route and send that point to the server as a <code>position</code>.</li>
+      <li>Open <code>courier.html</code>, enter your name, start your shift. Find yourself on the projector. Note your order id.</li>
+    </ol>
+
+    <h2>Done means</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>The status line says you're connected, as your name.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Your marker drives the route on your map, and your courier drives the same way on the projector.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The order status changes: to the restaurant, to the customer, delivered. A few seconds later, a new order starts.</span></li>
+    </ul>
+
+    <h2>Check it</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Network → <code>courier</code> → Messages: every frame, both directions. Which one is your <code>hello</code>, which is the <code>welcome</code>?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Change <code>SERVER</code> to a wrong URL and reload: which close code do you get?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Open your courier in a second tab. What happens to the first one, and why?</span></li>
+    </ul>
+
+    <h2>The protocol</h2>
+    <p>JSON text messages. The first one must be a <code>hello</code>.</p>
+    <div class="spec-wrap"><table class="spec">
+      <tr><th>direction</th><th>message</th><th>meaning</th></tr>
+      <tr><td>up</td><td><code>{ "type": "hello", "name": "Ana" }</code></td><td>a new courier</td></tr>
+      <tr><td>up</td><td><code>{ "type": "position", "lat": 41.38, "lon": 2.17 }</code></td><td>where you are</td></tr>
+      <tr><td>up</td><td><code>{ "type": "message", "text": "…" }</code></td><td>to the customer</td></tr>
+      <tr><td>down</td><td><code>{ "type": "welcome", "courierId", "name", "order", "resumeAt" }</code></td><td>your id, your order, and the route index to start from</td></tr>
+      <tr><td>down</td><td><code>{ "type": "order", "order" }</code></td><td>the next order, 3 s after a delivery</td></tr>
+      <tr><td>down</td><td><code>{ "type": "status", "status" }</code></td><td><code>picked_up</code>, then <code>delivered</code></td></tr>
+      <tr><td>down</td><td><code>{ "type": "message", "text" }</code></td><td>from the customer</td></tr>
+      <tr><td>close</td><td>1012</td><td>the server restarted</td></tr>
+      <tr><td>close</td><td>4000</td><td>the same courier connected from somewhere else</td></tr>
+    </table></div>
+
+    <h2>Stretch</h2>
+    <ul class="stretch">
+      <li>Reply to the customer: a small form on <code>courier.html</code> that sends a <code>message</code> up.</li>
+      <li>Draw the part of the route you've already driven in another colour.</li>
+      <li>In <code>track.html</code>, show how many events the tracker missed and got replayed after a restart (the event <code>id</code>s).</li>
+    </ul>
+  </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Track an order · Fleet</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    { "imports": { "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js" } }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Where's my food?</h1>
+    <p>The customer's page: one order, live, over server-sent events.</p>
+  </header>
+
+  <main>
+    <form id="pick">
+      <label>Order
+        <select name="order" required></select>
+      </label>
+      <button>Track</button>
+      <button type="button" id="refresh">Refresh the list</button>
+    </form>
+
+    <div class="bar">
+      <span>Order <span id="order-id" class="order-id">–</span></span>
+      <span id="courier"></span>
+      <span id="order-status"></span>
+      <span id="eta"></span>
+      <span id="connection" role="status"></span>
+    </div>
+
+    <div id="map"></div>
+
+    <section aria-labelledby="notes-title">
+      <h2 id="notes-title">Messages</h2>
+      <ol id="notes"></ol>
+      <form id="write">
+        <label>Write to the courier
+          <input name="text" required maxlength="200">
+        </label>
+        <button>Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="track.js"></script>
+</body>
+</html>
