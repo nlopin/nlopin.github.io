@@ -1,0 +1,1001 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🍺%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The Web Pub Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for the quiz ---------- */
+.slide code, .slide pre { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+
+/* one colour per round */
+.slide[data-act-num="1"] { --act: var(--blue); --on-act: #fff; --act-ink: var(--blue); }
+.slide[data-act-num="2"] { --act: var(--tomato); --on-act: #fff; --act-ink: #c8381a; }
+.slide[data-act-num="3"] { --act: var(--violet); --on-act: #fff; --act-ink: var(--violet); }
+.slide[data-act-num="4"] { --act: var(--yellow); --on-act: var(--ink); --act-ink: #a07800; }
+.slide[data-act-num="5"] { --act: var(--green); --on-act: var(--ink); --act-ink: #0b7a52; }
+.slide[data-act-num="6"] { --act: var(--pink); --on-act: var(--ink); --act-ink: #c2307c; }
+.slide[data-act-num="7"] { --act: #00b3c7; --on-act: var(--ink); --act-ink: #007b89; }
+.slide[data-act-num="T"] { --act: var(--ink); --on-act: var(--yellow); --act-ink: var(--ink); }
+html[data-act="1"] .deck-progress i { background: var(--blue); }
+html[data-act="2"] .deck-progress i { background: var(--tomato); }
+html[data-act="3"] .deck-progress i { background: var(--violet); }
+html[data-act="4"] .deck-progress i { background: var(--yellow); }
+html[data-act="5"] .deck-progress i { background: var(--green); }
+html[data-act="6"] .deck-progress i { background: var(--pink); }
+html[data-act="7"] .deck-progress i { background: #00b3c7; }
+.deck-menu section[data-act="1"] h3 { background: var(--blue); color: #fff; }
+.deck-menu section[data-act="2"] h3 { background: var(--tomato); color: #fff; }
+.deck-menu section[data-act="3"] h3 { background: var(--violet); color: #fff; }
+.deck-menu section[data-act="4"] h3 { background: var(--yellow); color: var(--ink); }
+.deck-menu section[data-act="5"] h3 { background: var(--green); color: var(--ink); }
+.deck-menu section[data-act="6"] h3 { background: var(--pink); color: var(--ink); }
+.deck-menu section[data-act="7"] h3 { background: #00b3c7; color: var(--ink); }
+
+/* title */
+.slide.title .big-title { font-size: 190px; line-height: 0.86; letter-spacing: -0.06em; margin: 24px 0 40px; }
+.slide.title .big-title em { font-family: var(--font-serif); font-weight: 400; color: var(--yellow); letter-spacing: -0.02em; }
+.slide.title p { color: #bdb4a4; font: 500 28px/1.4 var(--font-mono); }
+.slide.title .sticker { position: absolute; right: 120px; top: 110px; font-size: 34px; transform: rotate(6deg); }
+
+/* round intro: the format, in one line */
+.slide.act .act-meta .fmt { font-size: 26px; }
+
+/* pick the real logo: four framed options, the right one lights up on reveal */
+.pick4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px; margin: 30px 0 34px; }
+.pick4 figure { position: relative; background: var(--white); border: 3px solid var(--ink); border-radius: 18px; padding: 34px; box-shadow: 8px 8px 0 var(--ink); transition: opacity 0.3s, outline-color 0.3s; outline: 10px solid transparent; outline-offset: 8px; }
+.pick4 img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+.pick4 figcaption { position: absolute; left: -22px; top: -22px; width: 60px; height: 60px; margin: 0; border-radius: 50%; background: var(--ink); color: var(--paper); font: 800 32px/60px var(--font-sans); text-align: center; }
+.slide.s1 .pick4 figure:not(.right) { opacity: 0.22; }
+.slide.s1 .pick4 figure.right { outline-color: var(--green); }
+
+/* real or fake: numbered tiles, the verdict appears on reveal */
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px; margin: 26px 0 30px; counter-reset: t; }
+.tiles.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.slide .tiles > li { counter-increment: t; position: relative; margin: 0; padding: 40px 18px 26px; background: var(--white); border: 3px solid var(--ink); border-radius: 14px; box-shadow: 6px 6px 0 var(--ink); text-align: center; font: 700 34px/1.15 var(--font-mono); letter-spacing: -0.02em; transition: background 0.3s, color 0.3s; }
+.slide .tiles > li::before { content: counter(t); position: absolute; left: 12px; top: 10px; width: auto; height: auto; background: none; border: 0; font: 700 18px/1 var(--font-mono); color: var(--muted); }
+.slide .tiles > li small { display: block; margin-top: 8px; font: 500 21px/1.2 var(--font-sans); letter-spacing: 0; }
+.slide .tiles > li::after { position: absolute; right: -10px; top: -16px; padding: 6px 10px; border: 2.5px solid var(--ink); border-radius: 8px; font: 800 17px/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; opacity: 0; transform: rotate(5deg); transition: opacity 0.3s; }
+.slide.s1 .tiles > li::after { opacity: 1; }
+.slide .tiles > .real::after { content: "real"; background: var(--green); color: var(--ink); }
+.slide .tiles > .fake::after { content: "fake"; background: var(--tomato); color: #fff; }
+.slide .tiles > .half::after { content: "½ · Twitter only"; background: var(--yellow); color: var(--ink); }
+.slide .tiles > .npm::after { content: "npm"; background: #cb3837; color: #fff; }
+.slide .tiles > .poke::after { content: "Pokémon"; background: var(--yellow); color: var(--ink); }
+.slide.s1 .tiles > .fake { background: var(--paper-2); color: var(--muted); text-decoration: line-through 4px var(--tomato); }
+.slide.s1 .tiles > .npm { background: #fbe9e9; }
+.slide.s1 .tiles > .poke { background: #fff6d6; }
+
+/* a question with one big answer under it */
+.answer { font: 800 64px/1.1 var(--font-sans); letter-spacing: -0.03em; }
+.answer .muted { display: block; margin-top: 14px; font: 400 30px/1.35 var(--font-sans); letter-spacing: 0; }
+.slide .reveal-box.step { margin-top: 30px; }
+.slide .reveal-box code { font-size: 1em; }
+.huge-q { font: 800 260px/1 var(--font-sans); letter-spacing: -0.06em; color: var(--act-ink); }
+
+/* colour swatches, painted by the colour they name */
+.swatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px; margin: 10px 0 30px; }
+.swatches > div { height: 300px; border: 3px solid var(--ink); border-radius: 18px; box-shadow: 8px 8px 0 var(--ink); display: flex; align-items: flex-end; padding: 22px 26px; font: 800 44px/1 var(--font-sans); }
+.swatches > div span { background: var(--white); border: 3px solid var(--ink); border-radius: 10px; padding: 8px 14px; font-size: 36px; }
+.swatches > div b { font: 500 28px var(--font-mono); background: var(--white); border: 3px solid var(--ink); border-radius: 10px; padding: 8px 14px; margin-left: 14px; }
+.sw-gray { background: gray; }
+.sw-darkgray { background: darkgray; }
+.sw-rebecca { background: rebeccapurple; }
+.solo { grid-template-columns: minmax(0, 1fr); }
+/* chucknorris: the legacy colour parser paints the cell, not this stylesheet */
+.legacy { width: 100%; height: 280px; border: 3px solid var(--ink); border-radius: 18px; border-spacing: 0; overflow: hidden; box-shadow: 8px 8px 0 var(--ink); }
+.legacy td { font: 800 40px var(--font-mono); color: #fff; text-align: center; }
+
+/* name that site */
+.shotq { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 44px; align-items: start; }
+.shotq .shot { position: relative; height: 640px; }
+.shotq .shot .real-page { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s; }
+.slide.s1 .shotq .shot .real-page { opacity: 1; }
+.shotq .shot img { object-fit: cover; object-position: top center; }
+.shotq .answer { font-size: 56px; }
+
+.slide pre.code.huge { margin: 10px 0 0; }
+.slide pre.code .q { color: var(--hl-com); }
+.slide .rules li { font-size: 34px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     OPENING
+     ===================================================================== -->
+
+<section class="title no-chrome" data-act="0" data-act-name="Opening" data-at="0:00" data-title="The Web Pub Quiz">
+  <span class="sticker">no DevTools allowed</span>
+  <p>Programming Interactivity · after hours</p>
+  <h1 class="big-title">The Web<br><em>Pub Quiz</em></h1>
+  <p>7 rounds · about an hour · one winner</p>
+  <aside class="notes">
+    <p>Hand out one answer sheet per team (answer-sheet.html, printed) and a pen. Teams of 3–5.</p>
+    <p>Keys: <code>→</code> next step / slide · <code>p</code> presenter window with these notes · <code>m</code> menu · <code>f</code> fullscreen. Each round shows all its questions first, then an “Answers” slide, then the same questions again: on those, press → once to reveal each answer.</p>
+  </aside>
+</section>
+
+<section data-title="House rules">
+  <p class="kicker">Before we start</p>
+  <h2>House rules</h2>
+  <ul class="rules">
+    <li>Teams of 3 to 5. Give your team a name and write it on the sheet.</li>
+    <li>Phones and laptops stay closed. Your brain is the only runtime.</li>
+    <li>One point per answer. <strong>Closest guess</strong> questions: 2 points to the closest team.</li>
+    <li>The quizmaster's answer is final, even when it's <code>undefined</code>.</li>
+  </ul>
+  <aside class="notes">
+    <p>Scoring: real-or-fake tiles are one point each, so rounds 2, 3, 5 and 6 are worth roughly 10 each. Keep a running total on a whiteboard between rounds.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 1 · SPOT THE REAL LOGO
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Spot the real logo" data-at="0:02" data-title="Round 1 — Spot the real logo">
+  <div class="act-deco">A B
+C D</div>
+  <div class="act-num">round 01</div>
+  <h1>Spot the real logo</h1>
+  <div class="act-meta"><span class="chip">5 questions</span><span class="fmt">Four logos. One is real. Write the letter.</span></div>
+</section>
+
+<section class="quiz" data-title="1.1 · CSS">
+  <p class="kicker">Round 1 · Question 1</p>
+  <h2>Which one is the real CSS logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/css-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/css-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/css-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/css-d.svg" alt="Option D"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: C.</b> A: all four corners rounded (the real one keeps the top-left corner square). B: the old blue CSS3 shield, widely used next to the HTML5 one, but never the official CSS logo. D: letters moved to the top. The colour is <code>#663399</code>, which is <code>rebeccapurple</code>: remember it for Round 3.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.2 · JavaScript">
+  <p class="kicker">Round 1 · Question 2</p>
+  <h2>Which one is the real JavaScript logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/js-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/js-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/js-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/js-d.svg" alt="Option D"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: D.</b> A: letters moved up. B: white letters. C: rounded corners. The yellow JS square is a community logo; JavaScript has no official logo (Oracle owns the trademark on the name).</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.3 · HTML5">
+  <p class="kicker">Round 1 · Question 3</p>
+  <h2>Which one is the real HTML5 logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/html-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/html-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/html-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/html-d.svg" alt="Option D"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: B.</b> A: the 5 is mirrored. C: flat bottom, no point. D: the light and dark halves are swapped. The W3C released the logo in 2011.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.4 · Chrome">
+  <p class="kicker">Round 1 · Question 4</p>
+  <h2>Which one is the real Chrome logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/chrome-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/chrome-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/chrome-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/chrome-d.svg" alt="Option D"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: A</b> (the 2022 version). B: mirrored, so green and yellow swap sides. C: red and yellow swapped. D: no white ring around the blue centre.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.5 · Firefox">
+  <p class="kicker">Round 1 · Question 5</p>
+  <div class="split center">
+    <div>
+      <h2>This one is real. But what animal is a “firefox”?</h2>
+    </div>
+    <figure><img src="images/firefox.svg" alt="The Firefox logo"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: a red panda.</b> Mozilla says the logo shows a fox, but the name comes from a nickname for the red panda. Accept “red panda” only.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 1 — Answers">
+  <p class="kicker">Round 1 · Spot the real logo</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="1.1 · CSS · answer" data-steps="1">
+  <p class="kicker">Round 1 · Answer 1</p>
+  <h2>Which one is the real CSS logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/css-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/css-b.svg" alt="Option B"></figure>
+    <figure class="right"><figcaption>C</figcaption><img src="images/css-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/css-d.svg" alt="Option D"></figure>
+  </div>
+  <p class="step"><strong>C.</strong> Picked by the community in 2023, in <code>rebeccapurple</code>, with one square corner. B, the blue shield, was the unofficial CSS3 logo.</p>
+  <aside class="notes">
+    <p><b>Answer: C.</b> A: all four corners rounded (the real one keeps the top-left corner square). B: the old blue CSS3 shield, widely used next to the HTML5 one, but never the official CSS logo. D: letters moved to the top. The colour is <code>#663399</code>, which is <code>rebeccapurple</code>: remember it for Round 3.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.2 · JavaScript · answer" data-steps="1">
+  <p class="kicker">Round 1 · Answer 2</p>
+  <h2>Which one is the real JavaScript logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/js-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/js-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/js-c.svg" alt="Option C"></figure>
+    <figure class="right"><figcaption>D</figcaption><img src="images/js-d.svg" alt="Option D"></figure>
+  </div>
+  <p class="step"><strong>D.</strong> Square corners, black letters, bottom right. And nobody ever made it official.</p>
+  <aside class="notes">
+    <p><b>Answer: D.</b> A: letters moved up. B: white letters. C: rounded corners. The yellow JS square is a community logo; JavaScript has no official logo (Oracle owns the trademark on the name).</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.3 · HTML5 · answer" data-steps="1">
+  <p class="kicker">Round 1 · Answer 3</p>
+  <h2>Which one is the real HTML5 logo?</h2>
+  <div class="pick4">
+    <figure><figcaption>A</figcaption><img src="images/html-a.svg" alt="Option A"></figure>
+    <figure class="right"><figcaption>B</figcaption><img src="images/html-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/html-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/html-d.svg" alt="Option D"></figure>
+  </div>
+  <p class="step"><strong>B.</strong> The shield has a point at the bottom, and the lighter half is on the right.</p>
+  <aside class="notes">
+    <p><b>Answer: B.</b> A: the 5 is mirrored. C: flat bottom, no point. D: the light and dark halves are swapped. The W3C released the logo in 2011.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.4 · Chrome · answer" data-steps="1">
+  <p class="kicker">Round 1 · Answer 4</p>
+  <h2>Which one is the real Chrome logo?</h2>
+  <div class="pick4">
+    <figure class="right"><figcaption>A</figcaption><img src="images/chrome-a.svg" alt="Option A"></figure>
+    <figure><figcaption>B</figcaption><img src="images/chrome-b.svg" alt="Option B"></figure>
+    <figure><figcaption>C</figcaption><img src="images/chrome-c.svg" alt="Option C"></figure>
+    <figure><figcaption>D</figcaption><img src="images/chrome-d.svg" alt="Option D"></figure>
+  </div>
+  <p class="step"><strong>A.</strong> Red on top, yellow on the right, green on the left, and a white ring around the blue.</p>
+  <aside class="notes">
+    <p><b>Answer: A</b> (the 2022 version). B: mirrored, so green and yellow swap sides. C: red and yellow swapped. D: no white ring around the blue centre.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="1.5 · Firefox · answer" data-steps="1">
+  <p class="kicker">Round 1 · Answer 5</p>
+  <div class="split center">
+    <div>
+      <h2>This one is real. But what animal is a “firefox”?</h2>
+      <p class="step answer">A red panda.<span class="muted">“Firefox” is a nickname for the red panda. The logo draws a fox anyway.</span></p>
+    </div>
+    <figure><img src="images/firefox.svg" alt="The Firefox logo"></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: a red panda.</b> Mozilla says the logo shows a fox, but the name comes from a nickname for the red panda. Accept “red panda” only.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 2 · REAL OR FAKE HTML TAG
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Real or fake tag" data-at="0:09" data-title="Round 2 — Real or fake tag">
+  <div class="act-deco">&lt;?&gt;</div>
+  <div class="act-num">round 02</div>
+  <h1>Real or fake HTML tag?</h1>
+  <div class="act-meta"><span class="chip">10 questions</span><span class="fmt">Ten tags. Write R or F for each. Some of them are very old.</span></div>
+</section>
+
+<section class="quiz" data-title="2.1 · Ten tags">
+  <p class="kicker">Round 2 · Questions 1–10</p>
+  <h2>Did this tag ever exist?</h2>
+  <ul class="tiles">
+    <li class="real">&lt;marquee&gt;</li>
+    <li class="fake">&lt;sparkle&gt;</li>
+    <li class="real">&lt;blink&gt;</li>
+    <li class="real">&lt;plaintext&gt;</li>
+    <li class="real">&lt;xmp&gt;</li>
+    <li class="real">&lt;search&gt;</li>
+    <li class="fake">&lt;shout&gt;</li>
+    <li class="real">&lt;spacer&gt;</li>
+    <li class="real">&lt;bdi&gt;</li>
+    <li class="fake">&lt;glitter&gt;</li>
+  </ul>
+  <aside class="notes">
+    <p><b>Fake: 2, 7, 10.</b> Real ones, for the stories:</p>
+    <p><code>marquee</code>: scrolling text, from Internet Explorer. <code>blink</code>: blinking text, from Netscape. <code>plaintext</code>: everything after it is shown as raw text, and there is no way to close it, not even <code>&lt;/plaintext&gt;</code>. <code>xmp</code>: the ancestor of <code>pre</code>, shows markup as text. <code>spacer</code>: Netscape's empty box for layout. <code>search</code>: a landmark for a search form, added in 2023. <code>bdi</code>: bidirectional isolation, for usernames in Arabic or Hebrew inside English text.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 2 — Answers">
+  <p class="kicker">Round 2 · Real or fake tag</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="2.1 · Ten tags · answer" data-steps="1">
+  <p class="kicker">Round 2 · Answers 1–10</p>
+  <h2>Did this tag ever exist?</h2>
+  <ul class="tiles">
+    <li class="real">&lt;marquee&gt;</li>
+    <li class="fake">&lt;sparkle&gt;</li>
+    <li class="real">&lt;blink&gt;</li>
+    <li class="real">&lt;plaintext&gt;</li>
+    <li class="real">&lt;xmp&gt;</li>
+    <li class="real">&lt;search&gt;</li>
+    <li class="fake">&lt;shout&gt;</li>
+    <li class="real">&lt;spacer&gt;</li>
+    <li class="real">&lt;bdi&gt;</li>
+    <li class="fake">&lt;glitter&gt;</li>
+  </ul>
+  <p class="step"><strong>Three fakes:</strong> <code>sparkle</code>, <code>shout</code>, <code>glitter</code>. <code>&lt;search&gt;</code> is the newest: added in 2023.</p>
+  <aside class="notes">
+    <p><b>Fake: 2, 7, 10.</b> Real ones, for the stories:</p>
+    <p><code>marquee</code>: scrolling text, from Internet Explorer. <code>blink</code>: blinking text, from Netscape. <code>plaintext</code>: everything after it is shown as raw text, and there is no way to close it, not even <code>&lt;/plaintext&gt;</code>. <code>xmp</code>: the ancestor of <code>pre</code>, shows markup as text. <code>spacer</code>: Netscape's empty box for layout. <code>search</code>: a landmark for a search form, added in 2023. <code>bdi</code>: bidirectional isolation, for usernames in Arabic or Hebrew inside English text.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 3 · CSS COLOURS
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Colour or dessert" data-at="0:15" data-title="Round 3 — Colour or dessert">
+  <div class="act-deco">#?</div>
+  <div class="act-num">round 03</div>
+  <h1>Real CSS colour or ice cream flavour?</h1>
+  <div class="act-meta"><span class="chip">13 questions</span><span class="fmt">Ten names. Would <code>color: ___</code> work? R or F.</span></div>
+</section>
+
+<section class="quiz" data-title="3.1 · Ten colours">
+  <p class="kicker">Round 3 · Questions 1–10</p>
+  <h2>Is it a named CSS colour?</h2>
+  <ul class="tiles c4">
+    <li class="real">papayawhip</li>
+    <li class="fake">bananacream</li>
+    <li class="real">blanchedalmond</li>
+    <li class="fake">mangotango</li>
+    <li class="real">peachpuff</li>
+    <li class="real">cornsilk</li>
+    <li class="fake">salmonpink</li>
+    <li class="real">lavenderblush</li>
+    <li class="real">gainsboro</li>
+    <li class="real">burlywood</li>
+  </ul>
+  <aside class="notes">
+    <p><b>Fake: 2, 4, 7.</b> CSS has about 140 named colours. Most come from the X11 window system of the 1980s, which is why the list reads like a dessert menu.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.2 · gray or darkgray">
+  <p class="kicker">Round 3 · Question 11</p>
+  <h2>One of these is <code>gray</code>, the other is <code>darkgray</code>. Which one is <code>darkgray</code>?</h2>
+  <div class="swatches">
+    <div class="sw-darkgray"><span>A</span></div>
+    <div class="sw-gray"><span>B</span></div>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: A, the lighter one.</b> <code>darkgray</code> (#A9A9A9) comes from X11, where it was a light grey. <code>gray</code> (#808080) comes from the older HTML colour list. When the two lists merged, nobody fixed the names.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.3 · chucknorris">
+  <p class="kicker">Round 3 · Question 12</p>
+  <h2>What colour is this table cell?</h2>
+  <pre class="code big">&lt;td bgcolor="<span class="t-val">chucknorris</span>"&gt;</pre>
+  <aside class="notes">
+    <p><b>Answer: red.</b> The cell on the slide really is <code>bgcolor="chucknorris"</code>. The old HTML colour parser never rejects a value: it replaces every character that isn't a hex digit with 0, splits what's left into three parts and keeps the first two digits of each: <code>c00 0000 0000</code> → <code>#c00000</code>. Accept “red” or “dark red”.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.4 · rebeccapurple">
+  <p class="kicker">Round 3 · Question 13</p>
+  <h2>This colour is called <code>rebeccapurple</code>. Who is Rebecca?</h2>
+  <div class="swatches solo">
+    <div class="sw-rebecca"><b>#663399</b></div>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: Eric Meyer's daughter.</b> Rebecca died of brain cancer on her sixth birthday in 2014; purple was her favourite colour. The CSS Working Group added the name the same year. Read the answer gently.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 3 — Answers">
+  <p class="kicker">Round 3 · Colour or dessert</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="3.1 · Ten colours · answer" data-steps="1">
+  <p class="kicker">Round 3 · Answers 1–10</p>
+  <h2>Is it a named CSS colour?</h2>
+  <ul class="tiles c4">
+    <li class="real">papayawhip</li>
+    <li class="fake">bananacream</li>
+    <li class="real">blanchedalmond</li>
+    <li class="fake">mangotango</li>
+    <li class="real">peachpuff</li>
+    <li class="real">cornsilk</li>
+    <li class="fake">salmonpink</li>
+    <li class="real">lavenderblush</li>
+    <li class="real">gainsboro</li>
+    <li class="real">burlywood</li>
+  </ul>
+  <p class="step"><strong>Three fakes:</strong> <code>bananacream</code>, <code>mangotango</code>, <code>salmonpink</code>. Plain <code>salmon</code> is real.</p>
+  <aside class="notes">
+    <p><b>Fake: 2, 4, 7.</b> CSS has about 140 named colours. Most come from the X11 window system of the 1980s, which is why the list reads like a dessert menu.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.2 · gray or darkgray · answer" data-steps="1">
+  <p class="kicker">Round 3 · Answer 11</p>
+  <h2>One of these is <code>gray</code>, the other is <code>darkgray</code>. Which one is <code>darkgray</code>?</h2>
+  <div class="swatches">
+    <div class="sw-darkgray"><span>A</span><b class="step">darkgray · #a9a9a9</b></div>
+    <div class="sw-gray"><span>B</span><b class="step">gray · #808080</b></div>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: A, the lighter one.</b> <code>darkgray</code> (#A9A9A9) comes from X11, where it was a light grey. <code>gray</code> (#808080) comes from the older HTML colour list. When the two lists merged, nobody fixed the names.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.3 · chucknorris · answer" data-steps="1">
+  <p class="kicker">Round 3 · Answer 12</p>
+  <h2>What colour is this table cell?</h2>
+  <pre class="code big">&lt;td bgcolor="<span class="t-val">chucknorris</span>"&gt;</pre>
+  <div class="step mt">
+    <table class="legacy"><tr><td bgcolor="chucknorris">this cell, painted by your browser</td></tr></table>
+  </div>
+  <aside class="notes">
+    <p><b>Answer: red.</b> The cell on the slide really is <code>bgcolor="chucknorris"</code>. The old HTML colour parser never rejects a value: it replaces every character that isn't a hex digit with 0, splits what's left into three parts and keeps the first two digits of each: <code>c00 0000 0000</code> → <code>#c00000</code>. Accept “red” or “dark red”.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="3.4 · rebeccapurple · answer" data-steps="1">
+  <p class="kicker">Round 3 · Answer 13</p>
+  <h2>This colour is called <code>rebeccapurple</code>. Who is Rebecca?</h2>
+  <div class="swatches solo">
+    <div class="sw-rebecca"><b>#663399</b></div>
+  </div>
+  <p class="step">Rebecca Meyer, daughter of CSS pioneer Eric Meyer. The colour was added in her memory in 2014, and it's the colour of the CSS logo from Round 1.</p>
+  <aside class="notes">
+    <p><b>Answer: Eric Meyer's daughter.</b> Rebecca died of brain cancer on her sixth birthday in 2014; purple was her favourite colour. The CSS Working Group added the name the same year. Read the answer gently.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 4 · WAT
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="WAT" data-at="0:23" data-title="Round 4 — WAT">
+  <div class="act-deco">NaN</div>
+  <div class="act-num">round 04</div>
+  <h1>WAT</h1>
+  <div class="act-meta"><span class="chip">7 questions</span><span class="fmt">What does JavaScript say? Write it exactly.</span></div>
+</section>
+
+<section class="quiz" data-title="4.1 · baNaNa">
+  <p class="kicker">Round 4 · Question 1</p>
+  <h2>What does this evaluate to?</h2>
+  <pre class="code huge">"b" + "a" + +"a" + "a"</pre>
+  <aside class="notes">
+    <p><b>Answer: <code>"baNaNa"</code>.</b> <code>+"a"</code> is the unary plus: it converts <code>"a"</code> to a number, which is <code>NaN</code>, and then <code>NaN</code> is joined into the string. Half a point for “banana”.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.2 · sort">
+  <p class="kicker">Round 4 · Question 2</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">[10, 1, 3].sort()</pre>
+  <aside class="notes">
+    <p><b>Answer: <code>[1, 10, 3]</code>.</b> The fix is <code>.sort((a, b) =&gt; a - b)</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.3 · Math.max()">
+  <p class="kicker">Round 4 · Question 3</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">Math.max()</pre>
+  <aside class="notes">
+    <p><b>Answer: <code>-Infinity</code>.</b> And <code>Math.min()</code> is <code>Infinity</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.4 · typeof NaN">
+  <p class="kicker">Round 4 · Question 4</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">typeof NaN</pre>
+  <aside class="notes">
+    <p><b>Answer: <code>"number"</code>.</b> Bonus chaos: <code>NaN === NaN</code> is <code>false</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.5 · [] + {}">
+  <p class="kicker">Round 4 · Question 5</p>
+  <h2>What does this evaluate to?</h2>
+  <pre class="code huge">[] + {}</pre>
+  <aside class="notes">
+    <p><b>Answer: <code>"[object Object]"</code>.</b> The same string the market's <code>localStorage</code> bug stored when you forgot <code>JSON.stringify</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.6 · null">
+  <p class="kicker">Round 4 · Question 6</p>
+  <h2>True or false? One point for all three.</h2>
+  <pre class="code huge">null &gt;= 0   <span class="q">// ?</span>
+null &gt; 0    <span class="q">// ?</span>
+null == 0   <span class="q">// ?</span></pre>
+  <aside class="notes">
+    <p><b>Answer: true, false, false.</b> So null is greater than or equal to zero, without being greater than zero or equal to zero.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.7 · Valid name?">
+  <p class="kicker">Round 4 · Question 7</p>
+  <h2>One of these lines is valid JavaScript. Which one?</h2>
+  <pre class="code huge"><span class="q">A</span>  const ಠ_ಠ = 1;
+<span class="q">B</span>  let 💩 = 1;</pre>
+  <aside class="notes">
+    <p><b>Answer: A.</b> Identifiers may use any Unicode letter (ID_Start / ID_Continue). Emoji are symbols, not letters.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 4 — Answers">
+  <p class="kicker">Round 4 · WAT</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="4.1 · baNaNa · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 1</p>
+  <h2>What does this evaluate to?</h2>
+  <pre class="code huge">"b" + "a" + +"a" + "a"</pre>
+  <div class="step reveal-box solid answer"><code>"baNaNa"</code></div>
+  <aside class="notes">
+    <p><b>Answer: <code>"baNaNa"</code>.</b> <code>+"a"</code> is the unary plus: it converts <code>"a"</code> to a number, which is <code>NaN</code>, and then <code>NaN</code> is joined into the string. Half a point for “banana”.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.2 · sort · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 2</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">[10, 1, 3].sort()</pre>
+  <div class="step reveal-box solid answer"><code>[1, 10, 3]</code><span class="muted">Without a compare function, <code>sort</code> compares strings: <code>"10"</code> comes before <code>"3"</code>.</span></div>
+  <aside class="notes">
+    <p><b>Answer: <code>[1, 10, 3]</code>.</b> The fix is <code>.sort((a, b) =&gt; a - b)</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.3 · Math.max() · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 3</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">Math.max()</pre>
+  <div class="step reveal-box solid answer"><code>-Infinity</code><span class="muted">It starts from the smallest possible number and compares against each argument. With no arguments, nothing replaces it.</span></div>
+  <aside class="notes">
+    <p><b>Answer: <code>-Infinity</code>.</b> And <code>Math.min()</code> is <code>Infinity</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.4 · typeof NaN · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 4</p>
+  <h2>What does this return?</h2>
+  <pre class="code huge">typeof NaN</pre>
+  <div class="step reveal-box solid answer"><code>"number"</code><span class="muted">“Not a Number” is a number. It's a value of the floating-point type.</span></div>
+  <aside class="notes">
+    <p><b>Answer: <code>"number"</code>.</b> Bonus chaos: <code>NaN === NaN</code> is <code>false</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.5 · [] + {} · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 5</p>
+  <h2>What does this evaluate to?</h2>
+  <pre class="code huge">[] + {}</pre>
+  <div class="step reveal-box solid answer"><code>"[object Object]"</code><span class="muted"><code>+</code> turns both sides into strings: <code>""</code> and <code>"[object Object]"</code>.</span></div>
+  <aside class="notes">
+    <p><b>Answer: <code>"[object Object]"</code>.</b> The same string the market's <code>localStorage</code> bug stored when you forgot <code>JSON.stringify</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.6 · null · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 6</p>
+  <h2>True or false? One point for all three.</h2>
+  <pre class="code huge">null &gt;= 0   <span class="q">// ?</span>
+null &gt; 0    <span class="q">// ?</span>
+null == 0   <span class="q">// ?</span></pre>
+  <div class="step reveal-box solid answer"><code>true</code>, <code>false</code>, <code>false</code><span class="muted"><code>&gt;=</code> converts <code>null</code> to <code>0</code>. <code>==</code> doesn't: <code>null</code> only equals <code>undefined</code>.</span></div>
+  <aside class="notes">
+    <p><b>Answer: true, false, false.</b> So null is greater than or equal to zero, without being greater than zero or equal to zero.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="4.7 · Valid name? · answer" data-steps="1">
+  <p class="kicker">Round 4 · Answer 7</p>
+  <h2>One of these lines is valid JavaScript. Which one?</h2>
+  <pre class="code huge"><span class="q">A</span>  const ಠ_ಠ = 1;
+<span class="q">B</span>  let 💩 = 1;</pre>
+  <div class="step reveal-box solid answer">A<span class="muted"><code>ಠ</code> is a letter of the Kannada alphabet, so it can start a name. An emoji isn't a letter: <code>SyntaxError</code>.</span></div>
+  <aside class="notes">
+    <p><b>Answer: A.</b> Identifiers may use any Unicode letter (ID_Start / ID_Continue). Emoji are symbols, not letters.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 5 · STATUS CODES
+     ===================================================================== -->
+
+<section class="act" data-act="5" data-act-name="Status codes" data-at="0:33" data-title="Round 5 — Status codes">
+  <div class="act-deco">418</div>
+  <div class="act-num">round 05</div>
+  <h1>Real HTTP status or fake?</h1>
+  <div class="act-meta"><span class="chip">9 questions</span><span class="fmt">Eight codes, with their names. R or F.</span></div>
+</section>
+
+<section class="quiz" data-title="5.1 · Eight codes">
+  <p class="kicker">Round 5 · Questions 1–8</p>
+  <h2>Could a server send this back?</h2>
+  <ul class="tiles c4">
+    <li class="real">418<small>I'm a teapot</small></li>
+    <li class="real">451<small>Unavailable For Legal Reasons</small></li>
+    <li class="fake">299<small>Probably Fine</small></li>
+    <li class="half">420<small>Enhance Your Calm</small></li>
+    <li class="real">103<small>Early Hints</small></li>
+    <li class="fake">404½<small>Partially Found</small></li>
+    <li class="real">226<small>IM Used</small></li>
+    <li class="fake">499<small>Too Many Tabs Open</small></li>
+  </ul>
+  <aside class="notes">
+    <p><b>Fake: 3, 6, 8. Item 4 (420) gets half a point for either answer.</b></p>
+    <p>418: from an April Fools' RFC in 1998 about controlling coffee pots over HTTP; servers kept it as a joke, and the standard now reserves the code. 451: for pages blocked by law, added in 2016. 103 Early Hints: the server tells the browser what to preload before the real response is ready. 226 IM Used: from a 2002 RFC on sending only the changes to a page; almost nobody uses it. 420: Twitter's old API sent it when you were rate-limited.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="5.2 · Bonus: 451">
+  <p class="kicker">Round 5 · Bonus</p>
+  <h2>451 Unavailable For Legal Reasons is named after a book. Which book?</h2>
+  <aside class="notes">
+    <p><b>Answer: Fahrenheit 451.</b></p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 5 — Answers">
+  <p class="kicker">Round 5 · Status codes</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="5.1 · Eight codes · answer" data-steps="1">
+  <p class="kicker">Round 5 · Answers 1–8</p>
+  <h2>Could a server send this back?</h2>
+  <ul class="tiles c4">
+    <li class="real">418<small>I'm a teapot</small></li>
+    <li class="real">451<small>Unavailable For Legal Reasons</small></li>
+    <li class="fake">299<small>Probably Fine</small></li>
+    <li class="half">420<small>Enhance Your Calm</small></li>
+    <li class="real">103<small>Early Hints</small></li>
+    <li class="fake">404½<small>Partially Found</small></li>
+    <li class="real">226<small>IM Used</small></li>
+    <li class="fake">499<small>Too Many Tabs Open</small></li>
+  </ul>
+  <p class="step"><strong>Fakes:</strong> 299, 404½, 499. <strong>420</strong> was invented by Twitter: half a point either way.</p>
+  <aside class="notes">
+    <p><b>Fake: 3, 6, 8. Item 4 (420) gets half a point for either answer.</b></p>
+    <p>418: from an April Fools' RFC in 1998 about controlling coffee pots over HTTP; servers kept it as a joke, and the standard now reserves the code. 451: for pages blocked by law, added in 2016. 103 Early Hints: the server tells the browser what to preload before the real response is ready. 226 IM Used: from a 2002 RFC on sending only the changes to a page; almost nobody uses it. 420: Twitter's old API sent it when you were rate-limited.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="5.2 · Bonus: 451 · answer" data-steps="1">
+  <p class="kicker">Round 5 · Bonus</p>
+  <h2>451 Unavailable For Legal Reasons is named after a book. Which book?</h2>
+  <p class="step answer"><em class="s">Fahrenheit 451</em><span class="muted">Ray Bradbury, 1953: a society that burns books. 451 °F is the temperature at which paper burns, according to the book.</span></p>
+  <aside class="notes">
+    <p><b>Answer: Fahrenheit 451.</b></p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 6 · NPM OR POKÉMON
+     ===================================================================== -->
+
+<section class="act" data-act="6" data-act-name="npm or Pokémon" data-at="0:40" data-title="Round 6 — npm or Pokémon">
+  <div class="act-deco">npm i</div>
+  <div class="act-num">round 06</div>
+  <h1>npm package or Pokémon?</h1>
+  <div class="act-meta"><span class="chip">17 questions</span><span class="fmt">Twelve names. Write N or P.</span></div>
+</section>
+
+<section class="quiz" data-title="6.1 · Twelve names">
+  <p class="kicker">Round 6 · Questions 1–12</p>
+  <h2>Do you install it, or catch it?</h2>
+  <ul class="tiles c4">
+    <li class="npm">nodemon</li>
+    <li class="poke">sudowoodo</li>
+    <li class="npm">chokidar</li>
+    <li class="poke">klink</li>
+    <li class="poke">porygon</li>
+    <li class="npm">rimraf</li>
+    <li class="npm">yargs</li>
+    <li class="poke">tynamo</li>
+    <li class="poke">natu</li>
+    <li class="npm">execa</li>
+    <li class="npm">pino</li>
+    <li class="poke">wynaut</li>
+  </ul>
+  <aside class="notes">
+    <p><b>npm: 1, 3, 6, 7, 10, 11. Pokémon: 2, 4, 5, 8, 9, 12.</b> Read each name aloud too: half the fun is how they sound.</p>
+    <p>nodemon restarts a Node server when files change. chokidar watches files (it's Hindi for “watchman”). rimraf is <code>rm -rf</code> for Node. yargs parses command-line arguments. execa runs shell commands. pino is a logger. Sudowoodo is a tree that pretends to be a tree. Porygon is literally a computer program in the Pokémon lore. Klink is a pair of gears.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.2 · is-even">
+  <p class="kicker">Round 6 · Question 13</p>
+  <h2>The npm package <code>is-even</code> checks whether a number is even. It depends on one other package. Which one?</h2>
+  <aside class="notes">
+    <p><b>Answer: <code>is-odd</code>.</b> And <code>is-odd</code> depends on <code>is-number</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.3 · left-pad">
+  <p class="kicker">Round 6 · Question 14 · closest guess</p>
+  <h2>In 2016, one developer deleted <code>left-pad</code> from npm, and builds broke all over the internet. How many lines of code was it?</h2>
+  <aside class="notes">
+    <p><b>Answer: 11.</b> Two points to the closest team. After a name dispute over another package, its author unpublished all 273 of his packages. npm changed its rules afterwards: you can't unpublish a package that others depend on.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.4 · Mocha">
+  <p class="kicker">Round 6 · Question 15</p>
+  <h2><code>mocha</code> is a test runner on npm. What else in this quiz was once called Mocha?</h2>
+  <aside class="notes">
+    <p><b>Answer: JavaScript.</b> Brendan Eich wrote it in 10 days in May 1995; it was renamed LiveScript, then JavaScript, while Java was popular.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.5 · event-stream">
+  <p class="kicker">Round 6 · Question 16</p>
+  <h2>In 2018, a stranger took over the popular package <code>event-stream</code> and hid malicious code in it. What was it trying to steal?</h2>
+  <aside class="notes">
+    <p><b>Answer: bitcoin</b> (accept “crypto wallets”). The original author had handed the package to a volunteer who asked to help; the volunteer added a dependency, <code>flatmap-stream</code>, with the payload. A library runs with all of your page's rights.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.6 · LIBERTY">
+  <p class="kicker">Round 6 · Question 17</p>
+  <h2>In 2022, the author of <code>colors</code> broke his own package on purpose. Apps that updated printed one word, forever. Which word?</h2>
+  <aside class="notes">
+    <p><b>Answer: LIBERTY.</b> The package had over 20 million weekly downloads. Pin your versions.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 6 — Answers">
+  <p class="kicker">Round 6 · npm or Pokémon</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="6.1 · Twelve names · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answers 1–12</p>
+  <h2>Do you install it, or catch it?</h2>
+  <ul class="tiles c4">
+    <li class="npm">nodemon</li>
+    <li class="poke">sudowoodo</li>
+    <li class="npm">chokidar</li>
+    <li class="poke">klink</li>
+    <li class="poke">porygon</li>
+    <li class="npm">rimraf</li>
+    <li class="npm">yargs</li>
+    <li class="poke">tynamo</li>
+    <li class="poke">natu</li>
+    <li class="npm">execa</li>
+    <li class="npm">pino</li>
+    <li class="poke">wynaut</li>
+  </ul>
+  <p class="step">Six of each. The scariest-sounding ones are npm.</p>
+  <aside class="notes">
+    <p><b>npm: 1, 3, 6, 7, 10, 11. Pokémon: 2, 4, 5, 8, 9, 12.</b> Read each name aloud too: half the fun is how they sound.</p>
+    <p>nodemon restarts a Node server when files change. chokidar watches files (it's Hindi for “watchman”). rimraf is <code>rm -rf</code> for Node. yargs parses command-line arguments. execa runs shell commands. pino is a logger. Sudowoodo is a tree that pretends to be a tree. Porygon is literally a computer program in the Pokémon lore. Klink is a pair of gears.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.2 · is-even · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answer 13</p>
+  <h2>The npm package <code>is-even</code> checks whether a number is even. It depends on one other package. Which one?</h2>
+  <div class="step reveal-box solid answer"><code>is-odd</code><span class="muted">Its whole code is <code>return !isOdd(i)</code>. People install it.</span></div>
+  <aside class="notes">
+    <p><b>Answer: <code>is-odd</code>.</b> And <code>is-odd</code> depends on <code>is-number</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.3 · left-pad · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answer 14 · closest guess</p>
+  <h2>In 2016, one developer deleted <code>left-pad</code> from npm, and builds broke all over the internet. How many lines of code was it?</h2>
+  <div class="step reveal-box solid answer">11 lines<span class="muted">It padded the left side of a string. React and Babel depended on it, through other packages.</span></div>
+  <aside class="notes">
+    <p><b>Answer: 11.</b> Two points to the closest team. After a name dispute over another package, its author unpublished all 273 of his packages. npm changed its rules afterwards: you can't unpublish a package that others depend on.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.4 · Mocha · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answer 15</p>
+  <h2><code>mocha</code> is a test runner on npm. What else in this quiz was once called Mocha?</h2>
+  <div class="step reveal-box solid answer">JavaScript<span class="muted">Mocha → LiveScript → JavaScript, all in 1995.</span></div>
+  <aside class="notes">
+    <p><b>Answer: JavaScript.</b> Brendan Eich wrote it in 10 days in May 1995; it was renamed LiveScript, then JavaScript, while Java was popular.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.5 · event-stream · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answer 16</p>
+  <h2>In 2018, a stranger took over the popular package <code>event-stream</code> and hid malicious code in it. What was it trying to steal?</h2>
+  <div class="step reveal-box solid answer">Bitcoin<span class="muted">It targeted the wallets of one app, Copay, whose build pulled the package in.</span></div>
+  <aside class="notes">
+    <p><b>Answer: bitcoin</b> (accept “crypto wallets”). The original author had handed the package to a volunteer who asked to help; the volunteer added a dependency, <code>flatmap-stream</code>, with the payload. A library runs with all of your page's rights.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="6.6 · LIBERTY · answer" data-steps="1">
+  <p class="kicker">Round 6 · Answer 17</p>
+  <h2>In 2022, the author of <code>colors</code> broke his own package on purpose. Apps that updated printed one word, forever. Which word?</h2>
+  <div class="step reveal-box solid answer"><code>LIBERTY LIBERTY LIBERTY</code><span class="muted">Followed by garbled text, in an endless loop. A protest against big companies using free code without paying.</span></div>
+  <aside class="notes">
+    <p><b>Answer: LIBERTY.</b> The package had over 20 million weekly downloads. Pin your versions.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ROUND 7 · NAME THAT SITE
+     ===================================================================== -->
+
+<section class="act" data-act="7" data-act-name="Name that site" data-at="0:48" data-title="Round 7 — Name that site">
+  <div class="act-deco">□□□
+□■□</div>
+  <div class="act-num">round 07</div>
+  <h1>Name that site from its boxes</h1>
+  <div class="act-meta"><span class="chip">5 questions</span><span class="fmt">No text, no pictures, only the box model.</span></div>
+</section>
+
+<section class="quiz" data-title="7.1 · Site 1">
+  <p class="kicker">Round 7 · Question 1</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-1.png" alt="A website with every text and image hidden, only grey boxes left"></div>
+    <div><h2>Which site?</h2></div>
+  </div>
+  <aside class="notes"><p><b>Answer: Wikipedia.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.2 · Site 2">
+  <p class="kicker">Round 7 · Question 2</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-2.png" alt="A website with every text and image hidden, only grey boxes left"></div>
+    <div><h2>Which site?</h2></div>
+  </div>
+  <aside class="notes"><p><b>Answer: GitHub.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.3 · Site 3">
+  <p class="kicker">Round 7 · Question 3</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-3.png" alt="A website with every text and image hidden, only grey boxes left"></div>
+    <div><h2>Which site?</h2></div>
+  </div>
+  <aside class="notes"><p><b>Answer: MDN Web Docs.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.4 · Site 4">
+  <p class="kicker">Round 7 · Question 4</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-4.png" alt="A website with every text and image hidden, only grey boxes left"></div>
+    <div><h2>Which site?</h2></div>
+  </div>
+  <aside class="notes"><p><b>Answer: Hacker News.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.5 · How many elements">
+  <p class="kicker">Round 7 · Question 5 · closest guess</p>
+  <h2>How many elements are on Wikipedia's article about the World Wide Web?</h2>
+  <pre class="code big">document.querySelectorAll("*").length</pre>
+  <aside class="notes">
+    <p><b>Count it live:</b> open <code>https://en.wikipedia.org/wiki/World_Wide_Web</code>, open the console and run the line on the slide. Two points to the closest team. The count at prep time is in index.html.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Round 7 — Answers">
+  <p class="kicker">Round 7 · Name that site</p>
+  <h2>Pens down.<br>Answers.</h2>
+  <p>Same questions again, with the answers.</p>
+</section>
+
+<section class="quiz" data-title="7.1 · Site 1 · answer" data-steps="1">
+  <p class="kicker">Round 7 · Answer 1</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-1.png" alt="A website with every text and image hidden, only grey boxes left"><img class="real-page" src="images/site-1.jpg" alt="The same page as it really looks"></div>
+    <div><h2>Which site?</h2><p class="step answer">Wikipedia<span class="muted">An article page.</span></p></div>
+  </div>
+  <aside class="notes"><p><b>Answer: Wikipedia.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.2 · Site 2 · answer" data-steps="1">
+  <p class="kicker">Round 7 · Answer 2</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-2.png" alt="A website with every text and image hidden, only grey boxes left"><img class="real-page" src="images/site-2.jpg" alt="The same page as it really looks"></div>
+    <div><h2>Which site?</h2><p class="step answer">GitHub<span class="muted">A repository page.</span></p></div>
+  </div>
+  <aside class="notes"><p><b>Answer: GitHub.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.3 · Site 3 · answer" data-steps="1">
+  <p class="kicker">Round 7 · Answer 3</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-3.png" alt="A website with every text and image hidden, only grey boxes left"><img class="real-page" src="images/site-3.jpg" alt="The same page as it really looks"></div>
+    <div><h2>Which site?</h2><p class="step answer">MDN<span class="muted">A reference page.</span></p></div>
+  </div>
+  <aside class="notes"><p><b>Answer: MDN Web Docs.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.4 · Site 4 · answer" data-steps="1">
+  <p class="kicker">Round 7 · Answer 4</p>
+  <div class="shotq">
+    <div class="shot"><img src="images/boxes-4.png" alt="A website with every text and image hidden, only grey boxes left"><img class="real-page" src="images/site-4.jpg" alt="The same page as it really looks"></div>
+    <div><h2>Which site?</h2><p class="step answer">Hacker News<span class="muted">The front page.</span></p></div>
+  </div>
+  <aside class="notes"><p><b>Answer: Hacker News.</b></p></aside>
+</section>
+
+<section class="quiz" data-title="7.5 · How many elements · answer" data-steps="1">
+  <p class="kicker">Round 7 · Answer 5 · closest guess</p>
+  <h2>How many elements are on Wikipedia's article about the World Wide Web?</h2>
+  <pre class="code big">document.querySelectorAll("*").length</pre>
+  <div class="step reveal-box solid answer">We count it now, live.<span class="muted">Open the page, paste the line into the console, and read out the number.</span></div>
+  <aside class="notes">
+    <p><b>Count it live:</b> open <code>https://en.wikipedia.org/wiki/World_Wide_Web</code>, open the console and run the line on the slide. Two points to the closest team. The count at prep time is in index.html.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     TIEBREAKER + CLOSE
+     ===================================================================== -->
+
+<section class="quiz" data-act="T" data-act-name="Tiebreaker" data-at="0:55" data-title="Tiebreaker" data-steps="1">
+  <p class="kicker">Tiebreaker · closest guess</p>
+  <h2>What's the largest <code>z-index</code> a browser will honour? Anything above it is treated as this number.</h2>
+  <div class="step reveal-box solid answer"><code>2147483647</code><span class="muted">2<sup>31</sup> − 1: the largest signed 32-bit integer. Someone has always tried <code>z-index: 99999999999</code>.</span></div>
+  <aside class="notes">
+    <p><b>Answer: 2,147,483,647.</b> Only if two teams are tied. Write the guesses down before you reveal.</p>
+  </aside>
+</section>
+
+<section class="title no-chrome" data-act="F" data-act-name="Close" data-at="0:58" data-title="Scores">
+  <p>Programming Interactivity · after hours</p>
+  <h1 class="big-title">And the winner<br><em>is…</em></h1>
+  <p>Thanks for playing.</p>
+  <aside class="notes">
+    <p>Points per round, one per answer: 5, 10, 13, 7, 9, 16, 4 (64 in total). On top of that, each closest-guess question (6.3, 7.5) gives 2 points to the closest team only. Tiebreaker only if needed.</p>
+  </aside>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

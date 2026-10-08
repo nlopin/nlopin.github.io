@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🍺%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>The Web Pub Quiz · host notes</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .big-links a { font: 700 1.05rem "Bricolage Grotesque", sans-serif; color: #17140f; text-decoration: none; padding: 0.8rem 1.3rem; border-radius: 99px; background: #ffd23f; border: 2px solid #17140f; }
+    table.key { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1.5rem; }
+    table.key th, table.key td { text-align: left; vertical-align: top; padding: 0.4rem 0.8rem 0.4rem 0; border-bottom: 1px solid #d3c8b3; }
+    table.key th { white-space: nowrap; font-family: "JetBrains Mono", monospace; font-weight: 700; }
+  </style>
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · after hours</span><span>about 1 hour</span></div>
+    <div class="hero">
+      <span class="eyebrow-tag">Pub quiz</span>
+      <h1>The Web <em>Pub Quiz</em></h1>
+      <p class="intro">Seven rounds of real-or-fake and spot-the-difference about the web: logos, forgotten HTML tags, CSS colours, JavaScript surprises, HTTP status codes, npm packages and websites drawn as boxes.</p>
+      <div class="big-links"><a href="slides.html">▶ Open the slides</a><a href="answer-sheet.html">🖨 Answer sheet</a></div>
+    </div>
+
+    <h2>Before the night</h2>
+    <ul>
+      <li>Print one <a href="answer-sheet.html">answer sheet</a> per team (two A4 pages), plus pens.</li>
+      <li>Have a laptop with a browser for question 7.5: you'll count the elements on <code>en.wikipedia.org/wiki/World_Wide_Web</code> live. At prep time (October 2026) the count was <strong>6,254</strong>.</li>
+      <li>Something to keep the running score on: a whiteboard works.</li>
+    </ul>
+
+    <h2>Running it</h2>
+    <ul>
+      <li>Each round runs twice: first all the questions, then an “Answers” slide and the same questions again. On the answer pass, press <kbd>→</kbd> once to reveal each answer.</li>
+      <li>Press <kbd>p</kbd> for the presenter window: it shows each slide's answer and the story behind it.</li>
+      <li>One point per answer. Closest-guess questions (6.3, 7.5) give 2 points to the closest team only.</li>
+    </ul>
+
+    <h2>Timing</h2>
+    <table class="key">
+      <tr><th>0:00</th><td>Welcome, rules</td></tr>
+      <tr><th>0:02</th><td>Round 1 · Spot the real logo (5)</td></tr>
+      <tr><th>0:09</th><td>Round 2 · Real or fake HTML tag (10)</td></tr>
+      <tr><th>0:15</th><td>Round 3 · Real CSS colour or ice cream flavour (13)</td></tr>
+      <tr><th>0:23</th><td>Round 4 · WAT: what does JavaScript say (7)</td></tr>
+      <tr><th>0:33</th><td>Round 5 · Real HTTP status or fake (9)</td></tr>
+      <tr><th>0:40</th><td>Round 6 · npm package or Pokémon (17)</td></tr>
+      <tr><th>0:48</th><td>Round 7 · Name that site from its boxes (5)</td></tr>
+      <tr><th>0:55</th><td>Tiebreaker if needed, scores</td></tr>
+    </table>
+
+    <h2>Answer key</h2>
+    <table class="key">
+      <tr><th>Round 1</th><td>1 C · 2 D · 3 B · 4 A · 5 red panda</td></tr>
+      <tr><th>Round 2</th><td>Fake: 2 <code>sparkle</code>, 7 <code>shout</code>, 10 <code>glitter</code>. The rest are real.</td></tr>
+      <tr><th>Round 3</th><td>Fake: 2 <code>bananacream</code>, 4 <code>mangotango</code>, 7 <code>salmonpink</code>. 11: A (<code>darkgray</code> is the lighter one). 12: red (<code>#c00000</code>). 13: Rebecca Meyer, Eric Meyer's daughter.</td></tr>
+      <tr><th>Round 4</th><td>1 <code>"baNaNa"</code> · 2 <code>[1, 10, 3]</code> · 3 <code>-Infinity</code> · 4 <code>"number"</code> · 5 <code>"[object Object]"</code> · 6 true, false, false · 7 A</td></tr>
+      <tr><th>Round 5</th><td>Fake: 3 (299), 6 (404½), 8 (499). 4 (420, Twitter only): half a point for either answer. Bonus: <em>Fahrenheit 451</em>.</td></tr>
+      <tr><th>Round 6</th><td>npm: 1, 3, 6, 7, 10, 11. Pokémon: 2, 4, 5, 8, 9, 12. 13 <code>is-odd</code> · 14 closest to 11 lines · 15 JavaScript · 16 bitcoin · 17 LIBERTY</td></tr>
+      <tr><th>Round 7</th><td>1 Wikipedia · 2 GitHub · 3 MDN · 4 Hacker News · 5 closest to the live count</td></tr>
+      <tr><th>Tiebreaker</th><td>closest to 2,147,483,647</td></tr>
+    </table>
+
+    <h2>Making more grey-box pictures</h2>
+    <p>Open any page, paste this into the console, and take a screenshot:</p>
+<pre>document.head.insertAdjacentHTML("beforeend", `&lt;style&gt;
+  *, *::placeholder, *::before, *::after {
+    color: transparent !important; -webkit-text-fill-color: transparent !important;
+    background: #ddd !important; border-color: #999 !important;
+    text-shadow: none !important; box-shadow: none !important; }
+  * { outline: 1px solid #999; }
+  img, svg, video, canvas, picture, iframe { opacity: 0 !important; }
+&lt;/style&gt;`);</pre>
+    <p class="muted">Parts of a page inside shadow DOM (MDN's live examples, for one) need the same style added to each shadow root.</p>
+  </div>
+</body>
+</html>
