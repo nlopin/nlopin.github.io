@@ -1,0 +1,16 @@
+/* The meter's styles, written by the meter's author.
+   The class names look local. They aren't: this file applies to the whole page. */
+level-meter {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 3px;
+  height: 24px;
+}
+
+.bar {
+  width: 8px;
+  border-radius: 2px;
+  background: #d5d9e0;
+}
+
+.bar.on { background: #1f9d55; }

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · green room · step 10</title>
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="level-meter.js"></script>
+  <script type="module" src="camera-preview.js"></script>
+  <script type="module" src="device-picker.js"></script>
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <strong class="logo">Parley</strong>
+    <span class="chip">Weekly design review</span>
+    <span class="chip">4 waiting</span>
+    <button id="theme" type="button">Dark theme</button>
+  </header>
+
+  <main class="green-room">
+    <h1>Ready to join?</h1>
+
+    <form id="join">
+      <camera-preview mirrored>
+        <p>Your camera is off.</p>
+        <p slot="blocked">Parley can't use your camera. Open the site controls next to the address bar, allow the camera, and reload.</p>
+      </camera-preview>
+
+      <div class="controls">
+        <p id="status" role="status"></p>
+        <button id="start" type="button">Start camera and microphone</button>
+
+        <span class="label" id="level-label">Microphone level</span>
+        <level-meter aria-labelledby="level-label"></level-meter>
+
+        <label for="mic">Microphone</label>
+        <device-picker id="mic" kind="audioinput" name="mic" required>
+          <p slot="empty">Device names appear after you allow access.</p>
+        </device-picker>
+
+        <label for="camera">Camera</label>
+        <device-picker id="camera" kind="videoinput" name="camera">
+          <p slot="empty">Device names appear after you allow access.</p>
+        </device-picker>
+
+        <label><input type="checkbox" name="mirror" checked> Mirror my video</label>
+
+        <button>Join</button>
+        <button type="reset" class="secondary">Reset</button>
+        <output id="sent"></output>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

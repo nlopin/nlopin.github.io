@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E👏%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam 5 · Clap switch</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+  <style>
+    .api { border-collapse: collapse; margin: 0.6rem 0 1rem; max-width: 60rem; }
+    .api th, .api td { border-bottom: 1px solid var(--w-line); padding: 0.45rem 0.8rem; text-align: left; vertical-align: top; }
+    .api th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); white-space: nowrap; }
+    .api td:nth-child(2) { font-family: "IBM Plex Mono", monospace; white-space: nowrap; color: var(--w-act); }
+    .clock { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; max-width: 70rem; }
+    .clock div { border: 1px solid var(--w-line); border-radius: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.92rem; }
+    .clock b { display: block; font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid li { display: flex; flex-direction: column; border: 1px solid var(--w-line); border-radius: 0.6rem; }
+    .tasks-grid li:has(a:hover, a:focus-visible) { border-color: var(--w-act); }
+    .tasks-grid a.task { display: block; flex: 1; padding: 1rem 1.1rem 0.6rem; text-decoration: none; color: var(--w-ink); }
+    .tasks-grid a.fix { padding: 0 1.1rem 0.9rem; font-size: 0.85rem; color: var(--w-act); }
+    .reports li { margin-bottom: 0.5rem; }
+    .tasks-grid b { display: block; font-size: 1.15rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    .tasks-grid code { color: var(--w-act); }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Jam · all tasks</a><span>Task 5 · groups · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Jam · task 5</span>
+    <h1>Clap switch · <em>&lt;clap-switch&gt;</em></h1>
+    <p class="intro">Clap twice, the light goes on. The 1980s gadget, in a tag that listens to the room. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“I want to start my slides by clapping. Twice. Not when someone coughs.”</p>
+    <p>APIs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia">getUserMedia</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode">AnalyserNode</a></p>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="starter.zip" download>⤓ Download the starter</a></div>
+    <p>Rather debug than build? The <a href="05-clap-switch-fix.html">fix-it version</a> hands you a finished <code>&lt;clap-switch&gt;</code> with three bugs in it.</p>
+    <p>Rename the folder to <code>clap-switch/</code>, <code>my-tag.js</code> to <code>clap-switch.js</code>, and the tag in <code>index.html</code> to <code>&lt;clap-switch&gt;</code>. Serve the folder (<code>npx live-server</code>): camera, microphone and the clipboard need <code>localhost</code> or HTTPS. You present from its <code>index.html</code>.</p>
+
+    <h2>The tag's public API</h2>
+    <p>Keep these names. Add more if you need them.</p>
+    <table class="api"><tr><th>kind</th><th>name</th><th>meaning</th></tr>
+      <tr><th>attribute</th><td>claps</td><td>claps needed to switch, default 2</td></tr>
+      <tr><th>attribute</th><td>threshold</td><td>how loud a clap is, 0–1</td></tr>
+      <tr><th>method</th><td>start()</td><td>starts listening, the same as the element's own start button; call it from a click</td></tr>
+      <tr><th>event</th><td>clap</td><td>each clap: <code>detail: { count, level }</code>, <code>count</code> = claps so far in this sequence</td></tr>
+      <tr><th>event</th><td>toggle</td><td>the switch flips, after <code>claps</code> claps: <code>detail: { on }</code></td></tr>
+    </table>
+
+    <h2>Its gates</h2>
+    <ul class="stretch">
+      <li><strong>secure context</strong></li>
+      <li><strong>permission</strong>: the microphone prompt</li>
+      <li><strong>user activation</strong> for the <code>AudioContext</code></li>
+    </ul>
+
+    <h2>Done means · the toy</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>A live level meter, so the user sees what it hears.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Two claps within a second flip the switch; one clap, talking or a cough don't.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The threshold is adjustable from the page, and the meter shows where it is.</span></li>
+    </ul>
+
+    <h2>Then, if there's time</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>The page around it reacts to <code>toggle</code> (the element only reports).</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The switch's state is reflected as an <code>on</code> attribute, so the page can style it.</span></li>
+    </ul>
+
+    <h2>Done means · the tag contract</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><strong>One file, one element</strong>: <code>clap-switch.js</code> defines <code>&lt;clap-switch&gt;</code> and nothing else. Drop the file into any page and the tag works.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Attributes configure, properties carry data, events report</strong>: events bubble (<code>bubbles: true</code>), and the page never reaches into your shadow root.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Passes its gates in order</strong>: nothing starts before a user gesture; if it needs a permission, it reads the state first and asks only after the user asks for the feature.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Handles no</strong>: a refusal, a missing API or a missing device shows visible content that says what to do; a permission revoked while running is noticed.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Releases everything</strong> in <code>disconnectedCallback</code>: tracks, <code>AudioContext</code>, animation frames, timers, listeners on <code>window</code>.</span></li>
+    </ul>
+
+    <h2>Check it <em>(minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>Clap three times.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Play music from your phone next to the laptop.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Block the microphone, then allow it again without reloading.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Block the permission and reload. Then reset it in the site controls next to the address bar.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>While it runs, revoke the permission in the site controls.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Console: <code>document.querySelector("clap-switch").remove()</code>. Is anything still running, playing or recording?</span></li>
+    </ul>
+
+    <h2>Stretch</h2>
+    <ul class="stretch">
+      <li>Whistle detection from the frequency data.</li>
+      <li>Calibrate: measure the room's noise for two seconds first.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>What separates a clap from speech: how loud, or how fast it gets loud?</p></details>
+      <details><summary>Hint 2</summary><p>After a clap is detected, how long should the element ignore the input?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+      <ul class="gotchas">
+      <li>One clap counts as three.</li>
+      <li>Works at home, triggers constantly in the classroom.</li>
+      <li>The meter freezes when the tab is in the background, and the count is wrong after.</li>
+      </ul>
+    </details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Read the brief. Write the tag's API on paper: attributes, properties, events.</div>
+      <div><b>5–15 · the API works</b>Raw data on screen: numbers, a stream, a log. Ugly is fine.</div>
+      <div><b>15–35 · the toy</b>Turn the raw data into the experience.</div>
+      <div><b>35–42 · verify</b>Block, reset, revoke, remove the element. Another browser.</div>
+      <div><b>42–45 · rehearse</b>Stop coding. Run your 3 minutes once, screen share included.</div>
+    </div>
+
+    <h2>On stage · 3 minutes</h2>
+    <p>Present from your own laptop: share your screen in Zoom, with <strong>Share sound</strong> ticked if your tag makes any.</p>
+    <ol>
+      <li>Demo the toy.</li>
+      <li>Open DevTools: the tag in the Elements panel, its attributes, its shadow root.</li>
+      <li>Remove the element in the console: show that everything stops.</li>
+    </ol>
+  </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎙️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The green room, step by step</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../../assets/kit.css">
+  <style>
+    .steps { list-style: none; padding: 0; display: grid; gap: 0.8rem; max-width: 64rem; }
+    .steps li { border: 1px solid var(--w-line); border-radius: 0.6rem; padding: 0.9rem 1.1rem; }
+    .steps h3 { margin: 0 0 0.3rem; font-size: 1.15rem; }
+    .steps h3 small { font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); margin-right: 0.5rem; }
+    .steps p { margin: 0.25rem 0; }
+    .steps .files { font: 500 0.85rem "IBM Plex Mono", monospace; color: var(--w-muted); }
+    .act { margin-top: 2rem; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../../index.html">← Tags that listen · all materials</a><span>Demo · 13 steps</span></div>
+    <span class="eyebrow-tag">Demo</span>
+    <h1>The green room, <em>step by step</em></h1>
+    <p class="intro">The screen a video-call app shows before you join: a camera preview, a microphone level, a device picker. Built as three custom elements, then connected to the real camera and microphone. Every step is a complete folder: open it, read the diff from the step before, run it.</p>
+    <div class="tip"><p>Serve this folder over <code>http://localhost</code>: module scripts need <code>http://</code>, and from step 9 on the camera and microphone need <code>localhost</code> or HTTPS. Step 13 needs <code>localhost</code> and <code>127.0.0.1</code> on the same port, as two origins.</p></div>
+
+    <h2 class="act">Act 1 · Your own tags</h2>
+    <ol class="steps">
+      <li><h3><small>01</small><a href="01-wish/">The wish</a></h3><p>The markup we'd write if HTML had the widgets. Unknown tags, no error, nothing rendered.</p><p class="files">index.html · app.css</p></li>
+      <li><h3><small>02</small><a href="02-define/">Define</a></h3><p><code>&lt;level-meter&gt;</code> alone on a bench page: a class, <code>connectedCallback</code>, <code>customElements.define</code>. Its own stylesheet with a <code>.bar</code> class.</p><p class="files">level-meter.js · level-meter.css</p></li>
+      <li><h3><small>03</small><a href="03-attributes/">Attributes and properties</a></h3><p><code>observedAttributes</code> for <code>value</code> and <code>bars</code>; a <code>value</code> getter and setter; a fake slider drives the property.</p><p class="files">level-meter.js · main.js</p></li>
+      <li><h3><small>04</small><a href="04-in-the-app/">The page breaks it</a></h3><p>The meter in the app. The app's header is also <code>.bar</code>: both break.</p><p class="files">index.html · app.css · level-meter.css</p></li>
+      <li><h3><small>05</small><a href="05-shadow/">Shadow DOM</a></h3><p>The meter renders into a shadow root. The app themes it with <code>--meter-color</code> and <code>::part(bar)</code>; try the dark theme.</p><p class="files">level-meter.js · app.css</p></li>
+      <li><h3><small>06</small><a href="06-slots/">Slots</a></h3><p><code>&lt;camera-preview&gt;</code> with a default slot and a <code>blocked</code> slot for the app's own text; a reflected <code>mirrored</code> attribute. Plus <a href="06-slots/declarative.html">declarative shadow DOM</a>, no script.</p><p class="files">camera-preview.js · declarative.html</p></li>
+      <li><h3><small>07</small><a href="07-form/">The form</a></h3><p><code>&lt;device-picker&gt;</code> as a form-associated element: <code>setFormValue</code>, <code>setValidity</code>, <code>formResetCallback</code>, a <code>change</code> event. Submit it empty and read the console.</p><p class="files">device-picker.js · main.js</p></li>
+      <li><h3><small>08</small><a href="08-keyboard/">Keyboard and roles</a></h3><p>A radio group: roving tabindex, arrow keys, <code>delegatesFocus</code>, <code>internals.role</code>. The meter gets <code>role="meter"</code>.</p><p class="files">device-picker.js · level-meter.js</p></li>
+    </ol>
+
+    <h2 class="act">Act 2 · Plug in the world</h2>
+    <ol class="steps" start="9">
+      <li><h3><small>09</small><a href="09-microphone/">The microphone</a></h3><p>Secure context check, the permission state read first, <code>getUserMedia</code> from a click, an <code>AnalyserNode</code> feeding the same meter. Plus <a href="09-microphone/autoplay.html">the autoplay page</a>.</p><p class="files">main.js · autoplay.html</p></li>
+      <li><h3><small>10</small><a href="10-camera/">Camera and real devices</a></h3><p>The preview starts the camera and owns its state (<code>:state(live)</code>); the pickers list real devices of their <code>kind</code> and follow <code>devicechange</code>.</p><p class="files">camera-preview.js · device-picker.js · main.js</p></li>
+      <li><h3><small>11</small><a href="11-light-stays-on/">The light stays on</a></h3><p>A single-page app: the green room becomes an element the router adds and removes. Leave it with the camera on, and the camera stays on.</p><p class="files">router.js · green-room.js</p></li>
+      <li><h3><small>12</small><a href="12-cleanup/">Cleanup</a></h3><p><code>disconnectedCallback</code> in every element, an <code>AbortController</code> for outside listeners, the user leaving during the prompt, access revoked while running.</p><p class="files">camera-preview.js · device-picker.js · green-room.js</p></li>
+      <li><h3><small>13</small><a href="13-embedded/">Embedded</a></h3><p>The green room in three iframes: another origin without <code>allow</code>, with <code>allow</code>, and the same origin with <code>'none'</code>.</p><p class="files">index.html · app/green-room.js</p></li>
+    </ol>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎛️%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tags that listen — Lecture 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #ffffff; --act-ink: #ffffff; }
+.slide.wire[data-act-num="1"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="2"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+html.theme-wire[data-act="1"] .deck-progress i { background: #ffb547; box-shadow: 0 0 12px #ffb547; }
+html.theme-wire[data-act="2"] .deck-progress i { background: #3ee6ff; box-shadow: 0 0 12px #3ee6ff; }
+html.theme-wire[data-act="3"] .deck-progress i { background: #ff4fd8; box-shadow: 0 0 12px #ff4fd8; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="F"] h3 { background: #070d1a; color: #fff; }
+.deck-menu section[data-act="1"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="B"] h3 { background: #b6ff3b; color: #070d1a; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.5fr 1fr 0.9fr 1fr 0.55fr 1fr 0.9fr 0.5fr; gap: 8px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 10px; min-height: 300px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 17px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 20px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 23px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 16px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .ex { border-style: dashed; }
+.map .brk { background: #b6ff3b; border-color: #b6ff3b; color: #070d1a; --c: #070d1a; }
+.map .brk strong { color: #070d1a; }
+.m1 { --c: #ffb547; } .m2 { --c: #3ee6ff; } .m3 { --c: #ff4fd8; } .mf { --c: #ffffff; }
+.map.even { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 50px; height: 100%; align-items: center; }
+.big-title { font: 700 140px/0.88 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; }
+.big-title .b { color: #ffb547; text-shadow: 0 0 80px rgb(255 181 71 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.title-art { border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; padding: 20px; }
+
+/* raw text panels (markup, consoles) */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw .c { color: #4d5b7a; } .raw .k { color: #ffb547; } .raw .s { color: #b6ff3b; } .raw .n { color: #3ee6ff; } .raw .m { color: #ff4fd8; }
+
+/* code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 28px; margin-bottom: 10px; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { font-weight: 600; color: #fff; }
+.dtable .yes { color: #b6ff3b; font-weight: 700; } .dtable .no { color: #ff6b5a; font-weight: 700; } .dtable .some { color: #ffb547; font-weight: 700; }
+.dtable.tight td, .dtable.tight th { padding: 8px 12px; font-size: 21px; }
+.dtable.tight td code { font-size: 19px; }
+
+/* error boxes */
+.err { font: 500 21px/1.4 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+
+/* catalogue cards */
+.cat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cat .card { padding: 16px 20px; }
+.cat .card .label { margin-bottom: 8px; }
+.cat .card p { font-size: 22px; line-height: 1.35; margin: 0; color: #fff; }
+
+/* getUserMedia, in order */
+.gum { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: 26px; margin-top: 6px; }
+.gum code { font-size: 0.94em; padding: 0 0.2em; }
+.gum code.nw { white-space: nowrap; font-size: 0.9em; }
+.gum-chk, .gum-ok { position: relative; display: flex; flex-direction: column; gap: 6px; border: 2px solid var(--c); border-radius: 10px; padding: 14px 16px; background: color-mix(in srgb, var(--c) 9%, #060b17); --c: #3ee6ff; }
+.gum-chk.wide { grid-column: span 2; }
+.gum-ok { --c: #b6ff3b; }
+.gum-chk::after { content: "→"; position: absolute; right: -25px; top: calc(50% - 16px); font: 700 24px "IBM Plex Mono", monospace; color: #8599c2; }
+.gum-chk i { font: 600 16px "IBM Plex Mono", monospace; font-style: normal; color: var(--c); }
+.gum-chk b, .gum-ok b { font: 700 25px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.02em; }
+.gum-chk span, .gum-ok span { font: 500 16px/1.4 "IBM Plex Mono", monospace; color: #cfdcf7; }
+.gum-down { position: relative; height: 50px; padding: 12px 0 0 calc(50% + 12px); font: 600 16px "IBM Plex Mono", monospace; color: #ff6b5a; }
+.gum-down::before { content: ""; position: absolute; left: calc(50% - 1px); top: 0; bottom: 10px; width: 2px; background: currentColor; }
+.gum-down::after { content: ""; position: absolute; left: calc(50% - 6px); bottom: 2px; border: 6px solid transparent; border-top: 8px solid currentColor; border-bottom: 0; }
+.gum-down.ask { color: #ffb547; }
+.gum-down.end { color: #8599c2; }
+.gum-fail, .gum-ask, .gum-end { align-self: start; border-radius: 8px; padding: 12px 14px; font: 500 16px/1.4 "IBM Plex Mono", monospace; }
+.gum-fail { color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; }
+.gum-fail em { display: block; margin-top: 8px; font: 600 13px "IBM Plex Mono", monospace; font-style: normal; letter-spacing: 0.1em; text-transform: uppercase; color: #ff6b5a; }
+.gum-ask { display: flex; flex-direction: column; gap: 6px; color: #ffe2b0; background: color-mix(in srgb, #ffb547 10%, #060b17); border: 2px solid #ffb547; }
+.gum-ask b { font: 700 13px "IBM Plex Mono", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: #ffb547; }
+.gum-end { color: #8599c2; border: 1.5px dashed #2c3f66; }
+.slide .gum-foot { margin-top: 22px; font-size: 22px; line-height: 1.4; color: #cfdcf7; max-width: 1400px; }
+
+/* the shadow boundary */
+.tree { font: 500 22px/1.55 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; }
+.tree .sr { color: #3ee6ff; } .tree .host { color: #ffb547; } .tree .light { color: #b6ff3b; } .tree .c { color: #4d5b7a; }
+
+/* reading, cards */
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+.slide .split > ul li, .slide .split > ol li, .slide .vs2 > ul li, .slide .split > .stack > p, .slide .vs2 > div > ul li { font-size: 27px; line-height: 1.3; margin-bottom: 14px; }
+.cards3 .card p { font-size: 23px; line-height: 1.35; }
+.cards4 .card { padding: 18px 20px; }
+.cards4 .card p { font-size: 21px; line-height: 1.35; margin: 0; }
+.slide .split > pre.code, .slide .vs2 > pre.code { align-self: start; }
+
+/* break: the one bright slide in the deck */
+.slide.wire.breakslide {
+  --act: #070d1a;
+  background:
+    linear-gradient(rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    #b6ff3b;
+  color: #070d1a;
+  justify-content: center; align-items: center; text-align: center;
+}
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide .brk-kicker { font: 600 22px "IBM Plex Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(7 13 26 / 0.65) !important; margin: 0 0 10px; }
+.breakslide h2 { font: 700 170px/0.9 "Space Grotesk", sans-serif; letter-spacing: -0.06em; margin: 0; max-width: none; color: #070d1a !important; }
+.breakslide h2 em { font-style: normal; font-family: "IBM Plex Mono", monospace; font-weight: 600; letter-spacing: -0.04em; font-size: 0.55em; }
+.breakslide .brk-code { font: 500 30px/1.4 "IBM Plex Mono", monospace; background: #070d1a; color: #e3ecff; border-radius: 10px; padding: 18px 30px; margin: 34px 0 30px; white-space: pre; text-align: left; box-shadow: 10px 10px 0 rgb(7 13 26 / 0.25); }
+.breakslide .brk-code .k { color: #ff4fd8; } .breakslide .brk-code .f { color: #3ee6ff; } .breakslide .brk-code .n { color: #b6ff3b; } .breakslide .brk-code .c { color: #8599c2; }
+.breakslide .timer { font-size: 96px; border-width: 6px; color: #070d1a; border-color: #070d1a; }
+.breakslide p:not(.brk-kicker) { font-size: 26px; color: rgb(7 13 26 / 0.75) !important; max-width: 1100px; margin-top: 30px; }
+
+/* exercises */
+.slide.exercise ol > li { font-size: 30px; }
+.slide.exercise .dtable td, .slide.exercise .dtable th { font-size: 21px; padding: 7px 12px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Tags that listen.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 11</p>
+      <h1 class="big-title">Tags that <span class="b">listen.</span></h1>
+      <p class="title-sub">custom elements · shadow DOM · form-associated elements · permissions · camera · microphone · a jam</p>
+      <p class="title-sub">Materials: <a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/index.html" target="_blank" rel="noopener">11-elements-sensors</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">&lt;!-- index.html --&gt;</span>
+&lt;form&gt;
+  &lt;<span class="k">camera-preview</span> mirrored&gt;&lt;/<span class="k">camera-preview</span>&gt;
+  &lt;<span class="k">level-meter</span>&gt;&lt;/<span class="k">level-meter</span>&gt;
+  &lt;<span class="k">device-picker</span> name="mic"&gt;
+  &lt;/<span class="k">device-picker</span>&gt;
+  &lt;button&gt;Join&lt;/button&gt;
+&lt;/form&gt;</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:00. Two halves. First: tags HTML doesn't have, written as classes, with a lifecycle, a private DOM and a place in forms. Second: the browser's sensors behind its permission model, and a jam where every group builds a sensing tag. Have <code>demos/green-room/</code> open in a second window; the run sheet lists each step.</p>
+  </aside>
+</section>
+
+<section data-title="The day">
+  <p class="kicker">The plan · about 2 h 55</p>
+  <h2>Two acts, one exercise, one jam</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Intro</strong>a tag that updates itself<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>Your own tags</strong>define, lifecycle, shadow DOM, forms<time>0:05</time></div>
+    <div class="m1 ex"><b>✎ 1</b><strong>After the call</strong>a star rating · 18 min<time>0:40</time></div>
+    <div class="m2"><b>02</b><strong>Plug in the world</strong>camera, mic, permissions<time>1:00</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:25</time></div>
+    <div class="m3 ex"><b>⚡</b><strong>Jam</strong>one sensing tag per group · 45 min<time>1:40</time></div>
+    <div class="m3"><b>🎤</b><strong>Stage</strong>demos over Zoom<time>2:25</time></div>
+    <div class="mf"><b>✓</b><strong>Wrap</strong><time>2:50 → 2:55</time></div>
+  </div>
+  <p>Materials: <a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/index.html" target="_blank" rel="noopener">11-elements-sensors</a>. The demo, step by step: <a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/demos/green-room/index.html" target="_blank" rel="noopener">demos/green-room</a>.</p>
+  <aside class="notes">
+    <p>~0:01. One running example for both acts: the screen a video-call app shows before you join. Act 1 builds its widgets on fake data; Act 2 connects them to the real camera and microphone without changing them.</p>
+  </aside>
+</section>
+
+<section data-title="Cold open">
+  <p class="kicker">github.com · any repository · DevTools → Elements</p>
+  <h2>Something is listening to this attribute</h2>
+  <div class="split l2 center">
+<pre class="raw">&lt;<span class="k">relative-time</span> <span class="n">datetime</span>=<span class="s">"2026-10-09T14:12:00Z"</span>&gt;
+  2 days ago
+&lt;/<span class="k">relative-time</span>&gt;</pre>
+    <ul>
+      <li>Not an HTML element. No framework on the page re-rendered it.</li>
+      <li>Edit <code>datetime</code> in the Elements panel to yesterday: the text changes to "yesterday" by itself.</li>
+      <li>Something attached to <strong>this tag</strong> noticed. What is it, and how do you write one?</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:02. Do it live on any commit list: right-click a date → Inspect. GitHub's element is open source (<code>@github/relative-time-element</code>). It also updates as time passes ("2 minutes ago" becomes "3 minutes ago") and formats with <code>Intl</code> in the reader's language. Don't explain it yet: the close of the lecture comes back here.</p>
+  </aside>
+</section>
+
+<section data-title="The green room">
+  <p class="kicker">The running example · Parley, a video-call app</p>
+  <h2>Before you join a call, every app shows the same screen</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">camera preview</span><p>Your face, mirrored. A message when the camera is blocked.</p></div>
+    <div class="card"><span class="label">microphone level</span><p>Bars that move when you speak. Proof the right mic is on.</p></div>
+    <div class="card"><span class="label">device picker</span><p>Which microphone, which camera. Part of the form you submit.</p></div>
+  </div>
+  <p>HTML has <code>&lt;video&gt;</code>, <code>&lt;meter&gt;</code> and <code>&lt;select&gt;</code>. None of them is any of these.</p>
+  <aside class="notes">
+    <p>~0:04. Google Meet, Zoom, Teams, Jitsi all have one, so everyone has used it. <code>&lt;meter&gt;</code> shows one value, not a live level from a stream; <code>&lt;select&gt;</code> can't list devices it doesn't know or show a level beside each one. Parley is invented; the demo lives in <code>demos/green-room/</code>, one folder per step.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · YOUR OWN TAGS
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Your own tags" data-at="0:05" data-title="Act 1 — Your own tags">
+  <div class="act-deco">&lt;x-y&gt;</div>
+  <div class="act-num">act 01</div>
+  <h1>Your own tags</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:40</span><span>a class with a tag name</span></div>
+  <div class="act-list"><span>define</span><span>upgrade</span><span>lifecycle</span><span>attributes</span><span>properties</span><span>shadow DOM</span><span>::part</span><span>slots</span><span>ElementInternals</span><span>focus</span><span>roles</span></div>
+</section>
+
+<section data-title="The wish">
+  <p class="kicker">Step 1 · demos/green-room/01-wish</p>
+  <h2>Write the HTML you wish existed</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="html" class="small"><form id="join">
+  <camera-preview mirrored></camera-preview>
+
+  <span class="label">Microphone level</span>
+  <level-meter></level-meter>
+
+  <span class="label">Microphone</span>
+  <device-picker kind="audioinput" name="mic" required>
+  </device-picker>
+
+  <button>Join</button>
+</form></script>
+    <ul>
+      <li>Markup first: what would a page author want to write?</li>
+      <li>Open it: a Join button and nothing else.</li>
+      <li>No error in the console.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:05. Designing the markup first is designing the element's API: its name, its attributes, what goes inside it. Everything after this makes these three tags real. Open <code>01-wish/index.html</code>: the dashed box is <code>camera-preview:not(:defined)</code> in <code>app.css</code>, a hint for later.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Unknown, but not wrong">
+  <p class="kicker">Quick check · in the console</p>
+  <h2>What did the parser make of them?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">document.querySelector("level-meter").constructor.name
+document.createElement("levelmeter").constructor.name</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>HTMLElement</code> with a hyphen, <code>HTMLUnknownElement</code> without.</div>
+      <div class="reveal-box step">A name with a hyphen is a <strong>valid custom element name</strong>: reserved for authors, so no future HTML element can take it. It must start with a lowercase letter.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:06. The parser keeps unknown tags in the tree with their attributes and children; they behave like a <code>&lt;span&gt;</code> (display inline). HTML has added elements over the years (<code>&lt;dialog&gt;</code>, <code>&lt;search&gt;</code>), none with a hyphen, and the spec promises it never will. A few hyphenated names are reserved because SVG and MathML use them (<code>font-face</code>, <code>annotation-xml</code>). Convention: a prefix for your project or library (<code>gh-</code>, <code>sl-</code>), so two libraries don't collide.</p>
+  </aside>
+</section>
+
+<section data-title="Define">
+  <p class="kicker">Step 2 · demos/green-room/02-define</p>
+  <h2>An element is a class with a tag name</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">class LevelMeter extends HTMLElement {
+  connectedCallback() {
+    const bars = [];
+    for (let i = 0; i < 10; i++) {
+      const bar = document.createElement("span");
+      bar.className = "bar";
+      bars.push(bar);
+    }
+    this.replaceChildren(...bars);
+  }
+}
+
+customElements.define("level-meter", LevelMeter);</script>
+    <ul>
+      <li><code>extends HTMLElement</code>: <code>this</code> is the element itself, with every DOM method.</li>
+      <li><code>customElements</code> is the page's <strong>registry</strong>: name → class.</li>
+      <li>From now on the parser, <code>createElement</code> and <code>innerHTML</code> all create a <code>LevelMeter</code>.</li>
+      <li><code>connectedCallback</code>: the browser calls it when the element enters the document (Lecture 4: you don't call it, the browser does).</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:07. Step 2 develops the meter alone on a bench page, with its own <code>level-meter.css</code> (classes <code>.bar</code>, <code>.bar.on</code>). That file comes back as a problem in step 4. <code>replaceChildren</code>, not <code>append</code>: the element can be connected more than once (moved, re-inserted), and appending would add ten more bars each time.</p>
+  </aside>
+</section>
+
+<section data-title="Upgrade">
+  <p class="kicker">The order doesn't matter</p>
+  <h2>Tags parsed before the definition get upgraded</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// before define: an HTMLElement, no behaviour</span>
+document.querySelector("level-meter")
+  .constructor.name          <span class="c">// "HTMLElement"</span>
+
+<span class="c">// after define: the same object, upgraded</span>
+  .constructor.name          <span class="c">// "LevelMeter"</span>
+
+<span class="k">await</span> customElements.<span class="n">whenDefined</span>(<span class="s">"level-meter"</span>);</pre>
+    <ul>
+      <li>Script in the <code>&lt;head&gt;</code>, at the end of the body, <code>defer</code>, a module, <code>import()</code> later: all work.</li>
+      <li><code>:defined</code> / <code>:not(:defined)</code> in CSS: style the moment before the upgrade, so nothing jumps.</li>
+      <li><code>whenDefined</code>: wait for it in code.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:09. Trap worth knowing: if the page sets a property before the upgrade (<code>meter.value = 0.5</code> on the plain <code>HTMLElement</code>), that creates an own property on the object, which later hides the class's setter. Robust elements check for it in <code>connectedCallback</code>: read the own property, <code>delete</code> it, and assign it again so it goes through the setter. Lit does this for you. In the demo, module scripts run in document order, so the definitions always come first.</p>
+  </aside>
+</section>
+
+<section data-title="Lifecycle">
+  <p class="kicker">The browser calls these</p>
+  <h2>Five callbacks, and when each one runs</h2>
+  <table class="dtable tight">
+    <tr><th>callback</th><th>runs when</th><th>use it to</th></tr>
+    <tr><td><code>constructor()</code></td><td>the object is created or upgraded</td><td>set up private state, attach the shadow root. Call <code>super()</code> first</td></tr>
+    <tr><td><code>connectedCallback()</code></td><td>it enters a document</td><td>render, start things, add listeners on <code>window</code> or <code>document</code></td></tr>
+    <tr><td><code>disconnectedCallback()</code></td><td>it leaves the document</td><td>stop and remove what <code>connectedCallback</code> started</td></tr>
+    <tr><td><code>attributeChangedCallback(name, old, value)</code></td><td>an attribute in <code>static observedAttributes</code> changes</td><td>update from the new value</td></tr>
+    <tr><td><code>adoptedCallback()</code></td><td>it moves to another document (an iframe's)</td><td>rarely needed</td></tr>
+  </table>
+  <p class="muted">Newer: <code>connectedMoveCallback()</code>, for elements moved with <code>moveBefore()</code>. It comes back in Act 2.</p>
+  <aside class="notes">
+    <p>~0:10. Moving an element with <code>appendChild</code> calls <code>disconnected</code> then <code>connected</code>. On upgrade, <code>attributeChangedCallback</code> runs once for each observed attribute already in the markup, before <code>connectedCallback</code>. <code>disconnectedCallback</code> gets one line today and becomes the climax of Act 2.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Not in the constructor">
+  <p class="kicker">Quick check · two ways to create the same element</p>
+  <h2>What does the constructor see?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">class Bad extends HTMLElement {
+  constructor() {
+    super();
+    console.log(this.getAttribute("bars"));
+    this.append(document.createElement("span"));
+  }
+}
+customElements.define("bad-one", Bad);
+
+document.body.insertAdjacentHTML("beforeend",
+  '<bad-one bars="20"></bad-one>');
+document.createElement("bad-one");</script>
+    <div class="stack">
+      <div class="reveal-box step solid">From markup: <code>"20"</code>. From <code>createElement</code>: <code>null</code>: the attributes don't exist yet.</div>
+      <div class="reveal-box step"><code>createElement</code> also fails: <em>"The result must not have children"</em>. The constructor may not add attributes or children. Read and render in <code>connectedCallback</code>.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:11. Predict first. Chrome reports the error in the console and hands back an element that doesn't work. Exact message: <code>NotSupportedError: Failed to execute 'createElement' on 'Document': The result must not have children</code> (or "attributes"). The spec forbids it because <code>createElement</code> promises an empty element. Attaching a shadow root in the constructor is fine: it isn't a child.</p>
+  </aside>
+</section>
+
+<section data-title="Attributes in">
+  <p class="kicker">Step 3 · demos/green-room/03-attributes</p>
+  <h2>Observed attributes configure the element</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">class LevelMeter extends HTMLElement {
+  static observedAttributes = ["value", "bars"];
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "value") this.value = newValue;
+    if (name === "bars" && this.isConnected) this.#build();
+  }
+  // …
+}</script>
+    <div>
+      <script type="text/x-code" data-lang="html" class="xs"><level-meter value="0.3"></level-meter>
+<level-meter bars="20"></level-meter></script>
+      <ul class="mt">
+        <li>Only names in <code>observedAttributes</code> trigger the callback: the browser doesn't call you for every <code>class</code> change.</li>
+        <li>Values arrive as strings, or <code>null</code> when removed.</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:12. In the console: <code>meter.setAttribute("value", 0.8)</code>, the bars jump. <code>#build</code> is a private method (<code>#</code>): not reachable from outside the class, so the page can't depend on it. The <code>isConnected</code> check matters for <code>createElement</code> + <code>setAttribute</code> before the element is inserted. When tags in the page are upgraded, they're already connected, so <code>bars</code> builds once in the callback and again in <code>connectedCallback</code>: harmless, because <code>#build</code> replaces the children.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Attribute or property?">
+  <p class="kicker">Quick check · in the console</p>
+  <h2><code>meter.value = 0.8</code>. Nothing happens. Why?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">get value() {
+  return this.#value;
+}
+
+set value(v) {
+  this.#value = Math.min(1, Math.max(0, Number(v) || 0));
+  this.#update();
+}</script>
+    <div class="stack">
+      <div class="reveal-box step solid">An attribute is a string in the markup. A property is a field on the object. Nothing connects them until you write the getter and setter.</div>
+      <div class="reveal-box step">Like <code>&lt;input&gt;</code>: the <code>value</code> attribute is the starting value, the <code>value</code> property is the current one. Setting the property doesn't rewrite the attribute.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:13. Without the setter, <code>meter.value = 0.8</code> creates a plain field and the display ignores it. Check the <code>&lt;input&gt;</code> analogy live: type into any input, then compare <code>input.value</code> with <code>input.getAttribute("value")</code>. The fake slider in step 3 drives the property, up to 60 times a second.</p>
+  </aside>
+</section>
+
+<section data-title="Which one?">
+  <p class="kicker">The element's API</p>
+  <h2>Attributes configure, properties carry data, events report</h2>
+  <table class="dtable">
+    <tr><th></th><th>attribute</th><th>property</th><th>event</th></tr>
+    <tr><td>direction</td><td>in</td><td>in, and readable</td><td>out</td></tr>
+    <tr><td>type</td><td>string, or present / absent</td><td>any value: number, array, object</td><td><code>detail</code>: any value</td></tr>
+    <tr><td>written by</td><td>markup, a server, DevTools</td><td>code</td><td>the element</td></tr>
+    <tr><td>CSS can see it</td><td class="yes">yes: <code>[mirrored]</code></td><td class="no">no</td><td class="no">no</td></tr>
+    <tr><td>the meter</td><td><code>bars="20"</code></td><td><code>value</code>, 60 times a second</td><td>(none)</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:15. A live value through an attribute means a string conversion and a DOM mutation each frame, plus a <code>MutationObserver</code> notification for anyone watching. Boolean attributes are the exception that's usually reflected: <code>mirrored</code> on the camera preview (step 6), like <code>disabled</code>, has a property that writes the attribute (<code>toggleAttribute</code>), so CSS can select on it. Arrays and objects never go through attributes: <code>picker.devices = [...]</code> in step 7.</p>
+  </aside>
+</section>
+
+<section data-title="The page breaks it">
+  <p class="kicker">Step 4 · demos/green-room/04-in-the-app</p>
+  <h2>Into the app: two stylesheets, one class name</h2>
+  <div class="vs2">
+    <div>
+      <h3>app.css · the app's top bar</h3>
+      <script type="text/x-code" data-lang="css" class="xs">.bar {
+  display: flex;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+}</script>
+    </div>
+    <div>
+      <h3>level-meter.css · the meter's bars</h3>
+      <script type="text/x-code" data-lang="css" class="xs">.bar {
+  width: 8px;
+  border-radius: 2px;
+  background: #d5d9e0;
+}</script>
+    </div>
+  </div>
+  <p>The header collapses into a narrow grey column. The bars get the header's padding. Both authors wrote reasonable CSS.</p>
+  <aside class="notes">
+    <p>~0:16. Open <code>04-in-the-app</code>. The selectors are global: both rules apply to both elements, and where they conflict the later stylesheet wins. Renaming the class fixes this app, until the meter is used in another app with another <code>.bar</code>. A component's styles need a boundary, and so does its markup: the app's <code>document.querySelectorAll(".bar")</code> now also finds the meter's spans.</p>
+  </aside>
+</section>
+
+<section data-title="Shadow DOM">
+  <p class="kicker">Step 5 · demos/green-room/05-shadow</p>
+  <h2>A shadow root: a DOM tree only the element sees</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: inline-flex; gap: 3px; height: 24px; }
+    .bar { width: 8px; background: var(--meter-off, #d5d9e0); }
+    .bar.on { background: var(--meter-color, #1f9d55); }
+  </style>`;
+
+class LevelMeter extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.append(template.content.cloneNode(true));
+  }
+  // render into this.shadowRoot, not into this
+}</script>
+<pre class="tree"><span class="host">&lt;level-meter&gt;</span>   <span class="c">← the host</span>
+  <span class="sr">#shadow-root (open)</span>
+    <span class="sr">&lt;style&gt;</span>     <span class="c">← inside only</span>
+    <span class="sr">&lt;span class="bar"&gt;</span>
+    <span class="sr">&lt;span class="bar"&gt;</span>
+    …
+<span class="host">&lt;/level-meter&gt;</span></pre>
+  </div>
+  <aside class="notes">
+    <p>~0:18. The page's <code>.bar</code> doesn't match inside; the shadow root's <code>.bar</code> doesn't match outside. <code>document.querySelector(".bar")</code> no longer finds the meter's spans. <code>mode: "open"</code> exposes <code>element.shadowRoot</code> for debugging and tests; <code>"closed"</code> returns <code>null</code> there, but it isn't security: anyone can patch <code>attachShadow</code> before your code runs. Native elements use the same mechanism: tick "Show user agent shadow DOM" in DevTools settings and inspect an <code>&lt;input type="range"&gt;</code>. One template, cloned per instance: the markup is parsed once.</p>
+  </aside>
+</section>
+
+<section data-title="What crosses the boundary">
+  <p class="kicker">Encapsulated, not isolated</p>
+  <h2>What crosses into a shadow root, and what doesn't</h2>
+  <table class="dtable">
+    <tr><th>from the page</th><th>crosses?</th></tr>
+    <tr><td>selectors: <code>.bar</code>, <code>span</code>, <code>level-meter span</code></td><td class="no">no</td></tr>
+    <tr><td>inherited properties: <code>color</code>, <code>font</code>, <code>line-height</code></td><td class="yes">yes, through the host</td></tr>
+    <tr><td>custom properties: <code>--meter-color</code></td><td class="yes">yes: they inherit too</td></tr>
+    <tr><td><code>::part(bar)</code></td><td class="yes">only what the element marks with <code>part="…"</code></td></tr>
+    <tr><td><code>document.querySelector</code></td><td class="no">no: it stops at the host</td></tr>
+    <tr><td>events</td><td class="some">some, retargeted to the host (later)</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:20. That's why the meter's text would still use the app's font: inheritance flows down the flat tree. <code>:host { all: initial; }</code> cuts even that, rarely what you want. Global styles that should reach in (a reset, a design system) need to be adopted into the shadow root explicitly (<code>shadowRoot.adoptedStyleSheets</code>).</p>
+  </aside>
+</section>
+
+<section data-title="A styling API">
+  <p class="kicker">The app's dark theme</p>
+  <h2>The element decides what the page may style</h2>
+  <div class="vs2">
+    <div>
+      <h3>inside · level-meter.js</h3>
+      <script type="text/x-code" data-lang="js" class="xs">// <style> in the shadow root
+:host { display: inline-flex; }
+:host([hidden]) { display: none; }
+.bar.on { background: var(--meter-color, #1f9d55); }
+
+// #update(): light the first n bars
+const n = Math.round(this.#value * bars.length);
+bars.forEach((bar, i) => {
+  bar.part.add("bar");
+  bar.classList.toggle("on", i < n);
+});</script>
+    </div>
+    <div>
+      <h3>outside · app.css</h3>
+      <script type="text/x-code" data-lang="css" class="xs">level-meter {
+  --meter-color: var(--ok);
+}
+
+level-meter::part(bar) {
+  border-radius: 99px;
+}</script>
+    </div>
+  </div>
+  <ul class="mt">
+    <li><code>:host</code> styles the element itself, from inside. The page's rules on <code>level-meter</code> win over it.</li>
+    <li>Custom properties for values (colours, sizes), <code>::part</code> for whole pieces. Both are documented API: renaming one breaks pages.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:21. In step 5, click "Dark theme": <code>--ok</code> changes on <code>:root</code>, the meter follows (the demo also sets <code>--meter-off</code>, the colour of an unlit bar). <code>:host([hidden]) { display: none }</code> because <code>:host { display: inline-flex }</code> would otherwise override the <code>hidden</code> attribute. <code>::part()</code> takes no descendant selectors after it (<code>::part(bar) span</code> is invalid); <code>::part(bar):hover</code> works.</p>
+  </aside>
+</section>
+
+<section data-title="Slots">
+  <p class="kicker">Step 6 · the wish's &lt;camera-preview&gt;, built like the meter</p>
+  <h2>Its message is the app's text, so it stays in the page</h2>
+  <div class="vs2">
+    <div>
+      <h3>the page</h3>
+      <script type="text/x-code" data-lang="html" class="xs"><camera-preview mirrored>
+  <p>Your camera is off.</p>
+  <p slot="blocked">
+    Parley can't use your camera.
+    Open the site controls next to
+    the address bar, allow the camera,
+    and reload.
+  </p>
+</camera-preview></script>
+    </div>
+    <div>
+      <h3>the shadow root</h3>
+      <script type="text/x-code" data-lang="html" class="xs"><div class="idle">
+  <slot>Camera is off.</slot>
+</div>
+<div class="blocked">
+  <slot name="blocked">
+    Camera unavailable.
+  </slot>
+</div></script>
+    </div>
+  </div>
+  <ul class="mt">
+    <li>Children stay in the page's DOM (the <strong>light DOM</strong>): the app translates them, styles them, finds them with <code>querySelector</code>, points <code>aria-</code> ids at them. The slot only decides where they're <em>shown</em>.</li>
+    <li>Text inside <code>&lt;slot&gt;</code> is the fallback when the page provides nothing.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:23. Don't type the class: <code>06-slots/camera-preview.js</code> is the meter's recipe again (template, <code>attachShadow</code>, <code>:host</code>). Type only the two slots and the page's paragraphs. Tick "Pretend the camera is blocked" in the fake-data panel. <code>::slotted(p)</code> styles slotted children from inside, top level only. <code>mirrored</code> is a reflected boolean attribute: the property (<code>preview.mirrored = false</code>) writes the attribute, CSS (<code>:host([mirrored])</code>) reads it. The <code>state</code> attribute used here to fake "blocked" is temporary: in step 10 the element owns its state.</p>
+  </aside>
+</section>
+
+<section data-title="Declarative shadow DOM">
+  <p class="kicker">demos/green-room/06-slots/declarative.html</p>
+  <h2>A shadow root without JavaScript</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="html" class="xs"><level-meter value="0.6">
+  <template shadowrootmode="open">
+    <style>
+      :host { display: inline-flex; gap: 3px; }
+      .bar { width: 8px; background: #d5d9e0; }
+      .bar.on { background: #1f9d55; }
+    </style>
+    <span class="bar on" part="bar on"></span>
+    <!-- … -->
+  </template>
+</level-meter></script>
+    <ul>
+      <li>The parser builds the shadow root from the <code>&lt;template&gt;</code>. A server can send the element already rendered.</li>
+      <li>When the script arrives, <code>attachShadow</code> returns this root, emptied, and the element renders into it.</li>
+      <li>Only the HTML parser does this: <code>innerHTML</code> ignores <code>shadowrootmode</code>.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:25. Baseline since 2024. The page's <code>.bar { background: hotpink }</code> in that demo doesn't reach in, with no script on the page. For HTML strings from JavaScript there's <code>setHTMLUnsafe()</code> and <code>Document.parseHTMLUnsafe()</code>, which do honour it. Server-side rendering of web components (Lit SSR, Enhance) is built on this.</p>
+  </aside>
+</section>
+
+<section data-title="The form doesn't see it">
+  <p class="kicker">Step 7 · demos/green-room/07-form</p>
+  <h2>Submit the form. Where is <code>mic</code>?</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// a device is picked in &lt;device-picker&gt;</span>
+picker.value                <span class="c">// "usb"</span>
+Object.fromEntries(
+  <span class="k">new</span> FormData(form))       <span class="c">// {}</span>
+form.checkValidity()        <span class="c">// true, despite required</span></pre>
+    <ul>
+      <li>A <code>&lt;select&gt;</code> inside a form takes part in it: its value is submitted, <code>required</code> blocks submit, reset clears it.</li>
+      <li>A custom element doesn't, unless it says it's a form control.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:26. The picker receives its devices as a property: <code>picker.devices = [{ id, label }, …]</code>, fake ones for now (real ones need a permission, step 10). Native inputs inside the element's shadow root don't help either: a form doesn't see controls in another tree.</p>
+  </aside>
+</section>
+
+<section data-title="Form-associated">
+  <p class="kicker">ElementInternals</p>
+  <h2>A form-associated element talks to its form like a native control</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">class DevicePicker extends HTMLElement {
+  static formAssociated = true;
+  #internals = this.attachInternals();
+
+  #sync() {
+    this.#internals.setFormValue(this.#value || null);
+    if (this.required && !this.#value) {
+      this.#internals.setValidity(
+        { valueMissing: true }, "Choose one.", firstOption);
+    } else {
+      this.#internals.setValidity({});
+    }
+  }
+
+  formResetCallback() { this.value = ""; }
+}</script>
+    <ul>
+      <li><code>setFormValue</code>: what <code>FormData</code> gets under the element's <code>name</code>.</li>
+      <li><code>setValidity</code>: the same flags as <code>input.validity</code>; the form won't submit while one is true.</li>
+      <li>Lifecycle for forms: <code>formResetCallback</code>, <code>formDisabledCallback</code>, <code>formStateRestoreCallback</code>.</li>
+      <li>It's labelable: <code>&lt;label for="mic"&gt;</code> works.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:28. Also expose what a native control exposes, delegated to the internals: <code>form</code>, <code>name</code>, <code>validity</code>, <code>validationMessage</code>, <code>checkValidity()</code>, <code>reportValidity()</code> (all in <code>07-form/device-picker.js</code>). <code>:invalid</code> and <code>:user-invalid</code> match the element. Now submit with nothing picked: the form refuses, but no message appears, and the console says <code>An invalid form control with name='mic' is not focusable.</code> That is the next problem.</p>
+  </aside>
+</section>
+
+<section data-title="Events out">
+  <p class="kicker">The element reports, the page decides</p>
+  <h2>Events out, and what happens at the shadow boundary</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// on the host: needs only bubbles to reach the form
+this.dispatchEvent(new Event("change", { bubbles: true }));
+
+// from inside the shadow root: needs composed to get out
+button.dispatchEvent(new CustomEvent("pick", {
+  bubbles: true,
+  composed: true,
+  detail: { id },
+}));
+
+// the page
+picker.addEventListener("change", () => {
+  console.log(picker.value);
+});</script>
+    <ul>
+      <li>Events from inside are <strong>retargeted</strong>: outside, <code>event.target</code> is the host. The inside stays private.</li>
+      <li><code>composed: false</code> (the default for your events): the event stops at the shadow root.</li>
+      <li><code>event.composedPath()</code> lists the whole path, for debugging (open roots only).</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:30. Built-in UI events (<code>click</code>, <code>input</code>, <code>keydown</code>) are already composed. Name your events after what happened (<code>change</code>, <code>pick</code>, <code>statechange</code>), not after what the page should do. Dispatching on the host is usually the simplest: <code>bubbles</code> but no <code>composed</code> needed, and <code>event.target</code> is the element either way. A <code>change</code> on the picker reaches the form's <code>change</code> listener, like a native control's.</p>
+  </aside>
+</section>
+
+<section data-title="Tab doesn't reach it">
+  <p class="kicker">Lecture 2 again · unplug the mouse</p>
+  <h2>Tab skips the picker. A custom element starts with nothing.</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">focus</span><p><code>&lt;select&gt;</code> is in the Tab order. A <code>&lt;div&gt;</code> option isn't.</p></div>
+    <div class="card"><span class="label">keys</span><p>Arrows, <kbd>Space</kbd>, <kbd>Home</kbd>, typing a letter: all yours to write.</p></div>
+    <div class="card"><span class="label">role</span><p>A screen reader hears "group", or nothing. Not "radio group, 3 items".</p></div>
+  </div>
+  <p>And the form's "not focusable" error: the browser can't focus the element to show its validation message.</p>
+  <aside class="notes">
+    <p>~0:31. The point of this slide is the cost: every behaviour a native element gives you for free, a custom element has to implement. If a native element fits (a styled <code>&lt;select&gt;</code> here, or the new customisable select), use it. The picker earns its place only if it shows something <code>&lt;select&gt;</code> can't, like a live level next to each microphone.</p>
+  </aside>
+</section>
+
+<section data-title="Focus, keys, roles">
+  <p class="kicker">Step 8 · demos/green-room/08-keyboard</p>
+  <h2>A radio group: one Tab stop, arrows inside</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">constructor() {
+  super();
+  this.attachShadow({ mode: "open", delegatesFocus: true });
+  this.#internals.role = "radiogroup";
+}
+
+// each option
+option.setAttribute("role", "radio");
+option.setAttribute("aria-checked", String(chosen));
+option.tabIndex = isTabStop ? 0 : -1;   // roving tabindex
+
+// keydown: arrows move and select, wrapping
+if (event.key in moves) {
+  event.preventDefault();            // arrows would scroll
+  this.#choose(ids[next], { focus: true });
+}</script>
+    <ul>
+      <li><strong>Roving tabindex</strong>: only the chosen option has <code>tabindex="0"</code>; the WAI-ARIA radio group pattern.</li>
+      <li><code>delegatesFocus</code>: focusing the host (a label click, the form's validation) focuses the first focusable inside.</li>
+      <li><code>internals.role</code>, <code>internals.ariaValueNow</code>: default semantics, without attributes on the host. The page can still override them.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:33. Submit the empty form again: now the picker gets focus and the browser's own bubble says "Choose one." The meter gets <code>internals.role = "meter"</code> and <code>ariaValueNow</code>. Trap: an id inside a shadow root can't be referenced from outside, and an <code>aria-labelledby</code> inside can't point at the page. Label the host from the page instead: <code>&lt;level-meter aria-labelledby="level-label"&gt;</code> works because the host is in the page's DOM. Check with DevTools → Accessibility pane.</p>
+  </aside>
+</section>
+
+<section data-title="When not to">
+  <p class="kicker">Judgement</p>
+  <h2>When a custom element is the wrong tool</h2>
+  <ul>
+    <li><strong>A native element does the job</strong>: <code>&lt;dialog&gt;</code>, <code>&lt;details&gt;</code>, <code>popover</code>, <code>&lt;select&gt;</code>, <code>&lt;input type="range"&gt;</code>. You'd rebuild their focus, keys and semantics, worse.</li>
+    <li><strong>It's only layout</strong>: a <code>&lt;two-columns&gt;</code> wrapper is a CSS class.</li>
+    <li><strong>It's used once</strong>, and has no state or behaviour of its own.</li>
+    <li><strong>The content belongs to the page</strong> (its text, its translations, its styles) but you'd render it inside a shadow root: use slots, or no shadow root.</li>
+  </ul>
+  <p>Good candidates: a widget with state and behaviour that several pages or apps share, like the three in the green room.</p>
+  <aside class="notes">
+    <p>~0:36. The green room's picker is a teaching vehicle: it shows form association, focus and roles in one element. In production, this exact picker would be a styled <code>&lt;select&gt;</code>; a custom one pays off when it shows what <code>&lt;select&gt;</code> can't, like a live level per microphone. Not covered: customised built-ins (<code>&lt;button is="fancy-button"&gt;</code>, <code>extends HTMLButtonElement</code>) keep a native element's behaviour, but Safari has declined to implement them; autonomous elements plus <code>ElementInternals</code> are the portable route. A custom element without a shadow root is fine and common (GitHub's are mostly light DOM): the app's styles apply, and the class still gives you a lifecycle. The green room itself becomes one in step 11.</p>
+  </aside>
+</section>
+
+<section data-title="Who ships tags">
+  <p class="kicker">In production</p>
+  <h2>The same API under large apps, and under Lit</h2>
+  <div class="split r2 center">
+    <ul>
+      <li><strong>GitHub</strong>: <code>&lt;relative-time&gt;</code>, <code>&lt;include-fragment&gt;</code>, <code>&lt;details-menu&gt;</code>.</li>
+      <li><strong>YouTube</strong>: inspect the page, <code>&lt;ytd-app&gt;</code> and hundreds more.</li>
+      <li><strong>Photoshop on the web</strong>: Adobe's Spectrum Web Components, written with Lit.</li>
+      <li><strong>Firefox</strong>: parts of its own interface.</li>
+    </ul>
+    <script type="text/x-code" data-lang="js" class="xs">import { LitElement, html, css } from "lit";
+
+class LevelMeter extends LitElement {
+  static properties = { value: { type: Number } };
+  static styles = css`.on { background: var(--meter-color); }`;
+
+  render() {
+    const lit = Math.round(this.value * 10);
+    return Array.from({ length: 10 }, (_, i) =>
+      html`<span class=${i < lit ? "bar on" : "bar"}></span>`);
+  }
+}
+customElements.define("level-meter", LevelMeter);</script>
+  </div>
+  <aside class="notes">
+    <p>~0:37. Lit (about 5 kB) adds reactive properties (attribute ↔ property, re-render on change), efficient template updates and the upgrade-property fix; underneath it's <code>customElements.define</code>, a shadow root, the same lifecycle. Loaded like any Lecture 10 library: <code>"lit": "https://cdn.jsdelivr.net/npm/lit@3.2.1/+esm"</code> in the import map. Frameworks can render custom elements too; React 19 passes properties to them correctly.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — After the call">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 1 · pairs · 18 min</p>
+  <div class="ex-head"><h2>After the call</h2><button class="timer" data-min="18"></button></div>
+  <p>The post-call form asks "How was the call quality?" with an <code>&lt;input type="number"&gt;</code>. Replace it with:</p>
+  <script type="text/x-code" data-lang="html" class="small"><star-rating id="quality" name="quality" max="5" required></star-rating></script>
+  <ol class="mt">
+    <li>It submits with the form, blocks an empty submit, and resets.</li>
+    <li>It reports a new rating with a <code>change</code> event.</li>
+  </ol>
+  <p class="muted">If there's time: one Tab stop and arrow keys, a shadow root, a theming API.</p>
+  <p class="where mt">11-elements-sensors → <b><a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/exercises/01-star-rating.html" target="_blank" rel="noopener">Exercise 1 · After the call</a></b></p>
+  <aside class="notes">
+    <p>~0:40 → 0:58, debrief to 1:00. The starter has the form, the app's stylesheet and a <code>main.js</code> that prints <code>FormData</code> and logs <code>change</code> events; <code>star-rating.js</code> is an empty class. Walk round at minute 8: who has the value in <code>FormData</code>? At minute 15: who has <code>required</code> blocking the submit? Keyboard support is "if there's time"; <code>08-keyboard/device-picker.js</code> is the reference the brief points to. The solution is in <code>private/exercise-1-solution/</code> (not published). Debrief (2 min): show <code>:state(rated)</code> from the solution, the next act needs custom states.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · PLUG IN THE WORLD
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Plug in the world" data-at="1:00" data-title="Act 2 — Plug in the world">
+  <div class="act-deco">🎙</div>
+  <div class="act-num">act 02</div>
+  <h1>Plug in the world</h1>
+  <div class="act-meta"><span class="chip">1:00 – 1:25</span><span>real devices, behind four gates</span></div>
+  <div class="act-list"><span>secure contexts</span><span>getUserMedia</span><span>permissions</span><span>user activation</span><span>Web Audio</span><span>enumerateDevices</span><span>cleanup</span><span>Permissions Policy</span></div>
+</section>
+
+<section data-title="The browser's senses">
+  <p class="kicker">More than documents</p>
+  <h2>The browser is a platform for sensors</h2>
+  <div class="cat">
+    <div class="card"><span class="label">camera · microphone</span><p><code>getUserMedia</code></p></div>
+    <div class="card"><span class="label">sound out</span><p>Web Audio: oscillators, analysers, effects</p></div>
+    <div class="card"><span class="label">voice</span><p>SpeechRecognition, SpeechSynthesis</p></div>
+    <div class="card"><span class="label">pointer</span><p>pressure, tilt, several fingers: Pointer Events</p></div>
+    <div class="card"><span class="label">motion</span><p>DeviceOrientation, DeviceMotion</p></div>
+    <div class="card"><span class="label">controllers</span><p>Gamepad, WebHID, Web MIDI, Web Serial</p></div>
+    <div class="card"><span class="label">screen</span><p>EyeDropper, screen capture, Wake Lock</p></div>
+    <div class="card"><span class="label">other windows</span><p>BroadcastChannel</p></div>
+  </div>
+  <p>Some need nothing. Some need HTTPS, a click, and a yes from the user. That's this act.</p>
+  <aside class="notes">
+    <p>~1:00. Lecture 10's geolocation was the first of these. WebHID, Web MIDI and Web Serial are Chromium-only. Everything after the break uses one of these cards.</p>
+  </aside>
+</section>
+
+<section data-title="Secure contexts">
+  <p class="kicker">Step 9 · the green room on a phone, over plain HTTP</p>
+  <h2>On <code>http://192.168…</code>, the API isn't there</h2>
+<pre class="raw sm"><span class="c">// laptop, http://localhost:8080</span>        navigator.mediaDevices   <span class="c">// MediaDevices {…}</span>
+<span class="c">// phone,  http://192.168.1.20:8080</span>     navigator.mediaDevices   <span class="c">// undefined</span>
+                                       window.isSecureContext   <span class="c">// false</span></pre>
+  <ul class="mt">
+    <li>A <strong>secure context</strong>: HTTPS, or <code>localhost</code> / <code>127.0.0.1</code>. Camera, microphone, motion sensors, geolocation, the clipboard, service workers work only there.</li>
+    <li>No prompt: the property is missing (<code>mediaDevices</code>), or it exists and every call fails (<code>geolocation</code>). Check <code>isSecureContext</code> and say why.</li>
+    <li>To test on a phone: deploy (GitHub Pages is HTTPS), or a tunnel, or DevTools → Sensors on the laptop.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:01. The first gate, before any prompt. The reason: on plain HTTP anyone on the network can change the page, and a page that can switch on your camera mustn't be editable by the café's Wi-Fi. <code>09-microphone/main.js</code>'s <code>setup()</code> checks first and disables the button with a sentence that names the origin.</p>
+  </aside>
+</section>
+
+<section data-title="getUserMedia">
+  <p class="kicker">One call, one prompt</p>
+  <h2><code>getUserMedia</code> asks for a stream</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">start.addEventListener("click", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      // video: { deviceId: { exact: id }, width: 1280 },
+    });
+    stream.getTracks();   // [MediaStreamTrack (audio)]
+  } catch (error) {
+    say(PROBLEMS[error.name], true);
+  }
+});</script>
+    <ul>
+      <li>A <strong>MediaStream</strong> holds tracks, one per source. A <code>&lt;video&gt;</code> plays it: <code>video.srcObject = stream</code>.</li>
+      <li><strong>Constraints</strong>: which device, which size; <code>exact</code> fails if it can't be met.</li>
+      <li>The first call shows the prompt. A promise: it waits as long as the user does.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:02. Asking for <code>{ audio: true, video: true }</code> in one call gives one combined prompt; the green room asks in two calls from one click (the preview asks for video, the page for audio). Chrome shows them together or one after the other; Firefox shows two.</p>
+  </aside>
+</section>
+
+<section data-title="Three answers">
+  <p class="kicker">Permission · the user's answer</p>
+  <h2>The prompt has three answers, and the device can fail too</h2>
+  <table class="dtable tight">
+    <tr><th>what happened</th><th>result</th><th>tell the user</th></tr>
+    <tr><td>Allow (Chrome: "while visiting" or "this time")</td><td>a <code>MediaStream</code></td><td>(start)</td></tr>
+    <tr><td>Block (Chrome: "Never allow")</td><td><code>NotAllowedError</code></td><td>how to allow it in the site controls</td></tr>
+    <tr><td>closed the prompt</td><td><code>NotAllowedError</code>, state still <code>"prompt"</code></td><td>click again to be asked</td></tr>
+    <tr><td>no microphone</td><td><code>NotFoundError</code></td><td>plug one in; you can join muted</td></tr>
+    <tr><td>another app holds it</td><td><code>NotReadableError</code></td><td>close the other app</td></tr>
+    <tr><td>that device is gone</td><td><code>OverconstrainedError</code></td><td>pick another one</td></tr>
+  </table>
+  <p>On Block, the <code>blocked</code> slot from step 6 shows. That slot was written for this.</p>
+  <aside class="notes">
+    <p>~1:03. Chrome reports a closed prompt as <code>NotAllowedError</code> with the message "Permission dismissed". After repeated dismissals Chrome stops asking for a while (three dismissals, then about a week). <code>NotReadableError</code> is common on Windows, where one app at a time holds a camera. One <code>PROBLEMS</code> table maps names to sentences in <code>09-microphone/main.js</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Block is final">
+  <p class="kicker">Live, in Chrome · "Never allow", then try again</p>
+  <h2>After a block, the page can't ask again. Only the user can undo it.</h2>
+  <div class="split center">
+    <ul>
+      <li>Chrome: call <code>getUserMedia</code> again, or reload: instant <code>NotAllowedError</code>, no prompt.</li>
+      <li>Firefox keeps a block for the session unless "Remember" was ticked; Safari asks again on a later visit. Code for the strictest case.</li>
+      <li>The user resets it in the <strong>site controls</strong> next to the address bar, or in the browser's settings.</li>
+      <li>So the blocked message says <strong>where to click</strong>, not "please allow".</li>
+    </ul>
+    <div class="card"><span class="label">consequence</span><p>A prompt on page load, before the user knows why, gets blocked by reflex. And that block is permanent. A careless prompt is a feature lost for good on that site.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~1:04. Do it live in <code>09-microphone</code>: "Never allow", click again, reload. Then reset through the site controls (the icon left of the URL in Chrome → Reset permissions). Browsers also hide or auto-block prompts that aren't tied to a user action, most visibly for notifications (Chrome's quiet permission UI).</p>
+  </aside>
+</section>
+
+<section data-title="Ask in context">
+  <p class="kicker">Read the state, then ask</p>
+  <h2>Choose the screen before anything is asked</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">async function permissionState(name) {
+  try {
+    const status = await navigator.permissions.query({ name });
+    return status.state; // "granted" · "prompt" · "denied"
+  } catch {
+    return "unknown";    // this browser doesn't know the name
+  }
+}
+
+const state = await permissionState("microphone");
+if (state === "granted") say("Your microphone is ready.");
+else if (state === "denied") say(PROBLEMS.NotAllowedError, true);
+else say("Parley will ask for your microphone. "
+       + "Nothing is sent until you join.");</script>
+    <ul>
+      <li><code>permissions.query</code> reads the state without a prompt.</li>
+      <li><strong>prompt</strong>: explain first, then a button; the browser asks after the click.</li>
+      <li><strong>denied</strong>: skip the button, show how to reset.</li>
+      <li>Permission names differ between browsers: always <code>try</code>.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:05. Every real call app does this: a screen that says what it needs and why, then the system prompt. The "unknown" branch behaves like "prompt". Lecture 10's "Plan for no" slide was the same idea for geolocation.</p>
+  </aside>
+</section>
+
+<section data-title="A grant doesn't last">
+  <p class="kicker">Yesterday's yes is not today's</p>
+  <h2>A grant can be one-time, and it can be taken back mid-call</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">const status =
+  await navigator.permissions.query({ name: "camera" });
+status.addEventListener("change", () => {
+  if (status.state === "denied") showBlocked();
+});
+
+const [track] = stream.getVideoTracks();
+track.addEventListener("ended", () => {
+  // unplugged or revoked; track.stop() doesn't fire it
+  showStopped();
+});</script>
+    <ul>
+      <li>Chrome offers "Allow this time"; Firefox remembers only if the user ticks a box; Safari asks again in later visits.</li>
+      <li>The user can revoke access in the site controls while the camera runs.</li>
+      <li>Listen to both the permission (<code>change</code>) and the track (<code>ended</code>).</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:06. So the page can't store "the user said yes" in <code>localStorage</code> and skip the checks next time. Step 12 adds both: the preview watches the camera permission itself (it switches to <code>blocked</code>) and its track (<code>failed</code>); the green room watches the microphone. Revoke the camera in the site controls while it runs: the preview shows its blocked message. <code>ended</code> fires when the source stops on its own, never because your code called <code>stop()</code>.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Silence until you click">
+  <p class="kicker">demos/green-room/09-microphone/autoplay.html</p>
+  <h2>An <code>AudioContext</code> created on load. What's its state?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">const context = new AudioContext(); // on page load
+console.log(context.state);
+
+go.addEventListener("click", async () => {
+  await context.resume();
+  console.log(context.state);
+});</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>"suspended"</code>, then <code>"running"</code> after the click. The <strong>autoplay policy</strong>: no sound before the user has interacted.</div>
+      <div class="reveal-box step">Another gate: <strong>user activation</strong>. No prompt, no setting: the browser tracks clicks, taps and key presses. <code>getUserMedia</code> doesn't need it; the meter's <code>AudioContext</code> does, so create it inside the click.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:07. Open the autoplay page in a fresh tab without touching it. Chrome also warns: "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page." <code>navigator.userActivation.hasBeenActive</code> is sticky activation (any interaction so far, enough for audio); <code>isActive</code> is transient activation (an interaction in the last few seconds, needed for fullscreen, pop-ups, EyeDropper and, in Firefox and Safari, clipboard writes). An <code>await</code> before the call can use up the transient window.</p>
+  </aside>
+</section>
+
+<section data-title="Microphone to meter">
+  <p class="kicker">Step 9 · the same &lt;level-meter&gt;</p>
+  <h2>Microphone → analyser → <code>meter.value</code></h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">const context = new AudioContext(); // before any await
+const stream =
+  await navigator.mediaDevices.getUserMedia({ audio: true });
+const analyser = context.createAnalyser();
+analyser.fftSize = 1024;
+context.createMediaStreamSource(stream).connect(analyser);
+const samples = new Float32Array(analyser.fftSize);
+
+function tick() {
+  analyser.getFloatTimeDomainData(samples);  // -1 … 1
+  let sum = 0;
+  for (const s of samples) sum += s * s;
+  const rms = Math.sqrt(sum / samples.length);
+  const db = 20 * Math.log10(rms || 1e-8);   // ≈ -60 … 0
+  meter.value = (db + 60) / 60;
+  frame = requestAnimationFrame(tick);
+}</script>
+    <ul>
+      <li>An <code>AnalyserNode</code> exposes the latest samples; you poll it once per frame.</li>
+      <li>Root mean square: one number for loudness. Decibels, because hearing is logarithmic.</li>
+      <li><strong><code>&lt;level-meter&gt;</code> didn't change.</strong> It was built on fake numbers; real ones arrive through the same property.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:08. The context is created before the <code>await</code>: after it, transient activation may have expired. Chrome would still allow it (audio needs only sticky activation), but the order makes the rule visible. Speak in step 9 and the meter moves. The analyser isn't connected to <code>context.destination</code>, so nothing is played back (no feedback loop). This is the payoff of Act 1's API design: attribute for configuration, property for live data.</p>
+  </aside>
+</section>
+
+<section data-title="The camera">
+  <p class="kicker">Step 10 · demos/green-room/10-camera</p>
+  <h2>The preview owns the camera</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">async start(id) {
+  this.stop();
+  try {
+    this.#stream = await navigator.mediaDevices.getUserMedia({
+      video: id ? { deviceId: { exact: id } } : true,
+    });
+    this.#video.srcObject = this.#stream;
+    this.#setState("live");
+  } catch (error) {
+    const blocked = error.name === "NotAllowedError";
+    this.#setState(blocked ? "blocked" : "failed", error);
+  }
+}
+#setState(state, error = null) {
+  this.#internals.states.clear();
+  if (state !== "idle") this.#internals.states.add(state);
+  this.dispatchEvent(new CustomEvent("statechange", {
+    bubbles: true, detail: { state, error } }));
+}</script>
+    <ul>
+      <li><strong>Custom states</strong>: <code>internals.states</code>, selected with <code>:state(live)</code>, inside and outside. The page can read the state, not set it.</li>
+      <li>The step-6 <code>state</code> attribute is gone.</li>
+      <li><code>&lt;video autoplay muted playsinline&gt;</code>; <code>mirrored</code> is one CSS transform.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:10. <code>this.#video</code> stands for the <code>&lt;video&gt;</code> in the shadow root. The demo also checks <code>permissions.query</code> after a <code>NotAllowedError</code>: if the state is still <code>"prompt"</code>, the user closed the prompt, and the preview goes back to idle instead of "blocked". <code>:state()</code> is Baseline since 2024. A person looking at themselves expects a mirror; the other participants get the unmirrored image, which is why it's a display attribute and not a change to the stream. <code>muted</code> matters on a stream with audio: without it, you'd hear yourself.</p>
+  </aside>
+</section>
+
+<section data-title="Empty names">
+  <p class="kicker">enumerateDevices</p>
+  <h2>Before you allow access, devices have no names</h2>
+  <div class="vs2">
+<pre class="raw sm"><span class="c">// before any permission</span>
+[{ kind: <span class="s">"audioinput"</span>, deviceId: <span class="s">""</span>, label: <span class="s">""</span> },
+ { kind: <span class="s">"videoinput"</span>, deviceId: <span class="s">""</span>, label: <span class="s">""</span> }]
+
+<span class="c">// after Allow</span>
+[{ kind: <span class="s">"audioinput"</span>, deviceId: <span class="s">"d562…"</span>,
+   label: <span class="s">"MacBook Pro Microphone"</span> }, …]</pre>
+    <ul>
+      <li>A list of your devices is a fingerprint. Without trust, the browser hides it.</li>
+      <li>Order: ask, then list. The picker's <code>refresh()</code> runs again after the click.</li>
+      <li><code>devicechange</code> fires when headphones connect: the picker listens and refreshes itself.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:12. Chrome also lists aliases: <code>"default"</code> (and <code>"communications"</code> on Windows) for a device that appears again under its own id. The picker filters them so each device appears once. Before the grant the picker shows its <code>empty</code> slot: "Device names appear after you allow access", text the page provides. The picker gets its devices from its own <code>kind</code> attribute now; the page still only listens for <code>change</code> and restarts the chosen device.</p>
+  </aside>
+</section>
+
+<section data-title="The light stays on">
+  <p class="kicker">Step 11 · demos/green-room/11-light-stays-on</p>
+  <h2>Click "Back". The page is fine. The camera light is still on.</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// router.js: the green room is now an element too
+function show() {
+  if (location.hash === "#/green-room") {
+    outlet.replaceChildren(document.createElement("green-room"));
+  } else {
+    outlet.replaceChildren(lobby.content.cloneNode(true));
+  }
+}</script>
+    <ul>
+      <li>The green room left the DOM. Its <code>&lt;video&gt;</code> is gone.</li>
+      <li>The tracks still run: the laptop's light, the tab's recording dot, the OS microphone indicator.</li>
+      <li>The animation frame still feeds a meter nobody sees. Each visit adds another <code>devicechange</code> listener.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:13. The climax of the act. Live: go to the green room, start, click Back, point at the camera light. In DevTools, <code>getEventListeners(navigator.mediaDevices)</code> (Chrome console only) shows the listeners piling up after a few round trips. The green room became a light-DOM custom element so the router can create and remove it; its code is step 10's <code>main.js</code> in a class. It's a privacy bug, not a cosmetic one: the user believes they left the screen that records them.</p>
+  </aside>
+</section>
+
+<section data-title="Acquire, release">
+  <p class="kicker">Step 12 · demos/green-room/12-cleanup</p>
+  <h2>Release what you acquired</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">// camera-preview.js
+disconnectedCallback() {
+  this.stop();             // stops every track
+  this.#listeners.abort(); // the permission listener
+}
+
+// device-picker.js
+connectedCallback() {
+  this.#listeners = new AbortController();
+  navigator.mediaDevices.addEventListener(
+    "devicechange", () => this.refresh(),
+    { signal: this.#listeners.signal });
+}
+disconnectedCallback() {
+  this.#listeners.abort(); // removes them all
+}</script>
+    <table class="dtable tight">
+      <tr><th>acquired</th><th>released by</th></tr>
+      <tr><td>a track</td><td><code>track.stop()</code></td></tr>
+      <tr><td><code>AudioContext</code></td><td><code>context.close()</code></td></tr>
+      <tr><td>animation frame</td><td><code>cancelAnimationFrame</code></td></tr>
+      <tr><td>timer</td><td><code>clearInterval</code></td></tr>
+      <tr><td>listener outside</td><td><code>abort()</code></td></tr>
+    </table>
+  </div>
+  <aside class="notes">
+    <p>~1:16. Run the same steps on step 12: the light goes off on Back. Every descendant custom element gets its own <code>disconnectedCallback</code> when an ancestor is removed, so the preview releases the camera without the green room knowing about it. Listeners on the element's own children don't need removing: they go with the children.</p>
+  </aside>
+</section>
+
+<section data-title="A late answer">
+  <p class="kicker">Trap · the prompt resolves after the world moved on</p>
+  <h2>A stream can arrive after you stopped wanting it</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">async start(id) {
+  this.stop();               // increments #call
+  const call = this.#call;
+  const stream = await navigator.mediaDevices
+    .getUserMedia({ video: { deviceId: id } });
+  // stopped, restarted or removed meanwhile?
+  if (call !== this.#call) {
+    stream.getTracks().forEach((t) => t.stop());
+    return;
+  }
+  this.#stream = stream;
+}</script>
+    <ul>
+      <li>The user clicks Back while the prompt is open: <code>disconnectedCallback</code> runs first, the stream arrives after.</li>
+      <li>Two quick picks in the device list: two calls in flight, the first stream overwritten and never stopped.</li>
+      <li>After every <code>await</code>, check whether the answer is still wanted.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:17. The same race as Lecture 8's out-of-order search responses, with a device instead of a response. A counter is the smallest fix; an <code>AbortController</code> per call works too. The green room's microphone uses the same pattern (<code>#micCall</code>). The counters have been in the code since steps 9 and 10 (two quick picks); step 12 adds the case of leaving, because only now does <code>disconnectedCallback</code> call <code>stop()</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Moving is leaving">
+  <p class="kicker">Trap · same scene</p>
+  <h2>Moving an element disconnects it first</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">sidebar.append(preview);
+// disconnectedCallback → camera off
+// connectedCallback   → camera on again: a flicker
+
+sidebar.moveBefore(preview, null);
+// connectedMoveCallback only, if the class defines it</script>
+    <ul>
+      <li><code>append</code> to a new parent: <code>disconnected</code>, then <code>connected</code>.</li>
+      <li><code>moveBefore()</code> keeps the element's state (and a playing video) and calls <code>connectedMoveCallback</code> instead.</li>
+      <li>Where it isn't supported: make restarting cheap, or move the element less.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:18. <code>moveBefore</code> shipped in Chrome 133 (2025). Feature-detect it: <code>"moveBefore" in Element.prototype</code>, and fall back to <code>append</code>. <code>12-cleanup/camera-preview.js</code> defines an empty <code>connectedMoveCallback</code>, which is enough: defining it means "a move isn't a disconnect for me". Video-call apps move the self-view between layouts all the time.</p>
+  </aside>
+</section>
+
+<section data-title="Embedded">
+  <p class="kicker">Step 13 · demos/green-room/13-embedded</p>
+  <h2>The page that embeds you decides what you may ask for</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="html" class="xs"><!-- another origin, no allow: refused before any prompt -->
+<iframe src="https://parley.example/green-room"></iframe>
+
+<!-- delegated -->
+<iframe src="https://parley.example/green-room"
+        allow="camera; microphone"></iframe>
+
+<!-- taken away, even from the same origin -->
+<iframe src="/green-room"
+        allow="camera 'none'; microphone 'none'"></iframe>
+
+<!-- your page and all it embeds: a response header -->
+Permissions-Policy: camera=(), geolocation=()</script>
+    <ul>
+      <li><strong>Permissions Policy</strong>: checked before any prompt. By default camera and microphone are allowed for the page's own origin only.</li>
+      <li>A cross-origin frame needs <code>allow</code> to use it at all. Chrome then asks on behalf of the <strong>top-level page</strong>: the prompt names it, and the grant is stored for it.</li>
+      <li>The header turns a feature off for a page and its third-party scripts.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:19. Open <code>13-embedded</code> on <code>localhost</code>: frames A and B load from <code>127.0.0.1</code>, another origin. A says "doesn't allow", B can use the camera, C (same origin, <code>'none'</code>) is refused. B's prompt names <code>localhost</code>, the top-level page: if the camera is already allowed or blocked for <code>localhost</code> from earlier steps, B follows that without asking. Reset permissions before this step. The frame reads its policy with <code>document.featurePolicy.allowsFeature("camera")</code> in Chromium; elsewhere <code>getUserMedia</code> just fails with <code>NotAllowedError</code>. On GitHub Pages you can't set response headers; other static hosts (Netlify, Cloudflare Pages) read them from a <code>_headers</code> file.</p>
+  </aside>
+</section>
+
+<section data-title="getUserMedia, in order">
+  <p class="kicker">Act 2 on one slide · Chrome</p>
+  <h2>What <code>getUserMedia</code> checks, in order</h2>
+  <div class="gum">
+    <div class="gum-chk"><i>1</i><b>Secure context</b><span>HTTPS, <code>localhost</code> or <code>127.0.0.1</code></span></div>
+    <div class="gum-chk"><i>2</i><b>Permissions Policy</b><span>this frame may use the camera (header, <code>allow</code>)</span></div>
+    <div class="gum-chk"><i>3</i><b>A camera exists</b><span>at least one video input</span></div>
+    <div class="gum-chk wide"><i>4</i><b>Permission of the top-level site</b><span><code class="nw">permissions.query({ name: "camera" })</code></span><span><code>"granted"</code> → on to 5, no prompt</span></div>
+    <div class="gum-chk"><i>5</i><b>OS and hardware</b><span>the OS lets the browser in; the camera starts</span></div>
+    <div class="gum-ok"><b>Live</b><span>a <code>MediaStream</code>, track <code>"live"</code>, the light on</span></div>
+
+    <div class="gum-down">no</div>
+    <div class="gum-down">no</div>
+    <div class="gum-down">no</div>
+    <div class="gum-down">"denied"</div>
+    <div class="gum-down ask">"prompt"</div>
+    <div class="gum-down">no</div>
+    <div class="gum-down end">later</div>
+
+    <div class="gum-fail"><code>mediaDevices</code> is <code>undefined</code>: calling it is a <code>TypeError</code><em>no prompt</em></div>
+    <div class="gum-fail"><code>NotAllowedError</code>; console: "Permissions policy violation"<em>no prompt</em></div>
+    <div class="gum-fail"><code>NotFoundError</code><em>no prompt</em></div>
+    <div class="gum-fail"><code>NotAllowedError</code>; only the user can undo it<em>no prompt</em></div>
+    <div class="gum-ask"><b>the prompt</b><span>Allow → <code>"granted"</code>, on to 5</span><span>Never allow → <code>"denied"</code>, stored</span><span>close → <code>NotAllowedError</code>, still <code>"prompt"</code></span></div>
+    <div class="gum-fail">OS says no: <code>NotAllowedError</code>; camera busy: <code>NotReadableError</code></div>
+    <div class="gum-end">track <code>"ended"</code>: <code>stop()</code>, revoked, unplugged</div>
+  </div>
+  <p class="gum-foot">Only the prompt asks the user; every other "no" is silent, and the page has to say what happened. Not on this path: <strong>user activation</strong>.</p>
+  <aside class="notes">
+    <p>~1:22. Walk it left to right and map each box back to its step: 1 → the phone on HTTP (step 9), 2 → the iframes (step 13), 3 and 5 → the error table (slide 33), 4 → the prompt, Block, revoke (steps 9–12), the end box → cleanup (step 12). The order matters for the page: checks 1–3 and a stored "denied" fail before any prompt, so the user sees nothing unless the page says it. The device check comes before the prompt, so a laptop with no camera never asks. Box 4 belongs to the top-level site: a frame allowed by box 2 asks on the top page's behalf. User activation (slide 37) is a gate for audio playback, fullscreen, pop-ups and EyeDropper; the next slide's table shows which API uses which gate. Chrome's behaviour; Firefox and Safari word the prompt and the errors differently.</p>
+  </aside>
+</section>
+
+<section data-title="Which gates">
+  <p class="kicker">For the jam · Chrome's behaviour, check MDN for the rest</p>
+  <h2>Not every API uses every gate</h2>
+  <table class="dtable tight">
+    <tr><th>API</th><th>secure context</th><th>user activation</th><th>prompt</th></tr>
+    <tr><td>camera, microphone</td><td class="yes">yes</td><td>no</td><td class="yes">yes</td></tr>
+    <tr><td>Web Audio playback</td><td>no</td><td class="yes">yes, sticky</td><td>no</td></tr>
+    <tr><td>speech recognition</td><td class="yes">yes</td><td>no</td><td class="yes">microphone</td></tr>
+    <tr><td>speech synthesis</td><td>no</td><td class="yes">yes, sticky</td><td>no</td></tr>
+    <tr><td>clipboard write</td><td class="yes">yes</td><td class="some">Firefox, Safari: transient</td><td>no</td></tr>
+    <tr><td>EyeDropper</td><td class="yes">yes</td><td class="yes">yes, transient</td><td>no: the picker is the consent</td></tr>
+    <tr><td>Gamepad</td><td class="yes">yes</td><td class="some">a button press on the pad</td><td>no</td></tr>
+    <tr><td>device orientation</td><td class="yes">yes</td><td class="some">iOS: transient</td><td class="some">iOS: <code>requestPermission()</code></td></tr>
+    <tr><td>Pointer Events, BroadcastChannel</td><td>no</td><td>no (<code>window.open</code>: yes)</td><td>no</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~1:23. Each jam brief names its gates from this table, so a group knows which failures to handle before writing code. Details move: check before class, and put the date on the slide if you change it.</p>
+  </aside>
+</section>
+
+<section data-title="The contract">
+  <p class="kicker">What the green room's three tags have in common</p>
+  <h2>The contract for every tag in the jam</h2>
+  <ol>
+    <li><strong>One module defines one element</strong>. Drop the file into any page and the tag works.</li>
+    <li><strong>Attributes configure, properties carry live data, events report.</strong> The page never reaches into the shadow root.</li>
+    <li><strong>Gates in order</strong>: nothing starts before a gesture; read the permission state, ask only when the user asks for the feature.</li>
+    <li><strong>Handles no</strong> with visible content that says how to undo it, and notices a revoke.</li>
+    <li><strong>Releases everything</strong> in <code>disconnectedCallback</code>.</li>
+  </ol>
+  <aside class="notes">
+    <p>~1:24. This is the jam brief. Groups will be checked against it at minute 35: block, revoke, remove the element.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:25" data-title="Break">
+  <p class="brk-kicker">// disconnectedCallback()</p>
+  <h2>Break. <em>15&nbsp;min</em></h2>
+  <pre class="brk-code" aria-hidden="true">you.<span class="f">stop</span>(); <span class="c">// camera off, microphone off</span>
+<span class="k">await</span> coffee; <span class="c">// then the jam</span></pre>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: form groups, pick a sense, build a tag.</p>
+  <aside class="notes">
+    <p>Start the timer. Put the jam index on the second screen so groups can read the briefs during the break.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     JAM
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Jam" data-at="1:40" data-title="Jam — Tags that sense something else">
+  <div class="act-deco">⚡</div>
+  <div class="act-num">jam</div>
+  <h1>Tags that sense something else</h1>
+  <div class="act-meta"><span class="chip">1:40 – 2:25</span><span>one group, one sense, one tag</span></div>
+  <div class="act-list"><span>Web Audio</span><span>EyeDropper</span><span>camera</span><span>speech</span><span>microphone</span><span>BroadcastChannel</span><span>Gamepad</span></div>
+</section>
+
+<section class="exercise" data-title="The jam">
+  <span class="sticker your-turn">jam</span>
+  <p class="kicker">Groups of 3–4 · 45 min · then 3 min each on stage</p>
+  <div class="ex-head"><h2>Six tags, six senses</h2><button class="timer" data-min="45"></button></div>
+  <table class="dtable">
+    <tr><th>tag</th><th>sense</th><th></th></tr>
+    <tr><td><code>&lt;theremin-pad&gt;</code></td><td>pointer → sound, a live waveform</td><td>★☆☆</td></tr>
+    <tr><td><code>&lt;colour-thief&gt;</code></td><td>EyeDropper, clipboard, a palette that stays</td><td>★★☆</td></tr>
+    <tr><td><code>&lt;photo-booth&gt;</code></td><td>camera → canvas → a strip of four</td><td>★★☆</td></tr>
+    <tr><td><code>&lt;voice-command&gt;</code></td><td>speech in, speech out</td><td>★★☆</td></tr>
+    <tr><td><code>&lt;clap-switch&gt;</code></td><td>microphone, two claps flip a switch</td><td>★★☆</td></tr>
+    <tr><td><code>&lt;window-pong&gt;</code></td><td>two windows, one ball</td><td>★★★</td></tr>
+  </table>
+  <p class="mt">Or <strong>fix it</strong>: every task also comes finished, with three bugs and the users' reports.</p>
+  <p class="where">11-elements-sensors → <b><a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/jam/index.html" target="_blank" rel="noopener">Jam · all briefs</a></b></p>
+  <aside class="notes">
+    <p>1:40 → 2:25. Each card on the jam page links its fix-it version: the finished tag with three planted bugs, described only as symptoms. Same API; the answer keys are in each <code>jam/NN-&lt;tag&gt;-solution/bugs.md</code>, not linked. Spare: <code>&lt;gamepad-car&gt;</code>, only if there are gamepads in the room. Each brief has the tag's public API, its gates, done-means, checks, hints as questions and traps as symptoms. Ask groups to pick within two minutes; two groups on the same tag is fine. Have the Zoom link up before minute 40: each group joins from the laptop that runs its tag and tests a screen share.</p>
+  </aside>
+</section>
+
+<section data-title="The 45 minutes">
+  <p class="kicker">The jam, minute by minute</p>
+  <h2>Raw data by minute 15, or say so</h2>
+  <div class="map even">
+    <div class="m3"><b>0–5</b><strong>Plan</strong>the tag's API on paper: attributes, properties, events</div>
+    <div class="m3"><b>5–15</b><strong>The API works</strong>raw numbers, a stream, a log. Ugly is fine</div>
+    <div class="m3 ex"><b>15</b><strong>Checkpoint</strong>the tag shows raw sensor data</div>
+    <div class="m3"><b>15–35</b><strong>The toy</strong>turn raw data into the experience</div>
+    <div class="m3"><b>35–42</b><strong>Verify</strong>block, reset, revoke, remove the element</div>
+    <div class="m3"><b>42–45</b><strong>Rehearse</strong>stop coding, run the 3 minutes in Zoom</div>
+    <div class="mf"><b>✎</b><strong>Starter</strong>my-tag.js, a page that logs the events you list</div>
+    <div class="mf"><b>?</b><strong>Hints</strong>questions in each brief</div>
+  </div>
+  <aside class="notes">
+    <p>Walk the room at minute 15: any group without raw data on screen is stuck on a gate. Usually: <code>file://</code> instead of a server, a phone on HTTP, an <code>AudioContext</code> created on load, or SpeechRecognition without network.</p>
+  </aside>
+</section>
+
+<section data-title="Testing without the hardware">
+  <p class="kicker">For the verify phase</p>
+  <h2>Test the refusals, and test without devices</h2>
+  <ul>
+    <li><strong>Reset a block</strong>: site controls next to the address bar → reset permissions, reload.</li>
+    <li><strong>Revoke while running</strong>: the same controls, while the tag is live. Your <code>ended</code> and <code>change</code> listeners fire.</li>
+    <li><strong>Remove the element</strong>: <code>document.querySelector("photo-booth").remove()</code>. Light off? Sound off?</li>
+    <li><strong>Fake sensors</strong>: DevTools → ⋮ → More tools → Sensors: orientation, location.</li>
+    <li><strong>Fake camera and microphone</strong>: start Chrome with <code>--use-fake-device-for-media-stream</code> (a test pattern and a beep); add <code>--use-fake-ui-for-media-stream</code> to skip the prompt.</li>
+  </ul>
+  <aside class="notes">
+    <p>On macOS: <code>open -a "Google Chrome" --args --use-fake-device-for-media-stream</code> with Chrome fully quit first. Also: the operating system has its own permission (macOS System Settings → Privacy &amp; Security → Camera); if the browser itself isn't allowed, every page gets <code>NotAllowedError</code> or <code>NotReadableError</code>.</p>
+  </aside>
+</section>
+
+<section data-title="On stage">
+  <p class="kicker">2:25 · 3 minutes per group · your laptop, shared in Zoom</p>
+  <h2>Show the toy, then show the tag</h2>
+  <ol>
+    <li><strong>Demo</strong> the toy.</li>
+    <li><strong>The tag</strong> in the Elements panel: its attributes, its shadow root, its parts.</li>
+    <li><strong>Remove it</strong> in the console: everything stops.</li>
+  </ol>
+  <aside class="notes">
+    <p>2:25 → 2:50. Six groups × 3 minutes, plus a minute each to hand over the screen share; the next group is ready to share while one presents. Each group presents from its own laptop: nothing is handed in. Refusals were checked at minute 35; on stage there's no time for them. Two groups on the same tag: both present, the second shows only what it did differently.</p>
+  </aside>
+</section>
+
+
+<!-- =====================================================================
+     WRAP
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Wrap" data-at="2:50" data-title="Back to the cold open">
+  <p class="kicker">github.com, again</p>
+  <h2>Now you know who was listening</h2>
+<pre class="raw">class RelativeTimeElement extends HTMLElement {
+  static observedAttributes = [<span class="s">"datetime"</span>, <span class="s">"lang"</span>, …];
+  attributeChangedCallback() { <span class="c">/* re-render the text */</span> }
+  connectedCallback()        { <span class="c">/* render, start updating */</span> }
+  disconnectedCallback()     { <span class="c">/* stop updating */</span> }
+}
+customElements.define(<span class="s">"relative-time"</span>, RelativeTimeElement);</pre>
+  <p>The same kind of element you wrote today: an observed attribute in, a render, a cleanup.</p>
+  <aside class="notes">
+    <p>~2:50. Simplified from <code>@github/relative-time-element</code> (MIT): the real one observes more attributes and keeps a shared timer for all instances on the page, which it stops observing on disconnect.</p>
+  </aside>
+</section>
+
+<section data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>Tags that listen</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">define</span><p>A class with a hyphenated name. Upgraded whenever the definition arrives. Render in <code>connectedCallback</code>.</p></div>
+    <div class="card"><span class="label">API</span><p>Attributes configure, properties carry data, events report. Parts and custom properties for styling.</p></div>
+    <div class="card"><span class="label">shadow DOM</span><p>Private markup and styles. Slots keep the page's content in the page.</p></div>
+    <div class="card"><span class="label">forms</span><p><code>formAssociated</code> + <code>ElementInternals</code>: value, validity, reset, label. Focus, keys and role are yours.</p></div>
+    <div class="card"><span class="label">gates</span><p>Secure context, Permissions Policy, user activation, permission. Block is final; ask in context.</p></div>
+    <div class="card"><span class="label">release</span><p>What <code>connectedCallback</code> acquires, <code>disconnectedCallback</code> releases. The camera light is the test.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:51. One sentence per card.</p>
+  </aside>
+</section>
+
+<section data-title="Three questions">
+  <p class="kicker">For any element you write</p>
+  <h2>Three questions before you ship a tag</h2>
+  <ol>
+    <li>What does it <strong>expose</strong>: attributes, properties, events, parts, custom properties?</li>
+    <li>What does it <strong>acquire</strong>, and where does it <strong>release</strong> it?</li>
+    <li>Which <strong>gates</strong> does it pass, and what does the user see when one says no?</li>
+  </ol>
+  <aside class="notes">
+    <p>~2:52. Optional homework: use your jam tag in a second page without changing its file. If you had to change it, something in its API leaked.</p>
+  </aside>
+</section>
+
+<section data-title="Reading">
+  <p class="kicker">Reading</p>
+  <h2>To go deeper</h2>
+  <ul class="reading">
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements" target="_blank" rel="noopener">MDN · Using custom elements</a> <span class="muted">— lifecycle, observed attributes, customised built-ins</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM" target="_blank" rel="noopener">MDN · Using shadow DOM</a> <span class="muted">— modes, styling, declarative shadow DOM</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals" target="_blank" rel="noopener">MDN · ElementInternals</a> <span class="muted">— form values, validity, ARIA, custom states</span></li>
+    <li><a href="https://www.w3.org/WAI/ARIA/apg/patterns/radio/" target="_blank" rel="noopener">WAI-ARIA APG · Radio group</a> <span class="muted">— roles, keys, roving tabindex</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia" target="_blank" rel="noopener">MDN · getUserMedia</a> <span class="muted">— constraints, every error name</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts/features_restricted_to_secure_contexts" target="_blank" rel="noopener">MDN · Features restricted to secure contexts</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/User_activation" target="_blank" rel="noopener">MDN · User activation</a> <span class="muted">— sticky vs transient, which APIs need which</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Permissions_Policy" target="_blank" rel="noopener">MDN · Permissions Policy</a> <span class="muted">— the header, <code>allow</code>, default allowlists</span></li>
+    <li><a href="https://lit.dev/docs/" target="_blank" rel="noopener">lit.dev</a> <span class="muted">— the thin layer over the same API</span></li>
+  </ul>
+  <aside class="notes">
+    <p>~2:53. The green room's thirteen steps stay online: <code>demos/green-room/</code>.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Tags that listen. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="big-title">Tags that <span class="b">listen.</span></h1>
+      <p class="title-sub">materials →<br><a href="https://lopin.me/harbour/programming-interactivity-11-elements-sensors/index.html" target="_blank" rel="noopener">lopin.me/harbour/programming-interactivity-11-elements-sensors</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">// the whole lecture</span>
+connectedCallback()    { <span class="c">/* acquire */</span> }
+disconnectedCallback() { <span class="c">/* release */</span> }</pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

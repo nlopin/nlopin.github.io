@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · voice-command</title>
+  <style>
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; transition: background 0.3s, color 0.3s; }
+    body.dark { background: #0f1218; color: #eef1f6; }
+    article { max-width: 640px; padding: 16px 20px; border: 1px solid #d9dde5; border-radius: 12px; margin-bottom: 24px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="voice-command.js"></script>
+</head>
+<body>
+  <h1>Talk to the page</h1>
+
+  <article>
+    <h2 id="headline">Bakers swap scales for voices</h2>
+    <ol id="steps">
+      <li>Mix 500 g of flour with 10 g of salt.</li>
+      <li>Add 350 ml of warm water and 7 g of yeast.</li>
+      <li>Knead for ten minutes.</li>
+      <li>Leave to rise for an hour.</li>
+    </ol>
+  </article>
+
+  <!-- The element only reports the phrase; the page decides what it does. -->
+  <p>
+    <label>Microphone
+      <select id="device"><option value="">Default microphone</option></select>
+    </label>
+  </p>
+
+  <voice-command lang="en-GB" commands="dark mode, light mode, bigger, smaller, read the headline, next step"></voice-command>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    const voice = document.querySelector("voice-command");
+    const log = document.querySelector("#log");
+    const device = document.querySelector("#device");
+
+    // Names appear only after the microphone is allowed: list again when the permission or the devices change.
+    async function listMicrophones() {
+      const all = await navigator.mediaDevices.enumerateDevices();
+      // "default" and "communications" are Chrome's aliases for a device listed again under its own id.
+      const mics = all.filter((d) => d.kind === "audioinput" && d.deviceId && !["default", "communications"].includes(d.deviceId));
+      const chosen = device.value;
+      device.replaceChildren(
+        new Option("Default microphone", ""),
+        ...mics.map((mic, i) => new Option(mic.label || `Microphone ${i + 1}`, mic.deviceId)),
+      );
+      device.value = mics.some((mic) => mic.deviceId === chosen) ? chosen : "";
+    }
+
+    if (navigator.mediaDevices) {
+      listMicrophones();
+      navigator.mediaDevices.addEventListener("devicechange", listMicrophones);
+      navigator.permissions
+        .query({ name: "microphone" })
+        .then((status) => status.addEventListener("change", listMicrophones))
+        .catch(() => {}); // this browser doesn't know the permission name
+    }
+
+    device.addEventListener("change", () => {
+      voice.device = device.value;
+    });
+    const steps = [...document.querySelectorAll("#steps li")];
+    let step = -1;
+    let size = 16;
+
+    const actions = {
+      "dark mode": () => { document.body.classList.add("dark"); return "Dark mode."; },
+      "light mode": () => { document.body.classList.remove("dark"); return "Light mode."; },
+      bigger: () => { size += 2; document.body.style.fontSize = `${size}px`; return "Bigger."; },
+      smaller: () => { size = Math.max(12, size - 2); document.body.style.fontSize = `${size}px`; return "Smaller."; },
+      "read the headline": () => document.querySelector("#headline").textContent,
+      "next step": () => {
+        step = Math.min(steps.length - 1, step + 1);
+        steps.forEach((li, i) => (li.style.fontWeight = i === step ? "700" : ""));
+        return steps[step].textContent;
+      },
+    };
+
+    voice.addEventListener("command", (event) => {
+      const line = `command ${JSON.stringify(event.detail)}`;
+      log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n");
+      const answer = actions[event.detail.command]?.();
+      if (answer) voice.say(answer);
+    });
+  </script>
+</body>
+</html>

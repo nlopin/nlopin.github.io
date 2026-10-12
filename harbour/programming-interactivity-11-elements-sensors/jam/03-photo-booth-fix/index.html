@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · photo-booth</title>
+  <style>
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    photo-booth { max-width: 640px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="photo-booth.js"></script>
+</head>
+<body>
+  <h1>Photo booth</h1>
+
+  <photo-booth shots="4" countdown="3"></photo-booth>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    const booth = document.querySelector("photo-booth");
+    const log = document.querySelector("#log");
+    for (const type of ["photo", "strip"]) {
+      booth.addEventListener(type, (event) => {
+        const line = `${type} { blob: ${event.detail.blob.type}, ${Math.round(event.detail.blob.size / 1024)} KB }`;
+        log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n");
+      });
+    }
+  </script>
+</body>
+</html>

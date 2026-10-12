@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · window-pong</title>
+  <style>
+    body { margin: 24px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="window-pong.js"></script>
+</head>
+<body>
+  <h1>Two-window pong</h1>
+  <p>Open this page in a second window, side by side. Move your paddle with the pointer, or click the court and use the arrow keys.</p>
+
+  <!-- No side attribute: the two windows agree between themselves. -->
+  <window-pong channel="demo"></window-pong>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    const pong = document.querySelector("window-pong");
+    const log = document.querySelector("#log");
+    pong.addEventListener("score", (event) => {
+      document.title = `${event.detail.left} : ${event.detail.right} · pong`;
+      const line = `score ${JSON.stringify(event.detail)}`;
+      log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n");
+    });
+  </script>
+</body>
+</html>

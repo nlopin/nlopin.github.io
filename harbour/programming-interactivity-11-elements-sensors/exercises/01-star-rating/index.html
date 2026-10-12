@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · after the call</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="star-rating.js"></script>
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <strong class="logo">Parley</strong>
+    <button id="theme" type="button">Dark theme</button>
+  </header>
+
+  <main>
+    <form id="feedback">
+      <h1>The call has ended</h1>
+      <p class="muted">Weekly design review · 47 minutes · 5 people</p>
+
+      <label for="quality">How was the call quality?</label>
+      <!-- Replace this input with your element:
+           <star-rating id="quality" name="quality" max="5" required></star-rating> -->
+      <input id="quality" type="number" name="quality" min="1" max="5" required>
+
+      <label for="comment">Anything else? <span class="muted">(optional)</span></label>
+      <textarea id="comment" name="comment" rows="3"></textarea>
+
+      <div class="actions">
+        <button>Send</button>
+        <button type="reset" class="secondary">Clear</button>
+      </div>
+
+      <output id="sent"></output>
+    </form>
+  </main>
+</body>
+</html>

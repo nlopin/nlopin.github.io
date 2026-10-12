@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · declarative shadow DOM · step 6</title>
+  <style>
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    /* the page's .bar can't reach inside, exactly as with attachShadow */
+    .bar { padding: 20px; background: hotpink; }
+  </style>
+</head>
+<body>
+  <h1>A shadow root without JavaScript</h1>
+  <p>No script on this page. The parser builds the shadow root from the template, so a server can send the finished meter.</p>
+
+  <level-meter value="0.6">
+    <template shadowrootmode="open">
+      <style>
+        :host { display: inline-flex; gap: 3px; height: 24px; }
+        .bar { width: 8px; border-radius: 2px; background: #d5d9e0; }
+        .bar.on { background: #1f9d55; }
+      </style>
+      <span class="bar on" part="bar on"></span><span class="bar on" part="bar on"></span><span class="bar on" part="bar on"></span><span class="bar on" part="bar on"></span><span class="bar on" part="bar on"></span><span class="bar on" part="bar on"></span><span class="bar" part="bar"></span><span class="bar" part="bar"></span><span class="bar" part="bar"></span><span class="bar" part="bar"></span>
+    </template>
+  </level-meter>
+
+  <p>In the Elements panel: <code>#shadow-root (open)</code>, and no <code>&lt;template&gt;</code>: the parser consumed it. When <code>level-meter.js</code> loads later, <code>attachShadow</code> returns this same root, emptied, and the element renders into it.</p>
+</body>
+</html>

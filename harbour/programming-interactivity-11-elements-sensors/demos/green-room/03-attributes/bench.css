@@ -1,0 +1,5 @@
+/* A workbench: the element alone, before it goes into the app. */
+body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+h1 { font-size: 20px; }
+.dev { margin-top: 24px; font-size: 14px; color: #5d6576; }
+.dev label { display: flex; gap: 10px; align-items: center; }

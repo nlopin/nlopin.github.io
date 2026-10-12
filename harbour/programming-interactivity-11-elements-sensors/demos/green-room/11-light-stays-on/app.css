@@ -1,0 +1,143 @@
+/* Parley: a video-call app. The app's own styles, written before any custom element existed. */
+
+:root {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --ink: #161a22;
+  --muted: #5d6576;
+  --line: #d9dde5;
+  --accent: #2f6fde;
+  --ok: #1f9d55;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1218;
+  --surface: #191d26;
+  --ink: #eef1f6;
+  --muted: #9aa3b5;
+  --line: #2c3240;
+  --accent: #7aa7ff;
+  --ok: #3ddc84;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* the app's top bar */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.logo { font-weight: 800; letter-spacing: -0.02em; margin-right: auto; }
+
+.chip {
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.bar button, .bar a { font: inherit; font-size: 14px; color: var(--accent); background: none; border: 0; cursor: pointer; }
+
+/* the green room */
+.green-room { max-width: 960px; margin: 32px auto; padding: 0 16px; }
+.green-room h1 { font-size: 28px; margin: 0 0 20px; }
+
+#join {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  #join { grid-template-columns: 1fr; }
+}
+
+.controls {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.controls label, .controls .label { font-size: 14px; font-weight: 600; color: var(--muted); }
+
+.controls button {
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.controls button.secondary { background: none; color: var(--accent); border: 1px solid var(--line); }
+.controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#status { font-size: 14px; color: var(--muted); min-height: 1.5em; margin: 0; }
+#status.problem { color: #c2410c; }
+
+output { display: block; font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: var(--muted); }
+
+/* placeholders: what an unknown element looks like before it has any behaviour */
+camera-preview:not(:defined) {
+  display: block;
+  aspect-ratio: 16 / 9;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+}
+
+/* a panel for fake data, used while the real camera and microphone aren't connected */
+.dev {
+  margin-top: 24px;
+  padding: 12px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.dev summary { cursor: pointer; font-weight: 600; }
+.dev label { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+
+/* Step 5: theming the meter from the outside. Selectors can't reach into its shadow root;
+   custom properties inherit into it, and ::part reaches what it exposes. */
+level-meter {
+  --meter-color: var(--ok);
+  --meter-off: var(--line);
+}
+
+level-meter::part(bar) { border-radius: 99px; }
+
+/* Step 7: the picker's styling API */
+device-picker {
+  --picker-line: var(--line);
+  --picker-accent: var(--accent);
+  --picker-muted: var(--muted);
+}
+
+/* Step 11: the app's other screen */
+.lobby { max-width: 960px; margin: 32px auto; padding: 0 16px; }
+.lobby h1 { font-size: 28px; margin: 0 0 8px; }
+.lobby .card { padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; display: grid; gap: 8px; justify-items: start; }
+.lobby .card a { font-weight: 700; color: #fff; background: var(--accent); padding: 10px 16px; border-radius: 8px; text-decoration: none; }
+.back { display: inline-block; margin-bottom: 12px; color: var(--accent); }
+green-room { display: block; }

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · green room · step 1</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="./level-meter.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <strong class="logo">Parley</strong>
+    <span class="chip">Weekly design review</span>
+    <span class="chip">4 waiting</span>
+  </header>
+
+  <main class="green-room">
+    <h1>Ready to join?</h1>
+
+    <!-- Step 1: the HTML we wish existed. None of these three tags exists yet. -->
+    <form id="join">
+      <camera-preview mirrored></camera-preview>
+
+      <div class="controls">
+        <span class="label">Microphone level</span>
+        <level-meter></level-meter>
+
+        <span class="label">Microphone</span>
+        <device-picker kind="audioinput" name="mic" required></device-picker>
+
+        <button>Join</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

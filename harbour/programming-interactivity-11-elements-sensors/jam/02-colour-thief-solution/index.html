@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · colour-thief</title>
+  <style>
+    :root { --accent: #2f6fde; }
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    h1 { color: var(--accent); }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .row > div { padding: 16px; border: 1px solid #d9dde5; border-radius: 12px; }
+    .stripes { display: flex; height: 40px; margin: 16px 0; border-radius: 8px; overflow: hidden; }
+    .stripes span { flex: 1; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="colour-thief.js"></script>
+</head>
+<body>
+  <h1>Colour thief</h1>
+  <p>Something to steal from:</p>
+  <div class="stripes">
+    <span style="background:#ff6b5a"></span><span style="background:#ffb547"></span><span style="background:#b6ff3b"></span>
+    <span style="background:#3ee6ff"></span><span style="background:#7aa7ff"></span><span style="background:#ff4fd8"></span>
+  </div>
+
+  <!-- Two thieves, two palettes: different storage keys. -->
+  <div class="row">
+    <div><h2>Work</h2><colour-thief max="8" storage-key="work"></colour-thief></div>
+    <div><h2>Home</h2><colour-thief max="4" storage-key="home"></colour-thief></div>
+  </div>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    const log = document.querySelector("#log");
+    // The page decides what a pick means: here, the heading takes the colour.
+    document.addEventListener("pick", (event) => {
+      document.documentElement.style.setProperty("--accent", event.detail.hex);
+      const line = `pick ${JSON.stringify(event.detail)} from ${event.target.getAttribute("storage-key")}`;
+      log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n");
+    });
+  </script>
+</body>
+</html>

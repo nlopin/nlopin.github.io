@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · green room · step 9</title>
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="level-meter.js"></script>
+  <script type="module" src="camera-preview.js"></script>
+  <script type="module" src="device-picker.js"></script>
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <strong class="logo">Parley</strong>
+    <span class="chip">Weekly design review</span>
+    <span class="chip">4 waiting</span>
+    <button id="theme" type="button">Dark theme</button>
+  </header>
+
+  <main class="green-room">
+    <h1>Ready to join?</h1>
+
+    <form id="join">
+      <!-- Step 6: the messages are the app's text, so they live in the page and go into slots. -->
+      <camera-preview mirrored>
+        <p>Your camera is off.</p>
+        <p slot="blocked">Parley can't use your camera. Open the site controls next to the address bar, allow the camera, and reload.</p>
+      </camera-preview>
+
+      <div class="controls">
+        <span class="label" id="level-label">Microphone level</span>
+        <level-meter aria-labelledby="level-label"></level-meter>
+
+        <!-- Step 9: the browser asks only after this click. -->
+        <p id="status" role="status"></p>
+        <button id="start" type="button" class="secondary">Test your mic</button>
+
+        <!-- Step 7: a form-associated element is labelable, like <select>. -->
+        <label for="mic">Microphone</label>
+        <device-picker id="mic" kind="audioinput" name="mic" required></device-picker>
+
+        <button>Join</button>
+        <button type="reset" class="secondary">Reset</button>
+        <output id="sent"></output>
+      </div>
+    </form>
+
+    <details class="dev" open>
+      <summary>Fake data</summary>
+      <label><input id="fake-blocked" type="checkbox"> Pretend the camera is blocked</label>
+      <label><input id="fake-mirrored" type="checkbox" checked> Mirrored</label>
+    </details>
+  </main>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎨%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam 2 · Colour thief · fix it</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+  <style>
+    .api { border-collapse: collapse; margin: 0.6rem 0 1rem; max-width: 60rem; }
+    .api th, .api td { border-bottom: 1px solid var(--w-line); padding: 0.45rem 0.8rem; text-align: left; vertical-align: top; }
+    .api th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); white-space: nowrap; }
+    .api td:nth-child(2) { font-family: "IBM Plex Mono", monospace; white-space: nowrap; color: var(--w-act); }
+    .clock { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; max-width: 70rem; }
+    .clock div { border: 1px solid var(--w-line); border-radius: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.92rem; }
+    .clock b { display: block; font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid li { display: flex; flex-direction: column; border: 1px solid var(--w-line); border-radius: 0.6rem; }
+    .tasks-grid li:has(a:hover, a:focus-visible) { border-color: var(--w-act); }
+    .tasks-grid a.task { display: block; flex: 1; padding: 1rem 1.1rem 0.6rem; text-decoration: none; color: var(--w-ink); }
+    .tasks-grid a.fix { padding: 0 1.1rem 0.9rem; font-size: 0.85rem; color: var(--w-act); }
+    .reports li { margin-bottom: 0.5rem; }
+    .tasks-grid b { display: block; font-size: 1.15rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    .tasks-grid code { color: var(--w-act); }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Jam · all tasks</a><span>Task 2 · fix-it version · groups · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Jam · task 2 · fix it</span>
+    <h1>Colour thief · <em>fix it</em></h1>
+    <p class="intro">Someone has already built <code>&lt;colour-thief&gt;</code>. It runs, and it's nearly right: three bugs stand between it and the brief. Find them, fix them, then make the tag yours.</p>
+    <p>The tag, its public API and its gates are the ones in the <a href="02-colour-thief.html">main brief</a>. APIs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API">EyeDropper API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText">Clipboard API</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">localStorage</a></p>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="02-colour-thief-fix.zip" download>⤓ Download the broken tag</a></div>
+    <p>The zip holds a <code>colour-thief/</code> folder: <code>colour-thief.js</code> and the <code>index.html</code> it runs in. Serve the folder (<code>npx live-server</code>): camera, microphone and the clipboard need <code>localhost</code> or HTTPS. Keep a copy of the broken version: on stage you show one bug before and after.</p>
+
+    <h2>What the users report</h2>
+    <p>Each report is one bug. Fixing one can make another easier to see.</p>
+    <ul class="checklist core reports">
+      <li><input type="checkbox" aria-label="done"><span>Pick two colours and reload: the palette is empty.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Swatches appear, but the page's heading never takes the colour, and the Events log stays empty.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>After a reload, Work and Home show the same palette.</span></li>
+    </ul>
+
+    <h2>Where to look</h2>
+    <ul class="stretch">
+      <li>Console: errors and warnings, with the line that threw them.</li>
+      <li>Sources: a breakpoint (or <code>debugger;</code>) in the handler you suspect, then step through.</li>
+      <li>Console: <code>monitorEvents(document.querySelector("colour-thief"))</code> logs every event the element receives; <code>unmonitorEvents</code> stops it.</li>
+      <li>Elements: attributes update live, and the shadow root is open.</li>
+    </ul>
+
+    <h2>Done means</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>Every report above is gone, and nothing else broke: run the checks in the main brief.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>For each bug you can say three things: the symptom, the cause, the fix. Write them in a comment next to the fix.</span></li>
+    </ul>
+
+    <h2>Done means · the tag contract</h2>
+    <p>Most of the bugs break one of these.</p>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><strong>One file, one element</strong>: <code>colour-thief.js</code> defines <code>&lt;colour-thief&gt;</code> and nothing else. Drop the file into any page and the tag works.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Attributes configure, properties carry data, events report</strong>: events bubble (<code>bubbles: true</code>), and the page never reaches into your shadow root.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Passes its gates in order</strong>: nothing starts before a user gesture; if it needs a permission, it reads the state first and asks only after the user asks for the feature.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Handles no</strong>: a refusal, a missing API or a missing device shows visible content that says what to do; a permission revoked while running is noticed.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Releases everything</strong> in <code>disconnectedCallback</code>: tracks, <code>AudioContext</code>, animation frames, timers, listeners on <code>window</code>.</span></li>
+    </ul>
+
+    <h2>Then, if there's time</h2>
+    <ul class="stretch">
+      <li>Show the contrast ratio of each swatch against white and black.</li>
+      <li>Name the closest CSS named colour.</li>
+      <li>Drag a swatch to reorder.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>For an element that's already in the HTML, in which order does the browser call <code>attributeChangedCallback</code> and <code>connectedCallback</code>?</p></details>
+      <details><summary>Hint 2</summary><p>The page listens on <code>document</code>. What does an event dispatched on the element need to get there?</p></details>
+      <details><summary>Hint 3</summary><p>Where exactly does each thief save? Look at Application → Local storage.</p></details>
+    </div>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · reproduce</b>Run it. Make each report happen on your screen.</div>
+      <div><b>5–30 · fix</b>One report at a time: the cause, then the smallest fix.</div>
+      <div><b>30–40 · make it yours</b>One stretch from the main brief.</div>
+      <div><b>40–42 · verify</b>The main brief's checks: block, reset, remove.</div>
+      <div><b>42–45 · rehearse</b>Stop coding. Run your 3 minutes once, screen share included.</div>
+    </div>
+
+    <h2>On stage · 3 minutes</h2>
+    <p>Present from your own laptop: share your screen in Zoom, with <strong>Share sound</strong> ticked if your tag makes any.</p>
+    <ol>
+      <li>Demo the fixed tag.</li>
+      <li>One bug: make it happen in the broken copy, show the cause, show the fix.</li>
+      <li>Remove the element in the console: show that everything stops.</li>
+    </ol>
+  </div>
+</body>
+</html>

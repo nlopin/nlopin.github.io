@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Partner intranet · Parley embedded · step 13</title>
+  <style>
+    body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: #eef0e8; color: #1d2318; }
+    header { padding: 14px 24px; background: #2d3b1f; color: #fff; font-weight: 700; }
+    main { max-width: 1200px; margin: 24px auto; padding: 0 16px; display: grid; gap: 24px; }
+    section { background: #fff; border: 1px solid #cfd5c4; border-radius: 12px; padding: 16px; }
+    h2 { margin: 0 0 4px; font-size: 18px; }
+    code { font-size: 0.9em; }
+    pre { background: #f4f6ef; padding: 8px 12px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+    iframe { width: 100%; height: 640px; border: 1px solid #cfd5c4; border-radius: 8px; }
+    .note { color: #59624d; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>Partner intranet · today's meetings</header>
+  <main>
+    <p class="note" id="origins"></p>
+
+    <section>
+      <h2>A · another origin, no <code>allow</code></h2>
+      <p class="note">The default allowlist for camera and microphone is <code>'self'</code>: a frame from another origin can't use them, and no prompt appears.</p>
+      <pre id="code-a"></pre>
+      <iframe id="a" title="Parley, another origin, no allow"></iframe>
+    </section>
+
+    <section>
+      <h2>B · another origin, <code>allow="camera; microphone"</code></h2>
+      <p class="note">The embedding page delegates both features. The frame can use them; in Chrome the prompt names this page's origin (the top-level page), not the frame's, and the answer is stored for this page.</p>
+      <pre id="code-b"></pre>
+      <iframe id="b" allow="camera; microphone" title="Parley, another origin, allowed"></iframe>
+    </section>
+
+    <section>
+      <h2>C · same origin, <code>allow="camera 'none'; microphone 'none'"</code></h2>
+      <p class="note">The embedding page can also take a feature away, even from its own origin.</p>
+      <pre id="code-c"></pre>
+      <iframe id="c" allow="camera 'none'; microphone 'none'" title="Parley, same origin, denied"></iframe>
+    </section>
+  </main>
+
+  <script>
+    // localhost and 127.0.0.1 are different origins: an easy way to get a cross-origin frame locally.
+    const app = new URL("app/index.html#/green-room", location.href);
+    const swap = { localhost: "127.0.0.1", "127.0.0.1": "localhost" }[location.hostname];
+    const other = new URL(app);
+    if (swap) other.hostname = swap;
+
+    document.querySelector("#origins").textContent = swap
+      ? `This page: ${location.origin}. Frames A and B: ${other.origin}.`
+      : `No second origin on ${location.hostname}: frames A and B are same-origin here, so A works too. ` +
+        "Serve this folder on localhost to see A refused.";
+
+    const frames = { a: other, b: other, c: app };
+    for (const [id, url] of Object.entries(frames)) {
+      const frame = document.querySelector(`#${id}`);
+      frame.src = url;
+      const allow = frame.getAttribute("allow");
+      document.querySelector(`#code-${id}`).textContent =
+        `<iframe src="${url.origin}/…/app/"${allow ? ` allow="${allow}"` : ""}></iframe>`;
+    }
+  </script>
+</body>
+</html>

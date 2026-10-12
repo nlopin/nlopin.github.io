@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🗣️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam 4 · Talk to the page</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+  <style>
+    .api { border-collapse: collapse; margin: 0.6rem 0 1rem; max-width: 60rem; }
+    .api th, .api td { border-bottom: 1px solid var(--w-line); padding: 0.45rem 0.8rem; text-align: left; vertical-align: top; }
+    .api th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); white-space: nowrap; }
+    .api td:nth-child(2) { font-family: "IBM Plex Mono", monospace; white-space: nowrap; color: var(--w-act); }
+    .clock { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; max-width: 70rem; }
+    .clock div { border: 1px solid var(--w-line); border-radius: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.92rem; }
+    .clock b { display: block; font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid li { display: flex; flex-direction: column; border: 1px solid var(--w-line); border-radius: 0.6rem; }
+    .tasks-grid li:has(a:hover, a:focus-visible) { border-color: var(--w-act); }
+    .tasks-grid a.task { display: block; flex: 1; padding: 1rem 1.1rem 0.6rem; text-decoration: none; color: var(--w-ink); }
+    .tasks-grid a.fix { padding: 0 1.1rem 0.9rem; font-size: 0.85rem; color: var(--w-act); }
+    .reports li { margin-bottom: 0.5rem; }
+    .tasks-grid b { display: block; font-size: 1.15rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    .tasks-grid code { color: var(--w-act); }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="index.html">← Jam · all tasks</a><span>Task 4 · groups · 45 min · then 3 min on stage</span></div>
+    <span class="eyebrow-tag">Jam · task 4</span>
+    <h1>Talk to the page · <em>&lt;voice-command&gt;</em></h1>
+    <p class="intro">Say “dark mode”, the page goes dark. Say “read the headline”, it reads it to you. Build a tag that listens for commands and answers out loud. <span class="stars" title="difficulty">★★☆</span></p>
+    <p class="story">“My hands are covered in flour and the recipe is on the tablet. Next step, please.”</p>
+    <p>APIs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition">SpeechRecognition</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis">SpeechSynthesis</a></p>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="starter.zip" download>⤓ Download the starter</a></div>
+    <p>Rather debug than build? The <a href="04-voice-command-fix.html">fix-it version</a> hands you a finished <code>&lt;voice-command&gt;</code> with three bugs in it.</p>
+    <p>Rename the folder to <code>voice-command/</code>, <code>my-tag.js</code> to <code>voice-command.js</code>, and the tag in <code>index.html</code> to <code>&lt;voice-command&gt;</code>. Serve the folder (<code>npx live-server</code>): camera, microphone and the clipboard need <code>localhost</code> or HTTPS. You present from its <code>index.html</code>.</p>
+
+    <h2>The tag's public API</h2>
+    <p>Keep these names. Add more if you need them.</p>
+    <table class="api"><tr><th>kind</th><th>name</th><th>meaning</th></tr>
+      <tr><th>attribute</th><td>lang</td><td>e.g. <code>en-GB</code>, <code>es-ES</code></td></tr>
+      <tr><th>attribute</th><td>commands</td><td>the phrases it reacts to, comma-separated</td></tr>
+      <tr><th>method</th><td>say(text)</td><td>speaks</td></tr>
+      <tr><th>event</th><td>command</td><td>a phrase was recognised: <code>detail: { command, transcript }</code></td></tr>
+    </table>
+
+    <h2>Its gates</h2>
+    <ul class="stretch">
+      <li><strong>secure context</strong></li>
+      <li><strong>permission</strong>: the microphone prompt</li>
+      <li><strong>user activation</strong> for speaking: <code>speechSynthesis.speak()</code> stays silent before the first click</li>
+      <li>Chrome and Safari only; Chrome sends the audio to a server, so it needs the network</li>
+    </ul>
+
+    <h2>Done means · the toy</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>A button starts listening; the element shows what it heard, live.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>At least five commands change the page around it. The element itself doesn't know what they do: the page listens for <code>command</code>.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>It answers out loud, and doesn't hear its own voice as a new command.</span></li>
+    </ul>
+
+    <h2>Then, if there's time</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>Firefox: the element says it can't listen here, and offers a text box instead.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Blocked microphone: it says how to allow it.</span></li>
+    </ul>
+
+    <h2>Done means · the tag contract</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><strong>One file, one element</strong>: <code>voice-command.js</code> defines <code>&lt;voice-command&gt;</code> and nothing else. Drop the file into any page and the tag works.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Attributes configure, properties carry data, events report</strong>: events bubble (<code>bubbles: true</code>), and the page never reaches into your shadow root.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Passes its gates in order</strong>: nothing starts before a user gesture; if it needs a permission, it reads the state first and asks only after the user asks for the feature.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Handles no</strong>: a refusal, a missing API or a missing device shows visible content that says what to do; a permission revoked while running is noticed.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Releases everything</strong> in <code>disconnectedCallback</code>: tracks, <code>AudioContext</code>, animation frames, timers, listeners on <code>window</code>.</span></li>
+    </ul>
+
+    <h2>Check it <em>(minutes 35–42)</em></h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>Say a command in the middle of a sentence.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Turn off Wi-Fi in Chrome.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Remove the element while it listens.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Block the permission and reload. Then reset it in the site controls next to the address bar.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>While it runs, revoke the permission in the site controls.</span></li>
+    </ul>
+
+    <h2>Stretch</h2>
+    <ul class="stretch">
+      <li>A wake word.</li>
+      <li>Commands with a parameter: “font size 24”.</li>
+      <li>Interim results, greyed out, replaced by the final one.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>Which name does the constructor have in Chrome and Safari today?</p></details>
+      <details><summary>Hint 2</summary><p>Does recognition stop on its own? Which event tells you?</p></details>
+      <details><summary>Hint 3</summary><p>How does the element know when its own speech has finished?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+      <ul class="gotchas">
+      <li>It stops listening after a few seconds of silence.</li>
+      <li>It hears its own answer and runs the command again.</li>
+      <li><code>network</code> error in the console in a classroom.</li>
+      </ul>
+    </details>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Read the brief. Write the tag's API on paper: attributes, properties, events.</div>
+      <div><b>5–15 · the API works</b>Raw data on screen: numbers, a stream, a log. Ugly is fine.</div>
+      <div><b>15–35 · the toy</b>Turn the raw data into the experience.</div>
+      <div><b>35–42 · verify</b>Block, reset, revoke, remove the element. Another browser.</div>
+      <div><b>42–45 · rehearse</b>Stop coding. Run your 3 minutes once, screen share included.</div>
+    </div>
+
+    <h2>On stage · 3 minutes</h2>
+    <p>Present from your own laptop: share your screen in Zoom, with <strong>Share sound</strong> ticked if your tag makes any.</p>
+    <ol>
+      <li>Demo the toy.</li>
+      <li>Open DevTools: the tag in the Elements panel, its attributes, its shadow root.</li>
+      <li>Remove the element in the console: show that everything stops.</li>
+    </ol>
+  </div>
+</body>
+</html>

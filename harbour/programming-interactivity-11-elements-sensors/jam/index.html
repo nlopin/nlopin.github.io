@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎛️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · Tags that sense something else</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+  <style>
+    .api { border-collapse: collapse; margin: 0.6rem 0 1rem; max-width: 60rem; }
+    .api th, .api td { border-bottom: 1px solid var(--w-line); padding: 0.45rem 0.8rem; text-align: left; vertical-align: top; }
+    .api th { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); white-space: nowrap; }
+    .api td:nth-child(2) { font-family: "IBM Plex Mono", monospace; white-space: nowrap; color: var(--w-act); }
+    .clock { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; max-width: 70rem; }
+    .clock div { border: 1px solid var(--w-line); border-radius: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.92rem; }
+    .clock b { display: block; font: 600 0.8rem "IBM Plex Mono", monospace; color: var(--w-act); }
+    @media (max-width: 760px) { .clock { grid-template-columns: 1fr 1fr; } }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+    .tasks-grid li { display: flex; flex-direction: column; border: 1px solid var(--w-line); border-radius: 0.6rem; }
+    .tasks-grid li:has(a:hover, a:focus-visible) { border-color: var(--w-act); }
+    .tasks-grid a.task { display: block; flex: 1; padding: 1rem 1.1rem 0.6rem; text-decoration: none; color: var(--w-ink); }
+    .tasks-grid a.fix { padding: 0 1.1rem 0.9rem; font-size: 0.85rem; color: var(--w-act); }
+    .reports li { margin-bottom: 0.5rem; }
+    .tasks-grid b { display: block; font-size: 1.15rem; margin: 0.2rem 0 0.3rem; }
+    .tasks-grid small { font: 600 0.75rem "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--w-muted); }
+    .tasks-grid code { color: var(--w-act); }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Tags that listen · all materials</a><span>Jam · groups · 45 min</span></div>
+    <span class="eyebrow-tag">Jam</span>
+    <h1>Tags that sense <em>something else</em></h1>
+    <p class="intro">The browser has more senses than a camera and a microphone. One group, one tag, one sense. Every tag follows the same contract as the green room's. At the end, each group demos its tag from its own laptop, shared in Zoom.</p>
+
+    <h2>The tasks</h2>
+    <ul class="tasks-grid">
+      <li><a class="task" href="01-theremin-pad.html"><small>task 1 · ★☆☆</small><b>🎻 Theremin</b><code>&lt;theremin-pad&gt;</code></a><a class="fix" href="01-theremin-pad-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="02-colour-thief.html"><small>task 2 · ★★☆</small><b>🎨 Colour thief</b><code>&lt;colour-thief&gt;</code></a><a class="fix" href="02-colour-thief-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="03-photo-booth.html"><small>task 3 · ★★☆</small><b>📸 Photo booth</b><code>&lt;photo-booth&gt;</code></a><a class="fix" href="03-photo-booth-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="04-voice-command.html"><small>task 4 · ★★☆</small><b>🗣️ Talk to the page</b><code>&lt;voice-command&gt;</code></a><a class="fix" href="04-voice-command-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="05-clap-switch.html"><small>task 5 · ★★☆</small><b>👏 Clap switch</b><code>&lt;clap-switch&gt;</code></a><a class="fix" href="05-clap-switch-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="06-window-pong.html"><small>task 6 · ★★★</small><b>🏓 Two-window pong</b><code>&lt;window-pong&gt;</code></a><a class="fix" href="06-window-pong-fix.html">or fix a broken one →</a></li>
+      <li><a class="task" href="07-gamepad-car.html"><small>spare · ★★★</small><b>🏎️ Gamepad racer</b><code>&lt;gamepad-car&gt;</code></a><a class="fix" href="07-gamepad-car-fix.html">or fix a broken one →</a></li>
+    </ul>
+    <p>Every task has a <strong>fix-it version</strong>: the finished tag with three bugs in it, and the users' reports of what goes wrong. Same API, same 45 minutes.</p>
+
+    <h2>The contract, for every tag</h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span><strong>One file, one element</strong>: <code>your-tag.js</code> defines <code>&lt;your-tag&gt;</code> and nothing else. Drop the file into any page and the tag works.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Attributes configure, properties carry data, events report</strong>: events bubble (<code>bubbles: true</code>), and the page never reaches into your shadow root.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Passes its gates in order</strong>: nothing starts before a user gesture; if it needs a permission, it reads the state first and asks only after the user asks for the feature.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Handles no</strong>: a refusal, a missing API or a missing device shows visible content that says what to do; a permission revoked while running is noticed.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><strong>Releases everything</strong> in <code>disconnectedCallback</code>: tracks, <code>AudioContext</code>, animation frames, timers, listeners on <code>window</code>.</span></li>
+    </ul>
+
+    <h2>The 45 minutes</h2>
+    <div class="clock">
+      <div><b>0–5 · plan</b>Read the brief. Write the tag's API on paper: attributes, properties, events.</div>
+      <div><b>5–15 · the API works</b>Raw data on screen: numbers, a stream, a log. Ugly is fine.</div>
+      <div><b>15–35 · the toy</b>Turn the raw data into the experience.</div>
+      <div><b>35–42 · verify</b>Block, reset, revoke, remove the element. Another browser.</div>
+      <div><b>42–45 · rehearse</b>Stop coding. Run your 3 minutes once, screen share included.</div>
+    </div>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="starter.zip" download>⤓ Download the starter</a></div>
+    <p>Minute 15 is the checkpoint: your tag is on the page and shows raw data from its sense. If it doesn't, say so then, not at minute 40.</p>
+
+    <h2>Testing without the hardware</h2>
+    <ul class="stretch">
+      <li>Reset a blocked permission: the site controls next to the address bar → reset permissions, then reload.</li>
+      <li>DevTools → ⋮ → More tools → <strong>Sensors</strong>: fake device orientation and location.</li>
+      <li>Chrome started with <code>--use-fake-device-for-media-stream</code> gives a test pattern and a beep instead of your camera and microphone; add <code>--use-fake-ui-for-media-stream</code> to skip the prompt.</li>
+    </ul>
+  </div>
+</body>
+</html>

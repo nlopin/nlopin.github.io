@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · gamepad-car</title>
+  <style>
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    body { min-height: 200vh; }
+    gamepad-car { max-width: 800px; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="gamepad-car.js"></script>
+</head>
+<body>
+  <h1>Gamepad racer</h1>
+  <p>
+    <label>Track
+      <select id="track"><option>oval</option><option>square</option></select>
+    </label>
+  </p>
+
+  <gamepad-car track="oval"></gamepad-car>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    const car = document.querySelector("gamepad-car");
+    const log = document.querySelector("#log");
+    document.querySelector("#track").addEventListener("change", (event) => {
+      car.setAttribute("track", event.target.value);
+    });
+    car.addEventListener("lap", (event) => {
+      const line = `lap ${JSON.stringify(event.detail)}`;
+      log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n");
+    });
+  </script>
+</body>
+</html>

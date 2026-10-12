@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Silence until you click · step 9</title>
+  <style>
+    body { margin: 40px; font: 18px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    code { font-size: 0.9em; }
+    output { display: block; margin: 12px 0; font: 16px ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <h1>Silence until you click</h1>
+  <p>Open a fresh tab on this page and don't touch anything. The <code>AudioContext</code> was created on load.</p>
+  <output id="log"></output>
+  <button id="go" type="button">Play a beep</button>
+  <script>
+    const log = document.querySelector("#log");
+    const context = new AudioContext(); // created without a user gesture
+    const show = () => {
+      log.textContent =
+        `context.state: ${context.state} · userActivation.hasBeenActive: ${navigator.userActivation?.hasBeenActive}`;
+    };
+    show();
+    context.addEventListener("statechange", show);
+
+    document.querySelector("#go").addEventListener("click", async () => {
+      await context.resume(); // allowed now: we're inside a click
+      const beep = context.createOscillator();
+      beep.connect(context.destination);
+      beep.start();
+      beep.stop(context.currentTime + 0.15);
+      show();
+    });
+  </script>
+</body>
+</html>

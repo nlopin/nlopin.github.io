@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parley · level meter on the bench · step 2</title>
+  <link rel="stylesheet" href="bench.css">
+  <link rel="stylesheet" href="level-meter.css">
+  <!-- Step 2: a module script is deferred: it runs after parsing. The upgrade demo is on 01-wish. -->
+  <script type="module" src="level-meter.js"></script>
+</head>
+<body>
+  <h1>&lt;level-meter&gt; on the bench</h1>
+
+  <level-meter></level-meter>
+
+  <!-- In the console:
+       const meter = document.querySelector("level-meter");
+       meter instanceof HTMLElement        // true, before and after define
+       meter.constructor.name              // "HTMLElement" before define, "LevelMeter" after
+       document.createElement("levelmeter") instanceof HTMLUnknownElement  // true: no hyphen
+       await customElements.whenDefined("level-meter")
+  -->
+</body>
+</html>

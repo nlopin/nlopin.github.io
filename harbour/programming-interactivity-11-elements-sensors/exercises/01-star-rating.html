@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E⭐%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 1 · After the call</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Tags that listen · all materials</a><span>Exercise 1 · pairs · 18 min</span></div>
+    <span class="eyebrow-tag">Act 1 · your own tags</span>
+    <h1>Exercise 1 · <em>After the call</em></h1>
+    <p class="intro">The call has ended, and Parley asks the question every call app asks: how was the call quality? Today the answer is an <code>&lt;input type="number"&gt;</code>. Replace it with a tag HTML doesn't have, one that the form treats like any of its own controls.</p>
+
+    <pre class="code">&lt;star-rating id="quality" name="quality" max="5" required&gt;&lt;/star-rating&gt;</pre>
+
+    <h2>Start</h2>
+    <div class="links"><a class="dl" href="01-star-rating.zip" download>⤓ Download the starter</a></div>
+    <ul>
+      <li>Extract the zip and serve the folder from a local server: module scripts need <code>http://</code>, not <code>file://</code>.</li>
+    </ul>
+    <pre class="code">cd 01-star-rating
+npx live-server --port=8080</pre>
+    <ul>
+      <li><code>index.html</code>: the post-call form. The comment in it shows where your tag goes.</li>
+      <li><code>star-rating.js</code>: an empty class and the <code>define</code> call. Your element goes here.</li>
+      <li><code>main.js</code>: the app. On submit it prints what <code>FormData</code> holds; it logs every <code>change</code> event that reaches the form. You shouldn't need to change it.</li>
+    </ul>
+
+    <h2>Done means <em>(18 minutes)</em></h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>The form prints <code>"quality": "4"</code> after you pick four stars, and nothing for <code>quality</code> before you pick any.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>With <code>required</code>, <em>Send</em> does nothing until a rating is chosen, and the browser shows its own validation message next to the stars. <em>Clear</em> empties the rating.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><code>main.js</code> logs <code>change from star-rating</code> when the rating changes, and not when it stays the same.</span></li>
+    </ul>
+
+    <h2>Then, if there's time</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span><kbd>Tab</kbd> reaches the stars once, and the arrow keys change the rating. Clicking the label focuses the stars. The green room's picker (<a href="../demos/green-room/08-keyboard/device-picker.js"><code>08-keyboard/device-picker.js</code></a>) solves the same problem for a list: read it for the pattern.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Add <code>span { color: red; padding: 8px; }</code> to <code>style.css</code>: your stars don't change, and your element's own styles don't change the page.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The app's dark theme recolours the stars without editing <code>star-rating.js</code>: decide what your element exposes for that.</span></li>
+      <li><input type="checkbox" aria-label="done"><span><code>max="10"</code> in the markup gives ten stars.</span></li>
+    </ul>
+
+    <h2>Check it</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="checked"><span>Console: <code>document.querySelector("star-rating").value = 2</code>. Does the display follow? Does <code>FormData</code>?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Unplug the mouse. Fill in and send the whole form from the keyboard.</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>DevTools → Elements → Accessibility pane on one star: what role and name does it have? What would a screen reader say?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Console: <code>document.createElement("star-rating")</code>. Any error? Append it to the form: does it work?</span></li>
+      <li><input type="checkbox" aria-label="checked"><span>Load the element two seconds late: replace its script tag with <code>&lt;script type="module"&gt;setTimeout(() =&gt; import("./star-rating.js"), 2000)&lt;/script&gt;</code>. What does the form show for those two seconds, and does the element work after?</span></li>
+    </ul>
+
+    <h2>Stretch</h2>
+    <ul class="stretch">
+      <li>A <code>readonly</code> attribute: shows the rating, can't be changed, still submitted.</li>
+      <li>Hovering previews the rating without changing it.</li>
+      <li>A custom state, so the page can style a rated element with <code>star-rating:state(rated)</code>.</li>
+      <li>Navigate away and press <em>Back</em>: does the browser restore the rating? Look up <code>formStateRestoreCallback</code>.</li>
+      <li>The first render without JavaScript: declarative shadow DOM in the markup, upgraded when the script arrives.</li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <div class="hints">
+      <details><summary>Hint 1</summary><p>What does the form ask a native control for? Which object gives a custom element the same voice?</p></details>
+      <details><summary>Hint 2</summary><p>Where does the browser look for the validation message and for the element that should get focus when the form is invalid?</p></details>
+      <details><summary>Hint 3</summary><p>Which method does a form call on its controls when it resets?</p></details>
+      <details><summary>Hint 4</summary><p>How many elements should be in the Tab order for one group of choices? What does the WAI-ARIA radio group pattern say?</p></details>
+      <details><summary>Hint 5</summary><p>An event dispatched from inside a shadow root and one dispatched on the host: which options does each need to reach the form?</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+      <ul class="gotchas">
+        <li>Your element is never in <code>FormData</code>, even with a value set.</li>
+        <li><em>Send</em> is blocked but no message appears, and the console says the control "is not focusable".</li>
+        <li><code>Failed to execute 'createElement' on 'Document': The result must not have attributes</code> (or children), and the element you get back does nothing.</li>
+        <li><code>NotSupportedError: … has already been used with this registry</code>.</li>
+        <li>The arrow keys scroll the page as well as changing the rating.</li>
+        <li>After a re-render, keyboard focus jumps to the top of the page.</li>
+      </ul>
+    </details>
+  </div>
+</body>
+</html>

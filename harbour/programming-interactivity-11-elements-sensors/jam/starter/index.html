@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jam · my tag</title>
+  <style>
+    body { margin: 40px; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #log { font: 13px/1.5 ui-monospace, monospace; white-space: pre; color: #5d6576; }
+  </style>
+  <script type="module" src="my-tag.js"></script>
+</head>
+<body>
+  <h1>My tag</h1>
+
+  <!-- Rename the tag and the file. The page only sets attributes and listens for events. -->
+  <my-tag></my-tag>
+
+  <h2>Events</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    // Log every event your tag reports. Add your event names here.
+    const tag = document.querySelector("my-tag");
+    const log = document.querySelector("#log");
+    for (const type of ["change"]) {
+      tag.addEventListener(type, (event) => {
+        const line = `${type} ${JSON.stringify(event.detail ?? null)}`;
+        log.textContent = [line, ...log.textContent.split("\n")].slice(0, 50).join("\n"); // newest 50
+      });
+    }
+  </script>
+</body>
+</html>
