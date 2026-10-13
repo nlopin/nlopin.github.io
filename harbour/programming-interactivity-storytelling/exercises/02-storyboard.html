@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🎞️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 2 · Six frames</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Let them touch it · all materials</a><span>Exercise 2 · alone, then pairs · 14 min</span></div>
+    <span class="eyebrow-tag">Act 2 · patterns and failures</span>
+    <h1>Exercise 2 · <em>Six frames</em></h1>
+    <p class="intro">Storyboard an interactive explanation of one idea, on paper, before any code. Six frames, a sketch and a sentence each. You'll build the middle three after the break.</p>
+
+    <h2>Pick an idea <em>(1 min)</em></h2>
+    <p>Your own, or one of these. Each is a claim that surprises someone who hasn't seen it:</p>
+    <ul>
+      <li>A hash table finds a key without looking at the other keys.</li>
+      <li>Bubble sort is fine for 10 items and useless for 100 000.</li>
+      <li>Binary search finds a word among a million in 20 steps.</li>
+      <li><code>Array(3).fill([])</code> holds the same inner array three times.</li>
+      <li><code>[10, 9, 1].sort()</code> returns <code>[1, 10, 9]</code>.</li>
+      <li>Clients that retry at fixed intervals after an outage all hit the server at the same moment; random jitter spreads them out.</li>
+      <li><code>0.1 + 0.2 !== 0.3</code>, and a shop's totals drift by a cent.</li>
+      <li>Raising a cache hit rate from 90% to 99% cuts the slow requests tenfold, not by 9%.</li>
+    </ul>
+    <p><strong>Rule:</strong> write the idea as one sentence with a verb. "Sorting" is a topic. "Comparing strings puts 10 before 9" is an idea.</p>
+
+    <h2>Draw six frames <em>(7 min)</em></h2>
+    <p>On the <a href="../print/storyboard.html">printable sheet</a> or six boxes on any paper. A <a href="../print/storyboard-example.html">filled-in example</a>: the token bucket, as it was storyboarded before it was built.</p>
+    <ol>
+      <li><strong>The question.</strong> What the reader sees first, and why they should care.</li>
+      <li><strong>The first touch.</strong> The one thing they can change. What happens when they do?</li>
+      <li><strong>The second control.</strong> What it is, and the "but" or "therefore" that brings it in now and not earlier.</li>
+      <li><strong>The surprise.</strong> What the reader sees that they didn't expect. Which default makes it happen?</li>
+      <li><strong>The rule.</strong> The general statement, in one sentence of text.</li>
+      <li><strong>The ending.</strong> The question the reader leaves with, or the sandbox they get.</li>
+    </ol>
+
+    <h2>Swap <em>(6 min, 3 each way)</em></h2>
+    <p>Give your sheet to your neighbour. They answer these about your storyboard, in writing, on the sheet:</p>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>What question does it open with? Would I care?</span></li>
+      <li><input type="checkbox" aria-label="done"><span>How many seconds until I can touch something?</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Where is the "but" or "therefore" between frames 2 and 3?</span></li>
+      <li><input type="checkbox" aria-label="done"><span>How does it end: a sandbox, a summary, a question?</span></li>
+    </ul>
+
+    <h2>Traps</h2>
+    <ul class="gotchas">
+      <li>Frame 1 is a definition. A definition answers a question nobody has asked yet.</li>
+      <li>Frame 2 offers every control at once: a dashboard, not a first touch.</li>
+      <li>The surprise depends on luck (random data). Write down the input that makes it happen every time.</li>
+      <li>No frame states the rule in words. Someone who never touches anything should still learn it.</li>
+    </ul>
+  </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+:root {
+  --bg: #fbfaf7; --ink: #1d1f24; --muted: #6b7080; --line: #d9d6cf;
+  --level: #2f62d6; --ok: #138a52; --refused: #d23a3a; --pending: #9aa0ad; --cursor: #d98a00;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #14161b; --ink: #eceef3; --muted: #9aa0ad; --line: #343843;
+    --level: #7aa2ff; --ok: #3ccf8e; --refused: #ff6b6b; --cursor: #ffb547; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.5 system-ui, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 1.6rem; margin: 0 0 4px; }
+.lede { color: var(--muted); margin: 0 0 20px; }
+
+.figure { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 20px; align-items: end; }
+.figure svg { width: 100%; height: auto; overflow: visible; }
+@media (max-width: 560px) { .figure { grid-template-columns: 90px minmax(0, 1fr); gap: 10px; } }
+
+.bucket { fill: none; stroke: var(--ink); stroke-width: 3; }
+.slot { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 4 4; }
+.token { fill: var(--level); }
+.big { font: 600 22px system-ui, sans-serif; fill: var(--ink); }
+
+.grid { stroke: var(--line); stroke-width: 1; }
+.axis { stroke: var(--muted); stroke-width: 1.5; }
+.tick { font: 13px system-ui, sans-serif; fill: var(--muted); }
+.level { fill: none; stroke: var(--level); stroke-width: 3; stroke-linejoin: round; }
+.req circle { stroke: var(--bg); stroke-width: 2; }
+.req.ok circle { fill: var(--ok); }
+.req.refused circle { fill: var(--refused); }
+.req.pending circle { fill: var(--pending); }
+.req .x { stroke: var(--bg); stroke-width: 2.5; stroke-linecap: round; }
+.req:focus { outline: none; }
+.req:focus-visible circle:first-child { stroke: var(--cursor); stroke-width: 4; }
+.req circle.hit { fill: transparent; stroke: none; }
+.cursor { stroke: var(--cursor); stroke-width: 3; }
+
+.sentence { font-size: 1.1rem; min-height: 3em; margin: 12px 0; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; padding: 0; list-style: none; }
+.legend span { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+.controls { display: grid; gap: 10px; margin: 16px 0; }
+.controls label { display: grid; grid-template-columns: 9em minmax(0, 1fr) 4.5em; gap: 12px; align-items: center; }
+.controls input[type="range"] { width: 100%; accent-color: var(--cursor); }
+.controls .out { font-variant-numeric: tabular-nums; text-align: right; }
+button { font: inherit; padding: 6px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--ink); }
+button:disabled { opacity: 0.35; cursor: default; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--cursor); outline-offset: 2px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+[hidden] { display: none !important; }
+
+.editable { touch-action: none; cursor: crosshair; }
+.editable .req { cursor: grab; }
+
+/* scrollytelling: text scrolls, the figure stays */
+main { max-width: 1200px; }
+.scrolly { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 40px; align-items: start; }
+.sticky { position: sticky; top: 16px; grid-column: 2; grid-row: 1; }
+.steps { grid-column: 1; grid-row: 1; }
+.steps section { min-height: 32rem; padding: 2rem 0; opacity: 0.35; transition: opacity 0.2s; }
+.steps section.active { opacity: 1; }
+.steps section:last-child { min-height: 20rem; }
+/* room after the last step, so it can reach the trigger line. svh: the small
+   viewport height, which doesn't change when mobile toolbars slide away */
+.steps { padding-bottom: max(4rem, calc(50svh - 18rem)); }
+.steps p { margin: 0 0 10px; max-width: 60ch; }
+.rule { font-weight: 600; border-left: 4px solid var(--level); padding-left: 12px; }
+#predict button { min-width: 3em; }
+@media (max-width: 760px) {
+  .scrolly { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .sticky { top: 0; z-index: 1; background: var(--bg); padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .sticky .legend { display: none; }
+  .sticky .sentence { font-size: 14px; line-height: 1.35; min-height: 2.7em; margin: 4px 0 0; } /* two lines reserved: the sticky keeps one height */
+  .sticky, .steps { grid-column: 1; grid-row: auto; }
+  /* short cards with room between them, instead of tall sections */
+  .steps { padding-bottom: 0; }
+  .steps section { min-height: 0; padding: 1rem 0; margin-bottom: 45svh; }
+  .steps section:last-child { min-height: 0; margin-bottom: 1rem; }
+  /* a small sticky figure: narrow bucket, compact controls, touch edits the timeline directly */
+  .sticky .figure { grid-template-columns: 56px minmax(0, 1fr); gap: 8px; }
+  .sticky .controls { gap: 4px; margin: 6px 0 0; font-size: 15px; }
+  .sticky .controls label { grid-template-columns: 6.5em minmax(0, 1fr) 4.5em; gap: 8px; }
+  .sticky [data-control="edit"] { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .steps section { transition: none; } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 560px) { .tick { font-size: 24px; } } /* viewBox units: readable once the svg is phone-sized */
+@media (max-width: 560px) { .req circle:first-child { r: 12px; } .req circle.hit { r: 28px; } } /* bigger marks on a phone-sized timeline */
+#text:focus, .steps section:focus { outline: none; }

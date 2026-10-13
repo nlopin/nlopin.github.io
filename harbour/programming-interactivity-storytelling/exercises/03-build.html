@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🛠️%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercise 3 · Build three frames</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="../assets/kit.css">
+  <link rel="stylesheet" href="brief.css">
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><a href="../index.html">← Let them touch it · all materials</a><span>Exercise 3 · alone · 40 min</span></div>
+    <span class="eyebrow-tag">Act 4 · engineering an explorable</span>
+    <h1>Exercise 3 · <em>Build three frames</em></h1>
+    <p class="intro">Build frames 2, 3 and 4 of your storyboard: the first touch, the second control, the surprise. Plain HTML, CSS and JavaScript. The drawing can be rough; the order of revelation can't.</p>
+
+    <h2>Start <em>(pick one)</em></h2>
+    <div class="links">
+      <a class="dl" href="03-starter.zip" download>⤓ Explorable starter</a>
+      <a class="dl" href="03-playground-starter.zip" download>⤓ Playground starter</a>
+    </div>
+    <ul>
+      <li><strong>Explorable starter</strong>: <code>main.js</code> has three steps, one per frame, a state, a figure drawn from the state, a sentence describing the state, and inputs bound to it. <code>model.js</code> is where the idea's computation goes, with no DOM, and <code>claims.test.mjs</code> checks the surprise you promise (<code>node --test claims.test.mjs</code>). Replace the TODOs. <code>rng.js</code> is a seeded random generator, if your surprise needs randomness.</li>
+      <li><strong>Playground starter</strong>, if your idea is about code (<code>sort()</code>, <code>0.1 + 0.2</code>, <code>Intl</code>): replace <code>STARTER</code> and <code>EXPECTED</code> at the top of <code>playground.js</code>, and the challenges in <code>index.html</code>.</li>
+      <li>Serve the folder over <code>http://</code>: <code>npx live-server --port=8080</code>. Module scripts don't load from <code>file://</code>.</li>
+      <li>Reference: the token bucket, built in seven steps, in <a href="../demos/token-bucket/index.html">demos/token-bucket</a>.</li>
+    </ul>
+
+    <h2>Done means, on the explorable track <em>(33 minutes)</em></h2>
+    <ul class="checklist core">
+      <li><input type="checkbox" aria-label="done"><span>The first screen asks your question and offers exactly one thing to touch.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Something visible changes within a second of the first touch.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The second control appears only at the second step, and the text says why it appears now ("But …" or "Therefore …").</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The surprise happens on every load, from the defaults of that step.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A sentence under the figure says what the figure shows, and changes with it.</span></li>
+    </ul>
+
+    <h2>Done means, on the playground track</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>The starter runs and shows the problem in its output; one marked place (<code>// ✎</code>) is the first thing to change.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The first challenge's <code>EXPECTED</code> checks fail on the starter and pass after the one edit.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>A second challenge asks the reader to predict first, and its text says why it comes now ("But …" / "Therefore …").</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The surprise is in the output, not in the answer box.</span></li>
+    </ul>
+
+    <h2>Test it <em>(last 7 minutes)</em></h2>
+    <p>Give your laptop to your neighbour. Don't speak, don't point, don't touch the mouse. Write three things, then swap:</p>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>Where did they hesitate? (Which step, which control.)</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Did they reach the surprise without help: yes or no?</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The sentence you wanted to say. That sentence is missing from the page.</span></li>
+    </ul>
+
+    <h2>Then, if there's time</h2>
+    <ul class="checklist">
+      <li><input type="checkbox" aria-label="done"><span>Frame 5: the rule, stated in a sentence, after the surprise.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Frame 6: a sandbox with every control, or a question to end on.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>The state in the URL, so a link opens your surprise.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Every number your text states is a test in <code>claims.test.mjs</code>.</span></li>
+      <li><input type="checkbox" aria-label="done"><span>Every control works from the keyboard. Try it with the mouse unplugged.</span></li>
+    </ul>
+
+    <h2>Stuck? <em>One hint at a time</em></h2>
+    <div class="hints">
+      <details><summary>Hint 1 · I don't know how to draw it</summary><p>Draw the fewest marks that show the state: bars, dots, a line. The starter draws two bars. Polish comes after the surprise works.</p></details>
+      <details><summary>Hint 2 · the surprise doesn't happen</summary><p>Which value of which control makes it happen? Put that value in the step's <code>set</code>, so the reader starts there, one move away from it.</p></details>
+      <details><summary>Hint 3 · my idea needs too many controls</summary><p>Which one control shows the idea on its own? Fix all the others in <code>set</code> and leave them out of <code>controls</code>.</p></details>
+      <details><summary>Hint 4 · my idea is about code</summary><p>Use the playground starter. The reader's first touch is one edit to one line; mark that line with a comment.</p></details>
+    </div>
+
+    <h2>Traps</h2>
+    <details class="traps"><summary>Open when something behaves strangely</summary>
+      <ul class="gotchas">
+        <li>The page is blank and the console says the module was blocked: you opened the file from disk. Serve it.</li>
+        <li>Moving a slider does nothing: the input changes the state but nothing calls <code>render()</code>.</li>
+        <li>A slider jumps back when the step changes: that's <code>goTo()</code> resetting the state to the step's <code>set</code>. Intended.</li>
+        <li>The playground prints "Stopped: still running after 1.5 s": the code has an infinite loop, and the watchdog threw its frame away. Fix the loop; the next edit runs in a fresh frame.</li>
+        <li>Your surprise only happens on some loads: it depends on random data. Seed it (<code>rng.js</code>) and write the seed into the step's <code>set</code>.</li>
+      </ul>
+    </details>
+  </div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TODO: your idea, as a question</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <!-- Frame 1 of your storyboard: the question. -->
+    <h1>TODO: your idea, as a question</h1>
+
+    <section class="story">
+      <p id="count" class="count"></p>
+      <p id="text" aria-live="polite"></p>
+    </section>
+
+    <!-- The figure. Draw into it in renderFigure(). -->
+    <svg id="figure" viewBox="0 0 800 300" role="img" aria-labelledby="alt"></svg>
+    <!-- The same state, as a sentence: for screen readers, and for readers who never touch anything. -->
+    <p id="alt" class="alt"></p>
+
+    <div class="controls">
+      <!-- One label per control. data-control: which steps show it; data-key: which field of the state it changes. -->
+      <label data-control="a">TODO: name of a <input data-key="a" type="range" min="0" max="10" step="1"><span data-for="a"></span></label>
+      <label data-control="b">TODO: name of b <input data-key="b" type="range" min="0" max="10" step="1"><span data-for="b"></span></label>
+    </div>
+
+    <nav class="nav">
+      <button id="back">← Back</button>
+      <button id="reset">Reset this step</button>
+      <button id="next">Next →</button>
+    </nav>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

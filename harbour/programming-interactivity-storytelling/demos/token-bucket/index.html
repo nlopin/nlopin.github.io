@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token bucket · step by step</title>
+  <link rel="stylesheet" href="01-two-views/style.css">
+  <style>
+    ol { padding-left: 1.4em; } li { margin: 10px 0; } a { color: var(--level); }
+    code { font-size: 0.92em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>A token bucket, step by step</h1>
+    <p class="lede">One explorable, built in seven complete folders. Each folder runs on its own; open two side by side and diff them to see one technique at a time. No libraries, no build step. Serve the folder over <code>http://</code> (module scripts don't load from <code>file://</code>).</p>
+    <ol>
+      <li><a href="01-two-views/">01 · one state, three views</a>: <code>simulate()</code> is a pure function; the bucket, the timeline and a sentence are all rendered from one state. A slider moves time.</li>
+      <li><a href="02-inputs/">02 · inputs bound to state</a>: sliders for capacity and rate; click, drag and remove requests on the timeline with Pointer Events and <code>setPointerCapture</code>; or focus a request and use the arrow keys and Delete (<code>edit.js</code>, shared by every later step).</li>
+      <li><a href="03-stepper/">03 · a stepper</a>: the explanation as data (<code>steps.js</code>). Each step sets the figure's starting state and lists the controls the reader has. Predict, then reveal. Back works.</li>
+      <li><a href="04-scroll/">04 · scroll-driven</a>: the same steps; an <code>IntersectionObserver</code> picks the step, <code>position: sticky</code> keeps the figure in view. The steps after the question stay hidden until the reader answers it.</li>
+      <li><a href="05-seeded/">05 · seeded randomness</a> (from 02): random traffic from <code>mulberry32(seed)</code>. Same seed, same bursts, for every reader.</li>
+      <li><a href="06-url/">06 · state in the URL</a> (from 05): the query string follows the state; links in the text open a given state; Back returns to the previous one. Values from the URL are validated.</li>
+      <li><a href="07-time/">07 · time you can pause</a> (from 06): a <code>requestAnimationFrame</code> loop with play, pause and step; paused at load under <code>prefers-reduced-motion</code>.</li>
+    </ol>
+    <p>Shared by every step: <code>model.js</code> (the bucket, no DOM) and <code>views.js</code> (three render functions, no state, and <code>announce()</code> for screen readers).</p>
+    <p>Every number the explanation states is a test: <code>node --test test/claims.test.mjs</code> in this folder.</p>
+  </main>
+</body>
+</html>

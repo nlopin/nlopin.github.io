@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playground · whose 09:00?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Whose 09:00?</h1>
+    <p class="lede">A team in three cities books a meeting for 09:00 Berlin time. The invitation prints one time for everyone. Edit the code; the output below follows as you type.</p>
+
+    <div class="editor">
+      <div class="bar">
+        <span class="file">invite.js</span>
+        <span class="row">
+          <button id="reset">Reset</button>
+          <button id="share">Copy link</button>
+        </span>
+      </div>
+      <div class="code-wrap">
+        <pre id="gutter" class="gutter" aria-hidden="true"></pre>
+        <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"
+          aria-label="Code. Tab inserts spaces; press Escape, then Tab, to leave the editor."></textarea>
+      </div>
+    </div>
+
+    <section class="output" aria-label="Output">
+      <div class="bar"><span class="file">console</span><span id="status" class="status" aria-live="polite"></span></div>
+      <ol id="console" class="console"></ol>
+    </section>
+
+    <!-- The reader's code runs in a sandboxed <iframe> that playground.js creates
+         for every run: an opaque origin, so it can't read this page's DOM,
+         cookies or storage. -->
+
+    <section class="challenges">
+      <h2>Try</h2>
+      <ol>
+        <li>
+          <p>Make every line show the meeting in that person's own time.</p>
+          <ul id="checks" class="checks"></ul>
+          <details><summary>A hint</summary><p>The second argument of <code>toLocaleTimeString</code> takes more options than <code>hour</code> and <code>minute</code>. Each person already has the value it needs.</p></details>
+          <details><summary>The answer</summary><pre>meeting.toLocaleTimeString("en-GB", {
+  hour: "2-digit", minute: "2-digit", timeZone: person.timeZone,
+});</pre></details>
+        </li>
+        <li>
+          <p><strong>Predict first.</strong> Move the meeting a week earlier: <code>"2026-10-27T08:00:00Z"</code>, still 09:00 in Berlin. Which line will change? Write your guess down, then edit and look.</p>
+          <details><summary>The answer</summary><p>New York: 04:00 instead of 03:00. Europe left summer time on 25 October, the United States only on 1 November, so for one week Berlin is five hours ahead of New York, not six. Nobody finds that by reading the code.</p></details>
+        </li>
+        <li>
+          <p><strong>Predict first.</strong> Add Priya in Kolkata (<code>"Asia/Kolkata"</code>). What will her line say?</p>
+          <details><summary>The answer</summary><p>13:30. India is five and a half hours ahead of UTC, and doesn't change its clocks. Time zones aren't whole hours.</p></details>
+        </li>
+        <li>
+          <p><strong>Your turn.</strong> What else could make an attendee see the wrong time? Try a date in late March, a city of your own, or print what one person's formatter decided: <code>new Intl.DateTimeFormat("en-GB", { timeZone: person.timeZone }).resolvedOptions()</code>.</p>
+        </li>
+      </ol>
+    </section>
+  </main>
+  <script type="module" src="playground.js"></script>
+</body>
+</html>

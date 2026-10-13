@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🪣%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Let them touch it — storytelling with demos and playgrounds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd, .slide textarea, .slide input { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #ffffff; --act-ink: #ffffff; }
+.slide.wire[data-act-num="1"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="2"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="4"] { --act: #9d8cff; --act-ink: #9d8cff; }
+.slide.wire[data-act-num="5"] { --act: #ff7a5c; --act-ink: #ff7a5c; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+html.theme-wire[data-act="1"] .deck-progress i { background: #ffb547; box-shadow: 0 0 12px #ffb547; }
+html.theme-wire[data-act="2"] .deck-progress i { background: #3ee6ff; box-shadow: 0 0 12px #3ee6ff; }
+html.theme-wire[data-act="3"] .deck-progress i { background: #ff4fd8; box-shadow: 0 0 12px #ff4fd8; }
+html.theme-wire[data-act="4"] .deck-progress i { background: #9d8cff; box-shadow: 0 0 12px #9d8cff; }
+html.theme-wire[data-act="5"] .deck-progress i { background: #ff7a5c; box-shadow: 0 0 12px #ff7a5c; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="F"] h3 { background: #070d1a; color: #fff; }
+.deck-menu section[data-act="1"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="4"] h3 { background: #070d1a; color: #9d8cff; }
+.deck-menu section[data-act="5"] h3 { background: #070d1a; color: #ff7a5c; }
+.deck-menu section[data-act="B"] h3 { background: #b6ff3b; color: #070d1a; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.55fr 1fr 0.9fr 0.9fr 0.9fr 0.55fr 1fr 1fr 1fr 1fr 0.55fr; gap: 8px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 10px; min-height: 300px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 16px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 20px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 21px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 16px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .ex { border-style: dashed; }
+.map .brk { background: #b6ff3b; border-color: #b6ff3b; color: #070d1a; --c: #070d1a; }
+.map .brk strong { color: #070d1a; }
+.m1 { --c: #ffb547; } .m2 { --c: #3ee6ff; } .m3 { --c: #ff4fd8; } .m4 { --c: #9d8cff; } .m5 { --c: #ff7a5c; } .mf { --c: #ffffff; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 50px; height: 100%; align-items: center; }
+.big-title { font: 700 150px/0.88 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; }
+.big-title .b { color: #ffb547; text-shadow: 0 0 80px rgb(255 181 71 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.title-art { border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; padding: 20px; }
+
+/* raw text panels */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw .c { color: #4d5b7a; } .raw .k { color: #ffb547; } .raw .s { color: #b6ff3b; } .raw .n { color: #3ee6ff; } .raw .m { color: #ff4fd8; } .raw .r { color: #ff7a5c; }
+
+/* columns, tables */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 28px; margin-bottom: 10px; }
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { font-weight: 600; color: #fff; }
+.dtable.tight td, .dtable.tight th { padding: 8px 12px; font-size: 21px; }
+
+/* cards */
+.cat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cat .card { padding: 16px 20px; }
+.cat .card .label { margin-bottom: 8px; }
+.cat .card p { font-size: 22px; line-height: 1.35; margin: 0; color: #fff; }
+.cards3 .card p { font-size: 23px; line-height: 1.35; }
+.cards3 .card h3 { font-size: 32px; margin-bottom: 10px; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.grid-5 .card { padding: 16px 18px; }
+.grid-5 .card h3 { font-size: 26px; margin-bottom: 8px; }
+.grid-5 .card p { font-size: 19px; line-height: 1.35; margin: 0 0 8px; }
+.grid-5 .card p.muted { font-size: 16px; }
+
+/* reading lists, split lists */
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+.slide .split > ul li, .slide .split > ol li, .slide .vs2 > ul li, .slide .split > .stack > p, .slide .vs2 > div > ul li, .slide .vs2 > div > p { font-size: 27px; line-height: 1.3; margin-bottom: 14px; }
+.slide .split > pre.code, .slide .vs2 > pre.code { align-self: start; }
+.slide ul.big li { font-size: 32px; line-height: 1.3; margin-bottom: 16px; }
+
+/* quotes */
+.quote { font: italic 400 50px/1.15 "Instrument Serif", serif; color: #fff; max-width: 1300px; margin: 10px 0 18px; }
+.quote.sm { font-size: 40px; }
+.cite { font: 500 22px "IBM Plex Mono", monospace; color: #8599c2; }
+
+/* a formula, typeset plainly */
+.formula { font: italic 400 46px/1.4 "Instrument Serif", serif; color: #fff; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 22px 30px; margin: 10px 0 24px; }
+.formula sub { font-size: 0.6em; } .formula sup { font-size: 0.6em; }
+.textbook { font: 400 26px/1.5 "Instrument Serif", serif; color: #cfdcf7; max-width: 1350px; }
+
+/* the ladder of abstraction */
+.ladder { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.ladder .card { padding: 20px 24px; }
+.ladder .card:nth-child(1) { margin-top: 160px; } .ladder .card:nth-child(2) { margin-top: 80px; }
+.ladder .card h3 { font-size: 30px; margin-bottom: 8px; }
+.ladder .card p { font-size: 22px; line-height: 1.35; margin: 0; }
+
+/* beats: "and then" vs "but / therefore" */
+.beats { list-style: none; margin: 0; padding: 0; counter-reset: beat; }
+.beats li { counter-increment: beat; font-size: 23px; line-height: 1.3; padding: 9px 0 9px 46px; position: relative; border-bottom: 1px solid #1f3052; }
+.beats li::before { content: counter(beat); position: absolute; left: 0; top: 9px; font: 600 18px "IBM Plex Mono", monospace; color: #8599c2; }
+.beats b { font-family: "IBM Plex Mono", monospace; font-weight: 600; color: var(--act); }
+.beats.flat b { color: #8599c2; }
+
+/* code on top, the points under it */
+.stacked { display: flex; flex-direction: column; gap: 18px; }
+.stacked > ul { margin: 0; }
+.slide .stacked > ul li { font-size: 25px; line-height: 1.3; margin-bottom: 8px; }
+
+/* live frames */
+.slide.wire .frame.embed { height: 640px; background: #fbfaf7; }
+.slide.wire .frame.embed.short { height: 600px; }
+.z80 { --z: 0.8; }
+
+/* break */
+.slide.wire.breakslide {
+  --act: #070d1a;
+  background:
+    linear-gradient(rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    #b6ff3b;
+  color: #070d1a;
+  justify-content: center; align-items: center; text-align: center;
+}
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide .brk-kicker { font: 600 22px "IBM Plex Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(7 13 26 / 0.65) !important; margin: 0 0 10px; }
+.breakslide h2 { font: 700 170px/0.9 "Space Grotesk", sans-serif; letter-spacing: -0.06em; margin: 0; max-width: none; color: #070d1a !important; }
+.breakslide h2 em { font-style: normal; font-family: "IBM Plex Mono", monospace; font-weight: 600; letter-spacing: -0.04em; font-size: 0.55em; }
+.breakslide .brk-code { font: 500 30px/1.4 "IBM Plex Mono", monospace; background: #070d1a; color: #e3ecff; border-radius: 10px; padding: 18px 30px; margin: 34px 0 30px; white-space: pre; text-align: left; box-shadow: 10px 10px 0 rgb(7 13 26 / 0.25); }
+.breakslide .brk-code .k { color: #ff4fd8; } .breakslide .brk-code .f { color: #3ee6ff; } .breakslide .brk-code .c { color: #8599c2; }
+.breakslide .timer { font-size: 96px; border-width: 6px; color: #070d1a; border-color: #070d1a; }
+.breakslide p:not(.brk-kicker) { font-size: 26px; color: rgb(7 13 26 / 0.75) !important; max-width: 1100px; margin-top: 30px; }
+
+/* exercises */
+.slide.exercise ol > li { font-size: 28px; }
+.slide.exercise .dtable td, .slide.exercise .dtable th { font-size: 20px; padding: 6px 12px; }
+.pieces { columns: 2; column-gap: 50px; list-style: none; padding: 0; margin: 0; }
+.pieces li { font-size: 23px; line-height: 1.3; margin-bottom: 10px; break-inside: avoid; }
+.pieces li b { font-family: "IBM Plex Mono", monospace; color: var(--act); margin-right: 10px; }
+.pieces li span { color: #8599c2; font-size: 19px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Opening" data-at="0:00" data-theme="wire" data-title="Let them touch it.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity</p>
+      <h1 class="big-title">Let them <span class="b">touch it.</span></h1>
+      <p class="title-sub">explorable explanations · the order of revelation · playgrounds · live demos</p>
+      <p class="title-sub">Materials: <a href="https://lopin.me/harbour/programming-interactivity-storytelling/index.html" target="_blank" rel="noopener">programming-interactivity-storytelling</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">// the shape of the class</span>
+<span class="k">question</span>
+  → one thing to <span class="n">touch</span>
+  → <span class="m">but</span> …
+  → <span class="m">therefore</span> …
+  → the <span class="s">rule</span>
+  → a <span class="k">question</span> of your own</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:00. Today is about explanation as a design problem: how a page teaches an idea by letting the reader touch it, how code playgrounds do the same for code, and how to show working code to a room. Four parts: read and dissect good explanations, name the patterns, build the first frames of your own, test it without speaking, then show it out loud. Have the gallery list (<code>exercises/01-take-one-apart.html</code>) and <code>demos/token-bucket/</code> open in a second window.</p>
+  </aside>
+</section>
+
+<section data-title="The day">
+  <p class="kicker">The plan · 3 h</p>
+  <h2>Five acts, three exercises</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Opening</strong>one idea, twice<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>Shape</strong>question, ladder, but / therefore<time>0:05</time></div>
+    <div class="m1 ex"><b>✎ 1</b><strong>Take one apart</strong>groups · 20 min<time>0:25</time></div>
+    <div class="m2"><b>02</b><strong>Patterns</strong>formats, failures<time>0:45</time></div>
+    <div class="m2 ex"><b>✎ 2</b><strong>Six frames</strong>storyboard · 14 min<time>0:59</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:13</time></div>
+    <div class="m3"><b>03</b><strong>Playgrounds</strong>code as the control<time>1:28</time></div>
+    <div class="m4"><b>04</b><strong>Engineering</strong>state, steps, seeds, URLs<time>1:48</time></div>
+    <div class="m4 ex"><b>✎ 3</b><strong>Build three frames</strong>alone · 40 min<time>2:00</time></div>
+    <div class="m5"><b>05</b><strong>Showing it</strong>90-second demos<time>2:40</time></div>
+    <div class="mf"><b>✓</b><strong>Close</strong><time>2:55</time></div>
+  </div>
+  <p>One running example: a <strong>token bucket</strong>, the rate limiter in front of most public APIs, built as an explorable in seven steps: <a href="https://lopin.me/harbour/programming-interactivity-storytelling/demos/token-bucket/index.html" target="_blank" rel="noopener">demos/token-bucket</a>.</p>
+  <aside class="notes">
+    <p>~0:01. The token bucket is the running example because everyone in the room has hit a rate limit (HTTP 429), few can explain why a burst of six loses exactly two requests, and the answer is a mechanism, which is what interaction is good at. The demo is plain HTML, SVG and modules; Act 4 opens it step by step.</p>
+  </aside>
+</section>
+
+<section data-title="A cubic Bézier curve, in a textbook">
+  <p class="kicker">One idea, twice · version A</p>
+  <h2>A cubic Bézier curve</h2>
+  <p class="formula">B(t) = (1−t)<sup>3</sup>P<sub>0</sub> + 3(1−t)<sup>2</sup>t P<sub>1</sub> + 3(1−t)t<sup>2</sup>P<sub>2</sub> + t<sup>3</sup>P<sub>3</sub>,&nbsp;&nbsp;t ∈ [0, 1]</p>
+  <p class="textbook">A cubic Bézier curve is a parametric curve defined by four control points P<sub>0</sub>…P<sub>3</sub>. The curve passes through P<sub>0</sub> and P<sub>3</sub>; P<sub>1</sub> and P<sub>2</sub> determine the tangent directions at the endpoints. Each point of the curve is a convex combination of the control points, weighted by the Bernstein polynomials of degree 3. Equivalently, the curve can be evaluated by repeated linear interpolation (de Casteljau's algorithm).</p>
+  <aside class="notes">
+    <p>~0:02. Read it out loud, at normal speed, once. Don't explain. Ask: hands up if you could now draw the curve for four points I give you. Everyone here has used a Bézier curve (<code>cubic-bezier()</code> in CSS, the pen tool in any design app). Keep it to 40 seconds.</p>
+  </aside>
+</section>
+
+<section data-title="The same curve, to touch">
+  <p class="kicker">One idea, twice · version B · live</p>
+  <h2>The same curve, with a point you can drag</h2>
+  <p class="big-link"><a href="https://pomax.github.io/bezierinfo/#decasteljau" target="_blank" rel="noopener">pomax.github.io/bezierinfo</a></p>
+  <ul class="big mt">
+    <li>Mike “Pomax” Kamermans, <em>A Primer on Bézier Curves</em>.</li>
+    <li>Drag a control point. Move <em>t</em>. Watch the lines between the lines.</li>
+  </ul>
+  <div class="stack mt">
+    <div class="reveal-box step solid">Which one did you understand? Which one would you rather have written?</div>
+  </div>
+  <aside class="notes">
+    <p>~0:03. Open the de Casteljau section live. Drag a control point slowly, then scrub <em>t</em>: the three interpolation lines, then two, then one point that traces the curve. The paragraph on the previous slide said exactly this (“repeated linear interpolation”). Nobody read it that way. Then the question. Expect: “B, obviously”, and “A, it's faster to write”. Both are right, and that tension is the class.</p>
+  </aside>
+</section>
+
+<section class="center" data-title="Interaction is an argument">
+  <p class="kicker">Thesis</p>
+  <h2>Interaction is an argument</h2>
+  <p class="lede">Every control is a claim about what matters. Every control you leave out is a decision too.</p>
+  <aside class="notes">
+    <p>~0:04. Pomax gave you <em>t</em> and the control points. He didn't give you colour, line width or the number of curves: they don't matter to the idea. The rest of the class is about making those decisions on purpose: what the reader touches, when, and what they see first.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · THE SHAPE OF AN EXPLANATION
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="The shape" data-at="0:05" data-title="Act 1 — The shape of an explanation">
+  <div class="act-deco">?→!</div>
+  <div class="act-num">act 01</div>
+  <h1>The shape of an explanation</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:25</span><span>what good explorables have in common</span></div>
+  <div class="act-list"><span>active reading</span><span>a question</span><span>the ladder</span><span>but / therefore</span><span>do · show · tell</span><span>gates</span><span>the reader who never clicks</span></div>
+</section>
+
+<section data-title="Explorable explanations">
+  <p class="kicker">Bret Victor · Explorable Explanations · 2011</p>
+  <p class="quote">“An active reader asks questions, considers alternatives, questions assumptions.”</p>
+  <div class="grid-3 cards3 mt">
+    <div class="card"><span class="label">reactive document</span><h3>Change an assumption</h3><p>The text contains its own model. Change a number in a sentence; the conclusions update.</p></div>
+    <div class="card"><span class="label">explorable example</span><h3>Touch the example</h3><p>A small working model inside ordinary prose, to build intuition for the claim next to it.</p></div>
+    <div class="card"><span class="label">contextual information</span><h3>Look it up in place</h3><p>Check a claim or a term without losing your place in the text.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:05. Victor's essay coined the term. A printed page lets the reader read; it doesn't let them test the author's claim. His examples: a budget proposal where you drag the tax rate in the sentence and the deficit in the next sentence changes; a filter-design article with a working filter in it. Today's token bucket is an explorable example. The essay is at worrydream.com/ExplorableExplanations.</p>
+  </aside>
+</section>
+
+<section data-title="Nicky Case's three steps">
+  <p class="kicker">Nicky Case · How I Make Explorable Explanations</p>
+  <h2>Three steps</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">1</span><h3>Start with a question</h3><p>“Make them love your question” before you answer it.</p></div>
+    <div class="card"><span class="label">2</span><h3>Climb the ladder</h3><p>Start on the ground with one concrete case; move up step by step to the general rule.</p></div>
+    <div class="card"><span class="label">3</span><h3>End with a question</h3><p>A sandbox where the reader asks their own. It “allows the student to go beyond the teacher”.</p></div>
+  </div>
+  <p class="muted">Case made <em>Parable of the Polygons</em> (with Vi Hart), <em>The Evolution of Trust</em>, <em>We Become What We Behold</em>, and runs the explorabl.es hub.</p>
+  <aside class="notes">
+    <p>~0:06. The post is short (blog.ncase.me/how-i-make-an-explorable-explanation); it's on the reading list. The next three slides take one step each. Case also says the goal is to “smart the people up”, not to “dumb the ideas down”: the ladder is how you get a non-expert to the real idea.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Make them love the question">
+  <p class="kicker">Step 1 · two openings for the same game</p>
+  <h2>Which one would you keep reading?</h2>
+  <div class="vs2">
+    <div class="card"><span class="label">A</span><p>The iterated prisoner's dilemma is a repeated two-player game in which each player chooses to cooperate or defect. Payoffs: mutual cooperation 2, mutual defection 0, defection against cooperation 3 / −1.</p></div>
+    <div class="card"><span class="label">B</span><p>During World War I, peace broke out. It was Christmas 1914 on the Western Front, and British and German soldiers left their trenches to share food and sing carols. Why did enemies trust each other, and why don't friends?</p></div>
+  </div>
+  <div class="stack mt">
+    <div class="reveal-box step solid">B is how <em>The Evolution of Trust</em> opens. The definition in A arrives later, once you want it.</div>
+  </div>
+  <aside class="notes">
+    <p>~0:07. B is a close paraphrase of Trust's first screen, not a quote. A is accurate and answers a question nobody has asked yet. <em>Parable of the Polygons</em> goes further: you're moving unhappy shapes within ten seconds and only find out afterwards that it's about segregation. The question doesn't have to be stated as a question; it has to make the reader want the answer.</p>
+  </aside>
+</section>
+
+<section data-title="The ladder of abstraction">
+  <p class="kicker">Bret Victor · Up and Down the Ladder of Abstraction</p>
+  <h2>One case, many cases, the rule</h2>
+  <div class="ladder">
+    <div class="card"><span class="label">ground</span><h3>One concrete case</h3><p>This client sends six requests in under a second. Four get through.</p></div>
+    <div class="card"><span class="label">up one</span><h3>Many cases</h3><p>Any burst, any bucket. Drag the capacity: the cut-off moves with it.</p></div>
+    <div class="card"><span class="label">top</span><h3>The rule</h3><p>Capacity sets the largest burst; the refill rate sets the long-run average.</p></div>
+  </div>
+  <p class="cite">“Start concrete, start grounded.” — Victor, Learnable Programming</p>
+  <aside class="notes">
+    <p>~0:09. Victor's essay walks a car-steering algorithm from one run, to a slider over a parameter, to a plot over all values of the parameter. Readers who start at the top (the rule) can repeat it but can't use it. Readers who start at the bottom can see why it's true. The token bucket demo's steps follow exactly these three rungs.</p>
+  </aside>
+</section>
+
+<section data-title="But, therefore">
+  <p class="kicker">Matt Stone &amp; Trey Parker, via Nicky Case</p>
+  <h2>“And then” is a list. “But” and “therefore” are a story.</h2>
+  <div class="vs2">
+    <div>
+      <h3>As written first</h3>
+      <ol class="beats flat">
+        <li>A token bucket holds tokens, <b>and then</b></li>
+        <li>each request spends one, <b>and then</b></li>
+        <li>tokens refill at a fixed rate, <b>and then</b></li>
+        <li>there's a capacity, <b>and then</b></li>
+        <li>bursts are limited, <b>and then</b></li>
+        <li>here's a sandbox.</li>
+      </ol>
+    </div>
+    <div class="step">
+      <h3>Rewritten</h3>
+      <ol class="beats">
+        <li>Six requests arrive at once. Four pass.</li>
+        <li><b>Therefore</b> each request spends a token.</li>
+        <li><b>But</b> later requests pass again,</li>
+        <li><b>therefore</b> tokens come back over time.</li>
+        <li><b>But</b> after a long wait, the same burst loses two again,</li>
+        <li><b>therefore</b> capacity caps the burst. Your turn: …</li>
+      </ol>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:11. The South Park writers' rule (from a 2011 NYU class): if the beats of your outline join with "and then", you have a sequence of events; join them with "but" or "therefore" and each beat is caused by the one before. Case uses it to order the sections of Trust. Show the left column; ask the room which beat could become a "but". Then reveal the right. Each "but" is a surprise the reader can see in the figure; each "therefore" is the rule that explains it. The right column is the step order of the token-bucket demo; a test (<code>test/claims.test.mjs</code>) checks that the steps' first words still read Four / But / Therefore / But / Therefore. The full outline is in <code>demos/but-therefore.md</code>.</p>
+  </aside>
+</section>
+
+<section data-title="End with a question">
+  <p class="kicker">Step 3</p>
+  <h2>End with a sandbox, or a question</h2>
+  <ul class="big">
+    <li><em>Trust</em> ends with a sandbox: change the population, the payoffs, the noise. Test claims the author never made.</li>
+    <li>The token bucket ends with: <em>twelve evenly spaced requests, a bucket of 3: what is the slowest refill rate that lets all twelve through? Now drag four to the same moment.</em></li>
+    <li>The sandbox comes <strong>last</strong>. Given first, it's a dashboard with no starting point.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:12. The ending question should be answerable with the controls the reader now has, and shouldn't have been answered in the text. The token-bucket answers: 1.05 tokens per second on the slider for the evenly spaced twelve, exactly 9/8.8 ≈ 1.023 (the bucket is full at the start, so early refill is wasted: the twelfth request needs nine refilled tokens in the 8.8 s after the bucket was last full); and with four at the same moment, no rate works: four at once can't pass a bucket of three. The reader discovers the rule of the whole piece (capacity caps the burst) on their own. Both numbers are checked in <code>demos/token-bucket/test/claims.test.mjs</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Do, show, tell">
+  <p class="kicker">Nicky Case · explorable explanations workshop notes</p>
+  <h2>Each medium for what it does best</h2>
+  <table class="dtable">
+    <thead><tr><th>Medium</th><th>Best at</th><th>Token bucket example</th></tr></thead>
+    <tbody>
+      <tr><td>Text</td><td>abstract claims, definitions, the rule</td><td>“capacity sets the largest burst”</td></tr>
+      <tr><td>A static picture</td><td>a relationship at a glance</td><td>the token level over 10 seconds</td></tr>
+      <tr><td>An animation</td><td>a sequence in time</td><td>the bucket draining during a burst</td></tr>
+      <tr><td>An interactive</td><td>a process the reader can vary</td><td>drag the capacity, see the cut-off move</td></tr>
+    </tbody>
+  </table>
+  <p class="cite mt">“Use interactivity only when interactivity works best.”</p>
+  <aside class="notes">
+    <p>~0:13. Case's workshop list (blog.ncase.me/explorable-explanations) calls it “Do, Show, Tell”: do (interact), show (pictures, animation), tell (text). The failure he names is over-interactivity: trying to explain everything with sliders. A definition behind a slider is slower than a sentence.</p>
+  </aside>
+</section>
+
+<section data-title="Gates">
+  <p class="kicker">Nicky Case, on playtesting Earth: A Primer</p>
+  <h2>Gates: withhold the next part</h2>
+  <ul class="big">
+    <li>Chaim Gingold's <em>Earth: A Primer</em> doesn't let the reader move on until they've done the page's task.</li>
+    <li>Case reports that playtesting is what led there: the next page opens only after the current one is done.</li>
+    <li>In the token bucket (scroll version), the answer and everything after it stay hidden until the reader guesses.</li>
+  </ul>
+  <p class="cite">“By withholding an explanation, the explorable explanation can be more effective.”</p>
+  <aside class="notes">
+    <p>~0:15. A gate is the opposite of the web's default, where everything is one scroll away. Use it sparingly: one gate at the question that the rest depends on. Always give a way past it (the token bucket has “Skip”), or the reader who already knows leaves.</p>
+  </aside>
+</section>
+
+<section data-title="The explorable is not the explanation">
+  <p class="kicker">Amit Patel · Red Blob Games</p>
+  <h2>The explorable is not the explanation</h2>
+  <ul class="big">
+    <li>The page reads correctly with no interaction at all.</li>
+    <li>Alternate explanation and interaction: a paragraph, a figure, a paragraph.</li>
+    <li>“Guide reader through main concepts, not throw them into an open ended simulation.”</li>
+    <li>Use a simplified version of the problem first, so readers can tell whether this is their problem.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:16. Patel has written interactive explanations of game algorithms (pathfinding, hexagonal grids, noise) for over a decade; his talk notes (redblobgames.com/x/2306-educ432) are on the reading list. His ranking of what interaction is for: first helping someone with a task, second understanding, third entertainment. Open the A* page and scroll it without touching anything: it still teaches.</p>
+  </aside>
+</section>
+
+<section data-title="The counter-argument">
+  <p class="kicker">The other side</p>
+  <h2>Most readers never touch it</h2>
+  <ul class="big">
+    <li>Newsrooms report that only a small share of readers use the controls: Patel cites 10–15% at The New York Times.</li>
+    <li>Readers test the author's implementation, not the topic.</li>
+  </ul>
+  <p class="quote sm">“One doesn’t walk away from the article with the dynamic environment in one’s pocket.”</p>
+  <p class="cite">Andy Matuschak · Most dynamic representations developed for communication aren't very enabling</p>
+  <aside class="notes">
+    <p>~0:18. Take the counter-argument seriously. Matuschak's point: an explorable serves the author's argument; when the article ends, the reader has no tool to think with. Patel's: readers fiddle without learning, and they explore his data structures rather than their own. The design response is the previous slide: write for the reader who never clicks, and make the first interaction so cheap that more of them do.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which medium?">
+  <p class="kicker">Quick check</p>
+  <h2>Text, picture, animation, or interactive?</h2>
+  <table class="dtable tight">
+    <tbody>
+      <tr><td>Berlin is one hour ahead of UTC in winter.</td><td><span class="step">text</span></td></tr>
+      <tr><td>Page load time against cache hit rate, 0–100%.</td><td><span class="step">a picture (a chart)</span></td></tr>
+      <tr><td>How one request passes a load balancer, a cache and a database.</td><td><span class="step">an animation, steppable</span></td></tr>
+      <tr><td>How the capacity and refill rate of a rate limiter trade off.</td><td><span class="step">an interactive</span></td></tr>
+      <tr><td>Why <code>[10, 9, 1].sort()</code> returns <code>[1, 10, 9]</code>.</td><td><span class="step">a playground: change the code</span></td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p>~0:20. Ask the room for each row before revealing. Arguments are welcome: a chart with a draggable point is an interactive, and that's fine if the dragging shows something the static chart can't. The last row previews Act 3: when the idea is about code, the control is the code.</p>
+  </aside>
+</section>
+
+<section data-title="What to look for">
+  <p class="kicker">Before the exercise</p>
+  <h2>You're reading for the author's decisions</h2>
+  <ul class="big">
+    <li>What did it ask before it explained?</li>
+    <li>What could you touch first, and when did the next control appear?</li>
+    <li>Where was the “but”?</li>
+    <li>What did it show you that the text alone couldn't?</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:22. Bridge to the exercise. The trap is retelling the topic (“it explains GPS”). The card asks about the page. Form groups of three now; assign pieces by number while they move.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 1 — Take one apart">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 1 · groups of 3 · 20 min</p>
+  <div class="ex-head"><h2>Take one apart</h2><button class="timer" data-min="20"></button></div>
+  <ul class="pieces">
+    <li><b>1</b>Mechanical Watch <span>Ciechanowski</span></li>
+    <li><b>2</b>GPS <span>Ciechanowski</span></li>
+    <li><b>3</b>Parable of the Polygons <span>Hart &amp; Case</span></li>
+    <li><b>4</b>The Evolution of Trust <span>Case</span></li>
+    <li><b>5</b>Introduction to A* <span>Patel</span></li>
+    <li><b>6</b>Hashing <span>Sam Rose</span></li>
+    <li><b>7</b>A Visual Introduction to ML <span>R2D3</span></li>
+    <li><b>8</b>Circles, Sines and Signals <span>Schaedler</span></li>
+    <li><b>9</b>Visualizing Algorithms <span>Bostock</span></li>
+    <li><b>10</b>Interactive Guide to Flexbox <span>Comeau</span></li>
+  </ul>
+  <p>12 min reading and playing, alone. 8 min filling in one card per group.</p>
+  <p class="where mt">storytelling → <b><a href="https://lopin.me/harbour/programming-interactivity-storytelling/exercises/01-take-one-apart.html" target="_blank" rel="noopener">Exercise 1 · Take one apart</a></b> · links, the card, a printable version</p>
+  <aside class="notes">
+    <p>~0:25 → 0:45. Walk round at minute 5: everyone should be in their piece, not on the gallery page. At minute 12, call time on reading. The heavy pieces (1, 2) need a recent laptop; swap a group to a spare (Distill's Momentum, Seeing Theory) if a page stutters. Collect one surprising answer per group for the report back.</p>
+  </aside>
+</section>
+
+<section data-title="The card">
+  <p class="kicker">Exercise 1 · the card</p>
+  <h2>Nine questions about the page, not the topic</h2>
+  <ol class="reading">
+    <li>The idea, in one sentence with a verb.</li>
+    <li>What question does it open with? Did you care by the end of the first screen?</li>
+    <li>Seconds until the first thing you can touch. What is it?</li>
+    <li>Which controls exist at the start, which appear later?</li>
+    <li>One “but” and one “therefore” in the sequence.</li>
+    <li>How many views of the same state? Are they linked?</li>
+    <li>Where were you surprised? What made the surprise possible?</li>
+    <li>Scroll through it again without touching anything. What's lost?</li>
+    <li>How does it end: a sandbox, a summary, a question?</li>
+  </ol>
+  <aside class="notes">
+    <p>Leave this slide up while groups fill in the card (minute 12 onwards).</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · PATTERNS AND FAILURES
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="Patterns" data-at="0:45" data-title="Act 2 — Patterns and failures">
+  <div class="act-deco">▶ ▮▮</div>
+  <div class="act-num">act 02</div>
+  <h1>Patterns and failures</h1>
+  <div class="act-meta"><span class="chip">0:45 – 0:59</span><span>what you just found, named</span></div>
+  <div class="act-list"><span>report back</span><span>five formats</span><span>order of controls</span><span>linked views</span><span>defaults</span><span>failures</span><span>accessibility</span></div>
+</section>
+
+<section data-title="Report back">
+  <p class="kicker">Report back · one sentence per group</p>
+  <h2>What surprised you, and what made it possible?</h2>
+  <p class="lede">Ten groups, one sentence each. The board collects what repeats.</p>
+  <button class="timer" data-min="3"></button>
+  <aside class="notes">
+    <p>~0:45 → 0:48. Write recurring answers on the board in three columns: <em>formats</em> (stepper, scroll, sandbox…), <em>order</em> (one control at a time, gating), <em>views</em> (linked figures, text beside the figure). The next slides name them; point back at the board as you go. Common answers: “the first thing was a game, not a definition” (Polygons), “every figure moved together” (Schaedler, R2D3), “the sliders came one at a time” (Ciechanowski).</p>
+  </aside>
+</section>
+
+<section data-title="Five formats">
+  <p class="kicker">Formats</p>
+  <h2>Five formats, often combined</h2>
+  <div class="grid-5">
+    <div class="card"><h3>Stepper</h3><p>Next / Back through states.</p><p class="muted">algorithms, proofs · A*</p></div>
+    <div class="card"><h3>Scrolly&shy;telling</h3><p>Scroll drives a sticky figure.</p><p class="muted">a narrative with a fixed order · R2D3</p></div>
+    <div class="card"><h3>Sandbox</h3><p>Every control open, no order.</p><p class="muted">after the idea is understood · Trust's end</p></div>
+    <div class="card"><h3>Side by side</h3><p>Two approaches, the same input.</p><p class="muted">comparisons · Bostock's shuffles</p></div>
+    <div class="card"><h3>Predict, then reveal</h3><p>The reader commits to an answer first.</p><p class="muted">misconceptions · the token bucket's first step</p></div>
+  </div>
+  <p class="lede mt">Most good pieces run <strong>guided first, sandbox last</strong>.</p>
+  <aside class="notes">
+    <p>~0:48. Map the board's answers onto the five. Bostock's “Visualizing Algorithms” puts a biased and an unbiased shuffle side by side on the same input, and the bias is visible in one glance. Predict-then-reveal works because a wrong prediction is a surprise you own.</p>
+  </aside>
+</section>
+
+<section data-title="One control at a time">
+  <p class="kicker">Order of controls · Case's “start small, build big”</p>
+  <h2>One new control per step</h2>
+  <ul class="big">
+    <li>Teach each control alone; combine them only once each is understood.</li>
+    <li>Ciechanowski's articles add one slider per section, and each figure has only the sliders its paragraph talks about.</li>
+    <li>The token bucket: time first, then the refill rate, then capacity, then editing the traffic.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:49. Case's example is the game Miegakure, which teaches each of its mechanics alone before combining them. A new control is a new variable in the reader's head. Two at once and they can't tell which one did what.</p>
+  </aside>
+</section>
+
+<section data-title="Linked views">
+  <p class="kicker">Live · demos/token-bucket/02-inputs</p>
+  <h2>Change one view, the others follow</h2>
+  <div class="frame embed short scaled z80"><iframe data-src="demos/token-bucket/02-inputs/index.html?embed" title="Token bucket with linked views"></iframe></div>
+  <aside class="notes">
+    <p>~0:50. Drag the time slider: the bucket, the cursor on the timeline and the sentence all change. Drag a request on the timeline: the outcomes and the token line change. Four views of one state: two figures, a sentence, and the sliders themselves. The sentence is the view that works for a screen reader and for the reader who never clicks. Keep text next to the figure it describes: a figure that scrolls away from its paragraph is two half-explanations.</p>
+  </aside>
+</section>
+
+<section data-title="Defaults make the point">
+  <p class="kicker">Defaults</p>
+  <h2>The starting values are part of the argument</h2>
+  <ul class="big">
+    <li>Choose defaults so the first touch shows the idea: the burst of six starts one slider-drag away from the cut-off.</li>
+    <li>A reset returns to them. Each step of a stepper restores its own.</li>
+    <li>Let the reader be wrong cheaply: predict first; reset to the defaults at any time.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:52. With a bucket of 10 the six-request burst would all pass and the first figure would show nothing. Default values are the most underrated design decision in an explorable: the reader's first impression is your defaults.</p>
+  </aside>
+</section>
+
+<section data-title="Failures">
+  <p class="kicker">Failures you've already seen</p>
+  <h2>Six ways an explorable fails</h2>
+  <ul class="reading">
+    <li>A dashboard of sliders and no starting point.</li>
+    <li>Animation the reader can't pause or step.</li>
+    <li>Randomness without a seed: the point appears only on some loads.</li>
+    <li>The text and its figure scroll apart.</li>
+    <li>The interesting part is behind three clicks.</li>
+    <li>Information only on hover: invisible on touch screens, and it fires while scrolling.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:53. Ask which of these the room met in the gallery. Most have a code fix in Act 4: a stepper, a play/pause loop, a seeded generator, <code>position: sticky</code>, defaults. The last one is a design fix: visible labels and a sentence instead of tooltips.</p>
+  </aside>
+</section>
+
+<section data-title="People disagree">
+  <p class="kicker">There is no single correct format</p>
+  <h2>The experts disagree, so test</h2>
+  <ul class="big">
+    <li><strong>The Pudding</strong> advises against steppers: a tap for every step. Scroll instead.</li>
+    <li><strong>Amit Patel</strong> prefers sliders to animations: the reader controls time.</li>
+    <li><strong>Nicky Case</strong> gates content: the reader can't skip ahead.</li>
+  </ul>
+  <p class="lede">Pick per idea, then watch someone use it.</p>
+  <aside class="notes">
+    <p>~0:55. The Pudding's article is Russell Samora's “Responsive scrollytelling best practices” (pudding.cool/process/responsive-scrollytelling, 2017). The disagreements come from different audiences: news readers on phones, programmers on desktops, students in a course. The only reliable check is a playtest, which Exercise 3 ends with.</p>
+  </aside>
+</section>
+
+<section data-title="Accessible by default">
+  <p class="kicker">Accessibility</p>
+  <h2>An explorable for everyone who reads it</h2>
+  <ul class="big">
+    <li>A sentence that states what the figure shows, updated with it.</li>
+    <li>Every control works from the keyboard: each request is a focusable button; arrows move it, Delete removes it.</li>
+    <li>Not colour alone: the refused requests are red <em>and</em> crossed.</li>
+    <li>Announced when the reader stops, not on every tick. Motion that pauses, and starts paused under <code>prefers-reduced-motion</code>.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:56. Each item is in the token-bucket demo: <code>renderSentence()</code>; <code>edit.js</code> (pointer and keyboard share one module); the ✕ on refused requests; <code>announce()</code>, which waits 700 ms after the last change before updating an <code>aria-live</code> region, so a slider drag is one announcement, not forty; the play loop in step 07. The sentence also serves the majority who never touch anything.</p>
+  </aside>
+</section>
+
+<section data-title="Six frames, filled in">
+  <p class="kicker">Before you draw · the token bucket as a storyboard</p>
+  <h2>Six frames, filled in</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">1 · question</span><p>Six requests in under a second, a bucket of four. How many get through? Pick a number.</p></div>
+    <div class="card"><span class="label">2 · first touch</span><p>Drag time across the burst: each request turns green or red as time reaches it.</p></div>
+    <div class="card"><span class="label">3 · second control</span><p><b>But</b> later requests pass, <b>therefore</b> tokens come back: the refill-rate slider appears.</p></div>
+    <div class="card"><span class="label">4 · surprise</span><p><b>But</b> after a long wait, the same burst still loses two. Default: capacity 4, burst of 6.</p></div>
+    <div class="card"><span class="label">5 · rule</span><p><b>Therefore</b> capacity caps the burst: the capacity slider appears. Rule stated.</p></div>
+    <div class="card"><span class="label">6 · ending</span><p>Twelve requests, a bucket of 3: the slowest rate? Now bunch four.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~0:58. One minute. This is the storyboard the token-bucket demo was built from; the drawn version is <code>print/storyboard-example.html</code>. Point out that frames 3 and 5 each bring in exactly one control, and each with a "but" or "therefore"; and that frame 4 names the default that makes the surprise happen. Frames 2–4 are what they'll build after the break.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 2 — Six frames">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 2 · alone, then pairs · 14 min</p>
+  <div class="ex-head"><h2>Six frames</h2><button class="timer" data-min="14"></button></div>
+  <ol>
+    <li>The question</li>
+    <li>The first touch</li>
+    <li>The second control, and its “but” / “therefore”</li>
+    <li>The surprise, and the default that makes it happen</li>
+    <li>The rule, in one sentence</li>
+    <li>The ending: a question or a sandbox</li>
+  </ol>
+  <p>Pick an idea (yours, or one from the brief), as a sentence with a verb. 8 min drawing, then swap: 3 min each way.</p>
+  <p class="where mt">storytelling → <b><a href="https://lopin.me/harbour/programming-interactivity-storytelling/exercises/02-storyboard.html" target="_blank" rel="noopener">Exercise 2 · Six frames</a></b> · idea list, printable sheet, a filled-in example</p>
+  <aside class="notes">
+    <p>~0:59 → 1:13. Hand out the printed sheets. Walk round in the first two minutes and check the idea sentences: a topic (“sorting”, “machine learning”) gets sent back for a verb. At minute 8 call the swap. Frames 2–4 are what they'll build after the break; say so.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:13" data-title="Break">
+  <p class="brk-kicker">// state.paused = true</p>
+  <h2>Break. <em>15&nbsp;min</em></h2>
+  <pre class="brk-code" aria-hidden="true">you.<span class="f">pause</span>(); <span class="c">// the storyboard stays on the desk</span>
+<span class="k">await</span> coffee; <span class="c">// then: code as the control</span></pre>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: playgrounds, then the engineering, then you build frames 2–4.</p>
+  <aside class="notes">
+    <p>Start the timer. Put <code>demos/playground/</code> on the second screen.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · PLAYGROUNDS
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Playgrounds" data-at="1:28" data-title="Act 3 — Playgrounds">
+  <div class="act-deco">{ }</div>
+  <div class="act-num">act 03</div>
+  <h1>Playgrounds</h1>
+  <div class="act-meta"><span class="chip">1:28 – 1:48</span><span>an explorable whose control is code</span></div>
+  <div class="act-list"><span>show the data</span><span>a start that runs</span><span>one thing to change</span><span>errors in words</span><span>reset</span><span>share</span><span>sandbox</span></div>
+</section>
+
+<section data-title="Playgrounds you know">
+  <p class="kicker">A playground is an explorable whose control is code</p>
+  <h2>What do you see before you type anything?</h2>
+  <div class="cat">
+    <div class="card"><span class="label">go.dev/tour</span><p>Tour of Go: a running program on every page.</p></div>
+    <div class="card"><span class="label">react.dev</span><p>Editable examples, then challenges with solutions.</p></div>
+    <div class="card"><span class="label">svelte.dev/tutorial</span><p>One concept per page, a broken app to fix.</p></div>
+    <div class="card"><span class="label">MDN</span><p>Live examples above the reference text.</p></div>
+    <div class="card"><span class="label">regex101.com</span><p>Matches highlight as you type; each token explained.</p></div>
+    <div class="card"><span class="label">cubic-bezier.com</span><p>Drag the curve, get the CSS, race it against <code>ease</code>.</p></div>
+    <div class="card"><span class="label">Observable</span><p>Notebooks: every cell's value shown under it.</p></div>
+    <div class="card"><span class="label">joshwcomeau.com</span><p>A playground in almost every article.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~1:28. Ask the room which of these they've used to learn something, and what they saw first. The answer is the same everywhere: code that already runs, with its output. Nobody shows an empty editor.</p>
+  </aside>
+</section>
+
+<section data-title="Learnable programming">
+  <p class="kicker">Bret Victor · Learnable Programming · 2012</p>
+  <h2>“Show the data”</h2>
+  <table class="dtable tight">
+    <tbody>
+      <tr><td>Read the vocabulary</td><td>every name's meaning visible in place</td></tr>
+      <tr><td>Follow the flow</td><td>see execution step by step, line by line</td></tr>
+      <tr><td>See the state</td><td>“The entire purpose of code is to manipulate data, and we never see the data.”</td></tr>
+      <tr><td>Create by reacting</td><td>“Start with something, then adjust until it's right.”</td></tr>
+      <tr><td>Create by abstracting</td><td>start with constants; turn them into variables, then functions</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p>~1:30. Victor wrote this as a critique of beginner coding environments (Khan Academy's at the time), but it's a checklist for any playground. Most playgrounds manage “create by reacting” (live output). Few manage “see the state”: the console is the cheapest way to show data, and a playground that prints values next to the code is better than one that only shows a final result.</p>
+  </aside>
+</section>
+
+<section data-title="Whose 09:00?">
+  <p class="kicker">Live · demos/playground</p>
+  <h2>Whose 09:00?</h2>
+  <div class="frame embed scaled z80"><iframe data-src="demos/playground/index.html?embed" title="A playground: Whose 09:00?"></iframe></div>
+  <aside class="notes">
+    <p>~1:32 → 1:37 (five minutes: this is the centrepiece of the act). The problem: a team in Lisbon, Berlin and New York gets one meeting time for everyone. The output shows the projector's local time three times. Edit live: add <code>timeZone: person.timeZone</code> to the options. The checks turn green as you type. Then break it: delete a bracket. The output stays (greyed) and an error appears with its line number. Then challenge 2: ask the room to predict first, then change the date to 27 October; New York moves by an hour and the others don't. That's the surprise, and nobody finds it by reading the code. Optional, if there's time: challenge 3 (Kolkata, 13:30), a second surprise: zones aren't whole hours. Type <code>while (true) {}</code> to show the watchdog stop it after 1.5 s. For challenge 2, switch to the playground tab (open per the run sheet): in the scaled frame the challenges are below the fold. If someone tries challenge 4 for Kolkata, Chrome may report <code>timeZone: "Asia/Calcutta"</code>: the old canonical name in the time-zone database, not a bug, and a good open-question surprise.</p>
+  </aside>
+</section>
+
+<section data-title="A playground tells a story too">
+  <p class="kicker">The same shape, with code as the control</p>
+  <h2>A playground tells a story too</h2>
+  <table class="dtable tight">
+    <tbody>
+      <tr><td>The question</td><td>a bug the reader recognises: one time printed for three cities</td></tr>
+      <tr><td>The first touch</td><td>one marked place: <code>// ✎ the options to change</code></td></tr>
+      <tr><td>Feedback</td><td>three checks turn green as the output changes</td></tr>
+      <tr><td>The surprise</td><td><strong>predict first</strong>, then move the date a week: only New York changes</td></tr>
+      <tr><td>The ending</td><td>an open question: what else could make an attendee see the wrong time?</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p>~1:37. The first screen runs: Josh Comeau's default playground says “You can edit this text.” The snippet is short, the place worth changing is marked, and what the reader doesn't need is out of the way. An empty editor asks the reader to know the answer before they've seen the question. The challenges are ordered, not a list of exercises: fix, then predict a surprise, then a second surprise, then an open question. “Predict first” matters more in a playground than anywhere: the output appears so fast that the reader never forms an expectation to be wrong about.</p>
+  </aside>
+</section>
+
+<section data-title="Output and errors">
+  <p class="kicker">Design · feedback</p>
+  <h2>Output beside the code, errors in words</h2>
+  <ul class="big">
+    <li>Run on input, after a pause in typing (300 ms), not on every keystroke.</li>
+    <li>Show the console under the code; show the error with its line number.</li>
+    <li>Code that doesn't parse prints nothing: keep the last good output, greyed.</li>
+    <li>A <strong>Reset</strong> to the starting code, and a link that reproduces exactly this code.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:39. Mid-edit, code is broken most of the time. If the output disappears every time a bracket is missing, the reader loses the thing they were comparing against. Reset makes experiments cheap: the reader can break anything and get back. The share link is the code itself, base64url-encoded UTF-8 in the URL's hash (never sent to the server); <code>btoa</code> alone throws on any character outside Latin-1, so encode with <code>TextEncoder</code> first. The TypeScript and Svelte playgrounds do the same, compressed.</p>
+  </aside>
+</section>
+
+<section data-title="A demonstration, not an IDE">
+  <p class="kicker">Josh Comeau · on CodeMirror vs Monaco</p>
+  <p class="quote sm">“Most web-based playgrounds are meant to demonstrate a concept, not serve as a daily-driver editor.”</p>
+  <ul class="big mt">
+    <li>A <code>&lt;textarea&gt;</code> with a line-number gutter is often enough.</li>
+    <li>Tab should indent, and <kbd>Esc</kbd> should give Tab back to the page: an editor must not trap the keyboard.</li>
+    <li>Challenges with a visible check, and the solution behind <code>&lt;details&gt;</code>.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:41. Sandpack ships CodeMirror; Comeau explains why it suits teaching better than Monaco (VS Code's editor, several megabytes, built for writing programs). A teaching playground needs to show a concept and load fast. The keyboard trap is real: a textarea that captures Tab with no way out fails WCAG 2.1.2. The checks in our demo are regular expressions over the output.</p>
+  </aside>
+</section>
+
+<section data-title="How it runs">
+  <p class="kicker">demos/playground/playground.js · (L12)</p>
+  <h2>Run the code in a fresh sandboxed frame</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="xs">function execute() {
+  run++;
+  frame?.remove();                                  // a new frame for every run
+  frame = document.createElement("iframe");
+  frame.setAttribute("sandbox", "allow-scripts");   // scripts only, opaque origin
+  frame.srcdoc = head + user + `<\/script><script>__send({ type: "done" })<\/script>`;
+  document.body.append(frame);
+  watchdog = setTimeout(() => { if (!finished) frame.remove(); /* "Stopped after 1.5 s" */ }, 1500);
+}
+// RELAY, inside the frame: console calls and errors become messages
+console.log = (...args) => __send({ type: "log", text: args.map((a) => __show(a)).join(" ") });</script>
+    <ul>
+      <li>The reader's code in its own <code>&lt;script&gt;</code>: a syntax error doesn't stop the relay.</li>
+      <li>A run number in every message: late output from a replaced run is ignored.</li>
+      <li>No <code>done</code> within 1.5 s: the frame is removed, and the console says why.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:43. About 200 lines in total, no library. The <code>&lt;/script</code> escape matters: without it, a string containing <code>&lt;/script&gt;</code> in the reader's code ends the script element early. <code>__show</code> prints values the way a reader writes them (<code>Map(1) {"a" =&gt; 1}</code>, <code>undefined</code>, <code>Date(…)</code>): Victor's "show the data" for the console. (L12) If Lecture 12 came first, this slide and the next are a recap: one sentence each.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Why the iframe">
+  <p class="kicker">Quick check · (L12)</p>
+  <h2>Why not just <code>eval(code.value)</code> in the page?</h2>
+  <div class="stack">
+    <div class="reveal-box step solid">The reader's code would run with the page's rights: its DOM, its cookies, its <code>localStorage</code>. And the code travels in links, so anyone could send a link that runs code on whoever opens it.</div>
+    <div class="reveal-box step">A sandboxed frame without <code>allow-same-origin</code> gets an <strong>opaque origin</strong>: it can't read the page. It can only <code>postMessage</code>, and the page checks <code>event.source === frame.contentWindow</code>.</div>
+    <div class="reveal-box step">An infinite loop may still hang the tab, depending on whether the browser gives the frame its own process. The watchdog throws a stuck frame away; a Worker can be terminated outright.</div>
+  </div>
+  <aside class="notes">
+    <p>~1:46. Every serious playground runs code in an iframe, usually on a separate origin; Comeau self-hosts his bundler on its own domain. With <code>eval</code>, the share-link feature is an XSS by design. Chrome currently runs this sandboxed frame out of process, so the page stays responsive while the frame spins; not every browser does. Demonstrate with <code>while (true) {}</code> in the playground.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 4 · ENGINEERING AN EXPLORABLE
+     ===================================================================== -->
+
+<section class="act" data-act="4" data-act-name="Engineering" data-at="1:48" data-title="Act 4 — Engineering an explorable">
+  <div class="act-deco">f(s)</div>
+  <div class="act-num">act 04</div>
+  <h1>Engineering an explorable</h1>
+  <div class="act-meta"><span class="chip">1:48 – 2:00</span><span>the token bucket, in seven folders</span></div>
+  <div class="act-list"><span>a tested model</span><span>several views</span><span>pointer + keyboard</span><span>steps as data</span><span>seeds</span><span>the URL</span><span>scroll · time</span></div>
+</section>
+
+<section data-title="A pure model">
+  <p class="kicker">Step 01 · model.js · test/claims.test.mjs</p>
+  <h2>The model knows nothing about the page</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="xs">export function simulate({ capacity, rate, requests }) {
+  // … for each request, in time order:
+  tokens = Math.min(capacity, tokens + (t - last) * rate);
+  if (tokens >= 1 - 1e-9) { tokens -= 1; outcome[i] = "ok"; } else outcome[i] = "refused";  // float tolerance
+  return { outcome, curve }; // curve: [time, tokens] points
+}
+
+// test/claims.test.mjs: every number the text states, checked
+test("5 / 7: the bucket is full again at 8 s, and the second burst still loses two", …);</script>
+    <ul>
+      <li>Parameters in, results out. No DOM, no globals: the figure can be redrawn from scratch any time.</li>
+      <li>It runs in Node, so the explanation's claims are tests: <code>node --test test/claims.test.mjs</code>.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:48. A pure model makes every later step cheap: steps, seeds, URLs and time are all ways of choosing the arguments. The test file checks every number in the text, from “four of the six” to “1.05 tokens per second”, plus the outline and the one-new-control rule. The first draft of this demo had a sentence the simulation contradicted (“the bucket holds four”, while it held three at that moment); a test caught it. Wrong numbers in an explanation are worse than none: the reader trusts the figure. The <code>1 - 1e-9</code> is a float tolerance: at 0.5 tokens per second the request at 3 s finds exactly one token in real arithmetic, and 1.0000000000000004 in floating point. It passes by a rounding margin of 4×10⁻¹⁶, and rounding could as easily have landed just below 1, giving a refusal the text doesn't explain. The tolerance makes the model's answer the arithmetic's answer.</p>
+  </aside>
+</section>
+
+<section data-title="One state, several views">
+  <p class="kicker">Step 01 · main.js</p>
+  <h2>One state, three render functions</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="small">function render() {
+  const result = simulate(state);
+  const level = levelAt(result.curve, state.cursor);
+  renderBucket(⟦$("#bucket")⟧, { capacity: state.capacity, level });
+  renderTimeline(⟦$("#timeline")⟧, { ...state, result });
+  renderSentence(⟦$("#sentence")⟧, { ...state, result, level });
+}</script>
+    <ul>
+      <li>Lecture 5's <code>render(state)</code>, with three outputs.</li>
+      <li>Linked views come for free: they read the same state.</li>
+      <li>The sentence is a view too.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:50. Ask: what do you need to add a fourth view, say a table of requests? One function, one call. Nothing else changes. The SVG is rebuilt on each render; at this size that's well under a millisecond.</p>
+  </aside>
+</section>
+
+<section data-title="Direct manipulation">
+  <p class="kicker">Step 02 · edit.js</p>
+  <h2>Pointer and keyboard, one state</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="xs">svg.addEventListener("pointerdown", (e) => {
+  const hit = requestAt(svg, e, requests);           // nearest in time, not the top circle
+  if (hit >= 0) drag = { i: hit, x: e.clientX, moved: false };
+  else { state().requests.push(timeFromEvent(svg, e)); /* … */ }
+  svg.⟦setPointerCapture⟧(e.pointerId);
+  render();
+});
+svg.addEventListener("keydown", (e) => {   // each request: tabindex="0" role="button"
+  if (e.key === "ArrowRight") requests[i] = snap(requests[i] + 0.05);
+  else if (e.key === "Delete") requests.splice(i, 1);
+  render();
+  svg.querySelector(`[data-i="${focus}"]`)?.focus(); // same request; after Delete, the next in time
+});</script>
+    <ul>
+      <li><code>setPointerCapture</code>: moves keep arriving when the pointer leaves the SVG. <code>touch-action: none</code>, or the drag scrolls the page.</li>
+      <li>Every drag has a keyboard path; after a re-render, focus returns to the request, or after Delete to the next one in time.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:51. Pointer Events (Lecture 11) cover mouse, pen and touch. Pixels become seconds through <code>getScreenCTM().inverse()</code>, so it works at any size. A click without movement removes a request; a four-pixel threshold tells a click from a drag. The first version picked the request by <code>e.target</code>: in a tight burst the enlarged hit circles overlap, and a click on one request removed its neighbour. <code>requestAt()</code> picks the nearest request in time instead, with a reach of at least 22 screen pixels. The marks are drawn in time order, so Tab moves left to right.</p>
+  </aside>
+</section>
+
+<section data-title="Steps as data">
+  <p class="kicker">Step 03 · steps.js</p>
+  <h2>The explanation is an array</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="xs">export const STEPS = [
+  { html: "… How many of the six get through?",
+    set: { capacity: 4, rate: 1, requests: BURST, cursor: 0 }, controls: [], predict: true },
+  { html: "<strong>Four.</strong> … Drag time across the burst …",
+    set: { capacity: 4, rate: 1, requests: BURST, cursor: 0.8 }, controls: ["cursor"],
+    reveal: true },                          // outcomes appear as time passes them
+  { html: "<strong>But</strong> … two more requests … both get through …", /* … */ },
+  { html: "<strong>Therefore</strong> tokens come back … Slow the refill …",
+    set: { /* … */ }, controls: ["cursor", ⟦"rate"⟧] },
+  // … But · Therefore · Your turn
+];
+function goTo(n) { step = n; state = structuredClone(STEPS[n].set); render(); }</script>
+    <ul>
+      <li>Each step sets the author's defaults and lists the controls; the figure is a function of state and step, so Back works.</li>
+      <li>The first words, in order, are the outline: Four · But · Therefore · But · Therefore. A test keeps them that way.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:53. Open <code>03-stepper</code> and click through. The predict step hides the outcomes and the token line, since either would give the answer away. Each step adds at most one control (the test checks that too). Editing <code>steps.js</code> rewrites the explanation without touching any drawing code, which is what you want when a playtest shows a step in the wrong place. The step text is a live region, so it's written only when the step changes, not on every render.</p>
+  </aside>
+</section>
+
+<section data-title="Seeded randomness">
+  <p class="kicker">Step 05 · rng.js</p>
+  <h2>The same surprise for every reader</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="small">export function mulberry32(seed) {
+  return function () {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const requests = traffic(mulberry32(7));</script>
+    <ul>
+      <li><code>Math.random</code> can't be seeded: the burst you wrote about may not happen.</li>
+      <li>Seed 7 always has a burst between 4.65 s and 5.25 s.</li>
+      <li>Not for security; for reproducible demos and tests.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:55. Click "Unseeded" a few times in 05, then go back to seed 7. Two of seed 7's requests land at exactly 4.65 s, so they draw as one mark: drag the top one aside to reveal the other (or Tab to both). The text can now refer to "the burst at 4.65 s" and be right for every reader; the test file checks it. mulberry32 is a small public-domain generator with a 32-bit state; good enough for demos, not for cryptography (use <code>crypto.getRandomValues</code>).</p>
+  </aside>
+</section>
+
+<section data-title="State in the URL">
+  <p class="kicker">Step 06 · url.js</p>
+  <h2>A link opens the figure in a given state</h2>
+  <div class="stacked">
+    <script type="text/x-code" data-lang="js" class="xs">// in the text:
+<a href="?cap=4&rate=1&seed=7&t=5.3">See the bucket just after them</a>
+
+// in the page:
+const p = new URLSearchParams(location.search);
+const num = (key, fallback, min, max) => {
+  const v = Number(p.get(key));
+  return p.has(key) && Number.isFinite(v) ? clamp(v, min, max) : fallback;
+};
+const capacity = Math.round(num("cap", 4, 1, 8));   // ?cap=99 → 8, ?rate=abc → 1
+history.⟦replaceState⟧(null, "", toSearch(state)); // debounced: 200 ms after the last change</script>
+    <ul>
+      <li>The address bar is one more view of the state.</li>
+      <li>The query string comes from strangers: validate and clamp every value.</li>
+      <li>Debounce the writes: Safari throttles <code>replaceState</code>.</li>
+      <li>Links push history, so Back returns to the previous state.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:57. With state in the URL, the text can point at the figure ("here is the burst"), a reader can send a teacher exactly what confuses them, and a playtester's state can be reproduced. Try <code>?cap=99&amp;rate=abc</code> live: it opens at capacity 8 and rate 1.</p>
+  </aside>
+</section>
+
+<section data-title="Scroll and time">
+  <p class="kicker">Steps 04 and 07 · read them after class</p>
+  <h2>Two more folders: scroll and time</h2>
+  <div class="vs2">
+    <div>
+      <h3>04 · scroll-driven</h3>
+      <ul>
+        <li>The same <code>steps.js</code>; an <code>IntersectionObserver</code> picks the step whose text crosses a line: the middle of the screen, or below the sticky figure on a phone.</li>
+        <li><code>position: sticky</code> keeps the figure in view.</li>
+        <li>Room after the last step, or the ending never reaches the line.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>07 · time you can pause</h3>
+      <ul>
+        <li>A <code>requestAnimationFrame</code> loop that advances by real elapsed time.</li>
+        <li>Play, pause, step; starts paused under <code>prefers-reduced-motion</code>, or when a link asks for a moment (<code>?t=5.3</code>).</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:59. One minute, then the exercise. Open 04 and scroll once if there's time: the gate (the steps after the question stay hidden until the reader guesses) is the visible part. <code>svh</code> is the small viewport height, which doesn't change when mobile toolbars slide away, unlike <code>vh</code>.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Exercise 3 — Build three frames">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 3 · alone · 40 min</p>
+  <div class="ex-head"><h2>Build frames 2, 3 and 4</h2><button class="timer" data-min="40"></button></div>
+  <ol>
+    <li>Your question is the heading; the first step offers one thing to touch.</li>
+    <li>The second control appears at the second step, with its “but” or “therefore”.</li>
+    <li>The surprise happens on every load, from that step's defaults.</li>
+    <li>A sentence under the figure says what it shows.</li>
+  </ol>
+  <p>Explorable or playground starter; each track has its own “done means” in the brief. Last 7 minutes: the silent test.</p>
+  <p class="where mt">storytelling → <b><a href="https://lopin.me/harbour/programming-interactivity-storytelling/exercises/03-build.html" target="_blank" rel="noopener">Exercise 3 · Build three frames</a></b> · starters, hints, traps</p>
+  <aside class="notes">
+    <p>~2:00 → 2:40. Walk round at minute 10: does everyone have a figure that redraws from state? At minute 20: is the second control hidden at step 1? Most common stall: drawing code. Tell them a rough figure with a working control beats a beautiful figure with none. At 2:33 call the silent test (next slide): seven minutes, both ways.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="The silent test">
+  <p class="kicker">Exercise 3 · last 7 minutes</p>
+  <div class="ex-head"><h2>The silent test</h2><button class="timer" data-min="7"></button></div>
+  <ul class="big">
+    <li>Your neighbour uses your page. You watch. Don't speak, don't point, don't touch the mouse.</li>
+    <li>Write three things: where they hesitated · did they reach the surprise? · the sentence you wanted to say.</li>
+    <li>Then swap.</li>
+  </ul>
+  <aside class="notes">
+    <p>~2:33. Swap after three and a half minutes. Before the timer starts, name the three volunteers for Show three. Nothing else for them yet: their laptops are in their testers' hands. This is the cheapest playtest there is, and it's what Case means by "test your explanation with people". The third line of the note is the important one: wherever the author wanted to speak, the page is missing a sentence. Show three uses these notes: an author can open with what their tester missed.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 5 · SHOWING IT
+     ===================================================================== -->
+
+<section class="act" data-act="5" data-act-name="Showing it" data-at="2:40" data-title="Act 5 — Showing it">
+  <div class="act-deco">▶</div>
+  <div class="act-num">act 05</div>
+  <h1>Showing it</h1>
+  <div class="act-meta"><span class="chip">2:40 – 2:55</span><span>working code, in front of a room</span></div>
+  <div class="act-list"><span>one point</span><span>the pain first</span><span>before beside after</span><span>prepare the run</span><span>end on purpose</span><span>90 seconds each</span></div>
+</section>
+
+<section data-title="A live demo is an explanation">
+  <p class="kicker">PostHog · 24 tips for giving S-tier demos</p>
+  <h2>A live demo follows the same rules</h2>
+  <ul class="big">
+    <li><strong>One point.</strong> Decide the sentence the room should remember. Get to it in the first minute.</li>
+    <li><strong>The pain first.</strong> Open with a problem the room already has, not with the feature.</li>
+    <li><strong>Before beside after.</strong> The same input through the old way and the new one.</li>
+    <li><strong>How it works, not how you built it.</strong> The code walkthrough is a different talk.</li>
+  </ul>
+  <aside class="notes">
+    <p>~2:40. While this slide and the next are up (to 2:45), the three volunteers copy their folder (or URL) to the projector laptop; only the first plugs in if there's one cable. The question / touch / surprise / rule shape works for a three-minute demo too: the pain is the question, the before-and-after is the surprise. PostHog's list (posthog.com/newsletter/how-to-demo) is written for hackathon demos and holds for any room.</p>
+  </aside>
+</section>
+
+<section data-title="Prepare the run">
+  <p class="kicker">Before you start</p>
+  <h2>Prepare the run, then don't apologise</h2>
+  <ul class="reading">
+    <li>Realistic data, and a seeded or saved state: the surprise happens on cue.</li>
+    <li>Notifications off. Browser zoomed so the back row can read it.</li>
+    <li>The URL bookmarked or in the address bar; the state in the URL.</li>
+    <li>A screenshot of every step, in case the network or the code fails.</li>
+    <li>Rehearse it aloud once.</li>
+    <li>No “sorry, it's rough” before you start. End with a sentence, then stop.</li>
+  </ul>
+  <aside class="notes">
+    <p>~2:43. Everything from Act 4 pays off here: a seed and a URL make a live demo repeatable. “Sorry, it's still rough” lowers expectations before anyone has seen anything; let the demo speak.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Show three">
+  <span class="sticker your-turn">show</span>
+  <p class="kicker">Show three · 90 seconds each</p>
+  <div class="ex-head"><h2>Three volunteers, three live demos</h2><button class="timer" data-min="10"></button></div>
+  <ol>
+    <li>One sentence of pain: the problem your page solves for its reader.</li>
+    <li>The surprise, live: before beside after, or the default that makes it happen.</li>
+    <li>A closing sentence. Stop.</li>
+  </ol>
+  <p>The room answers: what was the point? The author checks it against the sentence they chose.</p>
+  <aside class="notes">
+    <p>~2:45 → 2:55. The three volunteers were named at 2:33 and copied their pages to the projector laptop during slides 53–54. Volunteers apply slides 53–54: the pain sentence, the surprise live, stop. Pick three pages that differ: an explorable, a playground, one unfinished but with a clear first touch. Give each author 30 seconds to choose their sentence before they start. Keep time hard at 90 seconds. After each: the room says the point in one sentence; if it doesn't match the author's, ask which beat was missing.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     CLOSE
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Close" data-at="2:55" data-title="Three questions">
+  <p class="kicker">Close</p>
+  <h2>Three questions for any explanation you make</h2>
+  <ul class="big">
+    <li>What question does the reader care about?</li>
+    <li>What do they touch first?</li>
+    <li>What can only be understood by touching it?</li>
+  </ul>
+  <p class="lede">Optional: finish frames 5 and 6, and run the silent test on someone outside the course.</p>
+  <aside class="notes">
+    <p>~2:55. If the answer to the third question is “nothing”, write a paragraph and a picture instead. That's a good outcome, not a failure.</p>
+  </aside>
+</section>
+
+<section data-title="Read more">
+  <p class="kicker">Reading list</p>
+  <h2>Where these ideas come from</h2>
+  <ul class="reading">
+    <li><a href="https://blog.ncase.me/how-i-make-an-explorable-explanation/" target="_blank" rel="noopener">Nicky Case · How I Make Explorable Explanations</a> <span class="muted">— question, ladder, question</span></li>
+    <li><a href="https://blog.ncase.me/explorable-explanations/" target="_blank" rel="noopener">Nicky Case · Explorable Explanations</a> <span class="muted">— do / show / tell, gates, start small</span></li>
+    <li><a href="https://worrydream.com/ExplorableExplanations/" target="_blank" rel="noopener">Bret Victor · Explorable Explanations</a>, <a href="https://worrydream.com/LadderOfAbstraction/" target="_blank" rel="noopener">Ladder of Abstraction</a>, <a href="https://worrydream.com/LearnableProgramming/" target="_blank" rel="noopener">Learnable Programming</a></li>
+    <li><a href="https://www.redblobgames.com/x/2306-educ432/" target="_blank" rel="noopener">Amit Patel · notes on interactive explanations</a> <span class="muted">— and the critiques</span></li>
+    <li><a href="https://notes.andymatuschak.org/zB5wf5crA1jVZb6CycZSjGRTjSkw2BpsdjG" target="_blank" rel="noopener">Andy Matuschak · dynamic representations aren't very enabling</a></li>
+    <li><a href="https://www.joshwcomeau.com/react/next-level-playground/" target="_blank" rel="noopener">Josh Comeau · A World-Class Code Playground</a> <span class="muted">— design of a teaching playground</span></li>
+    <li><a href="https://pudding.cool/process/responsive-scrollytelling/" target="_blank" rel="noopener">The Pudding · Responsive scrollytelling best practices</a></li>
+    <li><a href="https://posthog.com/newsletter/how-to-demo" target="_blank" rel="noopener">PostHog · 24 tips for giving S-tier demos</a> · <a href="https://explorabl.es/" target="_blank" rel="noopener">explorabl.es</a></li>
+  </ul>
+  <aside class="notes">
+    <p>~2:57. All on the materials page too.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Let them touch it. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="big-title">Let them <span class="b">touch it.</span></h1>
+      <p class="title-sub">materials →<br><a href="https://lopin.me/harbour/programming-interactivity-storytelling/index.html" target="_blank" rel="noopener">lopin.me/harbour/programming-interactivity-storytelling</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">// the whole class</span>
+state = STEPS[step].set; <span class="c">// author</span>
+render(state);           <span class="c">// page</span>
+input → state → render   <span class="c">// reader</span></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

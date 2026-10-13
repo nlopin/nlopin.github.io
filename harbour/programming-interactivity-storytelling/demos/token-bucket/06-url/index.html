@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token bucket · 06 · state in the URL</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>A token bucket</h1>
+    <p class="lede">Step 06 · state in the URL. The address bar follows every change, so a link opens the figure exactly as you see it.</p>
+    <p class="links">Seed 7 sends a burst of six requests between 4.65 s and 5.25 s (two of them at the same moment).
+      <a href="?cap=4&amp;rate=1&amp;seed=7&amp;t=5.3">See the bucket just after them</a>: two are refused.
+      <a href="?cap=6&amp;rate=1&amp;seed=7&amp;t=5.3">The same traffic with a bucket of 6</a>: none are.</p>
+
+    <div class="figure">
+      <svg id="bucket" viewBox="0 0 140 305" role="img"></svg>
+      <svg id="timeline" viewBox="0 0 800 250" role="img" class="editable"></svg>
+    </div>
+    <ul class="legend">
+      <li><span style="background: var(--level)"></span>tokens in the bucket</li>
+      <li><span style="background: var(--ok)"></span>request accepted</li>
+      <li><span style="background: var(--refused)"></span>request refused ✕</li>
+    </ul>
+    <p id="sentence" class="sentence"></p>
+    <p id="announce" class="sr-only" aria-live="polite"></p>
+
+    <div class="controls">
+      <label>Time <input id="cursor" type="range" min="0" max="10" step="0.1"><span id="cursor-out" class="out"></span></label>
+      <label>Capacity <input id="capacity" type="range" min="1" max="8" step="1"><span id="capacity-out" class="out"></span></label>
+      <label>Refill rate <input id="rate" type="range" min="0.25" max="4" step="0.05"><span id="rate-out" class="out"></span></label>
+      <div class="row">
+        <button id="add">Add a request at the cursor</button>
+        <button id="clear">Remove all</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div class="row">
+        <label class="inline">Seed <input id="seed" type="number" min="1" step="1"></label>
+        <button id="next-seed">Next seed</button>
+        <button id="unseeded">Unseeded (Math.random)</button>
+        <button id="copy">Copy a link to this state</button>
+        <span id="copied" class="muted" aria-live="polite"></span>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

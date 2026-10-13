@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🪣%3C/text%3E%3C/svg%3E">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Let them touch it · Programming Interactivity</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/kit.css">
+  <style>
+    .hero h1 { font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem); line-height: 0.9; }
+    .big-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .page.wire .big-links a { font: 700 1.05rem "Space Grotesk", sans-serif; color: #03101b; text-decoration: none; padding: 0.8rem 1.3rem; border-radius: 99px; background: #ffb547; box-shadow: 0 0 24px rgb(255 181 71 / 0.4); }
+    .keys { font: 500 0.9rem/1.8 "IBM Plex Mono", monospace; }
+  </style>
+</head>
+<body class="page wire">
+  <div class="page-wrap">
+    <div class="page-top"><span>Programming Interactivity · Storytelling</span><span>theory + practice</span></div>
+    <div class="hero">
+      <span class="eyebrow-tag">Storytelling with demos and playgrounds</span>
+      <h1>Let them <em>touch it</em></h1>
+      <p class="intro">How a page explains an idea by letting the reader touch it. What good explorable explanations have in common: a question first, one concrete case before the rule, beats joined by "but" and "therefore", one control at a time, a sandbox at the end. Then code playgrounds, where the control is code. Then the engineering underneath: one state and several views, steps as data, scroll, seeded randomness, state in the URL, time you can pause. Then showing working code to a room.</p>
+      <div class="big-links"><a href="slides.html">▶ Open the slides</a><a href="demos/token-bucket/index.html">The token bucket, step by step</a><a href="demos/playground/index.html">The playground</a></div>
+    </div>
+
+    <h2>Exercises</h2>
+    <ul>
+      <li><a href="exercises/01-take-one-apart.html">Exercise 1 · Take one apart</a>: ten explorable explanations, one per group, and a card of nine questions about the author's decisions. Groups of 3, 20 min. <a href="print/dissection-card.html">Printable card</a>.</li>
+      <li><a href="exercises/02-storyboard.html">Exercise 2 · Six frames</a>: storyboard one idea on paper, then swap and critique. 14 min. <a href="print/storyboard.html">Printable sheet</a>, <a href="print/storyboard-example.html">a filled-in example</a>.</li>
+      <li><a href="exercises/03-build.html">Exercise 3 · Build three frames</a>: the first touch, the second control, the surprise. An explorable starter and a playground starter. 40 min, including the silent test.</li>
+    </ul>
+
+    <h2>Demos</h2>
+    <ul>
+      <li><a href="demos/token-bucket/index.html">A token bucket</a>, in seven complete folders: two views, inputs, a stepper, scroll-driven, seeded, state in the URL, time. Every number its text states is checked by <code>test/claims.test.mjs</code>.</li>
+      <li><a href="demos/playground/index.html">Whose 09:00?</a> A playground for <code>Intl</code> time zones: a textarea, a fresh sandboxed iframe per run with a watchdog, a console that shows values, reset, the code in the URL, checks, predict-first challenges.</li>
+      <li><a href="demos/but-therefore.md">The token bucket, outlined twice</a>: "and then" vs "but / therefore".</li>
+    </ul>
+
+    <h2>Read more</h2>
+    <ul>
+      <li><a href="https://blog.ncase.me/how-i-make-an-explorable-explanation/">Nicky Case · How I Make Explorable Explanations</a> and <a href="https://blog.ncase.me/explorable-explanations/">Explorable Explanations</a></li>
+      <li><a href="https://worrydream.com/ExplorableExplanations/">Bret Victor · Explorable Explanations</a>, <a href="https://worrydream.com/LadderOfAbstraction/">Up and Down the Ladder of Abstraction</a>, <a href="https://worrydream.com/LearnableProgramming/">Learnable Programming</a></li>
+      <li><a href="https://www.redblobgames.com/x/2306-educ432/">Amit Patel · notes on interactive explanations</a></li>
+      <li><a href="https://notes.andymatuschak.org/zB5wf5crA1jVZb6CycZSjGRTjSkw2BpsdjG">Andy Matuschak · Most dynamic representations developed for communication aren't very enabling</a></li>
+      <li><a href="https://www.joshwcomeau.com/react/next-level-playground/">Josh Comeau · A World-Class Code Playground with Sandpack</a></li>
+      <li><a href="https://pudding.cool/process/responsive-scrollytelling/">The Pudding · Responsive scrollytelling best practices</a></li>
+      <li><a href="https://posthog.com/newsletter/how-to-demo">PostHog · 24 tips for giving S-tier demos</a></li>
+      <li><a href="https://explorabl.es/">explorabl.es</a>: a hub of explorable explanations and tools</li>
+    </ul>
+
+    <h2>For the teacher</h2>
+    <div class="tip">
+      <p class="keys">Slides: <kbd>→</kbd> <kbd>←</kbd> move · <kbd>p</kbd> presenter view · <kbd>m</kbd> slide menu · <kbd>n</kbd> notes drawer · <kbd>f</kbd> fullscreen · <kbd>t</kbd> clock in footer.</p>
+    </div>
+  </div>
+</body>
+</html>

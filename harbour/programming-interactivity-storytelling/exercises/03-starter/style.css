@@ -1,0 +1,18 @@
+:root { --bg: #fbfaf7; --ink: #1d1f24; --muted: #6b7080; --line: #d9d6cf; --a: #2f62d6; --b: #d98a00; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root { --bg: #14161b; --ink: #eceef3; --muted: #9aa0ad; --line: #343843; --a: #7aa2ff; --b: #ffb547; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.5 system-ui, sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 1.6rem; }
+.story { min-height: 6em; } .story p { max-width: 60ch; margin: 0 0 8px; }
+.count, .alt { color: var(--muted); font-size: 0.95rem; }
+svg { width: 100%; height: auto; display: block; }
+.a { fill: var(--a); } .b { fill: var(--b); }
+.controls { display: grid; gap: 10px; margin: 16px 0; }
+.controls label { display: grid; grid-template-columns: 10em minmax(0, 1fr) 3em; gap: 12px; align-items: center; }
+.controls input { width: 100%; }
+.nav { display: flex; justify-content: space-between; margin-top: 18px; }
+button:disabled { opacity: 0.35; cursor: default; }
+button { font: inherit; padding: 6px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+:focus-visible { outline: 3px solid var(--b); outline-offset: 2px; }
+[hidden] { display: none !important; }
