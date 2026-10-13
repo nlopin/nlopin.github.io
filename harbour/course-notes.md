@@ -541,6 +541,15 @@ file, default vs named, AI code for the wrong major.
 project might use; import map, pinned, vendored; its cost in the Network and
 Performance panels.
 
+## Lecture 11 · "Tags that listen" (deck written)
+
+Deck: `programming-interactivity-11-elements-sensors/slides.html` (59
+slides). Teacher guide with clock times: `run-sheet.md`. Live build:
+`demos/green-room/01-wish` … `13-embedded` (Parley, a video-call app's green
+room). Act 1 · custom elements, Ex 1 `<star-rating>` (18 min), Act 2 ·
+camera, microphone and permissions, then the Web API jam (`jam/`, six briefs
+plus a gamepad spare), demoed over Zoom. Solution in `private/`, git-ignored.
+
 ## Open questions
 
 - Is the next class Friday of week 1 or Monday of week 2?

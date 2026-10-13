@@ -15,3 +15,6 @@ harbour/programming-interactivity-10-borrow/worker/dist/
 harbour/programming-interactivity-10-borrow/worker/.wrangler/
 harbour/programming-interactivity-10-borrow/worker/.dev.vars
 harbour/programming-interactivity-10-borrow/private/
+
+# Lecture 11 solutions
+harbour/programming-interactivity-11-elements-sensors/private/
