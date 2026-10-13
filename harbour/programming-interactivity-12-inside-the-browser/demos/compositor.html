@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who is drawing? — Lecture 12 demo</title>
+<style>
+  :root { --ink: #17140f; --paper: #f4efe6; --line: #d8cfbf; --hot: #ff5a36; --ok: #12a26f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 18px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); }
+  main { max-width: 980px; margin: 0 auto; padding: 24px; display: grid; gap: 20px; }
+  h1 { margin: 0; font-size: 28px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  button { font: 700 18px system-ui, sans-serif; padding: 10px 18px; border: 2px solid var(--ink); border-radius: 8px; background: var(--hot); color: #fff; cursor: pointer; }
+  select { font: 16px system-ui, sans-serif; padding: 6px 8px; }
+  #status { font: 600 16px ui-monospace, monospace; padding: 6px 10px; border-radius: 6px; background: #fff; border: 1px solid var(--line); }
+  #status.busy { background: var(--hot); color: #fff; border-color: var(--hot); }
+  .track { container-type: inline-size; position: relative; height: 64px; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .track span { position: absolute; left: 12px; top: 50%; translate: 0 -50%; font: 600 14px ui-monospace, monospace; color: #8a8173; }
+  .box { position: absolute; top: 8px; width: 48px; height: 48px; border-radius: 8px; background: var(--ink); }
+  /* both animations are CSS: the only difference is the property */
+  #by-left { animation: by-left 1.6s ease-in-out infinite alternate; }
+  #by-transform { left: 0; animation: by-transform 1.6s ease-in-out infinite alternate; background: var(--ok); }
+  #by-raf { left: 0; background: #2f49ff; }
+  @keyframes by-left { from { left: 0; } to { left: calc(100% - 48px); } }
+  @keyframes by-transform { from { transform: translateX(0); } to { transform: translateX(calc(100cqw - 48px)); } }
+  .feed { height: 260px; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 0 18px; }
+  .feed p { margin: 14px 0; }
+  label { font-size: 16px; }
+  @media (prefers-reduced-motion: reduce) { .box { animation-duration: 4s !important; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Who is drawing?</h1>
+  <div class="controls">
+    <button id="busy">Busy for 3 s</button>
+    <label>Wheel listener on the feed
+      <select id="wheel">
+        <option value="none">none</option>
+        <option value="passive">{ passive: true }</option>
+        <option value="blocking">{ passive: false }</option>
+      </select>
+    </label>
+    <span id="status">main thread: idle</span>
+  </div>
+
+  <div class="track"><span>CSS animation · left</span><div class="box" id="by-left"></div></div>
+  <div class="track"><span>CSS animation · transform</span><div class="box" id="by-transform"></div></div>
+  <div class="track"><span>requestAnimationFrame · transform</span><div class="box" id="by-raf"></div></div>
+
+  <div class="feed" id="feed"></div>
+</main>
+<script>
+  // the scroll feed: enough text to scroll for a while
+  const feed = document.getElementById("feed");
+  for (let i = 1; i <= 60; i++) {
+    const p = document.createElement("p");
+    p.textContent = `${i}. Cream the butter and sugar until pale, then beat in the eggs one at a time. Fold in the flour, keep the mixer slow.`;
+    feed.append(p);
+  }
+
+  // a box moved by JavaScript every frame: the main thread has to run for it to move
+  const raf = document.getElementById("by-raf");
+  const travel = () => raf.parentElement.clientWidth - 48;
+  (function tick(t) {
+    const x = (Math.sin(t / 510) + 1) / 2 * travel();
+    raf.style.transform = `translateX(${x}px)`;
+    requestAnimationFrame(tick);
+  })(0);
+
+  // three seconds of nothing but JavaScript
+  const status = document.getElementById("status");
+  document.getElementById("busy").addEventListener("click", () => {
+    status.textContent = "main thread: busy";
+    status.classList.add("busy");
+    // let the status paint first, then block
+    setTimeout(() => {
+      const end = performance.now() + 3000;
+      while (performance.now() < end) {}
+      status.textContent = "main thread: idle";
+      status.classList.remove("busy");
+    }, 50);
+  });
+
+  // a wheel listener on an element (not window/document/body) is not passive by default
+  const onWheel = () => {};
+  document.getElementById("wheel").addEventListener("change", (e) => {
+    feed.removeEventListener("wheel", onWheel, { passive: true });
+    feed.removeEventListener("wheel", onWheel, { passive: false });
+    if (e.target.value === "passive") feed.addEventListener("wheel", onWheel, { passive: true });
+    if (e.target.value === "blocking") feed.addEventListener("wheel", onWheel, { passive: false });
+  });
+</script>
+</body>
+</html>

